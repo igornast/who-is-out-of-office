@@ -1,0 +1,46 @@
+services:
+    nginx:
+        container_name: app_ooo_nginx
+        build:
+            context: ./
+            dockerfile: docker/nginx/Dockerfile
+            target: local
+        ports:
+            - "80:80"
+        environment:
+            PHP_HOST: app_ooo_php
+        volumes:
+            - ./app:/var/www
+        depends_on:
+            - php
+
+    php:
+        container_name: app_ooo_php
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+            target: local
+        environment:
+            PHP_IDE_CONFIG: '${PHP_IDE_CONFIG:-serverName=php_ooo}'
+            APP_ENV: dev
+        volumes:
+            - ./app:/var/www
+            - ./docker/php/conf/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+            - ./docker/php/conf/php.local.ini:/usr/local/etc/php/conf.d/docker-php-local.ini
+
+    db:
+        image: mysql:8
+        platform: linux/amd64
+        container_name: app_ooo_db
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_DATABASE: import_db
+            MYSQL_USER: mysql
+            MYSQL_PASSWORD: mysql
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql:/var/lib/mysql:delegated
+
+volumes:
+    mysql:
