@@ -47,24 +47,22 @@ ENV APP_ENV=prod
 
 WORKDIR /var/www
 
-#COPY app/composer.json app/composer.lock app/symfony.lock app/.env ./
-#
-#COPY app/composer.json app/composer.lock app/symfony.lock ./
-#COPY app/bin bin/
-#COPY app/config config/
-#COPY app/migrations migrations/
-#COPY app/public public/
-#COPY app/src src/
-#
-#RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-progress --no-interaction && \
-#    /var/www/bin/console cache:warmup
+COPY app/composer.json app/composer.lock app/symfony.lock app/.env ./
+
+COPY app/composer.json app/composer.lock app/symfony.lock ./
+COPY app/bin bin/
+COPY app/config config/
+COPY app/migrations migrations/
+COPY app/public public/
+COPY app/src src/
+
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-progress --no-interaction && \
+    /var/www/bin/console cache:warmup
 
 CMD ["start-fpm"]
 
 FROM app AS local
-RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash \
-    && apt-get install -y symfony-cli \
-    && docker-php-ext-enable xdebug
+RUN docker-php-ext-enable xdebug
 
 
 ENV APP_ENV=dev
