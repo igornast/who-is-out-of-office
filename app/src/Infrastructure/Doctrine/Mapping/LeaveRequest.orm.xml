@@ -1,0 +1,34 @@
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Infrastructure\Doctrine\Entity\LeaveRequest" table="leave_request">
+        <id name="id" column="id" type="integer" length="10">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="status" column="status" length="10"/>
+        <field name="workDays" type="integer" column="work_days" />
+        <field name="comment" column="comment" nullable="true" />
+        <field name="startDate" type="datetime_immutable" column="start_date" />
+        <field name="endDate" type="datetime_immutable" column="end_date" />
+
+        <many-to-one field="leaveType" target-entity="App\Infrastructure\Doctrine\Entity\LeaveType">
+            <join-column name="leave_type_id" nullable="false" />
+        </many-to-one>
+        <many-to-one field="user" target-entity="App\Infrastructure\Doctrine\Entity\User">
+            <join-column name="user_id" nullable="false" />
+        </many-to-one>
+        <many-to-one field="approvedBy" target-entity="App\Infrastructure\Doctrine\Entity\User">
+            <join-column name="approved_by_id" nullable="false" />
+        </many-to-one>
+
+        <field name="createdAt" column="created_at" type="datetime_immutable"/>
+        <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="preUpdate" method="updateTimestamp" />
+        </lifecycle-callbacks>
+    </entity>
+</doctrine-mapping>
