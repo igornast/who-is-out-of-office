@@ -4,8 +4,9 @@
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
     <entity name="App\Infrastructure\Doctrine\Entity\LeaveRequest" table="leave_request">
-        <id name="id" column="id" type="integer" length="10">
-            <generator strategy="AUTO"/>
+        <id name="id" type="uuid" column="id">
+            <generator strategy="CUSTOM"/>
+            <custom-id-generator class="Ramsey\Uuid\Doctrine\UuidGenerator" />
         </id>
 
         <field name="status" column="status" length="10"/>

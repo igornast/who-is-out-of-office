@@ -1,0 +1,57 @@
+# fixtures.yaml
+
+App\Infrastructure\Doctrine\Entity\User:
+    user_{1..10}:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: <firstName()>
+            lastName: <lastName()>
+            email: <email()>
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            role: 'ROLE_USER'
+            annualLeaveAllowance: <numberBetween(24, 30)>
+
+App\Infrastructure\Doctrine\Entity\LeaveType:
+    leave_type_vacation:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            name: 'Vacation'
+            description: 'Annual vacation leave'
+    leave_type_sick:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            name: 'Sick Leave'
+            description: 'Leave for sickness'
+
+App\Infrastructure\Doctrine\Entity\LeaveRequest:
+    leave_request_{1..10}:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: 'pending'
+            workDays: <numberBetween(1, 10)>
+            comment: <sentence()>
+            leaveType: '@leave_type_vacation'
+            user: '@user_<numberBetween(2, 10)>'
+            approvedBy: '@user_1'
+            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-20 days", "-15 days")->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-14 days", "-10 days")->format("Y-m-d H:i:s")))>'
+
+App\Infrastructure\Doctrine\Entity\HolidayCalendar:
+    holiday_calendar_fr:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            countryCode: 'FR'
+            countryName: 'France'
+    holiday_calendar_us:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            countryCode: 'US'
+            countryName: 'United States'
+
+App\Infrastructure\Doctrine\Entity\Holiday:
+    holiday_{1..5}:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            holidayCalendar: '@holiday_calendar_fr'
+            description: <word()>
+            date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeThisYear()->format("Y-m-d H:i:s")))>'

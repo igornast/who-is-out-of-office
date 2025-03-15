@@ -4,14 +4,15 @@
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
     <entity name="App\Infrastructure\Doctrine\Entity\Holiday" table="holiday">
-        <id name="id" column="id" type="integer" length="10">
-            <generator strategy="AUTO"/>
+        <id name="id" type="uuid" column="id">
+            <generator strategy="CUSTOM"/>
+            <custom-id-generator class="Ramsey\Uuid\Doctrine\UuidGenerator" />
         </id>
 
         <field name="description" column="description" length="255"/>
         <field name="date" type="datetime_immutable" column="date" />
 
-        <many-to-one field="holidayCalendar" target-entity="App\Infrastructure\Doctrine\Entity\HolidayCalendar">
+        <many-to-one field="holidayCalendar" target-entity="App\Infrastructure\Doctrine\Entity\HolidayCalendar" inversed-by="holidays">
             <join-column name="holiday_calendar_id" nullable="false" />
         </many-to-one>
 

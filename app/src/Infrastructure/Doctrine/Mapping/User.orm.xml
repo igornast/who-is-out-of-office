@@ -4,13 +4,15 @@
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
     <entity name="App\Infrastructure\Doctrine\Entity\User" table="user">
-        <id name="id" column="id" type="integer" length="10">
-            <generator strategy="AUTO"/>
+        <id name="id" type="uuid" column="id">
+            <generator strategy="CUSTOM"/>
+            <custom-id-generator class="Ramsey\Uuid\Doctrine\UuidGenerator" />
         </id>
 
         <field name="firstName" column="first_name" length="255"/>
         <field name="lastName" column="last_name" length="255"/>
         <field name="email" column="email" length="200" unique="true"/>
+        <field name="password" column="password" length="255" />
         <field name="role" column="role" length="200" />
         <field name="annualLeaveAllowance" column="annual_leave_allowance"  type="integer"/>
 

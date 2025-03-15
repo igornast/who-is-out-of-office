@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace App\Infrastructure\Doctrine\Entity;
 
 use App\Infrastructure\Traits\TimestampableTrait;
+use Ramsey\Uuid\UuidInterface;
 
 class LeaveType
 {
     use TimestampableTrait;
 
     public function __construct(
-        private string $name = '',
-        private ?int $id = null,
-        private ?string $description = null,
+        public UuidInterface $id,
+        public string $name,
+        public ?string $description = null,
     ) {
         $this->initializeTimestamps();
     }
