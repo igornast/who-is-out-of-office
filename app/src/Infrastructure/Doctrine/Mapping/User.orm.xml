@@ -13,7 +13,7 @@
         <field name="lastName" column="last_name" length="255"/>
         <field name="email" column="email" length="200" unique="true"/>
         <field name="password" column="password" length="255" />
-        <field name="role" column="role" length="200" />
+        <field name="roles" column="roles" type="json" />
         <field name="annualLeaveAllowance" column="annual_leave_allowance"  type="integer"/>
 
         <field name="createdAt" column="created_at" type="datetime_immutable"/>

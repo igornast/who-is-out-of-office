@@ -8,21 +8,43 @@ use App\Infrastructure\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampableTrait;
 
     public function __construct(
         public UuidInterface $id,
-        public string $firstName,
-        public string $lastName,
-        public string $email,
-        public string $password,
-        public string $role,
-        public int $annualLeaveAllowance = 24,
-        public ?Collection $leaveRequests = new ArrayCollection(),
+        public string        $firstName,
+        public string        $lastName,
+        public string        $email,
+        public string        $password,
+        public array        $roles = ['ROLE_USER'],
+        public int           $annualLeaveAllowance = 24,
+        public ?Collection   $leaveRequests = new ArrayCollection(),
     ) {
         $this->initializeTimestamps();
+    }
+
+    public function getRoles(): array
+    {
+        return array_unique(array_merge($this->roles, ['ROLE_USER']));
+    }
+
+    public function eraseCredentials(): void
+    {
+        return;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
     }
 }

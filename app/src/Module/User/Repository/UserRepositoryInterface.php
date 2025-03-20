@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Module\User\Repository;
+
+use App\Shared\DTO\UserDTO;
+
+interface UserRepositoryInterface
+{
+    /**
+     * @return UserDTO[]
+     */
+    public function findAll(): array;
+}

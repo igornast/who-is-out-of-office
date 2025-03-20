@@ -1,14 +1,32 @@
 # fixtures.yaml
 
 App\Infrastructure\Doctrine\Entity\User:
-    user_{1..10}:
+    user_1:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: <firstName()>
+            lastName: <lastName()>
+            email: 'admin@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_ADMIN']
+            annualLeaveAllowance: <numberBetween(24, 30)>
+    user_2:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: <firstName()>
+            lastName: <lastName()>
+            email: 'manager@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_MANAGER']
+            annualLeaveAllowance: <numberBetween(24, 30)>
+    user_{3..10}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: <firstName()>
             lastName: <lastName()>
             email: <email()>
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
-            role: 'ROLE_USER'
+            roles: ['ROLE_USER']
             annualLeaveAllowance: <numberBetween(24, 30)>
 
 App\Infrastructure\Doctrine\Entity\LeaveType:

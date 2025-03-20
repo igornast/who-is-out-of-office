@@ -1,0 +1,8 @@
+twig:
+    file_name_pattern: '*.twig'
+    paths:
+        'src/Module/Admin/template': 'AppAdmin'
+
+when@test:
+    twig:
+        strict_variables: true

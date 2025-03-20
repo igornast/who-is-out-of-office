@@ -17,20 +17,25 @@
         "doctrine/doctrine-bundle": "^2.13.2",
         "doctrine/doctrine-migrations-bundle": "^3.4.1",
         "doctrine/orm": "^3.3.2",
+        "easycorp/easyadmin-bundle": "^4.24",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.1",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
+        "symfony/expression-language": "7.2.*",
         "symfony/flex": "^2.5",
         "symfony/framework-bundle": "7.2.*",
         "symfony/monolog-bundle": "^3.10",
         "symfony/runtime": "7.2.*",
+        "symfony/twig-bundle": "7.2.*",
         "symfony/yaml": "7.2.*"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
         "friendsofphp/php-cs-fixer": "^3.71",
-        "nelmio/alice": "^3.14"
+        "nelmio/alice": "^3.14",
+        "symfony/stopwatch": "7.2.*",
+        "symfony/web-profiler-bundle": "7.2.*"
     },
     "config": {
         "allow-plugins": {
