@@ -11,7 +11,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $loader = new NativeLoader();
-        $objectSet = $loader->loadFile(__DIR__ . '/fixtures.yaml')->getObjects();
+        $objectSet = $loader->loadFile(__DIR__.'/fixtures.yaml')->getObjects();
 
         foreach ($objectSet as $object) {
             $manager->persist($object);

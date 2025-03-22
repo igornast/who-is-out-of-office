@@ -17,13 +17,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct(
         public UuidInterface $id,
-        public string        $firstName,
-        public string        $lastName,
-        public string        $email,
-        public string        $password,
-        public array        $roles = ['ROLE_USER'],
-        public int           $annualLeaveAllowance = 24,
-        public ?Collection   $leaveRequests = new ArrayCollection(),
+        public string $firstName,
+        public string $lastName,
+        public string $email,
+        public string $password,
+        public array $roles = ['ROLE_USER'],
+        public int $annualLeaveAllowance = 24,
+        public int $currentLeaveBalance = 24,
+        public ?Collection $leaveRequests = new ArrayCollection(),
     ) {
         $this->initializeTimestamps();
     }

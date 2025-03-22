@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Controller;
 
+use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
-use App\Shared\DTO\UserDTO;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -31,9 +31,10 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         return [
-//            MenuItem::linkToLogout('Logout', 'fa fa-exit'),
+            //            MenuItem::linkToLogout('Logout', 'fa fa-exit'),
             MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
             MenuItem::linkToCrud('My Team', 'fa fa-user', User::class),
+            MenuItem::linkToCrud('Leave Requests', 'fa fa-user', LeaveRequest::class),
         ];
     }
 }

@@ -15,6 +15,7 @@
         <field name="password" column="password" length="255" />
         <field name="roles" column="roles" type="json" />
         <field name="annualLeaveAllowance" column="annual_leave_allowance"  type="integer"/>
+        <field name="currentLeaveBalance" column="current_leave_balance"  type="integer"/>
 
         <field name="createdAt" column="created_at" type="datetime_immutable"/>
         <field name="updatedAt" column="updated_at" type="datetime_immutable"/>

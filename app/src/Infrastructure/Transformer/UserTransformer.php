@@ -17,7 +17,8 @@ class UserTransformer
             $user->lastName,
             $user->email,
             $user->roles,
-            $user->annualLeaveAllowance
+            $user->annualLeaveAllowance,
+            $user->currentLeaveBalance
         );
     }
 }

@@ -12,4 +12,8 @@ interface UserRepositoryInterface
      * @return UserDTO[]
      */
     public function findAll(): array;
+
+    public function findOneById(string $id): ?UserDTO;
+
+    public function save(UserDTO $userDTO): void;
 }

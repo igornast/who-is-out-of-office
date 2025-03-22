@@ -9,20 +9,18 @@
             <custom-id-generator class="Ramsey\Uuid\Doctrine\UuidGenerator" />
         </id>
 
-        <field name="status" column="status" length="10"/>
+        <field name="status" column="status" enum-type="App\Shared\Enum\LeaveRequestStatusEnum" length="30" />
+        <field name="leaveType" column="leave_type" enum-type="App\Shared\Enum\LeaveRequestTypeEnum" length="30" />
         <field name="workDays" type="integer" column="work_days" />
         <field name="comment" column="comment" nullable="true" />
         <field name="startDate" type="datetime_immutable" column="start_date" />
         <field name="endDate" type="datetime_immutable" column="end_date" />
 
-        <many-to-one field="leaveType" target-entity="App\Infrastructure\Doctrine\Entity\LeaveType">
-            <join-column name="leave_type_id" nullable="false" />
-        </many-to-one>
         <many-to-one field="user" target-entity="App\Infrastructure\Doctrine\Entity\User">
             <join-column name="user_id" nullable="false" />
         </many-to-one>
         <many-to-one field="approvedBy" target-entity="App\Infrastructure\Doctrine\Entity\User">
-            <join-column name="approved_by_id" nullable="false" />
+            <join-column name="approved_by_id" nullable="true" />
         </many-to-one>
 
         <field name="createdAt" column="created_at" type="datetime_immutable"/>
