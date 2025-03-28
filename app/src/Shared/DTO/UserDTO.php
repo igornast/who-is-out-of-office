@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Shared\DTO;
 
+use App\Infrastructure\Doctrine\Entity\User;
+
 class UserDTO
 {
     public function __construct(
@@ -14,6 +16,38 @@ class UserDTO
         public array $roles,
         public int $annualLeaveAllowance,
         public int $currentLeaveBalance,
+        public ?string $profileImageUrl = null,
+        public ?\DateTimeImmutable $birthDate = null,
     ) {
+    }
+
+    public static function fromEntity(User $user): UserDTO
+    {
+        return new self(
+            id: $user->id->toString(),
+            firstName: $user->firstName,
+            lastName: $user->lastName,
+            email: $user->email,
+            roles: $user->roles,
+            annualLeaveAllowance: $user->annualLeaveAllowance,
+            currentLeaveBalance: $user->currentLeaveBalance,
+            profileImageUrl: $user->profileImageUrl,
+            birthDate: $user->birthDate,
+        );
+    }
+
+    public static function fromArray(array $data): UserDTO
+    {
+        return new self(
+            id: $data['id'],
+            firstName: $data['first_name'],
+            lastName: $data['last_name'],
+            email: $data['email'],
+            roles: json_decode($data['roles'], true, flags: JSON_THROW_ON_ERROR),
+            annualLeaveAllowance: $data['annual_leave_allowance'],
+            currentLeaveBalance: $data['current_leave_balance'],
+            profileImageUrl: $data['profile_image_url'],
+            birthDate: \DateTimeImmutable::createFromFormat('Y-m-d', $data['birth_date']),
+        );
     }
 }

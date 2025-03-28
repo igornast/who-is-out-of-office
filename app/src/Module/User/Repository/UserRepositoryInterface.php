@@ -16,4 +16,9 @@ interface UserRepositoryInterface
     public function findOneById(string $id): ?UserDTO;
 
     public function save(UserDTO $userDTO): void;
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getUsersWithIncomingBirthdays(\DateTimeImmutable $start, \DateTimeImmutable $end): array;
 }

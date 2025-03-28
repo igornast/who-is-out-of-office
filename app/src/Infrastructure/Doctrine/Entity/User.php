@@ -24,6 +24,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public array $roles = ['ROLE_USER'],
         public int $annualLeaveAllowance = 24,
         public int $currentLeaveBalance = 24,
+        public ?string $profileImageUrl = null,
+        public ?\DateTimeImmutable $birthDate = null,
         public ?Collection $leaveRequests = new ArrayCollection(),
     ) {
         $this->initializeTimestamps();

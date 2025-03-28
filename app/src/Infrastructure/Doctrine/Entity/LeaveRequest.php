@@ -27,9 +27,4 @@ class LeaveRequest
     ) {
         $this->initializeTimestamps();
     }
-
-    public function getStartDate(): \DateTimeImmutable
-    {
-        return $this->startDate;
-    }
 }

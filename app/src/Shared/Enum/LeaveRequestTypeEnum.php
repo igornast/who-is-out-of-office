@@ -8,4 +8,12 @@ enum LeaveRequestTypeEnum: string
 {
     case SickLeave = 'sick_leave';
     case Vacation = 'vacation';
+
+    public static function getChoices(): array
+    {
+        return [
+            'Sick Leave' => self::SickLeave,
+            'Vacation' => self::Vacation,
+        ];
+    }
 }

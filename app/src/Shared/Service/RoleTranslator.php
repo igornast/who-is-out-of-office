@@ -22,12 +22,12 @@ class RoleTranslator
     {
         if (is_array($roles)) {
             $translated = array_map(function (string $role): string {
-                return $this->translator->trans($this->roleMapping[$role] ?? $role);
+                return $this->translator->trans(id: $this->roleMapping[$role] ?? $role, domain: 'admin');
             }, $roles);
 
             return implode(', ', $translated);
         }
 
-        return $this->translator->trans($this->roleMapping[$roles] ?? $roles);
+        return $this->translator->trans(id: $this->roleMapping[$roles] ?? $roles, domain: 'admin');
     }
 }

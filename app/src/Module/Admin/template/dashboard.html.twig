@@ -1,5 +1,30 @@
 {% extends '@EasyAdmin/layout.html.twig' %}
 
 {% block main %}
-    todo
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-3 mb-5 pe-md-3">
+                {% include '@AppAdmin/dashboard/_employ_info.html.twig' %}
+            </div>
+            <div class="col-12 col-md-9  ps-md-3">
+                <div class="row mb-5">
+                    <div class="col-md">
+                        <div class="row mb-lg-4">
+                            {% include '@AppAdmin/dashboard/_my_team.html.twig' %}
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-lg-5">
+                                {% include '@AppAdmin/dashboard/_upcoming_absences.html.twig' %}
+                            </div>
+                            <div class="col-12 col-lg-7">
+                                {% include '@AppAdmin/dashboard/_upcoming_birthdays.html.twig' %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 {% endblock main %}

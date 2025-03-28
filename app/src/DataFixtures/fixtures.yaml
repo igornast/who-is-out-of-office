@@ -1,5 +1,14 @@
 # fixtures.yaml
 
+parameters:
+    profileImages:
+        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+        - null
+
+
 App\Infrastructure\Doctrine\Entity\User:
     user_1:
         __construct:
@@ -11,6 +20,8 @@ App\Infrastructure\Doctrine\Entity\User:
             roles: ['ROLE_ADMIN']
             annualLeaveAllowance: 30
             currentLeaveBalance: 30
+            profileImageUrl: <randomElement($profileImages)>
+            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
     user_2:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -21,6 +32,8 @@ App\Infrastructure\Doctrine\Entity\User:
             roles: ['ROLE_MANAGER']
             annualLeaveAllowance: 30
             currentLeaveBalance: 30
+            profileImageUrl: <randomElement($profileImages)>
+            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
     user_{3..10}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -31,6 +44,8 @@ App\Infrastructure\Doctrine\Entity\User:
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
             currentLeaveBalance: 24
+            profileImageUrl: <randomElement($profileImages)>
+            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
 
 App\Infrastructure\Doctrine\Entity\LeaveRequest:
     leave_request_{1..10}:

@@ -1,0 +1,29 @@
+<div class="panel panel-primary mt-4">
+    <div class="panel-heading align-items-center pb-3">
+        <strong class="panel-title text-body-secondary mb-0">UPCOMING ABSENCES</strong>
+    </div>
+    <div class="panel-body">
+        <ul class="nav">
+            {% for leaveRequestDto in upcoming_absences_in_team %}
+                {% set userDto = leaveRequestDto.user %}
+                <li class="nav-item w-100">
+                    <div class="me-2 align-content-center mb-2"
+                         title="{{ userDto.firstName }} {{ userDto.lastName }}">
+                        <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}">
+                            {{ userDto.firstName }} {{ userDto.lastName }}
+                        </a>
+                        <span class="text-body-secondary"> - {{ leaveRequestDto.leaveType.value }} </span>
+                        <p class="text-body-secondary">
+                            {{ leaveRequestDto.startDate|date("Y.m.d") }} - {{ leaveRequestDto.endDate|date("Y.m.d") }}
+                        </p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% if upcoming_absences_in_team is empty %}
+            <div class="alert alert-secondary text-center" role="alert">
+                <span class="text-secondary text-lowercase">No upcoming absences</span>
+            </div>
+        {% endif %}
+    </div>
+</div>

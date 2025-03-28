@@ -16,6 +16,8 @@
         <field name="roles" column="roles" type="json" />
         <field name="annualLeaveAllowance" column="annual_leave_allowance"  type="integer"/>
         <field name="currentLeaveBalance" column="current_leave_balance"  type="integer"/>
+        <field name="profileImageUrl" column="profile_image_url" length="255" nullable="true" />
+        <field name="birthDate" column="birth_date" type="date_immutable" nullable="true" />
 
         <field name="createdAt" column="created_at" type="datetime_immutable"/>
         <field name="updatedAt" column="updated_at" type="datetime_immutable"/>

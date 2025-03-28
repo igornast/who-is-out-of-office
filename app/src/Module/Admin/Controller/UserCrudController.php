@@ -11,6 +11,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -38,11 +40,16 @@ class UserCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
+            FormField::addColumn(3),
+            ImageField::new('profileImageUrl'),
+
+            FormField::addColumn(9),
             TextField::new('firstName'),
             TextField::new('lastName'),
             TextField::new('email'),
             ArrayField::new('roles')
-                ->formatValue(fn (array $value, User $user): string => $this->roleTranslator->translate($value[0])),
+                ->hideOnDetail()
+                ->formatValue(fn (array $value, User $user): string => $this->roleTranslator->translate($value)),
         ];
     }
 }
