@@ -1,5 +1,7 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
+easyadmin:
+    resource: ../src/Module/**/*Controller.php
+    type: easyadmin.routes
+
+module.controllers:
+    resource: ../src/Module/**/*Controller.php
     type: attribute

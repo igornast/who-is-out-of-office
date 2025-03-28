@@ -1,0 +1,70 @@
+<div class="row mb-md-3">
+    <div class="col-md">
+        <div class="panel panel-primary">
+            <div class="panel-heading border-bottom mb-4 d-flex align-items-center pb-3">
+                <i class="fa-solid fa-user fa-lg me-3"></i>
+                <h6 class="panel-title text-body-emphasis mb-0">Employee</h6>
+            </div>
+            <div class="panel-body">
+                <h2>{{ user.firstName }} {{ user.lastName }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mb-5">
+    <div class="col-md">
+        <div class="panel panel-primary">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link d-flex gap-2 align-items-center"
+                       href="{{ url('app_dashboard_app_leave_request_index') }}">
+                        <span class="fs-6">Requests to approve</span>
+                        <span class="badge text-bg-primary rounded-pill ps-2 pe-2">{{ pending_requests|length }}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex gap-2 align-items-center"
+                       href="{{ url('app_dashboard_app_leave_request_index') }}">
+                        <span class="fs-6">Requests</span>
+                        <span class="badge text-bg-secondary rounded-pill ps-2 pe-2">{{ pending_requests|length }}</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md">
+        <div class="panel panel-primary">
+            <div class="panel-heading border-bottom mb-4 d-flex align-items-center pb-3">
+                <i class="fa-solid fa-plane-departure fa-lg me-3"></i>
+                <h6 class="panel-title text-body-emphasis mb-0">Absences</h6>
+            </div>
+            <div class="panel-body card">
+                <div class="card-body">
+                    <div class="col d-flex justify-content-between mb-2">
+                        <strong>TYPE</strong>
+                        <strong>BALANCE</strong>
+                    </div>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-con
+                        tent-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                Paid vacation
+                            </div>
+                            <span class="badge text-bg-primary rounded-pill ps-2 pe-2">
+                                {{ user.currentLeaveBalance }}
+                            </span>
+                        </li>
+                    </ul>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-secondary btn-lg"
+                           href="{{ url('app_dashboard_app_leave_request_new') }}">
+                            Request time off
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

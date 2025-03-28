@@ -1,0 +1,9 @@
+role:
+    admin: 'Administrator'
+    manager: 'Manager'
+    user: 'User'
+
+
+crud:
+    title:
+        leave_requests: Absence Requests

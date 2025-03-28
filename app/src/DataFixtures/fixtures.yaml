@@ -1,36 +1,60 @@
 # fixtures.yaml
 
+parameters:
+    profileImages:
+        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+        - null
+
+
 App\Infrastructure\Doctrine\Entity\User:
-    user_{1..10}:
+    user_1:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: <firstName()>
+            lastName: <lastName()>
+            email: 'admin@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_ADMIN']
+            annualLeaveAllowance: 30
+            currentLeaveBalance: 30
+            profileImageUrl: <randomElement($profileImages)>
+            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
+    user_2:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: <firstName()>
+            lastName: <lastName()>
+            email: 'manager@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_MANAGER']
+            annualLeaveAllowance: 30
+            currentLeaveBalance: 30
+            profileImageUrl: <randomElement($profileImages)>
+            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
+    user_{3..10}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: <firstName()>
             lastName: <lastName()>
             email: <email()>
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
-            role: 'ROLE_USER'
-            annualLeaveAllowance: <numberBetween(24, 30)>
-
-App\Infrastructure\Doctrine\Entity\LeaveType:
-    leave_type_vacation:
-        __construct:
-            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            name: 'Vacation'
-            description: 'Annual vacation leave'
-    leave_type_sick:
-        __construct:
-            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            name: 'Sick Leave'
-            description: 'Leave for sickness'
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 24
+            profileImageUrl: <randomElement($profileImages)>
+            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
 
 App\Infrastructure\Doctrine\Entity\LeaveRequest:
     leave_request_{1..10}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            status: 'pending'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from(["pending", "approved", "rejected", "cancelled", "withdrawn"][rand(0,4)]))>'
             workDays: <numberBetween(1, 10)>
             comment: <sentence()>
-            leaveType: '@leave_type_vacation'
+            leaveType: '<(App\Shared\Enum\LeaveRequestTypeEnum::from(["sick_leave", "vacation"][rand(0,1)]))>'
             user: '@user_<numberBetween(2, 10)>'
             approvedBy: '@user_1'
             startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-20 days", "-15 days")->format("Y-m-d H:i:s")))>'
