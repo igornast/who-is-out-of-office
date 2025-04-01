@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Module\Admin\EventSubscriber;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
+use App\Shared\DTO\LeaveRequestDTO;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
+use App\Shared\Facade\SlackFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
@@ -16,6 +18,7 @@ class LeaveRequestAdminSubscriber implements EventSubscriberInterface
     public function __construct(
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
         private readonly UserFacadeInterface $userFacade,
+        private readonly SlackFacadeInterface $slackFacade,
     ) {
     }
 
@@ -55,5 +58,7 @@ class LeaveRequestAdminSubscriber implements EventSubscriberInterface
             $leaveRequest->user->id->toString(),
             -$leaveRequest->workDays,
         );
+
+        $this->slackFacade->notifyOnNewLeaveRequest(LeaveRequestDTO::fromEntity($leaveRequest));
     }
 }

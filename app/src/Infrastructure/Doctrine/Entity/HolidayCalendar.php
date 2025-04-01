@@ -13,6 +13,9 @@ class HolidayCalendar
 {
     use TimestampableTrait;
 
+    /**
+     * @param Collection<int, Holiday> $holidays
+     */
     public function __construct(
         public UuidInterface $id,
         public string $countryCode,

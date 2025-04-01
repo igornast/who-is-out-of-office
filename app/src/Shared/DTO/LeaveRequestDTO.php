@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Shared\DTO;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
-use App\Infrastructure\Doctrine\Entity\User;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\LeaveRequestTypeEnum;
 
@@ -27,8 +26,8 @@ class LeaveRequestDTO
     public static function fromEntity(LeaveRequest $leaveRequest): self
     {
         $approver = null;
-        
-        if(null !== $leaveRequest->approvedBy) {
+
+        if (null !== $leaveRequest->approvedBy) {
             $approver = UserDTO::fromEntity($leaveRequest->approvedBy);
         }
 

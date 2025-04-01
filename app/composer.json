@@ -27,7 +27,9 @@
         "symfony/flex": "^2.5",
         "symfony/framework-bundle": "7.2.*",
         "symfony/monolog-bundle": "^3.10",
+        "symfony/notifier": "7.2.*",
         "symfony/runtime": "7.2.*",
+        "symfony/slack-notifier": "7.2.*",
         "symfony/twig-bundle": "7.2.*",
         "symfony/yaml": "7.2.*"
     },
@@ -35,6 +37,7 @@
         "doctrine/doctrine-fixtures-bundle": "^4.0",
         "friendsofphp/php-cs-fixer": "^3.71",
         "nelmio/alice": "^3.14",
+        "phpstan/phpstan": "^2.1",
         "symfony/stopwatch": "7.2.*",
         "symfony/web-profiler-bundle": "7.2.*"
     },

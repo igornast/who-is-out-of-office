@@ -49,7 +49,12 @@ class UserCrudController extends AbstractCrudController
             TextField::new('email'),
             ArrayField::new('roles')
                 ->hideOnDetail()
-                ->formatValue(fn (array $value, User $user): string => $this->roleTranslator->translate($value)),
+                ->formatValue(function (array $value, User $user): string {
+                    /** @var string[] $roles */
+                    $roles = $value;
+
+                    return $this->roleTranslator->translate($roles);
+                }),
         ];
     }
 }

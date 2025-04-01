@@ -8,7 +8,6 @@ use App\Infrastructure\Traits\TimestampableTrait;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\LeaveRequestTypeEnum;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class LeaveRequest
 {
@@ -16,7 +15,7 @@ class LeaveRequest
 
     public function __construct(
         public UuidInterface $id,
-        public UserInterface|User $user,
+        public User $user,
         public LeaveRequestStatusEnum $status,
         public LeaveRequestTypeEnum $leaveType,
         public \DateTimeImmutable $startDate,

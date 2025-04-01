@@ -15,6 +15,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampableTrait;
 
+    /**
+     * @param array<int, string> $roles
+     * @param Collection<int, LeaveRequest>|null $leaveRequests
+     */
     public function __construct(
         public UuidInterface $id,
         public string $firstName,

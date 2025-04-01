@@ -8,6 +8,9 @@ use App\Infrastructure\Doctrine\Entity\User;
 
 class UserDTO
 {
+    /**
+     * @param array<int, string> $roles
+     */
     public function __construct(
         public string $id,
         public string $firstName,

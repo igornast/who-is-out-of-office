@@ -13,6 +13,9 @@ class GetMyTeamUsersHandler
     {
     }
 
+    /**
+     * @return UserDTO[]
+     */
     public function handle(string $userId): array
     {
         return collect($this->userRepository->findAll())

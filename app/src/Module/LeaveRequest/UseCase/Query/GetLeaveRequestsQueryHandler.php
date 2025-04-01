@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Module\LeaveRequest\UseCase\Query;
 
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
+use App\Shared\DTO\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 
-class GetLeaveRequestsHandler
+class GetLeaveRequestsQueryHandler
 {
     public function __construct(
         private readonly LeaveRequestRepositoryInterface $repository,
@@ -16,6 +17,8 @@ class GetLeaveRequestsHandler
 
     /**
      * @param LeaveRequestStatusEnum[] $status
+     *
+     * @return LeaveRequestDTO[]
      */
     public function handle(string $userId, array $status): array
     {

@@ -32,6 +32,9 @@ final class UserFacade implements UserFacadeInterface
         return $this->getMyTeamUsersHandler->handle($userId);
     }
 
+    /**
+     * @return UserDTO[]
+     */
     public function getUsersWithIncomingBirthdays(): array
     {
         return $this->getUsersWithIncomingBirthdaysHandler->handle();
