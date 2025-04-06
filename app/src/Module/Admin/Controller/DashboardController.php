@@ -7,8 +7,8 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\LeaveRequest\LeaveRequestFacade;
-use App\Module\User\UserFacade;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Facade\UserFacadeInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -20,7 +20,7 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private readonly LeaveRequestFacade $leaveRequestFacade,
-        private readonly UserFacade $userFacade,
+        private readonly UserFacadeInterface $userFacade,
     ) {
     }
 
@@ -49,6 +49,7 @@ class DashboardController extends AbstractDashboardController
                 [LeaveRequestStatusEnum::Pending]
             ),
             'upcoming_absences_in_team' => $this->leaveRequestFacade->getUpcomingLeaveRequests(),
+            'slack_integration' => $user->slackIntegration
         ];
 
         return $this->render('@AppAdmin/dashboard.html.twig', $parameters);

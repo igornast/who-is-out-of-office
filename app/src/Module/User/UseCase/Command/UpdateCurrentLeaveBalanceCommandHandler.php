@@ -6,7 +6,7 @@ namespace App\Module\User\UseCase\Command;
 
 use App\Module\User\Repository\UserRepositoryInterface;
 
-class UpdateCurrentLeaveBalanceHandler
+class UpdateCurrentLeaveBalanceCommandHandler
 {
     public function __construct(private readonly UserRepositoryInterface $userRepository)
     {

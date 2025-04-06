@@ -11,7 +11,7 @@ use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;
 
-class NotifyNewLeaveRequestHandler
+class NotifyNewLeaveRequestCommandHandler
 {
     public function __construct(
         #[Autowire(env: 'SLACK_AR_APPROVE_CHANNEL_ID')]

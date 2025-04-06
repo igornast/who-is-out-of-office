@@ -20,6 +20,7 @@ class UserDTO
         public int $annualLeaveAllowance,
         public int $currentLeaveBalance,
         public ?string $profileImageUrl = null,
+        public ?string $slackMemberId = null,
         public ?\DateTimeImmutable $birthDate = null,
     ) {
     }
@@ -35,6 +36,7 @@ class UserDTO
             annualLeaveAllowance: $user->annualLeaveAllowance,
             currentLeaveBalance: $user->currentLeaveBalance,
             profileImageUrl: $user->profileImageUrl,
+            slackMemberId: $user->slackIntegration?->slackMemberId,
             birthDate: $user->birthDate,
         );
     }

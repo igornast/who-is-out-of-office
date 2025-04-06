@@ -21,4 +21,6 @@ interface UserRepositoryInterface
      * @return UserDTO[]
      */
     public function getUsersWithIncomingBirthdays(\DateTimeImmutable $start, \DateTimeImmutable $end): array;
+
+    public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO;
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Slack\Controller;
 
+use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
 use App\Infrastructure\Slack\Service\RequestVerifier;
-use App\Shared\DTO\Slack\InteractiveNotificationDTO;
 use App\Shared\Facade\SlackFacadeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

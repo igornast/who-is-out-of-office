@@ -1,0 +1,13 @@
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+<entity name="App\Infrastructure\Doctrine\Entity\UserSlackIntegration" table="user_slack_integration">
+        <id name="user" association-key="true" />
+        <one-to-one field="user" target-entity="App\Infrastructure\Doctrine\Entity\User" inversed-by="slackIntegration">
+            <join-column name="user_id" referenced-column-name="id" on-delete="CASCADE" />
+        </one-to-one>
+
+        <field name="slackMemberId" column="slack_member_id" length="100" unique="true" />
+    </entity>
+</doctrine-mapping>

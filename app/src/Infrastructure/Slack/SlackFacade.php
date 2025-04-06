@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Slack;
 
-use App\Infrastructure\Slack\UseCase\Command\InteractiveNotificationRequestHandler;
-use App\Infrastructure\Slack\UseCase\Command\NotifyNewLeaveRequestHandler;
+use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
+use App\Infrastructure\Slack\UseCase\Command\NotifyUserLeaveRequestStatusChangeCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\UpdateLeaveRequestWithInteractiveNotificationCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\NotifyNewLeaveRequestCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\SendChangeConfirmationToAbsenceChannelCommandHandler;
 use App\Shared\DTO\LeaveRequestDTO;
-use App\Shared\DTO\Slack\InteractiveNotificationDTO;
 use App\Shared\Facade\SlackFacadeInterface;
 
 final class SlackFacade implements SlackFacadeInterface
 {
     public function __construct(
-        private readonly NotifyNewLeaveRequestHandler $notifyNewLeaveRequestHandler,
-        private readonly InteractiveNotificationRequestHandler $notificationRequestHandler,
+        private readonly NotifyNewLeaveRequestCommandHandler $notifyNewLeaveRequestHandler,
+        private readonly UpdateLeaveRequestWithInteractiveNotificationCommandHandler $interactiveNotificationHandler,
+        private readonly SendChangeConfirmationToAbsenceChannelCommandHandler $sendConfirmationToChannelHandler,
+        private readonly NotifyUserLeaveRequestStatusChangeCommandHandler $notifyUserCommandHandler,
     ) {
     }
 
@@ -25,6 +29,9 @@ final class SlackFacade implements SlackFacadeInterface
 
     public function handleInteractiveNotification(InteractiveNotificationDTO $interactiveNotificationDTO): void
     {
-        $this->notificationRequestHandler->handle($interactiveNotificationDTO);
+        $leaveRequestDTO = $this->interactiveNotificationHandler->handle($interactiveNotificationDTO);
+
+        $this->sendConfirmationToChannelHandler->handle($leaveRequestDTO, $interactiveNotificationDTO);
+        $this->notifyUserCommandHandler->handle($leaveRequestDTO);
     }
 }

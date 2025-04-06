@@ -94,4 +94,23 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
 
         return $userDTOs;
     }
+
+    public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO
+    {
+        $em = $this->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+            ->from(User::class, 'u')
+            ->join('u.slackIntegration', 'si')
+            ->where('si.slackMemberId = :slackMemberId')
+            ->setParameter('slackMemberId', $slackMemberId);
+
+        $user = $qb->getQuery()->getOneOrNullResult();
+
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        return UserDTO::fromEntity($user);
+    }
 }

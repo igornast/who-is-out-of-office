@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\DTO\Slack;
+namespace App\Infrastructure\Slack\DTO\Slack;
 
 use App\Shared\Enum\LeaveRequestStatusEnum;
 
@@ -14,6 +14,7 @@ class InteractiveNotificationDTO
         public readonly string $identifier,
         public readonly string $channel,
         public readonly ?string $responseUrl,
+        public readonly ?string $memberId,
     ) {
     }
 
@@ -41,6 +42,7 @@ class InteractiveNotificationDTO
             identifier: $identifier,
             channel: $payload['channel']['id'] ?? '',
             responseUrl: $payload['response_url'] ?? null,
+            memberId: $payload['user']['id'] ?? null,
         );
     }
 }

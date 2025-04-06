@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Doctrine\Repository;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
+use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
@@ -37,8 +38,14 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
             return;
         }
 
+        $approvedBy = null;
+        $approver = $leaveRequestDTO->approvedBy;
+        if (null !== $approver) {
+            $approvedBy = $this->getUserOrNull($approver->id);
+        }
+
         $leaveRequestEntity->status = $leaveRequestDTO->status;
-        $leaveRequestEntity->approvedBy = $leaveRequestDTO->approvedBy;
+        $leaveRequestEntity->approvedBy = $approvedBy;
 
         $this->getEntityManager()->persist($leaveRequestEntity);
         $this->getEntityManager()->flush();
@@ -79,5 +86,18 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
 
         return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
 
+    }
+
+    private function getUserOrNull(string $userId): ?User
+    {
+        $em = $this->getEntityManager();
+        $qb = $em->createQueryBuilder();
+
+        return $qb->select('u')
+            ->from(User::class, 'u')
+            ->where('u.id = :id')
+            ->setParameter('id', $userId)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

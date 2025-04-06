@@ -1,7 +1,9 @@
 {
   "payload": {
     "type": "block_actions",
-    "user": {},
+    "user": {
+      "id": "123-member-id"
+    },
     "api_app_id": "",
     "token": "",
     "container": {},
@@ -27,7 +29,7 @@
           "text": "Approve",
           "emoji": true
         },
-        "value": "leave-request_approve_request-approve-id",
+        "value": "leave-request_approved_request-approve-id",
         "style": "primary",
         "type": "button",
         "action_ts": ""

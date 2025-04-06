@@ -1,0 +1,42 @@
+<div class="row">
+    <div class="col-md">
+        <div class="panel panel-primary">
+            <div class="panel-heading border-bottom mb-4 d-flex align-items-center pb-3">
+                <i class="fa-brands fa-slack fa-xl me-3"></i>
+                <h6 class="panel-title text-body-emphasis mb-0">Slack Notifications</h6>
+            </div>
+            <div class="panel-body card">
+                <div class="card-body">
+                    {% if slack_integration is null %}
+                        <div class="col d-flex justify-content-between mb-2">
+                            <p>
+                                You haven't configured your Slack member ID yet.<br>
+                                Add your Slack member ID to receive notifications when your leave request status
+                                changes.
+                            </p>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a class="btn btn-primary btn-lg"
+                               href="{{ url('app_dashboard_slack_integration_new') }}">
+                                Add member ID
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="col d-flex justify-content-between mb-2">
+                            <p>
+                                Your Slack Member ID: {{ user.slackIntegration.slackMemberId }}
+                            </p>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <a class="btn btn-primary btn-lg"
+                               href="{{ url('app_dashboard_slack_integration_edit', {'entityId': user.id}) }}">
+                                Edit
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

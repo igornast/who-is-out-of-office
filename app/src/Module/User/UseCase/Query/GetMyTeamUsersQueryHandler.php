@@ -7,7 +7,7 @@ namespace App\Module\User\UseCase\Query;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Shared\DTO\UserDTO;
 
-class GetMyTeamUsersHandler
+class GetMyTeamUsersQueryHandler
 {
     public function __construct(private readonly UserRepositoryInterface $userRepository)
     {
