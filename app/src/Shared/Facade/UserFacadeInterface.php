@@ -15,4 +15,9 @@ interface UserFacadeInterface
     public function getUsersWithIncomingBirthdays(): array;
 
     public function getUserBySlackMemberId(string $slackMemberId): ?UserDTO;
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getUsersWithBirthdaysForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
 }

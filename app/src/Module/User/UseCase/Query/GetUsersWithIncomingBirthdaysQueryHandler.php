@@ -22,8 +22,8 @@ class GetUsersWithIncomingBirthdaysQueryHandler
             $end = new \DateTimeImmutable('+ 20 days');
         }
 
-        return $this->userRepository->getUsersWithIncomingBirthdays(
-            start:  new \DateTimeImmutable(),
+        return $this->userRepository->findUsersWithIncomingBirthdays(
+            start:  new \DateTimeImmutable()->setTime(0, 0, 0),
             end: $end,
         );
     }

@@ -24,4 +24,9 @@ interface LeaveRequestRepositoryInterface
     public function findById(string $id): ?LeaveRequestDTO;
 
     public function update(LeaveRequestDTO $leaveRequestDTO): void;
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findApprovedForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
 }

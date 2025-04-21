@@ -10,14 +10,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Validator\Constraints\Unique;
 
 class SlackIntegrationCrudController extends AppAbstractCrudController
 {
-
     public static function getEntityFqcn(): string
     {
         return UserSlackIntegration::class;
@@ -34,7 +31,7 @@ class SlackIntegrationCrudController extends AppAbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('slackMemberId')
+            TextField::new('slackMemberId'),
         ];
     }
 
@@ -55,7 +52,7 @@ class SlackIntegrationCrudController extends AppAbstractCrudController
 
         $this->addFlash(
             type: 'success',
-            message: $action === Action::NEW ? 'flash.crud.slack-integration.success.new' : 'flash.crud.slack-integration.success.edit',
+            message: Action::NEW === $action ? 'flash.crud.slack-integration.success.new' : 'flash.crud.slack-integration.success.edit',
         );
 
         return $this->redirect($url);

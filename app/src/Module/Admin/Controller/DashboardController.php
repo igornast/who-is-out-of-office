@@ -49,7 +49,7 @@ class DashboardController extends AbstractDashboardController
                 [LeaveRequestStatusEnum::Pending]
             ),
             'upcoming_absences_in_team' => $this->leaveRequestFacade->getUpcomingLeaveRequests(),
-            'slack_integration' => $user->slackIntegration
+            'slack_integration' => $user->slackIntegration,
         ];
 
         return $this->render('@AppAdmin/dashboard.html.twig', $parameters);

@@ -58,7 +58,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $em->flush();
     }
 
-    public function getUsersWithIncomingBirthdays(\DateTimeImmutable $start, \DateTimeImmutable $end): array
+    public function findUsersWithIncomingBirthdays(\DateTimeImmutable $start, \DateTimeImmutable $end): array
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();

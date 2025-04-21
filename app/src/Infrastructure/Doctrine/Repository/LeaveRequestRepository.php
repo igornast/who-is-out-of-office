@@ -68,7 +68,7 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
      */
     public function findUpcomingApprovedAbsences(int $limit = 4): array
     {
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable()->setTime(0, 0, 0);
         $endInterval = $now->modify('+30 days');
 
         $qb = $this->createQueryBuilder('lr');
@@ -99,5 +99,24 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
             ->setParameter('id', $userId)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findApprovedForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        $qb = $this->createQueryBuilder('lr');
+        $items = $qb->where('lr.status = :approved')
+            ->andWhere('lr.startDate <= :end')
+            ->andWhere('lr.endDate   >= :start')
+            ->setParameter('approved', LeaveRequestStatusEnum::Approved)
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->orderBy('lr.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
     }
 }

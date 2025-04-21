@@ -8,7 +8,7 @@ use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 
-class GetLeaveRequestsQueryHandler
+class GetLeaveRequestsForUserQueryHandler
 {
     public function __construct(
         private readonly LeaveRequestRepositoryInterface $repository,

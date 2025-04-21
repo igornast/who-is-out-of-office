@@ -9,6 +9,7 @@ use App\Infrastructure\Slack\UseCase\Command\NotifyUserLeaveRequestStatusChangeC
 use App\Infrastructure\Slack\UseCase\Command\UpdateLeaveRequestWithInteractiveNotificationCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\NotifyNewLeaveRequestCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\SendChangeConfirmationToAbsenceChannelCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\WeeklyDigestNotificationCommandHandler;
 use App\Shared\DTO\LeaveRequestDTO;
 use App\Shared\Facade\SlackFacadeInterface;
 
@@ -19,6 +20,7 @@ final class SlackFacade implements SlackFacadeInterface
         private readonly UpdateLeaveRequestWithInteractiveNotificationCommandHandler $interactiveNotificationHandler,
         private readonly SendChangeConfirmationToAbsenceChannelCommandHandler $sendConfirmationToChannelHandler,
         private readonly NotifyUserLeaveRequestStatusChangeCommandHandler $notifyUserCommandHandler,
+        private readonly WeeklyDigestNotificationCommandHandler $weeklyNotificationHandler,
     ) {
     }
 
@@ -33,5 +35,10 @@ final class SlackFacade implements SlackFacadeInterface
 
         $this->sendConfirmationToChannelHandler->handle($leaveRequestDTO, $interactiveNotificationDTO);
         $this->notifyUserCommandHandler->handle($leaveRequestDTO);
+    }
+
+    public function sendWeeklyDigestNotification(): void
+    {
+        $this->weeklyNotificationHandler->handle();
     }
 }

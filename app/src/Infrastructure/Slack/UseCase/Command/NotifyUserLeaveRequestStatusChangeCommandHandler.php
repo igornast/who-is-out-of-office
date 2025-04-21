@@ -20,7 +20,7 @@ class NotifyUserLeaveRequestStatusChangeCommandHandler
     {
 
         $slackMemberId = $leaveRequestDTO->user->slackMemberId;
-        if (null === $slackMemberId) {
+        if (empty($slackMemberId)) {
             return;
         }
 
@@ -34,6 +34,9 @@ class NotifyUserLeaveRequestStatusChangeCommandHandler
                         'text' => 'Absence request status change',
                         'emoji' => true,
                     ],
+                ],
+                [
+                    'type' => 'divider',
                 ],
                 [
                     'type' => 'section',

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Module\LeaveRequest;
 
 use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestCommandHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetApprovedLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetCalculateWorkDaysQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
-use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
 use App\Shared\DTO\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
@@ -17,10 +18,11 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
 {
     public function __construct(
         private readonly GetCalculateWorkDaysQueryHandler $getCalculateWorkDaysHandler,
-        private readonly GetLeaveRequestsQueryHandler $getLeaveRequestsHandler,
+        private readonly GetLeaveRequestsForUserQueryHandler $getLeaveRequestsHandler,
         private readonly GetLeaveRequestQueryHandler $getLeaveRequestHandler,
         private readonly GetUpcomingLeaveRequestsQueryHandler $getUpcomingLeaveRequestsHandler,
         private readonly UpdateLeaveRequestCommandHandler $updateLeaveRequestCommandHandler,
+        private readonly GetApprovedLeaveRequestsForDatesQueryHandler $getLeaveRequestForDatesHandler,
     ) {
     }
 
@@ -55,5 +57,10 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function update(LeaveRequestDTO $leaveRequestDTO): void
     {
         $this->updateLeaveRequestCommandHandler->handle($leaveRequestDTO);
+    }
+
+    public function getApprovedLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        return $this->getLeaveRequestForDatesHandler->handle($startDate, $endDate);
     }
 }

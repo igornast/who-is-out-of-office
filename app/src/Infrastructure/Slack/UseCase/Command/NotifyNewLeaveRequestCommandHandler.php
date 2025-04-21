@@ -38,6 +38,9 @@ class NotifyNewLeaveRequestCommandHandler
                     ],
                 ],
                 [
+                    'type' => 'divider',
+                ],
+                [
                     'type' => 'section',
                     'fields' => [
                         [
@@ -72,7 +75,7 @@ class NotifyNewLeaveRequestCommandHandler
                     'elements' => [
                         [
                             'type' => 'button',
-                            'text' => ['type' => 'plain_text', 'text' => 'Approve', 'emoji' => true],
+                            'text' => ['type' => 'plain_text', 'text' => ' ✅ Approve ', 'emoji' => true],
                             'style' => 'primary',
                             'value' => sprintf(
                                 'leave-request_%s_%s',
@@ -82,8 +85,7 @@ class NotifyNewLeaveRequestCommandHandler
                         ],
                         [
                             'type' => 'button',
-                            'text' => ['type' => 'plain_text', 'text' => 'Reject', 'emoji' => true],
-                            'style' => 'danger',
+                            'text' => ['type' => 'plain_text', 'text' => ' 🚫 Reject ', 'emoji' => true],
                             'value' => sprintf(
                                 'leave-request_%s_%s',
                                 LeaveRequestStatusEnum::Rejected->value,
@@ -95,6 +97,6 @@ class NotifyNewLeaveRequestCommandHandler
             ],
         ]);
 
-        $this->chatter->send(new ChatMessage('New Absence Request')->options($options));
+        $this->chatter->send(new ChatMessage('Absence Approval Request')->options($options));
     }
 }

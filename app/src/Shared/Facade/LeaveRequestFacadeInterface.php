@@ -13,4 +13,9 @@ interface LeaveRequestFacadeInterface
     public function getById(string $id): ?LeaveRequestDTO;
 
     public function update(LeaveRequestDTO $leaveRequestDTO): void;
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function getApprovedLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
 }

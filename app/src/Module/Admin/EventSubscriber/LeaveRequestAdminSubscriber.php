@@ -6,6 +6,7 @@ namespace App\Module\Admin\EventSubscriber;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\Enum\LeaveRequestTypeEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\SlackFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
@@ -54,10 +55,12 @@ class LeaveRequestAdminSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->userFacade->updateUserCurrentLeaveBalance(
-            $leaveRequest->user->id->toString(),
-            -$leaveRequest->workDays,
-        );
+        if (LeaveRequestTypeEnum::Vacation === $leaveRequest->leaveType) {
+            $this->userFacade->updateUserCurrentLeaveBalance(
+                $leaveRequest->user->id->toString(),
+                -$leaveRequest->workDays,
+            );
+        }
 
         $this->slackFacade->notifyOnNewLeaveRequest(LeaveRequestDTO::fromEntity($leaveRequest));
     }
