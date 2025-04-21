@@ -1,1 +1,6 @@
-~
+flash:
+    crud:
+        slack-integration:
+            success:
+                new: 'Member Id added successfully.'
+                edit: 'Member Id updated successfully.'

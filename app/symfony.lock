@@ -74,6 +74,32 @@
             "config/packages/nelmio_alice.yaml"
         ]
     },
+    "phpstan/phpstan": {
+        "version": "2.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "5e490cc197fb6bb1ae22e5abbc531ddc633b6767"
+        },
+        "files": [
+            "phpstan.dist.neon"
+        ]
+    },
+    "phpunit/phpunit": {
+        "version": "12.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "10.0",
+            "ref": "b786e93f0b38027289867faca488b8c511436fe0"
+        },
+        "files": [
+            ".env.test",
+            "phpunit.dist.xml",
+            "tests/bootstrap.php"
+        ]
+    },
     "ramsey/uuid-doctrine": {
         "version": "2.1",
         "recipe": {
@@ -154,6 +180,18 @@
             "config/packages/monolog.yaml"
         ]
     },
+    "symfony/notifier": {
+        "version": "7.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.0",
+            "ref": "178877daf79d2dbd62129dd03612cb1a2cb407cc"
+        },
+        "files": [
+            "config/packages/notifier.yaml"
+        ]
+    },
     "symfony/routing": {
         "version": "7.2",
         "recipe": {
@@ -179,6 +217,15 @@
             "config/packages/security.yaml",
             "config/routes/security.yaml"
         ]
+    },
+    "symfony/slack-notifier": {
+        "version": "7.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.2",
+            "ref": "8fb9603326990013efbe6d71c2dd78ada316808a"
+        }
     },
     "symfony/translation": {
         "version": "7.2",

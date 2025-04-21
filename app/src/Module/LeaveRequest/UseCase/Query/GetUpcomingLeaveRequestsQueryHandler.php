@@ -6,9 +6,8 @@ namespace App\Module\LeaveRequest\UseCase\Query;
 
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequestDTO;
-use App\Shared\Enum\LeaveRequestStatusEnum;
 
-class GetUpcomingLeaveRequestsHandler
+class GetUpcomingLeaveRequestsQueryHandler
 {
     public function __construct(
         private readonly LeaveRequestRepositoryInterface $repository,

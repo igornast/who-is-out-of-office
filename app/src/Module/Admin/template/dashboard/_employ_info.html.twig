@@ -15,13 +15,15 @@
     <div class="col-md">
         <div class="panel panel-primary">
             <ul class="nav">
-                <li class="nav-item">
-                    <a class="nav-link d-flex gap-2 align-items-center"
-                       href="{{ url('app_dashboard_app_leave_request_index') }}">
-                        <span class="fs-6">Requests to approve</span>
-                        <span class="badge text-bg-primary rounded-pill ps-2 pe-2">{{ pending_requests|length }}</span>
-                    </a>
-                </li>
+                {% if is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex gap-2 align-items-center"
+                           href="{{ url('app_dashboard_app_leave_request_index') }}">
+                            <span class="fs-6">Requests to approve</span>
+                            <span class="badge text-bg-primary rounded-pill ps-2 pe-2">{{ pending_requests|length }}</span>
+                        </a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link d-flex gap-2 align-items-center"
                        href="{{ url('app_dashboard_app_leave_request_index') }}">
@@ -33,7 +35,7 @@
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row mb-5">
     <div class="col-md">
         <div class="panel panel-primary">
             <div class="panel-heading border-bottom mb-4 d-flex align-items-center pb-3">

@@ -8,6 +8,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RoleTranslator
 {
+    /**
+     * @var array<string, string>
+     */
     private array $roleMapping = [
         'ROLE_ADMIN' => 'role.admin',
         'ROLE_MANAGER' => 'role.manager',
@@ -18,16 +21,15 @@ class RoleTranslator
     {
     }
 
-    public function translate(string|array $roles): string
+    /**
+     * @param string[] $roles
+     */
+    public function translate(array $roles): string
     {
-        if (is_array($roles)) {
-            $translated = array_map(function (string $role): string {
-                return $this->translator->trans(id: $this->roleMapping[$role] ?? $role, domain: 'admin');
-            }, $roles);
+        $translated = array_map(function (string $role): string {
+            return $this->translator->trans(id: $this->roleMapping[$role] ?? $role, domain: 'admin');
+        }, $roles);
 
-            return implode(', ', $translated);
-        }
-
-        return $this->translator->trans(id: $this->roleMapping[$roles] ?? $roles, domain: 'admin');
+        return implode(', ', $translated);
     }
 }

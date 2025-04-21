@@ -7,8 +7,8 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\LeaveRequest\LeaveRequestFacade;
-use App\Module\User\UserFacade;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Facade\UserFacadeInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -20,7 +20,7 @@ class DashboardController extends AbstractDashboardController
 {
     public function __construct(
         private readonly LeaveRequestFacade $leaveRequestFacade,
-        private readonly UserFacade $userFacade,
+        private readonly UserFacadeInterface $userFacade,
     ) {
     }
 
@@ -41,6 +41,7 @@ class DashboardController extends AbstractDashboardController
 
         $parameters = [
             'user' => $user,
+            'is_admin' => $this->isAdmin(),
             'my_team' => $this->userFacade->getMyTeamUsers($userId),
             'users_with_birthdays' => $this->userFacade->getUsersWithIncomingBirthdays(),
             'pending_requests' => $this->leaveRequestFacade->getLeaveRequestsForUser(
@@ -48,6 +49,7 @@ class DashboardController extends AbstractDashboardController
                 [LeaveRequestStatusEnum::Pending]
             ),
             'upcoming_absences_in_team' => $this->leaveRequestFacade->getUpcomingLeaveRequests(),
+            'slack_integration' => $user->slackIntegration,
         ];
 
         return $this->render('@AppAdmin/dashboard.html.twig', $parameters);
@@ -61,7 +63,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToLogout('Logout', 'fa fa-right-from-bracket'),
             MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
             ...($this->isAdmin() ? [$teamCrudLink] : []),
-            MenuItem::linkToCrud('Leave Requests', 'fa fa-bell', LeaveRequest::class),
+            MenuItem::linkToCrud('Absence Requests', 'fa fa-calendar-plus', LeaveRequest::class),
         ];
     }
 

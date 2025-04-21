@@ -7,3 +7,7 @@ role:
 crud:
     title:
         leave_requests: Absence Requests
+
+    actions:
+        leave_requests:
+            new: Add Absence Request

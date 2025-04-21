@@ -4,18 +4,22 @@ declare(strict_types=1);
 
 namespace App\Module\User;
 
-use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceHandler;
-use App\Module\User\UseCase\Query\GetMyTeamUsersHandler;
-use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysHandler;
+use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
+use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
+use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
+use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDates;
+use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Facade\UserFacadeInterface;
 
 final class UserFacade implements UserFacadeInterface
 {
     public function __construct(
-        private readonly UpdateCurrentLeaveBalanceHandler $updateCurrentLeaveBalanceHandler,
-        private readonly GetMyTeamUsersHandler $getMyTeamUsersHandler,
-        private readonly GetUsersWithIncomingBirthdaysHandler $getUsersWithIncomingBirthdaysHandler,
+        private readonly UpdateCurrentLeaveBalanceCommandHandler $updateCurrentLeaveBalanceHandler,
+        private readonly GetMyTeamUsersQueryHandler $getMyTeamUsersHandler,
+        private readonly GetUsersWithIncomingBirthdaysQueryHandler $getUsersWithIncomingBirthdaysHandler,
+        private readonly GetUserBySlackMemberIdQueryHandler $getUserBySlackMemberIdQueryHandler,
+        private readonly GetUsersWithBirthdaysForDates $getUsersWithBirthdaysForDatesHandler,
     ) {
     }
 
@@ -32,8 +36,21 @@ final class UserFacade implements UserFacadeInterface
         return $this->getMyTeamUsersHandler->handle($userId);
     }
 
+    /**
+     * @return UserDTO[]
+     */
     public function getUsersWithIncomingBirthdays(): array
     {
         return $this->getUsersWithIncomingBirthdaysHandler->handle();
+    }
+
+    public function getUserBySlackMemberId(string $slackMemberId): ?UserDTO
+    {
+        return $this->getUserBySlackMemberIdQueryHandler->handle($slackMemberId);
+    }
+
+    public function getUsersWithBirthdaysForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        return $this->getUsersWithBirthdaysForDatesHandler->handle($startDate, $endDate);
     }
 }

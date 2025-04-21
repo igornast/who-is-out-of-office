@@ -41,6 +41,11 @@ class LeaveRequestCrudController extends AppAbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
+            ->update(
+                Crud::PAGE_INDEX,
+                Action::NEW,
+                fn (Action $action) => $action->setIcon('fa fa-plus')->setLabel('crud.actions.leave_requests.new')
+            )
             ->disable(Action::DELETE, Action::EDIT);
     }
 

@@ -12,6 +12,9 @@ enum LeaveRequestStatusEnum: string
     case Cancelled = 'cancelled';
     case Withdrawn = 'withdrawn';
 
+    /**
+     * @return array<string, LeaveRequestStatusEnum>
+     */
     public static function getChoices(): array
     {
         return [

@@ -5,21 +5,25 @@ declare(strict_types=1);
 namespace App\Module\User\UseCase\Query;
 
 use App\Module\User\Repository\UserRepositoryInterface;
+use App\Shared\DTO\UserDTO;
 
-class GetUsersWithIncomingBirthdaysHandler
+class GetUsersWithIncomingBirthdaysQueryHandler
 {
     public function __construct(private readonly UserRepositoryInterface $userRepository)
     {
     }
 
+    /**
+     * @return UserDTO[]
+     */
     public function handle(?\DateTimeImmutable $end = null): array
     {
         if (null === $end) {
             $end = new \DateTimeImmutable('+ 20 days');
         }
 
-        return $this->userRepository->getUsersWithIncomingBirthdays(
-            start:  new \DateTimeImmutable(),
+        return $this->userRepository->findUsersWithIncomingBirthdays(
+            start:  new \DateTimeImmutable()->setTime(0, 0, 0),
             end: $end,
         );
     }

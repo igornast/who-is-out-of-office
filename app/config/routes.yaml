@@ -5,3 +5,7 @@ easyadmin:
 module.controllers:
     resource: ../src/Module/**/*Controller.php
     type: attribute
+
+slack.controllers:
+    resource: ../src/Infrastructure/Slack/Controller/*Controller.php
+    type: attribute

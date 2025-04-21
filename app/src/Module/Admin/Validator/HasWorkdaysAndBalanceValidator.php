@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Module\Admin\Validator;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
+use App\Infrastructure\Doctrine\Entity\User;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -18,7 +20,7 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
     ) {
     }
 
-    public function validate(mixed $value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof HasWorkdaysAndBalance) {
             throw new UnexpectedTypeException($constraint, HasWorkdaysAndBalance::class);
@@ -32,14 +34,13 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'datetime');
         }
 
-        /** @var LeaveRequest $formData */
-        $formData =  $this->context->getObject()?->getParent()?->getData();
+        /** @var Form $form */
+        $form = $this->context->getObject();
 
-        $startDate = $formData->startDate;
+        /** @var LeaveRequest $leaveRequest */
+        $leaveRequest =  $form->getParent()?->getData();
 
-        if (!$startDate instanceof \DateTimeInterface) {
-            throw new UnexpectedValueException(null, 'startDate');
-        }
+        $startDate = $leaveRequest->startDate;
 
         $workdays = $this->leaveRequestFacade->calculateWorkDays($startDate, $value);
 
@@ -51,7 +52,9 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
             return;
         }
 
-        if ($formData->user->currentLeaveBalance < $workdays) {
+        /** @var User $user */
+        $user = $leaveRequest->user;
+        if ($user->currentLeaveBalance < $workdays) {
             $this->context
                 ->buildViolation($constraint->notEnoughBalanceMessage)
                 ->addViolation();

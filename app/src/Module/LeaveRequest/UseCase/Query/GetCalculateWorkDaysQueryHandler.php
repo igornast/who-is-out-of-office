@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\LeaveRequest\UseCase\Query;
 
-class GetCalculateWorkDaysHandler
+class GetCalculateWorkDaysQueryHandler
 {
     public function handle(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): int
     {

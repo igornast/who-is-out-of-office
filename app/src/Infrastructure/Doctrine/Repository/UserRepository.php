@@ -10,6 +10,9 @@ use App\Shared\DTO\UserDTO;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<User>
+ */
 class UserRepository extends ServiceEntityRepository implements UserRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
@@ -55,7 +58,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $em->flush();
     }
 
-    public function getUsersWithIncomingBirthdays(\DateTimeImmutable $start, \DateTimeImmutable $end): array
+    public function findUsersWithIncomingBirthdays(\DateTimeImmutable $start, \DateTimeImmutable $end): array
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
@@ -90,5 +93,24 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         }
 
         return $userDTOs;
+    }
+
+    public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO
+    {
+        $em = $this->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+            ->from(User::class, 'u')
+            ->join('u.slackIntegration', 'si')
+            ->where('si.slackMemberId = :slackMemberId')
+            ->setParameter('slackMemberId', $slackMemberId);
+
+        $user = $qb->getQuery()->getOneOrNullResult();
+
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        return UserDTO::fromEntity($user);
     }
 }

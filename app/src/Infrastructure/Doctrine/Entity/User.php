@@ -8,13 +8,19 @@ use App\Infrastructure\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+#[UniqueEntity('email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampableTrait;
 
+    /**
+     * @param array<int, string>                 $roles
+     * @param Collection<int, LeaveRequest>|null $leaveRequests
+     */
     public function __construct(
         public UuidInterface $id,
         public string $firstName,
@@ -26,6 +32,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public int $currentLeaveBalance = 24,
         public ?string $profileImageUrl = null,
         public ?\DateTimeImmutable $birthDate = null,
+        public ?UserSlackIntegration $slackIntegration = null,
         public ?Collection $leaveRequests = new ArrayCollection(),
     ) {
         $this->initializeTimestamps();
@@ -49,5 +56,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getPassword(): ?string
     {
         return $this->password;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('%s %s (%s)', $this->firstName, $this->lastName, $this->email);
     }
 }

@@ -1,0 +1,39 @@
+{
+  "payload": {
+    "type": "block_actions",
+    "user": {
+      "id": "123-member-id"
+    },
+    "api_app_id": "",
+    "token": "",
+    "container": {},
+    "trigger_id": "",
+    "team": {},
+    "enterprise": null,
+    "is_enterprise_install": false,
+    "channel": {
+      "id": "ABC123ABC123",
+      "name": "team-vacations"
+    },
+    "message": {},
+    "state": {
+      "values": {}
+    },
+    "response_url": "https://hooks.slack.com/actions/T12A123123/123123123/ABC123ABC123ABC",
+    "actions": [
+      {
+        "action_id": "123ABC",
+        "block_id": "123ABC",
+        "text": {
+          "type": "plain_text",
+          "text": "Approve",
+          "emoji": true
+        },
+        "value": "leave-request_approved_request-approve-id",
+        "style": "primary",
+        "type": "button",
+        "action_ts": ""
+      }
+    ]
+  }
+}

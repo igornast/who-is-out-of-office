@@ -1,7 +1,9 @@
 framework:
     secret: '%env(APP_SECRET)%'
     property_access: { enabled: true }
-    session: true
+    session:
+        handler_id: 'Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler'
+        cookie-samesite: strict
 
 when@test:
     framework:
