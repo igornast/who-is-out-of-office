@@ -8,7 +8,7 @@ This section describes how to integrate Slack notifications into the leave‑pla
 
 ---
 
-### 2. Configuration
+### 1. Configuration
 
 1. Make sure to define these environment variables in your `.env.local` or server environment:
 
@@ -25,7 +25,7 @@ SLACK_AR_HR_DIGEST_CHANNEL_ID=""
 
 ---
 
-### 3. Sending Notifications
+### 2. Sending Notifications
 
 The app uses two channels to communicate with the company members.
 * SLACK_AR_APPROVE_CHANNEL_ID - channel used for in-slack approval actions. Managers can approve or reject requests
@@ -34,20 +34,20 @@ The app uses two channels to communicate with the company members.
 * 
 ---
 
-### 4. Verifying Incoming Requests
+### 3. Verifying Incoming Requests
 
 The app uses `SLACK_SIGNING_SECRET` to verify if the incoming api messages has been sent by the absence bot app.
 For more details on the implementation check `RequestVerifier` class in the slack module.
 
 ---
 
-### 5. User‑Specific DMs
+### 4. User‑Specific DMs
 
 Once a user has configured their `slackMemberId`, and enabled the custom app. The bot can send them private updates.
 
 ---
 
-### 6. Weekly Digest (Scheduled Task)
+### 5. Weekly Digest (Scheduled Task)
 
 You can use weekly digest command to get summaries at a specific point in time. To trigger digestions 
 run the `slack:weekly_digest` command, which you can use in cron and set the schedule to every Monday at 8 am.
@@ -62,7 +62,7 @@ The bot will post a summary of:
 
 ---
 
-### 7. Slack Bot Setup & Approval Workflow
+### 6. Slack Bot Setup & Approval Workflow
 
 
 1. **Install the Leave Planner Bot**
