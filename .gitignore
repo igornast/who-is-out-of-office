@@ -1,1 +1,4 @@
 .idea
+
+/app/public/uploads/profile_images/*
+!/app/public/uploads/profile_images/.gitkeep

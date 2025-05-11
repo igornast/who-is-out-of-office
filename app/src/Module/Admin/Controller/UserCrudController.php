@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 #[AdminCrud(routePath: '/my-team', routeName: 'app_users')]
@@ -39,22 +40,36 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
-            FormField::addColumn(3),
-            ImageField::new('profileImageUrl'),
+        yield FormField::addColumn(3);
 
-            FormField::addColumn(9),
-            TextField::new('firstName'),
-            TextField::new('lastName'),
-            TextField::new('email'),
-            ArrayField::new('roles')
-                ->hideOnDetail()
-                ->formatValue(function (array $value, User $user): string {
-                    /** @var string[] $roles */
-                    $roles = $value;
+        yield ImageField::new('profileImageUrl')
+            ->setBasePath('uploads/profile_images')
+            ->hideOnForm();
 
-                    return $this->roleTranslator->translate($roles);
-                }),
-        ];
+        yield ImageField::new('profileImageUrl')
+            ->setBasePath('uploads/profile_images')
+            ->setUploadDir('public/uploads/profile_images')
+            ->setUploadedFileNamePattern('[slug]-[uuid].[extension]')
+            ->onlyOnForms();
+
+        yield FormField::addColumn(9);
+
+        yield TextField::new('firstName');
+        yield TextField::new('lastName');
+        yield TextField::new('email');
+        yield ArrayField::new('roles')
+            ->hideOnDetail()
+            ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
+    }
+
+    public function createEntity(string $entityFqcn): User
+    {
+        return new User(
+            id: Uuid::uuid4(),
+            firstName: '',
+            lastName: '',
+            email: '',
+            password: '',
+        );
     }
 }

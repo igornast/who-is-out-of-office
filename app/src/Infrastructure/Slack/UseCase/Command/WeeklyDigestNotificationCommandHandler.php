@@ -43,7 +43,7 @@ class WeeklyDigestNotificationCommandHandler
                 'channel' => $this->dailyDigestChannelId,
                 'blocks' => [
                     ...$contextSection,
-                    ...$this->generateEmptyDigestMessage()
+                    ...$this->generateEmptyDigestMessage(),
                 ],
             ]);
 
