@@ -30,6 +30,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public array $roles = ['ROLE_USER'],
         public int $annualLeaveAllowance = 24,
         public int $currentLeaveBalance = 24,
+        public ?string $plainPassword = null,
         public ?string $profileImageUrl = null,
         public ?\DateTimeImmutable $birthDate = null,
         public ?UserSlackIntegration $slackIntegration = null,

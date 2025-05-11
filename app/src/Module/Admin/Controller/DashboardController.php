@@ -12,13 +12,18 @@ use App\Shared\Facade\UserFacadeInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[AdminDashboard(routePath: '/app/dashboard', routeName: 'app_dashboard')]
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
+        #[Autowire('%profile_images_base_path%')]
+        private readonly string $profileImagesBasePath,
         private readonly LeaveRequestFacade $leaveRequestFacade,
         private readonly UserFacadeInterface $userFacade,
     ) {
@@ -55,6 +60,11 @@ class DashboardController extends AbstractDashboardController
         return $this->render('@AppAdmin/dashboard.html.twig', $parameters);
     }
 
+    private function isAdmin(): bool
+    {
+        return $this->isGranted('ROLE_ADMIN');
+    }
+
     public function configureMenuItems(): iterable
     {
         $teamCrudLink = MenuItem::linkToCrud('My Team', 'fa fa-user', User::class);
@@ -67,8 +77,21 @@ class DashboardController extends AbstractDashboardController
         ];
     }
 
-    private function isAdmin(): bool
+    /**
+     * @param UserInterface|User $user
+     */
+    public function configureUserMenu(UserInterface $user): UserMenu
     {
-        return $this->isGranted('ROLE_ADMIN');
+        $profileImageUrl = $user->profileImageUrl;
+        if (null === $profileImageUrl) {
+            return parent::configureUserMenu($user);
+        }
+
+        if (false === str_starts_with($profileImageUrl, 'http://') && false === str_starts_with($profileImageUrl, 'https://')) {
+            $profileImageUrl = sprintf('/%s/%s', $this->profileImagesBasePath, $profileImageUrl);
+        }
+
+        return parent::configureUserMenu($user)
+            ->setAvatarUrl($profileImageUrl);
     }
 }

@@ -6,9 +6,11 @@ namespace App\Module\Admin\Controller;
 
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Shared\Service\RoleTranslator;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminCrud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
@@ -16,12 +18,14 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AdminCrud(routePath: '/my-team', routeName: 'app_users')]
 class UserCrudController extends AbstractCrudController
 {
     public function __construct(
         private readonly RoleTranslator $roleTranslator,
+        private readonly UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
@@ -60,6 +64,10 @@ class UserCrudController extends AbstractCrudController
         yield ArrayField::new('roles')
             ->hideOnDetail()
             ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
+
+        yield TextField::new('plainPassword')
+            ->onlyOnForms()
+            ->setRequired(Crud::PAGE_NEW === $pageName);
     }
 
     public function createEntity(string $entityFqcn): User
@@ -71,5 +79,17 @@ class UserCrudController extends AbstractCrudController
             email: '',
             password: '',
         );
+    }
+
+    /**
+     * @param User $entityInstance
+     */
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if (null !== $entityInstance->plainPassword) {
+            $entityInstance->password = $this->passwordHasher->hashPassword($entityInstance, $entityInstance->plainPassword);
+        }
+
+        parent::persistEntity($entityManager, $entityInstance);
     }
 }

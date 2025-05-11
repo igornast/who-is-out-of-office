@@ -28,6 +28,7 @@
         "symfony/framework-bundle": "7.2.*",
         "symfony/monolog-bundle": "^3.10",
         "symfony/notifier": "7.2.*",
+        "symfony/password-hasher": "7.2.*",
         "symfony/runtime": "7.2.*",
         "symfony/slack-notifier": "7.2.*",
         "symfony/twig-bundle": "7.2.*",
