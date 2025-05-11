@@ -2,10 +2,18 @@
     <div class="pe-3 align-content-center mb-2"
          title="{{ userDto.firstName }} {{ userDto.lastName }}">
         {% if userDto.profileImageUrl %}
+            {% set img = userDto.profileImageUrl %}
+
+            {% if img starts with 'http://' or img starts with 'https://' %}
+                {% set src = img %}
+            {% else %}
+                {% set src = asset(profile_images_base_path ~ '/' ~ img) %}
+            {% endif %}
+
             <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}"
                class="btn btn-lg p-0 align-content-center"
                role="button">
-                <img src="{{ userDto.profileImageUrl }}" class="rounded-2"
+                <img src="{{ src }}" class="rounded-2"
                      style="width:65px;"
                      alt="{{ userDto.firstName }} {{ userDto.lastName }} avatar"/>
             </a>
