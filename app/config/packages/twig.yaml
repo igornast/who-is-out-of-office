@@ -2,6 +2,7 @@ twig:
     file_name_pattern: '*.twig'
     paths:
         'src/Module/Admin/template': 'AppAdmin'
+        'src/Module/User/template': 'AppUser'
     globals:
         profile_images_base_path: '%profile_images_base_path%'
 

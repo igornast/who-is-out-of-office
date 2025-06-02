@@ -18,6 +18,6 @@ class UpdateCurrentLeaveBalanceCommandHandler
 
         $userDTO->currentLeaveBalance = $userDTO->currentLeaveBalance + $number;
 
-        $this->userRepository->save($userDTO);
+        $this->userRepository->update($userDTO);
     }
 }

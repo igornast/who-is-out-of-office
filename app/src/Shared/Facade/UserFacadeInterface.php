@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Shared\Facade;
 
+use App\Module\User\DTO\UserInvitationRequestDTO;
+use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\UserDTO;
 
 interface UserFacadeInterface
@@ -20,4 +22,6 @@ interface UserFacadeInterface
      * @return UserDTO[]
      */
     public function getUsersWithBirthdaysForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
+
+    public function acceptUserInvitation(UserInvitationRequestDTO $invitationRequestDTO, InvitationDTO $invitationDTO): void;
 }

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Module\User;
 
+use App\Module\User\DTO\UserInvitationRequestDTO;
+use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDates;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
+use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Facade\UserFacadeInterface;
 
@@ -20,6 +23,7 @@ final class UserFacade implements UserFacadeInterface
         private readonly GetUsersWithIncomingBirthdaysQueryHandler $getUsersWithIncomingBirthdaysHandler,
         private readonly GetUserBySlackMemberIdQueryHandler $getUserBySlackMemberIdQueryHandler,
         private readonly GetUsersWithBirthdaysForDates $getUsersWithBirthdaysForDatesHandler,
+        private readonly AcceptUserInvitationCommandHandler $acceptInvitationHandler,
     ) {
     }
 
@@ -52,5 +56,10 @@ final class UserFacade implements UserFacadeInterface
     public function getUsersWithBirthdaysForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
     {
         return $this->getUsersWithBirthdaysForDatesHandler->handle($startDate, $endDate);
+    }
+
+    public function acceptUserInvitation(UserInvitationRequestDTO $invitationRequestDTO, InvitationDTO $invitationDTO): void
+    {
+        $this->acceptInvitationHandler->handle($invitationRequestDTO, $invitationDTO);
     }
 }

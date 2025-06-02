@@ -15,7 +15,7 @@ interface UserRepositoryInterface
 
     public function findOneById(string $id): ?UserDTO;
 
-    public function save(UserDTO $userDTO): void;
+    public function update(UserDTO $userDTO): void;
 
     /**
      * @return UserDTO[]

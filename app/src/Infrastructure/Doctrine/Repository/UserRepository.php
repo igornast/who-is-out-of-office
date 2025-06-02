@@ -41,7 +41,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return UserDTO::fromEntity($user);
     }
 
-    public function save(UserDTO $userDTO): void
+    public function update(UserDTO $userDTO): void
     {
         /** @var User $user */
         $user = $this->find($userDTO->id);
@@ -52,6 +52,9 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->roles = $userDTO->roles;
         $user->annualLeaveAllowance = $userDTO->annualLeaveAllowance;
         $user->currentLeaveBalance = $userDTO->currentLeaveBalance;
+        $user->isActive = $userDTO->isActive;
+        $user->birthDate = $userDTO->birthDate;
+        $user->password = $userDTO->password;
 
         $em = $this->getEntityManager();
         $em->persist($user);

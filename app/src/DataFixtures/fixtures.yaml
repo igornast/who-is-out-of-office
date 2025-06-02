@@ -20,6 +20,7 @@ App\Infrastructure\Doctrine\Entity\User:
             roles: ['ROLE_ADMIN']
             annualLeaveAllowance: 30
             currentLeaveBalance: 30
+            isActive: true
             profileImageUrl: <randomElement($profileImages)>
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
     user_2:
@@ -32,6 +33,7 @@ App\Infrastructure\Doctrine\Entity\User:
             roles: ['ROLE_MANAGER']
             annualLeaveAllowance: 30
             currentLeaveBalance: 30
+            isActive: true
             profileImageUrl: <randomElement($profileImages)>
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
     user_{3..10}:
@@ -44,6 +46,7 @@ App\Infrastructure\Doctrine\Entity\User:
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
             currentLeaveBalance: 24
+            isActive: true
             profileImageUrl: <randomElement($profileImages)>
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
 
