@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Module\LeaveRequest;
 
 use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestCommandHandler;
-use App\Module\LeaveRequest\UseCase\Query\GetApprovedLeaveRequestsForDatesQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetCalculateWorkDaysQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
@@ -22,7 +22,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetLeaveRequestQueryHandler $getLeaveRequestHandler,
         private readonly GetUpcomingLeaveRequestsQueryHandler $getUpcomingLeaveRequestsHandler,
         private readonly UpdateLeaveRequestCommandHandler $updateLeaveRequestCommandHandler,
-        private readonly GetApprovedLeaveRequestsForDatesQueryHandler $getLeaveRequestForDatesHandler,
+        private readonly GetLeaveRequestsForDatesQueryHandler $getLeaveRequestForDatesHandler,
     ) {
     }
 
@@ -59,8 +59,13 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         $this->updateLeaveRequestCommandHandler->handle($leaveRequestDTO);
     }
 
-    public function getApprovedLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    /**
+     * @param LeaveRequestStatusEnum[] $statuses
+     *
+     * @return LeaveRequestDTO[]
+     */
+    public function getLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array
     {
-        return $this->getLeaveRequestForDatesHandler->handle($startDate, $endDate);
+        return $this->getLeaveRequestForDatesHandler->handle($startDate, $endDate, $statuses);
     }
 }

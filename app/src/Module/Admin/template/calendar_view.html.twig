@@ -1,0 +1,92 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{% block head_javascript %}
+  {{ parent() }}
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+{% endblock %}
+
+{% block head_stylesheets %}
+  {{ parent() }}
+  <style>
+    #calendar {
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .fc-event.fc-pending-leave {
+      border: 2px dashed #ffc107 !important;
+      border-radius: 3px;
+    }
+
+    .fc-event {
+      font-size: 0.95rem;
+      line-height: 1.2em;
+      padding: 4px 6px;
+      min-height: 28px;
+      border-radius: 4px;
+    }
+
+    .fc-daygrid-event {
+      padding: 6px 8px;
+      font-size: 1rem;
+    }
+
+    .fc-day-sat, .fc-day-sun {
+      background-color: #f8f9fa;
+    }
+  </style>
+{% endblock %}
+
+{% block main %}
+{#    <a href="{{ path('app_booking_new') }}">Create new booking</a>#}
+
+    <div id="calendar"></div>
+{% endblock %}
+
+{% block body_javascript %}
+  {{ parent() }}
+
+    <script type="text/javascript">
+      document.addEventListener('DOMContentLoaded', () => {
+        const calendarEl = document.getElementById('calendar');
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          firstDay: 1,
+          editable: false,
+          eventSources: [
+            {
+              url: "{{ path('fc_load_events') }}",
+              method: 'POST',
+              extraParams: {
+                filters: JSON.stringify({})
+              },
+              failure: () => {
+                // alert('There was an error while fetching FullCalendar!');
+              },
+            },
+          ],
+          eventDidMount: function(info) {
+            const status = info.event.extendedProps.status;
+
+            if (status === 'pending') {
+              info.el.classList.add('fc-pending-leave');
+            }
+          },
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth',
+          },
+          timeZone: 'UTC',
+        });
+
+        calendar.render();
+      });
+    </script>
+{% endblock %}
+

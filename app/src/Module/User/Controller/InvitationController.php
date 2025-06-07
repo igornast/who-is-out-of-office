@@ -36,6 +36,7 @@ class InvitationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UserInvitationRequestDTO $invitationRequestDTO */
             $invitationRequestDTO = $form->getData();
 
             $this->userFacade->acceptUserInvitation($invitationRequestDTO, $invitationDTO);

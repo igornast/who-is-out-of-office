@@ -104,13 +104,13 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
     /**
      * @return LeaveRequestDTO[]
      */
-    public function findApprovedForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    public function findForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array
     {
         $qb = $this->createQueryBuilder('lr');
-        $items = $qb->where('lr.status = :approved')
+        $items = $qb->where('lr.status IN (:statuses)')
             ->andWhere('lr.startDate <= :end')
             ->andWhere('lr.endDate   >= :start')
-            ->setParameter('approved', LeaveRequestStatusEnum::Approved)
+            ->setParameter('statuses', $statuses)
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
             ->orderBy('lr.startDate', 'ASC')

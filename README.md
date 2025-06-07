@@ -1,6 +1,16 @@
 # who-is-out-of-office
 The Online Staff Leave Planner
 
+## 🛠️ Admin Account
+
+The database migrations include a default admin account for initial access:
+
+- **Email:** `admin@ooo.com`
+- **Password:** `admin`
+
+> ⚠️ **Important:** This account is intended for development and testing purposes only.  
+> Please update the password or remove it after deploying to a production environment.
+ 
 
 ## Slack Integration
 

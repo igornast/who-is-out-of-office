@@ -26,7 +26,9 @@ interface LeaveRequestRepositoryInterface
     public function update(LeaveRequestDTO $leaveRequestDTO): void;
 
     /**
+     * @param LeaveRequestStatusEnum[] $statuses
+     *
      * @return LeaveRequestDTO[]
      */
-    public function findApprovedForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
+    public function findForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
 }

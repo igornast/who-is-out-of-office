@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\Facade;
 
 use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\Enum\LeaveRequestStatusEnum;
 
 interface LeaveRequestFacadeInterface
 {
@@ -15,7 +16,9 @@ interface LeaveRequestFacadeInterface
     public function update(LeaveRequestDTO $leaveRequestDTO): void;
 
     /**
+     * @param LeaveRequestStatusEnum[] $statuses
+     *
      * @return LeaveRequestDTO[]
      */
-    public function getApprovedLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
+    public function getLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
 }

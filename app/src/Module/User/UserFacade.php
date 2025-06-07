@@ -35,7 +35,7 @@ final class UserFacade implements UserFacadeInterface
     /**
      * @return UserDTO[]
      */
-    public function getMyTeamUsers(string $userId): array
+    public function getTeamMembersForUserId(string $userId): array
     {
         return $this->getMyTeamUsersHandler->handle($userId);
     }
@@ -53,6 +53,9 @@ final class UserFacade implements UserFacadeInterface
         return $this->getUserBySlackMemberIdQueryHandler->handle($slackMemberId);
     }
 
+    /**
+     * @return UserDTO[]
+     */
     public function getUsersWithBirthdaysForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
     {
         return $this->getUsersWithBirthdaysForDatesHandler->handle($startDate, $endDate);
