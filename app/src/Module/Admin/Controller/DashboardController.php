@@ -47,7 +47,7 @@ class DashboardController extends AbstractDashboardController
         $parameters = [
             'user' => $user,
             'is_admin' => $this->isAdmin(),
-            'my_team' => $this->userFacade->getMyTeamUsers($userId),
+            'my_team' => $this->userFacade->getTeamMembersForUserId($userId),
             'users_with_birthdays' => $this->userFacade->getUsersWithIncomingBirthdays(),
             'pending_requests' => $this->leaveRequestFacade->getLeaveRequestsForUser(
                 $userId,
@@ -73,6 +73,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToLogout('Logout', 'fa fa-right-from-bracket'),
             MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
             ...($this->isAdmin() ? [$teamCrudLink] : []),
+            MenuItem::linkToRoute('Calendar', 'fa fa-calendar', 'app_calendar_view'),
             MenuItem::linkToCrud('Absence Requests', 'fa fa-calendar-plus', LeaveRequest::class),
         ];
     }

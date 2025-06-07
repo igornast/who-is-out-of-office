@@ -12,8 +12,14 @@ interface UserFacadeInterface
 {
     public function updateUserCurrentLeaveBalance(string $userId, int $number): void;
 
-    public function getMyTeamUsers(string $userId): array;
+    /**
+     * @return UserDTO[]
+     */
+    public function getTeamMembersForUserId(string $userId): array;
 
+    /**
+     * @return UserDTO[]
+     */
     public function getUsersWithIncomingBirthdays(): array;
 
     public function getUserBySlackMemberId(string $slackMemberId): ?UserDTO;

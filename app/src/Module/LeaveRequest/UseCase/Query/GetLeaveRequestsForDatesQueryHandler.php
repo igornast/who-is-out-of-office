@@ -6,8 +6,9 @@ namespace App\Module\LeaveRequest\UseCase\Query;
 
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\Enum\LeaveRequestStatusEnum;
 
-class GetApprovedLeaveRequestsForDatesQueryHandler
+class GetLeaveRequestsForDatesQueryHandler
 {
     public function __construct(
         private readonly LeaveRequestRepositoryInterface $leaveRequestRepository,
@@ -15,10 +16,12 @@ class GetApprovedLeaveRequestsForDatesQueryHandler
     }
 
     /**
+     * @param LeaveRequestStatusEnum[] $statuses
+     *
      * @return LeaveRequestDTO[]
      */
-    public function handle(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    public function handle(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array
     {
-        return $this->leaveRequestRepository->findApprovedForDates($startDate, $endDate);
+        return $this->leaveRequestRepository->findForDates($startDate, $endDate, $statuses);
     }
 }

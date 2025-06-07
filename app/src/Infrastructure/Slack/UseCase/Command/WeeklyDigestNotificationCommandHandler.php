@@ -6,6 +6,7 @@ namespace App\Infrastructure\Slack\UseCase\Command;
 
 use App\Shared\DTO\LeaveRequestDTO;
 use App\Shared\DTO\UserDTO;
+use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -31,7 +32,7 @@ class WeeklyDigestNotificationCommandHandler
         $monday  = $today->modify('-'.($weekDay - 1).' days');
         $sunday  = $monday->modify('+6 days');
 
-        $approvedRequests = $this->leaveRequestFacade->getApprovedLeaveRequestsForDates($monday, $sunday);
+        $approvedRequests = $this->leaveRequestFacade->getLeaveRequestsForDates($monday, $sunday, [LeaveRequestStatusEnum::Approved]);
         $birthdayUsers = $this->userFacade->getUsersWithBirthdaysForDates($monday, $sunday);
 
         $oooSection = $this->generateWhoIsOutSection($approvedRequests);
