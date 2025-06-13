@@ -35,6 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public ?string $profileImageUrl = null,
         public ?\DateTimeImmutable $birthDate = null,
         public ?UserSlackIntegration $slackIntegration = null,
+        public ?HolidayCalendar $holidayCalendar = null,
         public ?Collection $leaveRequests = new ArrayCollection(),
     ) {
         $this->initializeTimestamps();

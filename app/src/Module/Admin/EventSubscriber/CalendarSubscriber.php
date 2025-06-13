@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\EventSubscriber;
 
+use App\Infrastructure\Doctrine\Entity\User;
+use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\LeaveRequestTypeEnum;
+use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use CalendarBundle\Event\SetDataEvent;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CalendarBundle\Entity\Event;
 
@@ -17,6 +21,8 @@ class CalendarSubscriber implements EventSubscriberInterface
     public function __construct(
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
         private readonly UserFacadeInterface $userFacade,
+        private readonly HolidayFacadeInterface $holidayFacade,
+        private readonly Security $security,
     ) {
     }
 
@@ -32,6 +38,7 @@ class CalendarSubscriber implements EventSubscriberInterface
         $start = \DateTimeImmutable::createFromInterface($event->getStart());
         $end = \DateTimeImmutable::createFromInterface($event->getEnd());
 
+        $this->addPublicHolidayEvents($event);
         $this->addLeaveRequestEvents($event, $start, $end);
         $this->addBirthdayEvents($event, $start);
     }
@@ -52,14 +59,14 @@ class CalendarSubscriber implements EventSubscriberInterface
             $calendarEvent = new Event(
                 $title,
                 \DateTime::createFromImmutable($dto->startDate),
-                \DateTime::createFromImmutable($dto->endDate)
+                \DateTime::createFromImmutable($dto->endDate->modify('+1 day')),
             );
 
-            $calendarEvent->setAllDay(true);
             $calendarEvent->setOptions([
                 'backgroundColor' => $style['backgroundColor'],
                 'borderColor' => $style['borderColor'],
-                'textColor' => '#000000',
+                'textColor' => $style['textColor'],
+                'allDay' => true,
                 'extendedProps' => [
                     'status' => $dto->status->value,
                 ],
@@ -71,7 +78,7 @@ class CalendarSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array{'backgroundColor': string, 'borderColor': string}
+     * @return array{'backgroundColor': string, 'borderColor': string, 'textColor': string}
      */
     private function getLeaveEventStyle(LeaveRequestStatusEnum $status, LeaveRequestTypeEnum $type): array
     {
@@ -79,14 +86,17 @@ class CalendarSubscriber implements EventSubscriberInterface
             LeaveRequestStatusEnum::Pending === $status => [
                 'backgroundColor' => '#fff3cd',
                 'borderColor' => '#ffeeba',
+                'textColor' => '#000000',
             ],
             LeaveRequestStatusEnum::Approved === $status && LeaveRequestTypeEnum::Vacation === $type => [
                 'backgroundColor' => '#d4edda',
                 'borderColor' => '#28a745',
+                'textColor' => '#000000',
             ],
             LeaveRequestStatusEnum::Approved === $status && LeaveRequestTypeEnum::SickLeave === $type => [
-                'backgroundColor' => '#fce4ec',
-                'borderColor' => '#f06292',
+                'backgroundColor' => '#ede7f6',
+                'borderColor' => '#b39ddb',
+                'textColor' => '#4527a0',
             ],
             default => [
                 'backgroundColor' => '#e2e3e5',
@@ -132,6 +142,34 @@ class CalendarSubscriber implements EventSubscriberInterface
                     'type' => 'birthday',
                     'userId' => $userDTO->id,
                 ],
+            ]);
+
+            $event->addEvent($calendarEvent);
+        }
+    }
+
+    private function addPublicHolidayEvents(SetDataEvent $event)
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+        $userDTO = UserDTO::fromEntity($user);
+
+        if (null === $userDTO->calendarCountryCode) {
+            return;
+        }
+
+        $holidayCalendarDTO = $this->holidayFacade->getHolidayCalendarForCountry($userDTO->calendarCountryCode);
+
+        foreach ($holidayCalendarDTO->holidays as $holidayDTO) {
+            $calendarEvent = new Event(
+                '🎌 '.$holidayDTO->description,
+                \DateTime::createFromImmutable($holidayDTO->date),
+            );
+            $calendarEvent->setOptions([
+                'backgroundColor' => '#fde2e2',
+                'borderColor' => '#f5bcbc',
+                'textColor' => '#b30000',
+                'allDay' => true,
             ]);
 
             $event->addEvent($calendarEvent);

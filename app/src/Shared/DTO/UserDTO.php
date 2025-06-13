@@ -23,6 +23,7 @@ class UserDTO
         public ?string $password = null,
         public ?string $profileImageUrl = null,
         public ?string $slackMemberId = null,
+        public ?string $calendarCountryCode = null,
         public ?\DateTimeImmutable $birthDate = null,
     ) {
     }
@@ -41,6 +42,7 @@ class UserDTO
             password: $user->password,
             profileImageUrl: $user->profileImageUrl,
             slackMemberId: $user->slackIntegration?->slackMemberId,
+            calendarCountryCode: $user->holidayCalendar->countryCode ?? null,
             birthDate: $user->birthDate,
         );
     }

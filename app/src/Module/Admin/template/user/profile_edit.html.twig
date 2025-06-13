@@ -1,0 +1,98 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <style>
+        .ea-profile-form input,
+        .ea-profile-form select,
+        .ea-profile-form textarea {
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background-color: #fff;
+        }
+
+        .ea-profile-form .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .ea-profile-form label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .ea-profile-form h5 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .ea-profile-form .btn-primary {
+            margin-top: 1.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-4">
+        <h1 class="mb-4">Edit Profile</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="card shadow-sm">
+                    <div class="card-body ea-profile-form">
+                        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+                        <h5>Profile Info</h5>
+                        <div class="form-group">
+                            {{ form_row(form.firstName) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_row(form.lastName) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_row(form.holidayCalendar) }}
+                        </div>
+
+                        <h5>Change Password</h5>
+                        <div class="form-group">
+                            {{ form_row(form.plainPassword.first) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_row(form.plainPassword.second) }}
+                        </div>
+
+                        <h5>Profile Image</h5>
+                        <div class="form-group">
+                            {{ form_row(form.profileImageFile) }}
+                        </div>
+
+                        {% if app.user.profileImageUrl %}
+                            {% set img = app.user.profileImageUrl %}
+                            {% if img starts with 'http://' or img starts with 'https://' %}
+                                {% set src = img %}
+                            {% else %}
+                                {% set src = asset(profile_images_base_path ~ '/' ~ img) %}
+                            {% endif %}
+
+                            <div class="text-center mb-4">
+                                <img src="{{ src }}"
+                                     alt="Profile Image"
+                                     class="img-thumbnail border border-3 border-light shadow-sm"
+                                     style="max-width: 160px;">
+                            </div>
+                        {% endif %}
+
+
+                        <button class="btn btn-primary">Save Changes</button>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
