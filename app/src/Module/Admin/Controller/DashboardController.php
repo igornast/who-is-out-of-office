@@ -73,6 +73,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToLogout('Logout', 'fa fa-right-from-bracket'),
             MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
             ...($this->isAdmin() ? [$teamCrudLink] : []),
+            MenuItem::linkToRoute('Profile Settings', 'fa fa-user', 'app_user_profile'),
             MenuItem::linkToRoute('Calendar', 'fa fa-calendar', 'app_calendar_view'),
             MenuItem::linkToCrud('Absence Requests', 'fa fa-calendar-plus', LeaveRequest::class),
         ];
