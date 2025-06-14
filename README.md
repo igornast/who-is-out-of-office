@@ -12,6 +12,12 @@ The database migrations include a default admin account for initial access:
 > Please update the password or remove it after deploying to a production environment.
  
 
+## 📅 Public Holiday Import
+
+You can import a set of public holidays for a specific country and year using the following Symfony command:
+
+```php bin/console app:holiday:import NG Nigeria 2025```
+
 ## Slack Integration
 
 This section describes how to integrate Slack notifications into the leave‑planner application.
