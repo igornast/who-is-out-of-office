@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Slack\UseCase\Command;
 
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;

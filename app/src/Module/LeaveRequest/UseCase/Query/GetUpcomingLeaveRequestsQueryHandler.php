@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Module\LeaveRequest\UseCase\Query;
 
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 
 class GetUpcomingLeaveRequestsQueryHandler
 {

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Module\Admin\EventSubscriber;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Enum\LeaveRequestTypeEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\SlackFacadeInterface;
@@ -39,11 +40,14 @@ class LeaveRequestAdminSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $workDays = $this->leaveRequestFacade->calculateWorkDays(
+        $query = new CalculateWorkdaysQuery(
             startDate: $leaveRequest->startDate,
             endDate: $leaveRequest->endDate,
+            userWorkingDays: $leaveRequest->user->workingDays,
             holidayCalendarCountryCode: $leaveRequest->user->holidayCalendar?->countryCode
         );
+
+        $workDays = $this->leaveRequestFacade->calculateWorkDays($query);
 
         $leaveRequest->workDays = $workDays;
     }

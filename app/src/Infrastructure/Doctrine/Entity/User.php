@@ -28,6 +28,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public string $email,
         public string $password,
         public array $roles = ['ROLE_USER'],
+        public array $workingDays = [1, 2, 3, 4, 5],
         public int $annualLeaveAllowance = 24,
         public int $currentLeaveBalance = 24,
         public bool $isActive = false,

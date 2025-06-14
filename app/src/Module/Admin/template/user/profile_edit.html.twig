@@ -7,7 +7,6 @@
         .ea-profile-form select,
         .ea-profile-form textarea {
             width: 100%;
-            max-width: 600px;
             border: 1px solid #ced4da;
             border-radius: 0.5rem;
             padding: 0.5rem 0.75rem;
@@ -33,6 +32,13 @@
         .ea-profile-form .btn-primary {
             margin-top: 1.5rem;
         }
+
+        .checkbox-large input[type="checkbox"] {
+            transform: scale(1.8);
+            margin-right: 8px;
+            margin-bottom: 13px;
+            margin-top: 13px;
+        }
     </style>
 {% endblock %}
 
@@ -41,7 +47,7 @@
         <h1 class="mb-4">Edit Profile</h1>
 
         <div class="row justify-content-center">
-            <div class="col-lg-10 col-xl-8">
+            <div class="col-lg-10 col-xl-10">
                 <div class="card shadow-sm">
                     <div class="card-body ea-profile-form">
                         {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
@@ -56,6 +62,20 @@
                         <div class="form-group">
                             {{ form_row(form.holidayCalendar) }}
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Working Days</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                {% for checkbox in form.workingDays %}
+                                    <div class="form-check checkbox-large">
+                                        {{ form_widget(checkbox) }}
+                                        {{ form_label(checkbox) }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {{ form_errors(form.workingDays) }}
+                        </div>
+
 
                         <h5>Change Password</h5>
                         <div class="form-group">

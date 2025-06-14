@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Slack\UseCase\Command;
 
 use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 

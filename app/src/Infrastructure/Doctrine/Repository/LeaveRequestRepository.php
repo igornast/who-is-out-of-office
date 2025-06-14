@@ -7,7 +7,7 @@ namespace App\Infrastructure\Doctrine\Repository;
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -118,5 +118,15 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
             ->getResult();
 
         return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
+    }
+
+    public function delete(LeaveRequestDTO $leaveRequestDTO): void
+    {
+        $qb = $this->createQueryBuilder('lr');
+        $qb->delete()
+            ->where('lr.id = :id')
+            ->setParameter('id', $leaveRequestDTO->id)
+            ->getQuery()
+            ->execute();
     }
 }

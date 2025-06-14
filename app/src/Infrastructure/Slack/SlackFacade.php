@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Infrastructure\Slack;
 
 use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
-use App\Infrastructure\Slack\UseCase\Command\NotifyUserLeaveRequestStatusChangeCommandHandler;
-use App\Infrastructure\Slack\UseCase\Command\UpdateLeaveRequestWithInteractiveNotificationCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\NotifyNewLeaveRequestCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\NotifyUserLeaveRequestStatusChangeCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\SendChangeConfirmationToAbsenceChannelCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\UpdateLeaveRequestWithInteractiveNotificationCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\WeeklyDigestNotificationCommandHandler;
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Facade\SlackFacadeInterface;
 
 final class SlackFacade implements SlackFacadeInterface

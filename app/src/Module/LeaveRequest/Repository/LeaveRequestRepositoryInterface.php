@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\LeaveRequest\Repository;
 
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 
 interface LeaveRequestRepositoryInterface
@@ -31,4 +31,6 @@ interface LeaveRequestRepositoryInterface
      * @return LeaveRequestDTO[]
      */
     public function findForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
+
+    public function delete(LeaveRequestDTO $leaveRequestDTO);
 }

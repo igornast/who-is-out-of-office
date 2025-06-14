@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\Facade;
 
 use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 
 interface SlackFacadeInterface
 {

@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\DTO;
+namespace App\Shared\DTO\LeaveRequest;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
+use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\LeaveRequestTypeEnum;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Slack\UseCase\Command;
 
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;

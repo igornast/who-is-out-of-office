@@ -6,22 +6,17 @@ namespace App\Module\LeaveRequest\UseCase\Command;
 
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
-use App\Shared\Enum\LeaveRequestStatusEnum;
 
-class UpdateLeaveRequestCommandHandler
+class RemoveLeaveRequestCommandHandler
 {
     public function __construct(
-        private readonly LeaveRequestRepositoryInterface $repository,
+        private readonly LeaveRequestRepositoryInterface $leaveRequestRepository,
     ) {
+
     }
 
     public function handle(LeaveRequestDTO $leaveRequestDTO): void
     {
-        if (LeaveRequestStatusEnum::Rejected === $leaveRequestDTO->status) {
-
-        }
-
-
-        $this->repository->update($leaveRequestDTO);
+        $this->leaveRequestRepository->delete($leaveRequestDTO);
     }
 }

@@ -38,6 +38,7 @@ class CalendarSubscriber implements EventSubscriberInterface
         $start = \DateTimeImmutable::createFromInterface($event->getStart());
         $end = \DateTimeImmutable::createFromInterface($event->getEnd());
 
+        $this->markNonWorkingDaysForUser($event);
         $this->addPublicHolidayEvents($event);
         $this->addLeaveRequestEvents($event, $start, $end);
         $this->addBirthdayEvents($event, $start);
@@ -148,7 +149,39 @@ class CalendarSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addPublicHolidayEvents(SetDataEvent $event)
+    private function markNonWorkingDaysForUser(SetDataEvent $event): void
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+        $userDTO = UserDTO::fromEntity($user);
+
+        $nonWorkingDays = array_filter(
+            range(1, 5),
+            fn ($day) => !in_array($day, $userDTO->workingDays)
+        );
+
+        $start = $event->getStart();
+        $end = $event->getEnd();
+        $period = new \DatePeriod($start, new \DateInterval('P1D'), $end);
+
+        foreach ($period as $date) {
+            $weekday = (int) $date->format('N');
+
+            if (in_array($weekday, $nonWorkingDays)) {
+                $calendarEvent = new Event('⛔ Off Day', $date);
+                $calendarEvent->setOptions([
+                    'backgroundColor' => '#f0f0f0',
+                    'borderColor' => '#d3d3d3',
+                    'textColor' => '#888',
+                    'display' => 'background',
+                    'allDay' => true,
+                ]);
+                $event->addEvent($calendarEvent);
+            }
+        }
+    }
+
+    private function addPublicHolidayEvents(SetDataEvent $event): void
     {
         /** @var User $user */
         $user = $this->security->getUser();

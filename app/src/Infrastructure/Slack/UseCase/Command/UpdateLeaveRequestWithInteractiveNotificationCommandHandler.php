@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Infrastructure\Slack\UseCase\Command;
 
 use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
-use App\Shared\DTO\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
+use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 
@@ -20,13 +21,35 @@ class UpdateLeaveRequestWithInteractiveNotificationCommandHandler
     public function handle(InteractiveNotificationDTO $notificationDTO): LeaveRequestDTO
     {
         $leaveRequestDTO = $this->leaveRequestFacade->getById($notificationDTO->identifier);
+
+        if (null === $leaveRequestDTO) {
+            throw new \RuntimeException(sprintf('Leave request with id "%s" not found', $notificationDTO->identifier));
+        }
+
         $approvedByUserDTO = $this->userFacade->getUserBySlackMemberId($notificationDTO->memberId);
 
         $leaveRequestDTO->status = $notificationDTO->status;
         $leaveRequestDTO->approvedBy = $approvedByUserDTO;
 
+        if (in_array($leaveRequestDTO->status, [LeaveRequestStatusEnum::Rejected, LeaveRequestStatusEnum::Cancelled], true)) {
+            $this->handleRemoveAndReturnBlockedDays($leaveRequestDTO);
+
+            return $leaveRequestDTO;
+        }
+
         $this->leaveRequestFacade->update($leaveRequestDTO);
 
         return $leaveRequestDTO;
+    }
+
+    private function handleRemoveAndReturnBlockedDays(LeaveRequestDTO $leaveRequestDTO): void
+    {
+        $userDTO = $leaveRequestDTO->user;
+
+        $this->userFacade->updateUserCurrentLeaveBalance(
+            $userDTO->id,
+            $leaveRequestDTO->workDays,
+        );
+        $this->leaveRequestFacade->remove($leaveRequestDTO);
     }
 }

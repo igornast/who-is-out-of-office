@@ -6,6 +6,7 @@ namespace App\Module\Admin\Validator;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraint;
@@ -43,7 +44,14 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
         $startDate = $leaveRequest->startDate;
         $user = $leaveRequest->user;
 
-        $workdays = $this->leaveRequestFacade->calculateWorkDays($startDate, $value, $user->holidayCalendar?->countryCode);
+        $query = new CalculateWorkdaysQuery(
+            startDate: $startDate,
+            endDate: $value,
+            userWorkingDays: $user->workingDays,
+            holidayCalendarCountryCode: $user->holidayCalendar?->countryCode
+        );
+
+        $workdays = $this->leaveRequestFacade->calculateWorkDays($query);
 
         if ($workdays < 1) {
             $this->context

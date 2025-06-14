@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
@@ -62,10 +63,23 @@ class UserCrudController extends AbstractCrudController
 
         yield FormField::addColumn(9);
 
-        yield TextField::new('firstName')->onlyWhenUpdating();
-        yield TextField::new('lastName')->onlyWhenUpdating();
+        yield TextField::new('firstName')->hideWhenCreating();
+        yield TextField::new('lastName')->hideWhenCreating();
         yield TextField::new('email');
         yield NumberField::new('annualLeaveAllowance')->onlyWhenCreating();
+        yield ChoiceField::new('workingDays')
+            ->setChoices([
+                'Monday' => 1,
+                'Tuesday' => 2,
+                'Wednesday' => 3,
+                'Thursday' => 4,
+                'Friday' => 5,
+                'Saturday' => 6,
+                'Sunday' => 7,
+            ])
+            ->allowMultipleChoices()
+            ->renderExpanded();
+
         yield ArrayField::new('roles')
             ->hideOnDetail()
             ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
