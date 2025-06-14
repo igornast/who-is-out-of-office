@@ -9,7 +9,7 @@ use App\Shared\Enum\LeaveRequestStatusEnum;
 
 interface LeaveRequestFacadeInterface
 {
-    public function calculateWorkDays(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): int;
+    public function calculateWorkDays(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, ?string $holidayCalendarCountryCode): int;
 
     public function getById(string $id): ?LeaveRequestDTO;
 

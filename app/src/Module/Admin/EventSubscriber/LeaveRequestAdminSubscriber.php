@@ -41,7 +41,8 @@ class LeaveRequestAdminSubscriber implements EventSubscriberInterface
 
         $workDays = $this->leaveRequestFacade->calculateWorkDays(
             startDate: $leaveRequest->startDate,
-            endDate: $leaveRequest->endDate
+            endDate: $leaveRequest->endDate,
+            holidayCalendarCountryCode: $leaveRequest->user->holidayCalendar?->countryCode
         );
 
         $leaveRequest->workDays = $workDays;

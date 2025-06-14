@@ -41,8 +41,9 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
         $leaveRequest =  $form->getParent()?->getData();
 
         $startDate = $leaveRequest->startDate;
+        $user = $leaveRequest->user;
 
-        $workdays = $this->leaveRequestFacade->calculateWorkDays($startDate, $value);
+        $workdays = $this->leaveRequestFacade->calculateWorkDays($startDate, $value, $user->holidayCalendar?->countryCode);
 
         if ($workdays < 1) {
             $this->context
@@ -53,7 +54,6 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
         }
 
         /** @var User $user */
-        $user = $leaveRequest->user;
         if ($user->currentLeaveBalance < $workdays) {
             $this->context
                 ->buildViolation($constraint->notEnoughBalanceMessage)

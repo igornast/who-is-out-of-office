@@ -26,9 +26,9 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     ) {
     }
 
-    public function calculateWorkDays(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): int
+    public function calculateWorkDays(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, ?string $holidayCalendarCountryCode): int
     {
-        return $this->getCalculateWorkDaysHandler->handle($startDate, $endDate);
+        return $this->getCalculateWorkDaysHandler->handle($startDate, $endDate, $holidayCalendarCountryCode);
     }
 
     /**
