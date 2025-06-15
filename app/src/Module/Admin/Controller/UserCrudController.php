@@ -6,6 +6,7 @@ namespace App\Module\Admin\Controller;
 
 use App\Infrastructure\Doctrine\Entity\Invitation;
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\Constants\UserSettings;
 use App\Shared\Service\RoleTranslator;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminCrud;
@@ -68,15 +69,7 @@ class UserCrudController extends AbstractCrudController
         yield TextField::new('email');
         yield NumberField::new('annualLeaveAllowance')->onlyWhenCreating();
         yield ChoiceField::new('workingDays')
-            ->setChoices([
-                'Monday' => 1,
-                'Tuesday' => 2,
-                'Wednesday' => 3,
-                'Thursday' => 4,
-                'Friday' => 5,
-                'Saturday' => 6,
-                'Sunday' => 7,
-            ])
+            ->setChoices(UserSettings::WORKING_DAYS)
             ->allowMultipleChoices()
             ->renderExpanded();
 

@@ -6,6 +6,7 @@ namespace App\Module\Admin\Form;
 
 use App\Infrastructure\Doctrine\Entity\HolidayCalendar;
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\Constants\UserSettings;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -24,15 +25,7 @@ class UserProfileType extends AbstractType
             ->add('firstName', TextType::class)
             ->add('lastName', TextType::class)
             ->add('workingDays', ChoiceType::class, [
-                'choices'  => [
-                    'Monday'    => 1,
-                    'Tuesday'   => 2,
-                    'Wednesday' => 3,
-                    'Thursday'  => 4,
-                    'Friday'    => 5,
-                    'Saturday'  => 6,
-                    'Sunday'    => 7,
-                ],
+                'choices'  => UserSettings::WORKING_DAYS,
                 'expanded' => true,
                 'multiple' => true,
                 'label'    => 'Working Days',

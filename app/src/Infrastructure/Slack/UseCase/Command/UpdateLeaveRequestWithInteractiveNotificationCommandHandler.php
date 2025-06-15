@@ -26,6 +26,10 @@ class UpdateLeaveRequestWithInteractiveNotificationCommandHandler
             throw new \RuntimeException(sprintf('Leave request with id "%s" not found', $notificationDTO->identifier));
         }
 
+        if ($this->isAlreadyWithdrawn($leaveRequestDTO)) {
+            return $leaveRequestDTO;
+        }
+
         $approvedByUserDTO = $this->userFacade->getUserBySlackMemberId($notificationDTO->memberId);
 
         $leaveRequestDTO->status = $notificationDTO->status;
@@ -51,5 +55,10 @@ class UpdateLeaveRequestWithInteractiveNotificationCommandHandler
             $leaveRequestDTO->workDays,
         );
         $this->leaveRequestFacade->remove($leaveRequestDTO);
+    }
+
+    public function isAlreadyWithdrawn(LeaveRequestDTO $leaveRequestDTO): bool
+    {
+        return in_array($leaveRequestDTO->status, [LeaveRequestStatusEnum::Rejected, LeaveRequestStatusEnum::Cancelled, LeaveRequestStatusEnum::Withdrawn], true);
     }
 }

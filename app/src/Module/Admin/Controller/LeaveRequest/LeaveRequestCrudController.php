@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Module\Admin\Controller;
+namespace App\Module\Admin\Controller\LeaveRequest;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\Controller\AppAbstractCrudController;
 use App\Module\Admin\Validator\HasWorkdaysAndBalance;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\LeaveRequestTypeEnum;
@@ -26,6 +27,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -33,6 +35,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[AdminCrud(routePath: '/leave-request', routeName: 'app_leave_request')]
 class LeaveRequestCrudController extends AppAbstractCrudController
 {
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return LeaveRequest::class;
@@ -40,7 +47,19 @@ class LeaveRequestCrudController extends AppAbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        $withdrawAction = Action::new('withdraw', 'Withdraw')
+            ->linkToUrl(
+                fn (LeaveRequest $entity) => $this->urlGenerator->generate('app_leave_request_withdraw', ['id' => $entity->id])
+            )
+            ->setIcon('fa fa-ban')
+            ->addCssClass('btn btn-outline')
+        ->displayIf(
+            fn (LeaveRequest $request) => in_array($request->status, [LeaveRequestStatusEnum::Pending, LeaveRequestStatusEnum::Approved], true)
+        );
+
         return $actions
+            ->add(Crud::PAGE_DETAIL, $withdrawAction)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->update(
                 Crud::PAGE_INDEX,
                 Action::NEW,
@@ -133,7 +152,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
                 ]),
 
             FormField::addColumn(4)->hideWhenCreating(),
-            FormField::addPanel('Status')->hideWhenCreating(),
+            FormField::addPanel('Details')->hideWhenCreating(),
             ChoiceField::new('status')->setChoices(LeaveRequestStatusEnum::cases())->setDisabled()->hideWhenCreating(),
             NumberField::new('workDays')->setDisabled()->hideWhenCreating(),
             DateField::new('createdAt')->onlyOnIndex(),
