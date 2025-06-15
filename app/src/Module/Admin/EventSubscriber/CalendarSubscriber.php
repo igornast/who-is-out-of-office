@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Module\Admin\EventSubscriber;
 
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\Controller\LeaveRequest\LeaveRequestCrudController;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\LeaveRequestTypeEnum;
@@ -12,6 +13,8 @@ use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use CalendarBundle\Event\SetDataEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CalendarBundle\Entity\Event;
@@ -22,6 +25,7 @@ class CalendarSubscriber implements EventSubscriberInterface
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
         private readonly UserFacadeInterface $userFacade,
         private readonly HolidayFacadeInterface $holidayFacade,
+        private readonly AdminUrlGenerator $adminUrlGenerator,
         private readonly Security $security,
     ) {
     }
@@ -73,7 +77,14 @@ class CalendarSubscriber implements EventSubscriberInterface
                 ],
             ]);
 
-            $calendarEvent->addOption('url', '/admin/leave-request/'.$dto->id);
+            $calendarEvent->addOption(
+                'url',
+                $this->adminUrlGenerator
+                ->setController(LeaveRequestCrudController::class)
+                ->setAction(Action::DETAIL)
+                ->setEntityId($dto->id)
+                ->generateUrl()
+            );
             $event->addEvent($calendarEvent);
         }
     }

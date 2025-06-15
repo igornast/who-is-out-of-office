@@ -53,9 +53,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             )
             ->setIcon('fa fa-ban')
             ->addCssClass('btn btn-outline')
-        ->displayIf(
-            fn (LeaveRequest $request) => in_array($request->status, [LeaveRequestStatusEnum::Pending, LeaveRequestStatusEnum::Approved], true)
-        );
+            ->displayIf($this->shouldDisplayWithdrawAction());
 
         return $actions
             ->add(Crud::PAGE_DETAIL, $withdrawAction)
@@ -157,5 +155,10 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             NumberField::new('workDays')->setDisabled()->hideWhenCreating(),
             DateField::new('createdAt')->onlyOnIndex(),
         ];
+    }
+
+    private function shouldDisplayWithdrawAction(): \Closure
+    {
+        return fn (LeaveRequest $request) => in_array($request->status, [LeaveRequestStatusEnum::Pending, LeaveRequestStatusEnum::Approved], true) && $this->getUser() === $request->user;
     }
 }
