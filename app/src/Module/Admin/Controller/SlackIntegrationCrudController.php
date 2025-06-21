@@ -17,8 +17,7 @@ class SlackIntegrationCrudController extends AppAbstractCrudController
 {
     public function __construct(
         private readonly AdminUrlGenerator $adminUrlGenerator,
-    )
-    {
+    ) {
     }
 
     public static function getEntityFqcn(): string

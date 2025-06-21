@@ -71,7 +71,7 @@ SQL;
 
         $grouped = [];
         foreach ($items as $holidayData) {
-            if(!isset($holidayData['user_id'])) {
+            if (!isset($holidayData['user_id'])) {
                 continue;
             }
 
