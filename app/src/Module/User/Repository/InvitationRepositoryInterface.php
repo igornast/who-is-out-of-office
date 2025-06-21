@@ -11,4 +11,10 @@ interface InvitationRepositoryInterface
     public function findOneByToken(string $token): ?InvitationDTO;
 
     public function remove(InvitationDTO $invitationDTO): void;
+
+    /**
+     * @param array<string,mixed>       $criteria
+     * @param array<string, mixed>|null $orderBy
+     */
+    public function findOneBy(array $criteria, ?array $orderBy = null): ?object;
 }

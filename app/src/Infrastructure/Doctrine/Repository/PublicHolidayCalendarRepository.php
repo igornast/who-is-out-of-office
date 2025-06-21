@@ -13,6 +13,9 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Ramsey\Uuid\Uuid;
 
+/**
+ * @extends ServiceEntityRepository<HolidayCalendar>
+ */
 class PublicHolidayCalendarRepository extends ServiceEntityRepository implements PublicHolidayCalendarRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
@@ -33,7 +36,7 @@ class PublicHolidayCalendarRepository extends ServiceEntityRepository implements
 
     public function upsertByCountryCode(PublicHolidayCalendarDTO $calendarDTO): void
     {
-        /** @var HolidayCalendar $calendarEntity */
+        /** @var ?HolidayCalendar $calendarEntity */
         $calendarEntity = $this->findOneBy(['countryCode' => $calendarDTO->countryCode]);
 
         $entityManager = $this->getEntityManager();

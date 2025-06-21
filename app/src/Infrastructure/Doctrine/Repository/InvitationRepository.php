@@ -31,6 +31,10 @@ class InvitationRepository extends ServiceEntityRepository implements Invitation
     {
         $invitation = $this->findOneBy(['token' => $invitationDTO->token]);
 
+        if (!$invitation instanceof Invitation) {
+            return;
+        }
+
         $em = $this->getEntityManager();
 
         $em->remove($invitation);

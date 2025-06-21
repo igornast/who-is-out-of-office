@@ -113,6 +113,7 @@ class CalendarSubscriber implements EventSubscriberInterface
             default => [
                 'backgroundColor' => '#e2e3e5',
                 'borderColor' => '#d6d8db',
+                'textColor' => '#4527a0',
             ],
         };
     }
@@ -136,6 +137,7 @@ class CalendarSubscriber implements EventSubscriberInterface
                 continue;
             }
 
+            /** @var \DateTime $birthdayThisYear */
             $birthdayThisYear = \DateTime::createFromFormat('Y-m-d', $start->format('Y').'-'.$birthday->format('m-d'));
 
             $calendarEvent = new Event(

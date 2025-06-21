@@ -93,12 +93,15 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         $em = $this->getEntityManager();
         $qb = $em->createQueryBuilder();
 
-        return $qb->select('u')
+        /** @var User|null $user */
+        $user = $qb->select('u')
             ->from(User::class, 'u')
             ->where('u.id = :id')
             ->setParameter('id', $userId)
             ->getQuery()
             ->getOneOrNullResult();
+
+        return $user;
     }
 
     /**
@@ -107,6 +110,7 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
     public function findForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array
     {
         $qb = $this->createQueryBuilder('lr');
+        /** @var LeaveRequest[] $items */
         $items = $qb->where('lr.status IN (:statuses)')
             ->andWhere('lr.startDate <= :end')
             ->andWhere('lr.endDate   >= :start')
@@ -118,6 +122,32 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
             ->getResult();
 
         return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
+    }
+
+    /**
+     * @return array{string, LeaveRequestDTO[]}
+     */
+    public function findForDatesGroupedByUserId(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array
+    {
+        $qb = $this->createQueryBuilder('lr');
+        /** @var LeaveRequest[] $items */
+        $items = $qb->where('lr.status IN (:statuses)')
+            ->andWhere('lr.startDate <= :end')
+            ->andWhere('lr.endDate   >= :start')
+            ->setParameter('statuses', $statuses)
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->orderBy('lr.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($items as $item) {
+            $leaveRequestDTO = LeaveRequestDTO::fromEntity($item);
+            $result[$leaveRequestDTO->user->id][] = $leaveRequestDTO;
+        }
+
+        return $result;
     }
 
     public function delete(LeaveRequestDTO $leaveRequestDTO): void

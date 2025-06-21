@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -36,14 +37,15 @@ class UserProfileSettingsController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            if ($form->get('plainPassword')->getData()) {
-                $hashPassword = $this->hasher->hashPassword($user, $form->get('plainPassword')->getData());
+            $plainPassword = $form->get('plainPassword')->getData();
+            if (is_string($plainPassword)) {
+                $hashPassword = $this->hasher->hashPassword($user, $plainPassword);
 
                 $user->password = $hashPassword;
             }
 
             $uploadedFile = $form->get('profileImageFile')->getData();
-            if ($uploadedFile) {
+            if ($uploadedFile instanceof UploadedFile) {
                 $newFilename = uniqid().'.'.$uploadedFile->guessExtension();
                 $uploadedFile->move('uploads/profile_images', $newFilename);
 

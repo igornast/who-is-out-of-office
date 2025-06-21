@@ -30,7 +30,9 @@ class UpdateLeaveRequestWithInteractiveNotificationCommandHandler
             return $leaveRequestDTO;
         }
 
-        $approvedByUserDTO = $this->userFacade->getUserBySlackMemberId($notificationDTO->memberId);
+        $approvedByUserDTO = !is_null($notificationDTO->memberId)
+            ? $this->userFacade->getUserBySlackMemberId($notificationDTO->memberId)
+            : null;
 
         $leaveRequestDTO->status = $notificationDTO->status;
         $leaveRequestDTO->approvedBy = $approvedByUserDTO;

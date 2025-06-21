@@ -23,5 +23,12 @@ interface LeaveRequestFacadeInterface
      */
     public function getLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
 
-    public function remove(LeaveRequestDTO $leaveRequestDTO);
+    /**
+     * @param LeaveRequestStatusEnum[] $statuses
+     *
+     * @return array{string, LeaveRequestDTO[]}
+     */
+    public function getLeaveRequestsForDatesGroupedByUserId(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
+
+    public function remove(LeaveRequestDTO $leaveRequestDTO): void;
 }

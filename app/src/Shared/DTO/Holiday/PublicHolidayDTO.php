@@ -14,6 +14,7 @@ readonly class PublicHolidayDTO
     public function __construct(
         public UuidInterface $id,
         public string $description,
+        public string $countryCode,
         public \DateTimeImmutable $date,
     ) {
     }
@@ -23,16 +24,28 @@ readonly class PublicHolidayDTO
         return new self(
             id: $holiday->id,
             description: $holiday->description,
+            countryCode: $holiday->holidayCalendar->countryCode,
             date: $holiday->date,
         );
     }
 
-    public static function fromNager(NagerPublicHolidayDto $holiday)
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            id: Uuid::fromString($data['id']),
+            description: $data['description'],
+            countryCode: $data['country_code'],
+            date: \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['date']),
+        );
+    }
+
+    public static function fromNager(NagerPublicHolidayDto $holiday, string $countryCode): self
     {
         return new self(
             id: Uuid::uuid4(),
             description: $holiday->localName,
-            date: $holiday->date,
+            countryCode: $countryCode,
+            date: $holiday->date
         );
     }
 }

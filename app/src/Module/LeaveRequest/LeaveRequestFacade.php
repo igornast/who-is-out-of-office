@@ -8,6 +8,7 @@ use App\Module\LeaveRequest\UseCase\Command\RemoveLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Query\CalculateWorkDaysQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserIdQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
@@ -25,6 +26,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetUpcomingLeaveRequestsQueryHandler $getUpcomingLeaveRequestsHandler,
         private readonly UpdateLeaveRequestCommandHandler $updateLeaveRequestCommandHandler,
         private readonly GetLeaveRequestsForDatesQueryHandler $getLeaveRequestForDatesHandler,
+        private readonly GetLeaveRequestsForDatesGroupedByUserIdQueryHandler $getLeaveRequestForDatesGroupedByUserIdHandler,
         private readonly RemoveLeaveRequestCommandHandler $removeRequestHandler,
     ) {
     }
@@ -70,6 +72,16 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function getLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array
     {
         return $this->getLeaveRequestForDatesHandler->handle($startDate, $endDate, $statuses);
+    }
+
+    /**
+     * @param LeaveRequestStatusEnum[] $statuses
+     *
+     * @return array{string, LeaveRequestDTO[]}
+     */
+    public function getLeaveRequestsForDatesGroupedByUserId(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array
+    {
+        return $this->getLeaveRequestForDatesGroupedByUserIdHandler->handle($startDate, $endDate, $statuses);
     }
 
     public function remove(LeaveRequestDTO $leaveRequestDTO): void

@@ -32,7 +32,7 @@ readonly class PublicHolidayCalendarDTO
             id: Uuid::uuid4(),
             countryCode: $countryCode,
             countryName: $countryName,
-            holidays: array_map(fn (NagerPublicHolidayDto $holiday) => PublicHolidayDTO::fromNager($holiday), $holidays),
+            holidays: array_map(fn (NagerPublicHolidayDto $holiday) => PublicHolidayDTO::fromNager($holiday, $countryCode), $holidays),
         );
     }
 

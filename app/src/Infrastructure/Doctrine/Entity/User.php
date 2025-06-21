@@ -20,6 +20,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param array<int, string>                 $roles
      * @param Collection<int, LeaveRequest>|null $leaveRequests
+     * @param int[] $workingDays
      */
     public function __construct(
         public UuidInterface $id,

@@ -32,5 +32,12 @@ interface LeaveRequestRepositoryInterface
      */
     public function findForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
 
-    public function delete(LeaveRequestDTO $leaveRequestDTO);
+    /**
+     * @param LeaveRequestStatusEnum[] $statuses
+     *
+     * @return array{string, LeaveRequestDTO[]}
+     */
+    public function findForDatesGroupedByUserId(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
+
+    public function delete(LeaveRequestDTO $leaveRequestDTO): void;
 }

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Slack\UseCase\Command;
 
+use App\Infrastructure\Slack\Service\EmojisProvider;
+use App\Shared\DTO\Holiday\UserPublicHolidaysDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -16,11 +19,14 @@ use Symfony\Component\Notifier\Message\ChatMessage;
 
 class WeeklyDigestNotificationCommandHandler
 {
+    private const string SUBJECT_MESSAGE = 'Absences Weekly Digest';
+
     public function __construct(
         #[Autowire(env: 'SLACK_AR_HR_DIGEST_CHANNEL_ID')]
         private readonly string $dailyDigestChannelId,
         private readonly ChatterInterface $chatter,
         private readonly UserFacadeInterface $userFacade,
+        private readonly HolidayFacadeInterface $holidayFacade,
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
     ) {
     }
@@ -32,23 +38,33 @@ class WeeklyDigestNotificationCommandHandler
         $monday  = $today->modify('-'.($weekDay - 1).' days');
         $sunday  = $monday->modify('+6 days');
 
-        $approvedRequests = $this->leaveRequestFacade->getLeaveRequestsForDates($monday, $sunday, [LeaveRequestStatusEnum::Approved]);
+        /** @var array{string, LeaveRequestDTO[]} $mapUserIdToApprovedRequests */
+        $mapUserIdToApprovedRequests = $this->leaveRequestFacade->getLeaveRequestsForDatesGroupedByUserId($monday, $sunday, [LeaveRequestStatusEnum::Approved]);
+        /** @var array{string, UserPublicHolidaysDTO} $mapUserIdToHolidays */
+        $mapUserIdToHolidays = $this->holidayFacade->getHolidaysForDatesGroupedByUserId($monday, $sunday);
+
+        /** @var array{string, array{int, LeaveRequestDTO|UserPublicHolidaysDTO}} $mergedEvents */
+        $mergedEvents = collect($mapUserIdToApprovedRequests)
+        ->union($mapUserIdToHolidays)
+            ->map(function ($item, $key) use ($mapUserIdToApprovedRequests, $mapUserIdToHolidays) {
+                $publicHolidays = $mapUserIdToHolidays[$key] ?? null;
+
+                if (!$publicHolidays instanceof UserPublicHolidaysDTO) {
+                    return $mapUserIdToApprovedRequests[$key];
+                }
+
+                return array_merge($mapUserIdToApprovedRequests[$key] ?? [], [$publicHolidays]);
+            })
+            ->all();
+
         $birthdayUsers = $this->userFacade->getUsersWithBirthdaysForDates($monday, $sunday);
 
-        $oooSection = $this->generateWhoIsOutSection($approvedRequests);
+        $oooSection = $this->generateWhoIsOutSection($mergedEvents);
         $birthdaysSection = $this->generateBirthdaysSection($birthdayUsers);
         $contextSection = $this->generateHeaderSection();
 
         if (0 === sizeof($oooSection) && 0 === sizeof($birthdaysSection)) {
-            $options = new SlackOptions([
-                'channel' => $this->dailyDigestChannelId,
-                'blocks' => [
-                    ...$contextSection,
-                    ...$this->generateEmptyDigestMessage(),
-                ],
-            ]);
-
-            $this->chatter->send(new ChatMessage('Absences Weekly Digest')->options($options));
+            $this->handleNoLeaveAndBirthdaysDigest($contextSection);
 
             return;
         }
@@ -62,28 +78,61 @@ class WeeklyDigestNotificationCommandHandler
             ],
         ]);
 
-        $this->chatter->send(new ChatMessage('Absences Weekly Digest')->options($options));
+        $this->chatter->send(new ChatMessage(self::SUBJECT_MESSAGE)->options($options));
     }
 
     /**
-     * @param LeaveRequestDTO[] $leaveRequestDTOS
+     * @param array{string, array{int, LeaveRequestDTO|UserPublicHolidaysDTO}} $events
      */
-    private function generateWhoIsOutSection(array $leaveRequestDTOS): array
+    private function generateWhoIsOutSection(array $events): array
     {
-        if (0 === sizeof($leaveRequestDTOS)) {
+        if (0 === sizeof($events)) {
             return [];
         }
 
         $text = '';
-        foreach ($leaveRequestDTOS as $requestDTO) {
-            $text .=  sprintf(
-                "> *%s %s* - %s _(%s - %s)_\n",
-                $requestDTO->user->firstName,
-                $requestDTO->user->lastName,
-                $requestDTO->leaveType->name,
-                $requestDTO->startDate->format('F d'),
-                $requestDTO->endDate->format('F d')
+        /** @var array{int, LeaveRequestDTO|UserPublicHolidaysDTO} $userEvents */
+        foreach ($events as $userEvents) {
+
+            $firstAbsenseDTO = $userEvents[0];
+
+            if (!$firstAbsenseDTO instanceof LeaveRequestDTO && !$firstAbsenseDTO instanceof UserPublicHolidaysDTO) {
+                continue;
+            }
+
+            $user = $firstAbsenseDTO->user;
+            $text .= sprintf(
+                "*%s %s*\n",
+                $user->firstName,
+                $user->lastName,
             );
+
+            /** @var LeaveRequestDTO|UserPublicHolidaysDTO $event */
+            foreach ($userEvents as $event) {
+
+                if ($event instanceof LeaveRequestDTO) {
+                    $text .= sprintf(
+                        "    ‣ %s %s _(%s - %s)_\n",
+                        EmojisProvider::getLeaveTypeEmoji($event->leaveType),
+                        $event->leaveType->name,
+                        $event->startDate->format('F d'),
+                        $event->endDate->format('F d')
+                    );
+                }
+
+                if ($event instanceof UserPublicHolidaysDTO) {
+                    foreach ($event->holidays as $holiday) {
+                        $text .= sprintf(
+                            "    ‣ Public holiday: _%s (%s)_ %s\n",
+                            $holiday->date->format('F d'),
+                            $holiday->description,
+                            EmojisProvider::getFlagEmojiCode($holiday->countryCode),
+                        );
+                    }
+                }
+            }
+
+            $text .= "\n";
         }
 
         return [
@@ -106,7 +155,7 @@ class WeeklyDigestNotificationCommandHandler
         $text = '';
         foreach ($birthdayUserDTOs as $userDTO) {
             $text .=  sprintf(
-                "> *%s %s* - %s\n",
+                "    ‣ *%s %s* - %s\n",
                 $userDTO->firstName,
                 $userDTO->lastName,
                 $userDTO->birthDate?->format('F d') ?? '',
@@ -121,6 +170,9 @@ class WeeklyDigestNotificationCommandHandler
         ];
     }
 
+    /**
+     * @return array{int, array{string, string[]}}
+     */
     private function generateHeaderSection(): array
     {
         return[
@@ -157,5 +209,21 @@ class WeeklyDigestNotificationCommandHandler
                 ],
             ],
         ];
+    }
+
+    /**
+     * @param array{int, array{string, string[]}} $contextSection
+     */
+    private function handleNoLeaveAndBirthdaysDigest(array $contextSection): void
+    {
+        $options = new SlackOptions([
+            'channel' => $this->dailyDigestChannelId,
+            'blocks' => [
+                ...$contextSection,
+                ...$this->generateEmptyDigestMessage(),
+            ],
+        ]);
+
+        $this->chatter->send(new ChatMessage(self::SUBJECT_MESSAGE)->options($options));
     }
 }

@@ -15,6 +15,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class SlackIntegrationCrudController extends AppAbstractCrudController
 {
+    public function __construct(
+        private readonly AdminUrlGenerator $adminUrlGenerator,
+    )
+    {
+    }
+
     public static function getEntityFqcn(): string
     {
         return UserSlackIntegration::class;
@@ -44,7 +50,7 @@ class SlackIntegrationCrudController extends AppAbstractCrudController
     {
         $url = match ($action) {
             Action::NEW => $this->generateUrl('app_dashboard'),
-            default => $this->container->get(AdminUrlGenerator::class)
+            default => $this->adminUrlGenerator
                 ->setAction(Action::EDIT)
                 ->setEntityId($context->getEntity()->getPrimaryKeyValue()->id)
                 ->generateUrl(),
