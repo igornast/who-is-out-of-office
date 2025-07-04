@@ -47,6 +47,20 @@
   </style>
 {% endblock %}
 
+{% block content_header %}
+    <div class="content-header-title">
+        <h1 class="title">Team's Calendar</h1>
+    </div>
+
+    <div class="page-actions">
+        <div class="global-actions">
+            <a class="btn btn-outline-secondary" href="#" onclick="copyCalendarSubscribeUrl(this)">
+                <span class="action-label">Calendar Subscription Url</span>
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
 {% block main %}
     <div id="calendar"></div>
 {% endblock %}
@@ -91,6 +105,14 @@
 
         calendar.render();
       });
+    </script>
+
+    <script>
+      function copyCalendarSubscribeUrl(button) {
+        navigator.clipboard.writeText("{{ calendarSubscriptionUrl }}");
+        button.innerText = 'Copied to clipboard!';
+        setTimeout(() => button.innerText = 'Calendar Subscription Url', 2000);
+      }
     </script>
 {% endblock %}
 
