@@ -1,0 +1,4 @@
+leave_request:
+    type:
+        sick_leave: 'Sick Leave'
+        vacation: 'Vacations'

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Slack\UseCase\Command;
 
-use App\Infrastructure\Slack\Service\EmojisProvider;
 use App\Shared\DTO\Holiday\UserPublicHolidaysDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\UserDTO;
@@ -12,6 +11,7 @@ use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
+use App\Shared\Service\Messaging\EmojisProvider;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;

@@ -9,3 +9,7 @@ module.controllers:
 slack.controllers:
     resource: ../src/Infrastructure/Slack/Controller/*Controller.php
     type: attribute
+
+ical.controllers:
+    resource: ../src/Infrastructure/Ical/Controller/*Controller.php
+    type: attribute

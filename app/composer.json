@@ -18,6 +18,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.4.2",
         "doctrine/orm": "^3.3.3",
         "easycorp/easyadmin-bundle": "^4.24.7",
+        "eluceo/ical": "^2.14",
         "illuminate/collections": "^12.17.0",
         "ramsey/uuid": "^4.8.1",
         "ramsey/uuid-doctrine": "^2.1",

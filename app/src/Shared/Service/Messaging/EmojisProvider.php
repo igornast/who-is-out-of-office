@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Slack\Service;
+namespace App\Shared\Service\Messaging;
 
 use App\Shared\Enum\LeaveRequestTypeEnum;
 
