@@ -51,7 +51,8 @@ class PublicHolidayRepository extends ServiceEntityRepository implements PublicH
         $query = <<<SQL
             SELECT h.id, h.date, h.description, hc.country_code,
                    u.id as user_id, u.first_name, u.last_name, u.email, u.roles, u.working_days, 
-                   u.annual_leave_allowance, u.current_leave_balance, u.is_active, u.profile_image_url, u.birth_date
+                   u.annual_leave_allowance, u.current_leave_balance, u.is_active, u.profile_image_url, u.birth_date,
+                   u.created_at
             FROM holiday h
             INNER JOIN holiday_calendar hc ON h.holiday_calendar_id = hc.id
             INNER JOIN user u ON u.holiday_calendar_id = hc.id

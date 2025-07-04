@@ -42,75 +42,83 @@
     </style>
 {% endblock %}
 
+{% block content_header %}
+    <div class="content-header-title">
+        <h1 class="title">Edit Profile</h1>
+    </div>
+
+    <div class="page-actions">
+        <div class="global-actions">
+        </div>
+    </div>
+{% endblock %}
+
+
 {% block main %}
-    <div class="container mt-4">
-        <h1 class="mb-4">Edit Profile</h1>
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-11">
+            <div class="card shadow-sm">
+                <div class="card-body ea-profile-form">
+                    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
-        <div class="row justify-content-center">
-            <div class="col-lg-10 col-xl-10">
-                <div class="card shadow-sm">
-                    <div class="card-body ea-profile-form">
-                        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                    <h5>Profile Info</h5>
+                    <div class="form-group">
+                        {{ form_row(form.firstName) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_row(form.lastName) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_row(form.holidayCalendar) }}
+                    </div>
 
-                        <h5>Profile Info</h5>
-                        <div class="form-group">
-                            {{ form_row(form.firstName) }}
+                    <div class="mb-3">
+                        <label class="form-label">Working Days</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            {% for checkbox in form.workingDays %}
+                                <div class="form-check checkbox-large">
+                                    {{ form_widget(checkbox) }}
+                                    {{ form_label(checkbox) }}
+                                </div>
+                            {% endfor %}
                         </div>
-                        <div class="form-group">
-                            {{ form_row(form.lastName) }}
-                        </div>
-                        <div class="form-group">
-                            {{ form_row(form.holidayCalendar) }}
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Working Days</label>
-                            <div class="d-flex flex-wrap gap-3">
-                                {% for checkbox in form.workingDays %}
-                                    <div class="form-check checkbox-large">
-                                        {{ form_widget(checkbox) }}
-                                        {{ form_label(checkbox) }}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            {{ form_errors(form.workingDays) }}
-                        </div>
+                        {{ form_errors(form.workingDays) }}
+                    </div>
 
 
-                        <h5>Change Password</h5>
-                        <div class="form-group">
-                            {{ form_row(form.plainPassword.first) }}
-                        </div>
-                        <div class="form-group">
-                            {{ form_row(form.plainPassword.second) }}
-                        </div>
+                    <h5>Change Password</h5>
+                    <div class="form-group">
+                        {{ form_row(form.plainPassword.first) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_row(form.plainPassword.second) }}
+                    </div>
 
-                        <h5>Profile Image</h5>
-                        <div class="form-group">
-                            {{ form_row(form.profileImageFile) }}
-                        </div>
+                    <h5>Profile Image</h5>
+                    <div class="form-group">
+                        {{ form_row(form.profileImageFile) }}
+                    </div>
 
-                        {% if app.user.profileImageUrl %}
-                            {% set img = app.user.profileImageUrl %}
-                            {% if img starts with 'http://' or img starts with 'https://' %}
-                                {% set src = img %}
-                            {% else %}
-                                {% set src = asset(profile_images_base_path ~ '/' ~ img) %}
-                            {% endif %}
-
-                            <div class="text-center mb-4">
-                                <img src="{{ src }}"
-                                     alt="Profile Image"
-                                     class="img-thumbnail border border-3 border-light shadow-sm"
-                                     style="max-width: 160px;">
-                            </div>
+                    {% if app.user.profileImageUrl %}
+                        {% set img = app.user.profileImageUrl %}
+                        {% if img starts with 'http://' or img starts with 'https://' %}
+                            {% set src = img %}
+                        {% else %}
+                            {% set src = asset(profile_images_base_path ~ '/' ~ img) %}
                         {% endif %}
 
+                        <div class="text-center mb-4">
+                            <img src="{{ src }}"
+                                 alt="Profile Image"
+                                 class="img-thumbnail border border-3 border-light shadow-sm"
+                                 style="max-width: 160px;">
+                        </div>
+                    {% endif %}
 
-                        <button class="btn btn-primary">Save Changes</button>
 
-                        {{ form_end(form) }}
-                    </div>
+                    <button class="btn btn-primary">Save Changes</button>
+
+                    {{ form_end(form) }}
                 </div>
             </div>
         </div>

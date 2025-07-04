@@ -21,6 +21,7 @@ class UserDTO
         public int $annualLeaveAllowance,
         public int $currentLeaveBalance,
         public bool $isActive,
+        public \DateTimeImmutable $createdAt,
         public ?string $password = null,
         public ?string $profileImageUrl = null,
         public ?string $slackMemberId = null,
@@ -41,6 +42,7 @@ class UserDTO
             annualLeaveAllowance: $user->annualLeaveAllowance,
             currentLeaveBalance: $user->currentLeaveBalance,
             isActive: $user->isActive,
+            createdAt: $user->getCreatedAt(),
             password: $user->password,
             profileImageUrl: $user->profileImageUrl,
             slackMemberId: $user->slackIntegration?->slackMemberId,
@@ -61,6 +63,7 @@ class UserDTO
             annualLeaveAllowance: $data['annual_leave_allowance'],
             currentLeaveBalance: $data['current_leave_balance'],
             isActive: (bool) $data['is_active'],
+            createdAt: \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['created_at']),
             profileImageUrl: $data['profile_image_url'],
             birthDate: \DateTimeImmutable::createFromFormat('Y-m-d', $data['birth_date']),
         );
