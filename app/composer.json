@@ -40,7 +40,7 @@
         "doctrine/doctrine-fixtures-bundle": "^4.1",
         "friendsofphp/php-cs-fixer": "^3.75",
         "nelmio/alice": "^3.14.2",
-        "pestphp/pest": "^3.8.2",
+        "pestphp/pest": "^3.8",
         "phpstan/phpstan": "^2.1.17",
         "phpunit/phpunit": "^11.5.15",
         "symfony/stopwatch": "7.2.*",
@@ -96,6 +96,17 @@
             "@test:cs",
             "@test:stan",
             "@test:phpunit:u"
+        ],
+        "test-ci": [
+            "@test:cs",
+            "@test:stan",
+            "./vendor/bin/pest --testsuite Unit --coverage --min=90 --coverage-clover clover.xml"
+        ],
+        "reset-test-db": [
+            "php bin/console doctrine:database:drop --if-exists --force --env=test",
+            "php bin/console doctrine:database:create --env=test",
+            "php bin/console doctrine:schema:update --force --env=test",
+            "php bin/console doctrine:fixtures:load --no-interaction --env=test"
         ]
     },
     "conflict": {
