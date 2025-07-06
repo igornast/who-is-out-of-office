@@ -17,4 +17,3 @@ it('creates interactive notification from array', function () {
         ->and($dto->memberId)->toBe('123-member-id')
         ->and($dto->responseUrl)->toBe('https://hooks.slack.com/actions/T12A123123/123123123/ABC123ABC123ABC');
 });
-

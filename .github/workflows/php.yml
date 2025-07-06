@@ -18,7 +18,7 @@ jobs:
             mysql:
                 image: mysql:8.4.4
                 env:
-
+                    MYSQL_ALLOW_EMPTY_PASSWORD: yes
                     MYSQL_DATABASE: ooo_db_test
                     MYSQL_USER: mysql
                     MYSQL_PASSWORD: mysql

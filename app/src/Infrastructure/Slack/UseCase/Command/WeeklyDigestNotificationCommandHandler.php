@@ -94,13 +94,13 @@ class WeeklyDigestNotificationCommandHandler
         /** @var array{int, LeaveRequestDTO|UserPublicHolidaysDTO} $userEvents */
         foreach ($events as $userEvents) {
 
-            $firstAbsenseDTO = $userEvents[0];
+            $firstAbsenceDTO = $userEvents[0];
 
-            if (!$firstAbsenseDTO instanceof LeaveRequestDTO && !$firstAbsenseDTO instanceof UserPublicHolidaysDTO) {
+            if (!$firstAbsenceDTO instanceof LeaveRequestDTO && !$firstAbsenceDTO instanceof UserPublicHolidaysDTO) {
                 continue;
             }
 
-            $user = $firstAbsenseDTO->user;
+            $user = $firstAbsenceDTO->user;
             $text .= sprintf(
                 "*%s %s*\n",
                 $user->firstName,
