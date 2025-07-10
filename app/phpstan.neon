@@ -1,0 +1,16 @@
+parameters:
+    level: 8
+    paths:
+        - bin/
+        - config/
+        - src/
+    excludePaths:
+        - src/Shared/DTO/
+        - src/DataFixtures/
+    ignoreErrors:
+        - '#App\\Shared\\DTO#'
+        - '#getUserIdentifier\(\) should return non-empty-string but returns string.#'
+        - '#generateWhoIsOutSection\(\) should return#'
+        - '#generateBirthdaysSection\(\) should return#'
+        - '#generateHeaderSection\(\) should return#'
+        - '#generateEmptyDigestMessage\(\) should return#'
