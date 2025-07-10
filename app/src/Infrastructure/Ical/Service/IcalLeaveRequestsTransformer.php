@@ -14,7 +14,7 @@ use Eluceo\iCal\Domain\ValueObject\MultiDay;
 use Eluceo\iCal\Presentation\Component;
 use Eluceo\iCal\Presentation\Factory\CalendarFactory;
 
-class LeaveRequestsTransformer
+class IcalLeaveRequestsTransformer
 {
     public function __construct(private readonly UserMessagingTranslator $translator)
     {

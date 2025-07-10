@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Slack\UseCase\Command;
 
+use App\Infrastructure\Slack\Service\UsersEventsProvider;
 use App\Shared\DTO\Holiday\UserPublicHolidaysDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\UserDTO;
-use App\Shared\Enum\LeaveRequestStatusEnum;
-use App\Shared\Facade\HolidayFacadeInterface;
-use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\Messaging\EmojisProvider;
+use App\Shared\Service\UserMessagingTranslator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
@@ -26,8 +25,8 @@ class WeeklyDigestNotificationCommandHandler
         private readonly string $dailyDigestChannelId,
         private readonly ChatterInterface $chatter,
         private readonly UserFacadeInterface $userFacade,
-        private readonly HolidayFacadeInterface $holidayFacade,
-        private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
+        private readonly UsersEventsProvider $usersEventsProvider,
+        private readonly UserMessagingTranslator $translator,
     ) {
     }
 
@@ -38,24 +37,8 @@ class WeeklyDigestNotificationCommandHandler
         $monday  = $today->modify('-'.($weekDay - 1).' days');
         $sunday  = $monday->modify('+6 days');
 
-        /** @var array{string, LeaveRequestDTO[]} $mapUserIdToApprovedRequests */
-        $mapUserIdToApprovedRequests = $this->leaveRequestFacade->getLeaveRequestsForDatesGroupedByUserId($monday, $sunday, [LeaveRequestStatusEnum::Approved]);
-        /** @var array{string, UserPublicHolidaysDTO} $mapUserIdToHolidays */
-        $mapUserIdToHolidays = $this->holidayFacade->getHolidaysForDatesGroupedByUserId($monday, $sunday);
-
-        /** @var array{string, array{int, LeaveRequestDTO|UserPublicHolidaysDTO}} $mergedEvents */
-        $mergedEvents = collect($mapUserIdToApprovedRequests)
-        ->union($mapUserIdToHolidays)
-            ->map(function ($item, $key) use ($mapUserIdToApprovedRequests, $mapUserIdToHolidays) {
-                $publicHolidays = $mapUserIdToHolidays[$key] ?? null;
-
-                if (!$publicHolidays instanceof UserPublicHolidaysDTO) {
-                    return $mapUserIdToApprovedRequests[$key];
-                }
-
-                return array_merge($mapUserIdToApprovedRequests[$key] ?? [], [$publicHolidays]);
-            })
-            ->all();
+        /** @var array{string, LeaveRequestDTO[]|UserPublicHolidaysDTO[]} $mergedEvents */
+        $mergedEvents = $this->usersEventsProvider->provideMergedAbsencesPerUser($monday, $sunday);
 
         $birthdayUsers = $this->userFacade->getUsersWithBirthdaysForDates($monday, $sunday);
 
@@ -82,7 +65,9 @@ class WeeklyDigestNotificationCommandHandler
     }
 
     /**
-     * @param array{string, array{int, LeaveRequestDTO|UserPublicHolidaysDTO}} $events
+     * @param array{string, array{int, LeaveRequestDTO|UserPublicHolidaysDTO}}|void[] $events
+     *
+     * @return array{string, string|array{string, string}}|void[]
      */
     private function generateWhoIsOutSection(array $events): array
     {
@@ -94,11 +79,8 @@ class WeeklyDigestNotificationCommandHandler
         /** @var array{int, LeaveRequestDTO|UserPublicHolidaysDTO} $userEvents */
         foreach ($events as $userEvents) {
 
+            /** @var LeaveRequestDTO|UserPublicHolidaysDTO $firstAbsenceDTO */
             $firstAbsenceDTO = $userEvents[0];
-
-            if (!$firstAbsenceDTO instanceof LeaveRequestDTO && !$firstAbsenceDTO instanceof UserPublicHolidaysDTO) {
-                continue;
-            }
 
             $user = $firstAbsenceDTO->user;
             $text .= sprintf(
@@ -114,7 +96,7 @@ class WeeklyDigestNotificationCommandHandler
                     $text .= sprintf(
                         "    ‣ %s %s _(%s - %s)_\n",
                         EmojisProvider::getLeaveTypeEmoji($event->leaveType),
-                        $event->leaveType->name,
+                        $this->translator->translate('leave_request.type.'.$event->leaveType->value),
                         $event->startDate->format('F d'),
                         $event->endDate->format('F d')
                     );
@@ -144,6 +126,8 @@ class WeeklyDigestNotificationCommandHandler
 
     /**
      * @param UserDTO[] $birthdayUserDTOs
+     *
+     * @return array{string, string|array{string, string}}|void[]
      */
     private function generateBirthdaysSection(array $birthdayUserDTOs): array
     {
@@ -196,7 +180,10 @@ class WeeklyDigestNotificationCommandHandler
         ];
     }
 
-    private function generateEmptyDigestMessage()
+    /**
+     * @return array{int, array{string, string[]}}
+     */
+    private function generateEmptyDigestMessage(): array
     {
         return[
             [

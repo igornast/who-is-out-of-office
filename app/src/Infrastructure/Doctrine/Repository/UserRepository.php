@@ -54,7 +54,10 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->currentLeaveBalance = $userDTO->currentLeaveBalance;
         $user->isActive = $userDTO->isActive;
         $user->birthDate = $userDTO->birthDate;
-        $user->password = $userDTO->password;
+
+        if (null !== $userDTO->password) {
+            $user->password = $userDTO->password;
+        }
 
         $em = $this->getEntityManager();
         $em->persist($user);

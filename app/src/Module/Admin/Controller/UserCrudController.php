@@ -80,7 +80,7 @@ class UserCrudController extends AbstractCrudController
         yield TextField::new('invitationCopy', 'Status')
             ->setVirtual(true)
             ->setValue('')
-            ->formatValue(fn ($value, $user) => $this->generateInvitationButton($value, $user))
+            ->formatValue(fn ($value, $user) => $this->generateInvitationButton($user))
             ->onlyOnIndex()
             ->renderAsHtml();
 
@@ -117,7 +117,7 @@ class UserCrudController extends AbstractCrudController
         parent::updateEntity($entityManager, $entityInstance);
     }
 
-    private function generateInvitationButton(mixed $value, User $user)
+    private function generateInvitationButton(User $user): string
     {
 
         $invitation = $this->em
