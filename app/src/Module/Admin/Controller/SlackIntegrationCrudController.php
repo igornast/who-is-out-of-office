@@ -13,6 +13,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+/**
+ * @extends AppAbstractCrudController<UserSlackIntegration>
+ */
 class SlackIntegrationCrudController extends AppAbstractCrudController
 {
     public function __construct(

@@ -39,7 +39,7 @@ class CalendarExportController extends AbstractController
             endDate: new \DateTimeImmutable()->modify('+ 1 year'),
             statuses: [LeaveRequestStatusEnum::Approved]
         );
-        $calendarComponent =  $this->leaveRequestsTransformer->transformToCalendar($leaveRequestDTOs);
+        $calendarComponent = $this->leaveRequestsTransformer->transformToCalendar($leaveRequestDTOs);
 
         return new Response((string) $calendarComponent, 200, [
             'Content-Type' => 'text/calendar; charset=utf-8',

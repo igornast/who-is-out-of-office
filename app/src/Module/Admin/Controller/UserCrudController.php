@@ -25,6 +25,9 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @extends AbstractCrudController<User>
+ */
 #[AdminCrud(routePath: '/my-team', routeName: 'app_users')]
 class UserCrudController extends AbstractCrudController
 {

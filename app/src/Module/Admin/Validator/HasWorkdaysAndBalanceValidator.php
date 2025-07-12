@@ -39,7 +39,7 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
         $form = $this->context->getObject();
 
         /** @var LeaveRequest $leaveRequest */
-        $leaveRequest =  $form->getParent()?->getData();
+        $leaveRequest = $form->getParent()?->getData();
 
         $startDate = $leaveRequest->startDate;
         $user = $leaveRequest->user;

@@ -25,10 +25,10 @@ class UserProfileType extends AbstractType
             ->add('firstName', TextType::class)
             ->add('lastName', TextType::class)
             ->add('workingDays', ChoiceType::class, [
-                'choices'  => UserSettings::WORKING_DAYS,
+                'choices' => UserSettings::WORKING_DAYS,
                 'expanded' => true,
                 'multiple' => true,
-                'label'    => 'Working Days',
+                'label' => 'Working Days',
                 'required' => true,
             ])
             ->add('holidayCalendar', EntityType::class, [

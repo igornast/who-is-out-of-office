@@ -31,7 +31,7 @@ class LeaveRequestActionController extends AbstractController
             $this->addFlash('warning', 'Only pending requests can be withdrawn.');
         }
 
-        $leaveRequest->status =  LeaveRequestStatusEnum::Withdrawn;
+        $leaveRequest->status = LeaveRequestStatusEnum::Withdrawn;
         $this->em->flush();
 
         $this->userFacade->updateUserCurrentLeaveBalance($leaveRequest->user->id->toString(), $leaveRequest->workDays);

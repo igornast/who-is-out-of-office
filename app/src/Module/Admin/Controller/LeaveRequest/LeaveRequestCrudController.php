@@ -32,6 +32,9 @@ use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AppAbstractCrudController<LeaveRequest>
+ */
 #[AdminCrud(routePath: '/leave-request', routeName: 'app_leave_request')]
 class LeaveRequestCrudController extends AppAbstractCrudController
 {

@@ -32,10 +32,10 @@ class WeeklyDigestNotificationCommandHandler
 
     public function handle(): void
     {
-        $today   = new \DateTimeImmutable()->setTime(0, 0, 0);
+        $today = new \DateTimeImmutable()->setTime(0, 0, 0);
         $weekDay = (int) $today->format('N');
-        $monday  = $today->modify('-'.($weekDay - 1).' days');
-        $sunday  = $monday->modify('+6 days');
+        $monday = $today->modify('-'.($weekDay - 1).' days');
+        $sunday = $monday->modify('+6 days');
 
         /** @var array{string, LeaveRequestDTO[]|UserPublicHolidaysDTO[]} $mergedEvents */
         $mergedEvents = $this->usersEventsProvider->provideMergedAbsencesPerUser($monday, $sunday);
@@ -138,7 +138,7 @@ class WeeklyDigestNotificationCommandHandler
 
         $text = '';
         foreach ($birthdayUserDTOs as $userDTO) {
-            $text .=  sprintf(
+            $text .= sprintf(
                 "    ‣ *%s %s* - %s\n",
                 $userDTO->firstName,
                 $userDTO->lastName,
