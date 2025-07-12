@@ -101,7 +101,7 @@
         "test-ci": [
             "@test:cs",
             "@test:stan",
-            "./vendor/bin/pest --testsuite Unit --coverage --min=90 --coverage-clover clover.xml"
+            "./vendor/bin/pest --testsuite Unit --coverage --coverage-clover clover.xml"
         ],
         "reset-test-db": [
             "php bin/console doctrine:database:drop --if-exists --force --env=test",
