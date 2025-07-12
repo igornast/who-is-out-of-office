@@ -1,4 +1,5 @@
 # who-is-out-of-office
+![PHPStan](https://img.shields.io/badge/PHPStan-Level%208-brightgreen)  
 The Online Staff Leave Planner
 
 ## 🛠️ Admin Account

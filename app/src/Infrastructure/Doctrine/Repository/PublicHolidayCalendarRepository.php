@@ -54,7 +54,7 @@ class PublicHolidayCalendarRepository extends ServiceEntityRepository implements
             function (PublicHolidayDTO $holidayDTO) use ($calendarEntity) {
                 $calendarEntity->holidays
                     ->add(new Holiday(
-                        id: Uuid::uuid4(),
+                        id: Uuid::fromString($holidayDTO->id),
                         description: $holidayDTO->description,
                         date: $holidayDTO->date,
                         holidayCalendar: $calendarEntity

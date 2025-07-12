@@ -8,6 +8,11 @@ use App\Infrastructure\Doctrine\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
+/**
+ * @template TEntity of object
+ *
+ * @extends AbstractCrudController<TEntity>
+ */
 abstract class AppAbstractCrudController extends AbstractCrudController
 {
     protected function getUser(): User

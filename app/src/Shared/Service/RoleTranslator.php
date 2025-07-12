@@ -26,9 +26,7 @@ class RoleTranslator
      */
     public function translate(array $roles): string
     {
-        $translated = array_map(function (string $role): string {
-            return $this->translator->trans(id: $this->roleMapping[$role] ?? $role, domain: 'admin');
-        }, $roles);
+        $translated = array_map(fn (string $role): string => $this->translator->trans(id: $this->roleMapping[$role] ?? $role, domain: 'admin'), $roles);
 
         return implode(', ', $translated);
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Ical\Controller;
 
 use App\Infrastructure\Ical\Service\CalendarRequestVerifier;
-use App\Infrastructure\Ical\Service\LeaveRequestsTransformer;
+use App\Infrastructure\Ical\Service\IcalLeaveRequestsTransformer;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
@@ -19,7 +19,7 @@ class CalendarExportController extends AbstractController
 {
     public function __construct(
         private readonly CalendarRequestVerifier $calendarRequestVerifier,
-        private readonly LeaveRequestsTransformer $leaveRequestsTransformer,
+        private readonly IcalLeaveRequestsTransformer $leaveRequestsTransformer,
         private readonly UserFacadeInterface $userFacade,
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
     ) {
@@ -39,7 +39,7 @@ class CalendarExportController extends AbstractController
             endDate: new \DateTimeImmutable()->modify('+ 1 year'),
             statuses: [LeaveRequestStatusEnum::Approved]
         );
-        $calendarComponent =  $this->leaveRequestsTransformer->transformToCalendar($leaveRequestDTOs);
+        $calendarComponent = $this->leaveRequestsTransformer->transformToCalendar($leaveRequestDTOs);
 
         return new Response((string) $calendarComponent, 200, [
             'Content-Type' => 'text/calendar; charset=utf-8',

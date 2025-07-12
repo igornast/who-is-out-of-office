@@ -13,19 +13,19 @@
         "php": ">=8.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/dbal": "^3.9.4",
-        "doctrine/doctrine-bundle": "^2.14.0",
+        "doctrine/dbal": "^3.10.0",
+        "doctrine/doctrine-bundle": "^2.15.0",
         "doctrine/doctrine-migrations-bundle": "^3.4.2",
-        "doctrine/orm": "^3.3.3",
-        "easycorp/easyadmin-bundle": "^4.24.7",
+        "doctrine/orm": "^3.5.0",
+        "easycorp/easyadmin-bundle": "^4.24.9",
         "eluceo/ical": "^2.14",
-        "illuminate/collections": "^12.17.0",
-        "ramsey/uuid": "^4.8.1",
+        "illuminate/collections": "^12.20.0",
+        "ramsey/uuid": "^4.9.0",
         "ramsey/uuid-doctrine": "^2.1",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
         "symfony/expression-language": "7.2.*",
-        "symfony/flex": "^2.7.1",
+        "symfony/flex": "^2.8.1",
         "symfony/framework-bundle": "7.2.*",
         "symfony/monolog-bundle": "^3.10",
         "symfony/notifier": "7.2.*",
@@ -34,11 +34,12 @@
         "symfony/slack-notifier": "7.2.*",
         "symfony/twig-bundle": "7.2.*",
         "symfony/yaml": "7.2.*",
-        "tattali/calendar-bundle": "^7.0"
+        "tattali/calendar-bundle": "^7.0.1"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.1",
-        "friendsofphp/php-cs-fixer": "^3.75",
+        "friendsofphp/php-cs-fixer": "^3.82.2",
+        "mockery/mockery": "^1.6.12",
         "nelmio/alice": "^3.14.2",
         "pestphp/pest": "^3.8.2",
         "phpstan/phpstan": "^2.1.17",
@@ -96,6 +97,17 @@
             "@test:cs",
             "@test:stan",
             "@test:phpunit:u"
+        ],
+        "test-ci": [
+            "@test:cs",
+            "@test:stan",
+            "./vendor/bin/pest --testsuite Unit --coverage --coverage-clover clover.xml"
+        ],
+        "reset-test-db": [
+            "php bin/console doctrine:database:drop --if-exists --force --env=test",
+            "php bin/console doctrine:database:create --env=test",
+            "php bin/console doctrine:schema:update --force --env=test",
+            "php bin/console doctrine:fixtures:load --no-interaction --env=test"
         ]
     },
     "conflict": {

@@ -18,6 +18,9 @@ class InteractiveNotificationDTO
     ) {
     }
 
+    /**
+     * @param mixed[] $data
+     */
     public static function fromArray(array $data): self
     {
         $payload = json_decode(json: $data['payload'], associative: true) ?? [];
@@ -37,7 +40,7 @@ class InteractiveNotificationDTO
         [$type, $status, $identifier] = explode('_', $value);
 
         return new self(
-            status: LeaveRequestStatusEnum::tryFrom($status),
+            status: LeaveRequestStatusEnum::from($status),
             type: $type,
             identifier: $identifier,
             channel: $payload['channel']['id'] ?? '',

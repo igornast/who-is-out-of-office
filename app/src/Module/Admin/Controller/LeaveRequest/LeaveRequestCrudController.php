@@ -32,6 +32,9 @@ use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AppAbstractCrudController<LeaveRequest>
+ */
 #[AdminCrud(routePath: '/leave-request', routeName: 'app_leave_request')]
 class LeaveRequestCrudController extends AppAbstractCrudController
 {
@@ -116,7 +119,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
     {
         return [
             FormField::addColumn(8),
-            FormField::addPanel('Request absence'),
+            FormField::addFieldset('Request absence'),
             AssociationField::new('user', 'Name')
                 ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName))
                 ->setPermission('ROLE_ADMIN'),
@@ -150,7 +153,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
                 ]),
 
             FormField::addColumn(4)->hideWhenCreating(),
-            FormField::addPanel('Details')->hideWhenCreating(),
+            FormField::addFieldset('Details')->hideWhenCreating(),
             ChoiceField::new('status')->setChoices(LeaveRequestStatusEnum::cases())->setDisabled()->hideWhenCreating(),
             NumberField::new('workDays')->setDisabled()->hideWhenCreating(),
             DateField::new('createdAt')->onlyOnIndex(),

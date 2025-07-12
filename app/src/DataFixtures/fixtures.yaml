@@ -22,7 +22,8 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 30
             isActive: true
             profileImageUrl: <randomElement($profileImages)>
-            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
+            holidayCalendar: '@holiday_calendar_fr'
+            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 days", "+2 days")->format("Y-m-d H:i:s")))>'
     user_2:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -35,8 +36,9 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 30
             isActive: true
             profileImageUrl: <randomElement($profileImages)>
+            holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
-    user_{3..10}:
+    user_{3..6}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: <firstName()>
@@ -48,10 +50,36 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 24
             isActive: true
             profileImageUrl: <randomElement($profileImages)>
+            holidayCalendar: '@holiday_calendar_fr'
+            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
+    user_{7..10}:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: <firstName()>
+            lastName: <lastName()>
+            email: <email()>
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 24
+            isActive: true
+            profileImageUrl: <randomElement($profileImages)>
+            holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
 
 App\Infrastructure\Doctrine\Entity\LeaveRequest:
     leave_request_{1..10}:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: <numberBetween(1, 10)>
+            comment: <sentence()>
+            leaveType: '<(App\Shared\Enum\LeaveRequestTypeEnum::from(["sick_leave", "vacation"][rand(0,1)]))>'
+            user: '@user_<numberBetween(2, 10)>'
+            approvedBy: '@user_1'
+            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-2 days", "now")->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+10 days")->format("Y-m-d H:i:s")))>'
+    leave_request_{11..16}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from(["pending", "approved", "rejected", "cancelled", "withdrawn"][rand(0,4)]))>'
@@ -60,8 +88,8 @@ App\Infrastructure\Doctrine\Entity\LeaveRequest:
             leaveType: '<(App\Shared\Enum\LeaveRequestTypeEnum::from(["sick_leave", "vacation"][rand(0,1)]))>'
             user: '@user_<numberBetween(2, 10)>'
             approvedBy: '@user_1'
-            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-20 days", "-15 days")->format("Y-m-d H:i:s")))>'
-            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-14 days", "-10 days")->format("Y-m-d H:i:s")))>'
+            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-10 days", "-2 days")->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+10 days")->format("Y-m-d H:i:s")))>'
 
 App\Infrastructure\Doctrine\Entity\HolidayCalendar:
     holiday_calendar_fr:
@@ -69,16 +97,27 @@ App\Infrastructure\Doctrine\Entity\HolidayCalendar:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             countryCode: 'FR'
             countryName: 'France'
-    holiday_calendar_us:
+    holiday_calendar_de:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            countryCode: 'US'
-            countryName: 'United States'
+            countryCode: 'DE'
+            countryName: 'Germany'
+    holiday_calendar_nl:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            countryCode: 'NL'
+            countryName: 'Netherlands'
 
 App\Infrastructure\Doctrine\Entity\Holiday:
-    holiday_{1..5}:
+    holiday_{1..3}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             holidayCalendar: '@holiday_calendar_fr'
             description: <word()>
-            date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeThisYear()->format("Y-m-d H:i:s")))>'
+            date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+10 days")->format("Y-m-d H:i:s")))>'
+    holiday_{4..6}:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            holidayCalendar: '@holiday_calendar_de'
+            description: <word()>
+            date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeThisMonth()->format("Y-m-d H:i:s")))>'
