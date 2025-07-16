@@ -37,7 +37,7 @@ class IcalLeaveRequestsTransformer
 
             $description = sprintf(
                 '%s (%s - %s) %s',
-                $this->translator->translate('leave_request.type.'.$leaveRequestDTO->leaveType->value),
+                $this->translator->translate(UserMessagingTranslator::LEAVE_REQUEST_TYPE.$leaveRequestDTO->leaveType->value),
                 $leaveRequestDTO->startDate->format('F d'),
                 $leaveRequestDTO->endDate->format('F d'),
                 $leaveRequestDTO->comment

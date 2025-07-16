@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Facade;
 
+use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Enum\LeaveRequestStatusEnum;
@@ -15,6 +16,8 @@ interface LeaveRequestFacadeInterface
     public function getById(string $id): ?LeaveRequestDTO;
 
     public function update(LeaveRequestDTO $leaveRequestDTO): void;
+
+    public function save(SaveLeaveRequestCommand $command): void;
 
     /**
      * @param LeaveRequestStatusEnum[] $statuses

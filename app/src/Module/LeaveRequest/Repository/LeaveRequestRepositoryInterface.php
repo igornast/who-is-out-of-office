@@ -23,6 +23,8 @@ interface LeaveRequestRepositoryInterface
 
     public function findById(string $id): ?LeaveRequestDTO;
 
+    public function saveLeaveRequest(LeaveRequestDTO $leaveRequestDTO): void;
+
     public function update(LeaveRequestDTO $leaveRequestDTO): void;
 
     /**
@@ -40,4 +42,10 @@ interface LeaveRequestRepositoryInterface
     public function findForDatesGroupedByUserId(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
 
     public function delete(LeaveRequestDTO $leaveRequestDTO): void;
+
+    public function beginTransaction(): void;
+
+    public function commit(): void;
+
+    public function rollback(): void;
 }

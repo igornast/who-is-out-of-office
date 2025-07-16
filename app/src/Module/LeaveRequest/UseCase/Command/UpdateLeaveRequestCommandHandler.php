@@ -6,7 +6,6 @@ namespace App\Module\LeaveRequest\UseCase\Command;
 
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
-use App\Shared\Enum\LeaveRequestStatusEnum;
 
 class UpdateLeaveRequestCommandHandler
 {
@@ -17,11 +16,6 @@ class UpdateLeaveRequestCommandHandler
 
     public function handle(LeaveRequestDTO $leaveRequestDTO): void
     {
-        if (LeaveRequestStatusEnum::Rejected === $leaveRequestDTO->status) {
-
-        }
-
-
         $this->repository->update($leaveRequestDTO);
     }
 }
