@@ -96,7 +96,7 @@ class WeeklyDigestNotificationCommandHandler
                     $text .= sprintf(
                         "    ‣ %s %s _(%s - %s)_\n",
                         EmojisProvider::getLeaveTypeEmoji($event->leaveType),
-                        $this->translator->translate('leave_request.type.'.$event->leaveType->value),
+                        $this->translator->translate(UserMessagingTranslator::LEAVE_REQUEST_TYPE.$event->leaveType->value),
                         $event->startDate->format('F d'),
                         $event->endDate->format('F d')
                     );

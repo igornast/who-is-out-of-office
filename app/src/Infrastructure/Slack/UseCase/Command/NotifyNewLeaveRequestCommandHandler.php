@@ -6,6 +6,7 @@ namespace App\Infrastructure\Slack\UseCase\Command;
 
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Service\UserMessagingTranslator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
@@ -17,6 +18,7 @@ class NotifyNewLeaveRequestCommandHandler
         #[Autowire(env: 'SLACK_AR_APPROVE_CHANNEL_ID')]
         private readonly string $requestsApproveChannelId,
         private readonly ChatterInterface $chatter,
+        private readonly UserMessagingTranslator $translator,
     ) {
     }
 
@@ -45,7 +47,7 @@ class NotifyNewLeaveRequestCommandHandler
                     'fields' => [
                         [
                             'type' => 'mrkdwn',
-                            'text' => sprintf('*Type:* %s', $leaveRequestDTO->leaveType->value),
+                            'text' => sprintf('*Type:* %s', $this->translator->translate(UserMessagingTranslator::LEAVE_REQUEST_TYPE.$leaveRequestDTO->leaveType->value)),
                         ],
                         [
                             'type' => 'mrkdwn',

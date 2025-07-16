@@ -11,6 +11,7 @@ use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<LeaveRequest>
@@ -27,6 +28,28 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         $leaveRequest = $this->findOneBy(['id' => $id]);
 
         return null !== $leaveRequest ? LeaveRequestDTO::fromEntity($leaveRequest) : null;
+    }
+
+    public function saveLeaveRequest(LeaveRequestDTO $leaveRequestDTO): void
+    {
+        $user = $this->getUserOrNull($leaveRequestDTO->user->id);
+
+        if (is_null($user)) {
+            throw new \RuntimeException('User not found');
+        }
+
+        $leaveRequest = new LeaveRequest(
+            id: Uuid::fromString($leaveRequestDTO->id),
+            user: $user,
+            status: $leaveRequestDTO->status,
+            leaveType: $leaveRequestDTO->leaveType,
+            startDate: $leaveRequestDTO->startDate,
+            endDate: $leaveRequestDTO->endDate,
+            workDays: $leaveRequestDTO->workDays,
+        );
+
+        $this->getEntityManager()->persist($leaveRequest);
+        $this->getEntityManager()->flush();
     }
 
     public function update(LeaveRequestDTO $leaveRequestDTO): void
@@ -158,5 +181,20 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
             ->setParameter('id', $leaveRequestDTO->id)
             ->getQuery()
             ->execute();
+    }
+
+    public function beginTransaction(): void
+    {
+        $this->getEntityManager()->beginTransaction();
+    }
+
+    public function commit(): void
+    {
+        $this->getEntityManager()->commit();
+    }
+
+    public function rollback(): void
+    {
+        $this->getEntityManager()->rollback();
     }
 }

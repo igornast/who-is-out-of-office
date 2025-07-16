@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Module\LeaveRequest;
 
 use App\Module\LeaveRequest\UseCase\Command\RemoveLeaveRequestCommandHandler;
+use App\Module\LeaveRequest\UseCase\Command\SaveLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Query\CalculateWorkDaysQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
@@ -12,6 +13,7 @@ use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserI
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
+use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Enum\LeaveRequestStatusEnum;
@@ -25,6 +27,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetLeaveRequestQueryHandler $getLeaveRequestHandler,
         private readonly GetUpcomingLeaveRequestsQueryHandler $getUpcomingLeaveRequestsHandler,
         private readonly UpdateLeaveRequestCommandHandler $updateLeaveRequestCommandHandler,
+        private readonly SaveLeaveRequestCommandHandler $saveLeaveRequestCommandHandler,
         private readonly GetLeaveRequestsForDatesQueryHandler $getLeaveRequestForDatesHandler,
         private readonly GetLeaveRequestsForDatesGroupedByUserIdQueryHandler $getLeaveRequestForDatesGroupedByUserIdHandler,
         private readonly RemoveLeaveRequestCommandHandler $removeRequestHandler,
@@ -62,6 +65,20 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function update(LeaveRequestDTO $leaveRequestDTO): void
     {
         $this->updateLeaveRequestCommandHandler->handle($leaveRequestDTO);
+    }
+
+    public function save(SaveLeaveRequestCommand $command): void
+    {
+        $query = new CalculateWorkdaysQuery(
+            startDate: $command->startDate,
+            endDate: $command->endDate,
+            userWorkingDays: $command->userDTO->workingDays,
+            holidayCalendarCountryCode: $command->userDTO->calendarCountryCode
+        );
+
+        $workDays = $this->calculateWorkDays($query);
+
+        $this->saveLeaveRequestCommandHandler->handle($command, $workDays);
     }
 
     /**

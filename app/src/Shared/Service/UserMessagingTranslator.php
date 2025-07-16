@@ -8,6 +8,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserMessagingTranslator
 {
+    public const string LEAVE_REQUEST_TYPE = 'leave_request.type.';
+
     public function __construct(private readonly TranslatorInterface $translator)
     {
     }

@@ -61,10 +61,15 @@ class LeaveRequestCrudController extends AppAbstractCrudController
         return $actions
             ->add(Crud::PAGE_DETAIL, $withdrawAction)
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->update(
+            ->disable(Action::NEW)
+            ->add(
                 Crud::PAGE_INDEX,
-                Action::NEW,
-                fn (Action $action) => $action->setIcon('fa fa-plus')->setLabel('crud.actions.leave_requests.new')
+                Action::new('new-request')
+                    ->setLabel('crud.actions.leave_requests.new')
+                    ->setIcon('fa fa-plus')
+                    ->linkToRoute('app_leave_request_new')
+                    ->addCssClass('btn btn-success')
+                    ->createAsGlobalAction()
             )
             ->disable(Action::DELETE, Action::EDIT);
     }
@@ -123,7 +128,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             AssociationField::new('user', 'Name')
                 ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName))
                 ->setPermission('ROLE_ADMIN'),
-            ChoiceField::new('leaveType', 'What type of absence')
+            ChoiceField::new('leaveType', 'Select the type of absence')
                 ->setChoices(LeaveRequestTypeEnum::getChoices())
                 ->setFormTypeOptions(['constraints' => [
                     new NotBlank(['message' => 'Please choose a leave type.']),
