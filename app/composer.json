@@ -24,6 +24,8 @@
         "phpstan/phpdoc-parser": "^2.1",
         "ramsey/uuid": "^4.9.0",
         "ramsey/uuid-doctrine": "^2.1",
+        "symfony/asset": "7.2.*",
+        "symfony/asset-mapper": "7.2.*",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
         "symfony/expression-language": "7.2.*",
@@ -37,9 +39,13 @@
         "symfony/runtime": "7.2.*",
         "symfony/serializer": "7.2.*",
         "symfony/slack-notifier": "7.2.*",
+        "symfony/stimulus-bundle": "*",
         "symfony/twig-bundle": "7.2.*",
+        "symfony/ux-live-component": "^2.27",
         "symfony/yaml": "7.2.*",
-        "tattali/calendar-bundle": "^7.0.1"
+        "tattali/calendar-bundle": "^7.0.1",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.1",
@@ -86,7 +92,8 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"

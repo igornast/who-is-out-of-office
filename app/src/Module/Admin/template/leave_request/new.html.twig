@@ -1,52 +1,8 @@
 {% extends '@!EasyAdmin/layout.html.twig' %}
 
-{% block head_javascript %}
-    {{ parent() }}
-
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-{% endblock %}
-
 {% block head_stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <style>
-        .ea-request-form input,
-        .ea-request-form select,
-        .ea-request-form textarea {
-            width: 100%;
-            border: 1px solid #ced4da;
-            border-radius: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background-color: #fff;
-        }
-
-        .ea-request-form .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .ea-request-form label {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .ea-request-form h5 {
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .ea-request-form .btn-primary {
-            margin-top: 1.5rem;
-        }
-
-        .checkbox-large input[type="checkbox"] {
-            transform: scale(1.8);
-            margin-right: 8px;
-            margin-bottom: 13px;
-            margin-top: 13px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('vendor/flatpickr/dist/flatpickr.min.css') }}">
 {% endblock %}
 
 {% block content_header %}
@@ -66,21 +22,7 @@
         <div class="col-lg-10 col-xl-11">
             <div class="card shadow-sm">
                 <div class="card-body ea-request-form">
-                    {{ form_start(form) }}
-                        <div class="form-group">
-                            {{ form_row(form.leaveType) }}
-                        </div>
-                        <div class="form-group">
-                            {{ form_row(form.dateRange) }}
-
-                            <div id="leave-preview" class="alert alert-info mt-3 d-none" role="alert">
-                                <strong><span id="leave-workdays"></span></strong> workdays will be taken.
-                                Remaining balance: <span id="leave-balance"></span>.
-                            </div>
-                        </div>
-
-                        <button class="btn btn-primary mt-0">Send the request</button>
-                    {{ form_end(form) }}
+                    {{ component('LeaveRequestForm') }}
                 </div>
             </div>
         </div>
@@ -89,39 +31,5 @@
 
 {% block body_javascript %}
   {{ parent() }}
-
-    <script type="text/javascript">
-      flatpickr('.js-datepicker', {
-        mode: 'range',
-        dateFormat: 'Y-m-d',
-        locale: {
-          'firstDayOfWeek': 1
-        },
-        onClose: function(selectedDates, dateStr) {
-          if (selectedDates.length < 2) {
-            return;
-          }
-
-          const startDate = selectedDates[0].toISOString().split('T')[0];
-          const endDate = selectedDates[1].toISOString().split('T')[0];
-
-          fetch("{{ url('app_leave_request_calculate') }}", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-              startDate: startDate,
-              endDate: endDate
-            })
-          })
-            .then(response => response.json())
-            .then(data => {
-              document.getElementById('leave-preview').classList.remove('d-none');
-              document.getElementById('leave-workdays').textContent = data.workdays;
-              document.getElementById('leave-balance').textContent = data.remainingBalance;
-            });
-        }
-      });
-    </script>
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
 {% endblock %}

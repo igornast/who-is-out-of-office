@@ -8,43 +8,7 @@
 
 {% block head_stylesheets %}
   {{ parent() }}
-  <style>
-    #calendar {
-      margin: 20px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .fc-event.fc-pending-leave {
-      border: 2px dashed #ffc107 !important;
-      border-radius: 3px;
-    }
-
-    .fc-event {
-      font-size: 0.9rem;
-      line-height: 1.2em;
-      padding: 4px 6px;
-      min-height: 28px;
-      border-radius: 4px;
-    }
-    .fc-event-title {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 100%;
-    }
-
-    .fc-daygrid-event {
-      padding: 6px 8px;
-      font-size: 1rem;
-    }
-
-    .fc-day-sat, .fc-day-sun {
-      background-color: #e9ecef;
-    }
-  </style>
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
 {% endblock %}
 
 {% block content_header %}

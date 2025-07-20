@@ -28,12 +28,16 @@ class DateRangeToStartEndTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param string $value
+     * @param ?string $value
      *
-     * @return array{'start': \DateTimeImmutable, 'end': \DateTimeImmutable}
+     * @return array{}|array{'start': \DateTimeImmutable, 'end': \DateTimeImmutable}
      */
     public function reverseTransform(mixed $value): array
     {
+        if (null === $value) {
+            return [];
+        }
+
         $start = $value;
         $end = $value;
 

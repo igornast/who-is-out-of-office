@@ -21,12 +21,20 @@ class LeaveRequestDraftType extends AbstractType
             ->add('leaveType', EnumType::class, [
                 'class' => LeaveRequestTypeEnum::class,
                 'label' => 'What type of absence',
+                'attr' => [
+                    'data-live-name' => 'leaveType',
+                    'data-action' => 'live#action',
+                    'data-live-action-param' => 'updated',
+                ],
             ])
             ->add('dateRange', TextType::class, [
                 'label' => 'When',
                 'attr' => [
-                    'class' => 'js-datepicker',
                     'placeholder' => 'YYYY-MM-DD to YYYY-MM-DD',
+                    'data-controller' => 'flatpickr',
+                    'data-live-name' => 'dateRange',
+                    'data-action' => 'live#action',
+                    'data-live-action-param' => 'updated',
                 ],
             ]);
 
