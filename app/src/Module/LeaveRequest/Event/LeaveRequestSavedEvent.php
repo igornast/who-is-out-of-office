@@ -6,7 +6,7 @@ namespace App\Module\LeaveRequest\Event;
 
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 
-class LeaveRequestApprovedEvent
+class LeaveRequestSavedEvent
 {
     public function __construct(public LeaveRequestDTO $leaveRequestDTO)
     {

@@ -17,7 +17,27 @@ The database migrations include a default admin account for initial access:
 
 You can import a set of public holidays for a specific country and year using the following Symfony command:
 
-```php bin/console app:holiday:import NG Nigeria 2025```
+```shell
+php app/bin/console app:holiday:import NG Nigeria 2025
+```
+
+## 🗂️ Frontend & Assets
+The project uses Symfony AssetMapper and Symfony UX for JavaScript, CSS, and components.
+
+After deployment, compile the assets:
+
+```shell
+php app/bin/console asset-map:compile
+```
+
+Side notes:
+* Assets live in `assets/` and importmap.php. 
+* Remote packages (e.g. Stimulus, UX components) are resolved at compile time. 
+* Do not edit files in `public/assets/` they are generated.
+
+For details, see [AssetMapper](https://symfony.com/doc/current/frontend/asset_mapper.html) and [Symfony UX](https://ux.symfony.com).
+
+
 
 ## Slack Integration
 

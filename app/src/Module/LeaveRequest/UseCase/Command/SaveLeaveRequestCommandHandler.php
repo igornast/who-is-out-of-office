@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\LeaveRequest\UseCase\Command;
 
-use App\Module\LeaveRequest\Event\LeaveRequestApprovedEvent;
+use App\Module\LeaveRequest\Event\LeaveRequestSavedEvent;
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
@@ -53,6 +53,6 @@ class SaveLeaveRequestCommandHandler
             throw $e;
         }
 
-        $this->dispatcher->dispatch(new LeaveRequestApprovedEvent($leaveRequestDTO));
+        $this->dispatcher->dispatch(new LeaveRequestSavedEvent($leaveRequestDTO));
     }
 }

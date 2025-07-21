@@ -14,22 +14,27 @@ if ! command -v docker-php-entrypoint >/dev/null 2>&1; then
     exit 1
 fi
 
-#DB_HOST="${DB_HOST:-db}"
-#DB_PORT="${DB_PORT:-3306}"
-#
-#if [ "$APP_ENV" = "dev" ]; then
-#    echo "Running composer install..."
-#    composer install --prefer-dist --no-progress --no-suggest
-#
-#    echo "Waiting for database at $DB_HOST:$DB_PORT..."
-#    until pg_isready -h "$DB_HOST" -p "$DB_PORT" -q; do
-#        sleep 1
-#    done
-#    echo "Database is ready!"
-#
-#    echo "Running database migrations..."
-#    php bin/console doctrine:migrations:migrate -vv --no-interaction
-#fi
+DB_HOST="${DB_HOST:-db}"
+DB_PORT="${DB_PORT:-3306}"
+DB_USER="${DB_USER:-mysql}"
+DB_PASS="${DB_PASS:-mysql}"
+
+if [ "$APP_ENV" = "dev" ]; then
+    echo "Running composer install..."
+    composer install --prefer-dist --no-progress --no-suggest
+
+    echo "Waiting for database at $DB_HOST:$DB_PORT..."
+    until mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASS" -e "SELECT 1;"; do
+        sleep 1
+    done
+    echo "Database is ready!"
+
+    echo "Running database migrations..."
+    php bin/console doctrine:migrations:migrate -vv --no-interaction
+
+    echo "Running database fixtures"
+    php bin/console doctrine:fixtures:load -vv --no-interaction
+fi
 
 echo "Starting PHP-FPM as $(whoami)..."
 exec docker-php-entrypoint "php-fpm"

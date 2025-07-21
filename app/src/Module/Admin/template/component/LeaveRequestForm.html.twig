@@ -1,0 +1,19 @@
+<div {{ attributes }}>
+
+    {{ form_start(form) }}
+
+    {{ form_row(form.leaveType) }}
+    {{ form_row(form.dateRange) }}
+
+
+    {{ infoBox|raw }}
+
+    <button data-loading="hide" id="submit-btn" class="btn btn-primary mt-2" {% if isSubmitDisabled %}disabled{% endif %}>
+        Submit
+    </button>
+    <button data-loading="show" id="spinner" class="btn btn-primary mt-2" disabled>
+        <span class="spinner-border spinner-border-sm"></span> Loading...
+    </button>
+
+    {{ form_end(form) }}
+</div>

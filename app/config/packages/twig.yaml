@@ -5,7 +5,8 @@ twig:
         'src/Module/User/template': 'AppUser'
     globals:
         profile_images_base_path: '%profile_images_base_path%'
-
+    form_themes:
+        - 'forms/form_theme.html.twig'
 when@test:
     twig:
         strict_variables: true

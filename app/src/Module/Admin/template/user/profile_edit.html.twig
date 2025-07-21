@@ -1,45 +1,10 @@
-{% extends '@!EasyAdmin/layout.html.twig' %}
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block page_title %}Profile Settings{% endblock %}
 
 {% block head_stylesheets %}
     {{ parent() }}
-    <style>
-        .ea-profile-form input,
-        .ea-profile-form select,
-        .ea-profile-form textarea {
-            width: 100%;
-            border: 1px solid #ced4da;
-            border-radius: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background-color: #fff;
-        }
-
-        .ea-profile-form .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .ea-profile-form label {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .ea-profile-form h5 {
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .ea-profile-form .btn-primary {
-            margin-top: 1.5rem;
-        }
-
-        .checkbox-large input[type="checkbox"] {
-            transform: scale(1.8);
-            margin-right: 8px;
-            margin-bottom: 13px;
-            margin-top: 13px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
 {% endblock %}
 
 {% block content_header %}

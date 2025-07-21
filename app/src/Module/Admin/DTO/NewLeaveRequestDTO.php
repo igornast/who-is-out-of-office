@@ -7,7 +7,7 @@ namespace App\Module\Admin\DTO;
 use App\Shared\Enum\LeaveRequestTypeEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class LeaveRequestDraftDTO
+class NewLeaveRequestDTO
 {
     public function __construct(
         #[Assert\NotBlank]
@@ -22,10 +22,14 @@ class LeaveRequestDraftDTO
     /**
      * A virtual field for the form transformer.
      *
-     * @param array{'start': \DateTimeImmutable, 'end': \DateTimeImmutable} $dates
+     * @param array{}|array{'start': \DateTimeImmutable, 'end': \DateTimeImmutable} $dates
      */
     public function setDateRange(array $dates): void
     {
+        if (empty($dates)) {
+            return;
+        }
+
         $this->startDate = $dates['start'];
         $this->endDate = $dates['end'];
     }
