@@ -6,11 +6,9 @@ namespace App\Module\Admin\Controller\LeaveRequest;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
-use App\Module\Admin\DTO\LeaveRequestCalculateRequestDTO;
-use App\Module\Admin\DTO\LeaveRequestDraftDTO;
-use App\Module\Admin\Form\LeaveRequestDraftType;
+use App\Module\Admin\DTO\NewLeaveRequestDTO;
+use App\Module\Admin\Form\NewLeaveRequestType;
 use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
-use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
@@ -22,9 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class LeaveRequestActionController extends AbstractController
 {
@@ -63,8 +59,8 @@ class LeaveRequestActionController extends AbstractController
     #[Route('/app/leave-request/new', name: 'app_leave_request_new')]
     public function new(Request $request): Response
     {
-        $dto = new LeaveRequestDraftDTO();
-        $form = $this->createForm(LeaveRequestDraftType::class, $dto);
+        $dto = new NewLeaveRequestDTO();
+        $form = $this->createForm(NewLeaveRequestType::class, $dto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -90,32 +86,6 @@ class LeaveRequestActionController extends AbstractController
 
         return $this->render('@AppAdmin/leave_request/new.html.twig', [
             'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route('app/leave-request/calculate', name: 'app_leave_request_calculate', methods: ['POST'])]
-    public function confirm(
-        #[CurrentUser]
-        User $user,
-        #[MapRequestPayload]
-        LeaveRequestCalculateRequestDTO $requestDTO,
-    ): Response {
-        $start = new \DateTimeImmutable($requestDTO->startDate);
-        $end = new \DateTimeImmutable($requestDTO->endDate);
-
-        $query = new CalculateWorkdaysQuery(
-            startDate: $start,
-            endDate: $end,
-            userWorkingDays: $user->workingDays,
-            holidayCalendarCountryCode: $user->holidayCalendar?->countryCode
-        );
-
-        $workingDays = $this->leaveRequestFacade->calculateWorkDays($query);
-        $remainingBalance = $user->currentLeaveBalance - $workingDays;
-
-        return $this->json([
-            'workdays' => $workingDays,
-            'remainingBalance' => max($remainingBalance, 0),
         ]);
     }
 }

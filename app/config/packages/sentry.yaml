@@ -1,0 +1,19 @@
+when@prod:
+    sentry:
+        dsn: '%env(SENTRY_DSN)%'
+        options:
+            ignore_exceptions:
+                - 'Symfony\Component\ErrorHandler\Error\FatalError'
+                - 'Symfony\Component\Debug\Exception\FatalErrorException'
+
+        register_error_listener: false
+        register_error_handler: false
+
+    monolog:
+        handlers:
+            sentry:
+                type: sentry
+                level: !php/const Monolog\Logger::ERROR
+                hub_id: Sentry\State\HubInterface
+                fill_extra_context: true # Enables sending monolog context to Sentry
+                process_psr_3_messages: false # Disables the resolution of PSR-3 placeholders

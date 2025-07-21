@@ -43,6 +43,11 @@ class UserCrudController extends AbstractCrudController
         return User::class;
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud->setPageTitle(Action::INDEX, 'crud.title.user');
+    }
+
     public function configureActions(Actions $actions): Actions
     {
         return $actions

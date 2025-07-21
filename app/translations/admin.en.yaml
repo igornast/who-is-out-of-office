@@ -7,6 +7,7 @@ role:
 crud:
     title:
         leave_requests: Absence Requests
+        user: My Team
 
     actions:
         leave_requests:

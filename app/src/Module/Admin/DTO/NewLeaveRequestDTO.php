@@ -7,7 +7,7 @@ namespace App\Module\Admin\DTO;
 use App\Shared\Enum\LeaveRequestTypeEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class LeaveRequestDraftDTO
+class NewLeaveRequestDTO
 {
     public function __construct(
         #[Assert\NotBlank]

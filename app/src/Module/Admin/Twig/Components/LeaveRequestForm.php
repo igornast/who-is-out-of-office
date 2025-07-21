@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Module\Admin\Twig\Components;
 
 use App\Infrastructure\Doctrine\Entity\User;
-use App\Module\Admin\DTO\LeaveRequestDraftDTO;
-use App\Module\Admin\Form\LeaveRequestDraftType;
+use App\Module\Admin\DTO\NewLeaveRequestDTO;
+use App\Module\Admin\Form\NewLeaveRequestType;
 use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Enum\LeaveRequestTypeEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
@@ -32,11 +32,11 @@ class LeaveRequestForm extends AbstractController
     public bool $isSubmitDisabled = true;
 
     #[LiveProp]
-    public ?LeaveRequestDraftDTO $dto = null;
+    public ?NewLeaveRequestDTO $dto = null;
 
     protected function instantiateForm(): FormInterface
     {
-        return $this->createForm(LeaveRequestDraftType::class, $this->dto);
+        return $this->createForm(NewLeaveRequestType::class, $this->dto);
     }
 
     #[LiveAction]
