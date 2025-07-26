@@ -121,6 +121,18 @@
             "config/packages/ramsey_uuid_doctrine.yaml"
         ]
     },
+    "sentry/sentry-symfony": {
+        "version": "5.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "5.0",
+            "ref": "dddae4d15976bf2c6b52e18bf8a997f6"
+        },
+        "files": [
+            "./config/packages/sentry.yaml"
+        ]
+    },
     "symfony/asset-mapper": {
         "version": "7.2",
         "recipe": {

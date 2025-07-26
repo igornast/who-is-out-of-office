@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Module\Admin\Twig\Components;
 
 use App\Infrastructure\Doctrine\Entity\User;
-use App\Module\Admin\DTO\NewLeaveRequestDTO;
 use App\Module\Admin\Form\NewLeaveRequestType;
 use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Enum\LeaveRequestTypeEnum;
@@ -15,8 +14,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
-use Symfony\UX\LiveComponent\Attribute\LiveProp;
-use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
@@ -25,18 +22,14 @@ class LeaveRequestForm extends AbstractController
 {
     use DefaultActionTrait;
     use ComponentWithFormTrait;
-    use ComponentToolsTrait;
 
     public string $infoBox = '';
 
     public bool $isSubmitDisabled = true;
 
-    #[LiveProp]
-    public ?NewLeaveRequestDTO $dto = null;
-
     protected function instantiateForm(): FormInterface
     {
-        return $this->createForm(NewLeaveRequestType::class, $this->dto);
+        return $this->createForm(NewLeaveRequestType::class, null);
     }
 
     #[LiveAction]

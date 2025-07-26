@@ -17,13 +17,13 @@ return [
         'entrypoint' => true,
     ],
     '@symfony/stimulus-bundle' => [
-        'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
+        'path' => '@symfony/stimulus-bundle/loader.js',
+    ],
+    '@symfony/ux-live-component' => [
+        'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
     ],
     '@hotwired/stimulus' => [
         'version' => '3.2.2',
-    ],
-    '@symfony/ux-live-component' => [
-        'version' => '2.27.0',
     ],
     'flatpickr' => [
         'version' => '4.6.13',
