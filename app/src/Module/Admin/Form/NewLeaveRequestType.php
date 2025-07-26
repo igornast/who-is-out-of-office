@@ -23,7 +23,6 @@ class NewLeaveRequestType extends AbstractType
                 'class' => LeaveRequestTypeEnum::class,
                 'label' => 'What type of absence',
                 'attr' => [
-                    'data-live-name' => 'leaveType',
                     'data-action' => 'live#action',
                     'data-live-action-param' => 'updated',
                 ],
@@ -33,7 +32,6 @@ class NewLeaveRequestType extends AbstractType
                 'attr' => [
                     'placeholder' => 'YYYY-MM-DD to YYYY-MM-DD',
                     'data-controller' => 'flatpickr',
-                    'data-live-name' => 'dateRange',
                     'data-action' => 'live#action',
                     'data-live-action-param' => 'updated',
                 ],
