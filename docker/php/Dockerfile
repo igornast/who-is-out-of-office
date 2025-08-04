@@ -66,8 +66,6 @@ RUN docker-php-ext-enable xdebug
 
 RUN apt-get clean && apt-get update && apt-get install -y --fix-missing --no-install-recommends default-mysql-client-core
 
-ENV APP_ENV=dev
-
 WORKDIR /var/www
 
 CMD ["dev-start-fpm"]

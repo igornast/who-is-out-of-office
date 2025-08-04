@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/error.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container error-container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="error-code">Error</div>
+                <div class="error-message">Oops! Something went wrong.</div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

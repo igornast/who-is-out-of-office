@@ -84,8 +84,6 @@ class LeaveRequestActionController extends AbstractController
             return $this->redirect($url);
         }
 
-        return $this->render('@AppAdmin/leave_request/new.html.twig', [
-            'form' => $form->createView(),
-        ]);
+        return $this->render('@AppAdmin/leave_request/new.html.twig');
     }
 }

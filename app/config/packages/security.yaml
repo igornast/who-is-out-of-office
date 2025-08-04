@@ -23,6 +23,7 @@ security:
 
     access_control:
         - { path: ^/app, roles: ROLE_USER }
+        - { path: ^/fc-load-events, roles: ROLE_USER }
 
 when@test:
     security:

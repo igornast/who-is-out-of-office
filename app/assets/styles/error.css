@@ -1,0 +1,28 @@
+body {
+    background-color: #f8f9fa;
+}
+.error-container {
+    text-align: center;
+    padding: 100px 0;
+}
+.error-code {
+    font-size: 100px;
+    color: #4a6bff;
+    margin-bottom: 20px;
+}
+.error-message {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #333;
+}
+.btn-custom {
+    background-color: #4a6bff;
+    color: white;
+    border-radius: 50px;
+    padding: 10px 30px;
+    transition: all 0.3s ease;
+}
+.btn-custom:hover {
+    background-color: #3a5bef;
+    transform: translateY(-2px);
+}

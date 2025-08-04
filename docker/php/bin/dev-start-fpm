@@ -19,22 +19,20 @@ DB_PORT="${DB_PORT:-3306}"
 DB_USER="${DB_USER:-mysql}"
 DB_PASS="${DB_PASS:-mysql}"
 
-if [ "$APP_ENV" = "dev" ]; then
-    echo "Running composer install..."
-    composer install --prefer-dist --no-progress --no-suggest
+  echo "Running composer install..."
+  composer install --prefer-dist --no-progress --no-suggest
 
-    echo "Waiting for database at $DB_HOST:$DB_PORT..."
-    until mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASS" -e "SELECT 1;"; do
-        sleep 1
-    done
-    echo "Database is ready!"
+  echo "Waiting for database at $DB_HOST:$DB_PORT..."
+  until mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASS" -e "SELECT 1;"; do
+      sleep 2
+  done
+  echo "Database is ready!"
 
-    echo "Running database migrations..."
-    php bin/console doctrine:migrations:migrate -vv --no-interaction
+  echo "Running database migrations..."
+  php bin/console doctrine:migrations:migrate -vv --no-interaction
 
-    echo "Running database fixtures"
-    php bin/console doctrine:fixtures:load -vv --no-interaction
-fi
+  echo "Running database fixtures"
+  php bin/console doctrine:fixtures:load -vv --no-interaction
 
 echo "Starting PHP-FPM as $(whoami)..."
 exec docker-php-entrypoint "php-fpm"

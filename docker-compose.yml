@@ -22,7 +22,6 @@ services:
             target: local
         environment:
             PHP_IDE_CONFIG: '${PHP_IDE_CONFIG:-serverName=php_ooo}'
-            APP_ENV: dev
         volumes:
             - ./app:/var/www
             - ./docker/php/conf/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
