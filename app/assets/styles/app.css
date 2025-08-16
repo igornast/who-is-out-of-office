@@ -1,3 +1,16 @@
+/* avatar */
+.avatar-img {
+    border-radius: var(--bs-border-radius);
+    height: 65px;
+    width: 65px;
+    object-fit: cover;
+}
+
+.avatar {
+    height: 65px;
+    width: 65px;
+}
+
 
 /* new leave request */
 .ea-request-form input,

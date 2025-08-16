@@ -13,14 +13,13 @@
             <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}"
                class="btn btn-lg p-0 align-content-center"
                role="button">
-                <img src="{{ src }}" class="rounded-2"
+                <img src="{{ src }}" class="avatar-img"
                      style="width:65px;"
                      alt="{{ userDto.firstName }} {{ userDto.lastName }} avatar"/>
             </a>
         {% else %}
             <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}"
-               class="btn btn-primary btn-lg fs-3 align-content-center"
-               style="min-width: 65px; min-height: 65px" role="button">
+               class="btn btn-primary btn-lg fs-3 align-content-center avatar" role="button">
                 {{ userDto.firstName[:1] }}{{ userDto.lastName[:1] }}
             </a>
         {% endif %}

@@ -3,6 +3,27 @@ role:
     manager: 'Manager'
     user: 'User'
 
+menu:
+    items:
+        logout: Logout
+        dashboard: Dashboard
+        my_team: My Team
+        profile: Profile Settings
+        calendar: Calendar
+        absence_requests: Absence Requests
+
+
+
+dashboard:
+    title:
+        my_team: My Team
+        employee: Employee
+        absences: Absences
+        upcoming_absences: UPCOMING ABSENCES
+        slack: Slack Notifications
+        birthdays: Time to celebrate
+    birthdays:
+        no_upcoming: No upcoming birthdays
 
 crud:
     title:

@@ -3,3 +3,8 @@
 {% block head_favicon %}
     <link rel="shortcut icon" href="{{ asset('image/icons/icon_pride.png') }}">
 {% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+{% endblock %}
