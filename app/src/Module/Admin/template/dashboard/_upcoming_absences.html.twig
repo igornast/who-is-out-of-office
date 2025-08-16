@@ -1,6 +1,6 @@
 <div class="panel panel-primary mt-4">
     <div class="panel-heading align-items-center pb-3">
-        <strong class="panel-title text-body-secondary mb-0">UPCOMING ABSENCES</strong>
+        <strong class="panel-title text-body-secondary mb-0">{{ 'dashboard.title.upcoming_absences'|trans(domain: 'admin') }}</strong>
     </div>
     <div class="panel-body">
         <ul class="nav">
@@ -12,7 +12,9 @@
                         <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}">
                             {{ userDto.firstName }} {{ userDto.lastName }}
                         </a>
-                        <span class="text-body-secondary"> - {{ leaveRequestDto.leaveType.value }} </span>
+
+                        {% set typeTranslateKey = 'leave_request.type.' ~ leaveRequestDto.leaveType.value %}
+                        <span class="text-body-secondary"> - {{ typeTranslateKey|trans(domain: 'users_messaging') }} </span>
                         <p class="text-body-secondary">
                             {{ leaveRequestDto.startDate|date("Y.m.d") }} - {{ leaveRequestDto.endDate|date("Y.m.d") }}
                         </p>

@@ -67,15 +67,15 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        $teamCrudLink = MenuItem::linkToCrud('My Team', 'fa fa-user', User::class);
+        $teamCrudLink = MenuItem::linkToCrud('menu.items.my_team', 'fa fa-user', User::class);
 
         return [
-            MenuItem::linkToLogout('Logout', 'fa fa-right-from-bracket'),
-            MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
+            MenuItem::linkToLogout('menu.items.logout', 'fa fa-right-from-bracket'),
+            MenuItem::linkToDashboard('menu.items.dashboard', 'fa fa-home'),
             ...($this->isAdmin() ? [$teamCrudLink] : []),
-            MenuItem::linkToRoute('Profile Settings', 'fa fa-user', 'app_user_profile'),
-            MenuItem::linkToRoute('Calendar', 'fa fa-calendar', 'app_calendar_view'),
-            MenuItem::linkToCrud('Absence Requests', 'fa fa-calendar-plus', LeaveRequest::class),
+            MenuItem::linkToRoute('menu.items.profile', 'fa fa-user', 'app_user_profile'),
+            MenuItem::linkToRoute('menu.items.calendar', 'fa fa-calendar', 'app_calendar_view'),
+            MenuItem::linkToCrud('menu.items.absence_requests', 'fa fa-calendar-plus', LeaveRequest::class),
         ];
     }
 

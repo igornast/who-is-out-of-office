@@ -2,11 +2,6 @@
 
 {% block page_title %}Profile Settings{% endblock %}
 
-{% block head_stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
-{% endblock %}
-
 {% block content_header %}
     <div class="content-header-title">
         <h1 class="title">Edit Profile</h1>
@@ -81,6 +76,8 @@
                     {% endif %}
 
 
+                    {{ form_errors(form) }}
+
                     <button class="btn btn-primary">Save Changes</button>
 
                     {{ form_end(form) }}
@@ -88,4 +85,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
 {% endblock %}
