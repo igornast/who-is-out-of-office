@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Shared\Service\Messaging;
 
-use App\Shared\Enum\LeaveRequestTypeEnum;
-
 class EmojisProvider
 {
     public static function getFlagEmojiCode(string $countryCode): string
@@ -26,13 +24,5 @@ class EmojisProvider
         }
 
         return $emoji;
-    }
-
-    public static function getLeaveTypeEmoji(LeaveRequestTypeEnum $type): string
-    {
-        return  match ($type) {
-            LeaveRequestTypeEnum::Vacation => '🌴',
-            LeaveRequestTypeEnum::SickLeave => '🤒',
-        };
     }
 }

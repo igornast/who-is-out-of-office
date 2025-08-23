@@ -4,3 +4,7 @@
     <link rel="shortcut icon" href="{{ asset('image/icons/icon_pride.png') }}">
 {% endblock %}
 
+{% block body_javascript %}
+    {{ parent() }}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
+{% endblock %}

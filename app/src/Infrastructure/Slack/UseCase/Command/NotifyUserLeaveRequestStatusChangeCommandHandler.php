@@ -43,7 +43,7 @@ class NotifyUserLeaveRequestStatusChangeCommandHandler
                     'fields' => [
                         [
                             'type' => 'mrkdwn',
-                            'text' => sprintf('*Type:* %s', $leaveRequestDTO->leaveType->value),
+                            'text' => sprintf('*Type:* %s', $leaveRequestDTO->leaveType->name),
                         ],
                         [
                             'type' => 'mrkdwn',

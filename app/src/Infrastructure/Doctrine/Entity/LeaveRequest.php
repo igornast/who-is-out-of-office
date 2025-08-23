@@ -6,7 +6,6 @@ namespace App\Infrastructure\Doctrine\Entity;
 
 use App\Infrastructure\Traits\TimestampableTrait;
 use App\Shared\Enum\LeaveRequestStatusEnum;
-use App\Shared\Enum\LeaveRequestTypeEnum;
 use Ramsey\Uuid\UuidInterface;
 
 class LeaveRequest
@@ -17,7 +16,7 @@ class LeaveRequest
         public UuidInterface $id,
         public User $user,
         public LeaveRequestStatusEnum $status,
-        public LeaveRequestTypeEnum $leaveType,
+        public LeaveRequestType $leaveType,
         public \DateTimeImmutable $startDate,
         public \DateTimeImmutable $endDate,
         public int $workDays = 0,

@@ -7,8 +7,9 @@ namespace App\Module\Admin\Controller\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\DTO\NewLeaveRequestDTO;
-use App\Module\Admin\Form\NewLeaveRequestType;
+use App\Module\Admin\Form\NewLeaveRequestFormType;
 use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
+use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
@@ -60,7 +61,7 @@ class LeaveRequestActionController extends AbstractController
     public function new(Request $request): Response
     {
         $dto = new NewLeaveRequestDTO();
-        $form = $this->createForm(NewLeaveRequestType::class, $dto);
+        $form = $this->createForm(NewLeaveRequestFormType::class, $dto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -68,7 +69,7 @@ class LeaveRequestActionController extends AbstractController
             $user = $this->getUser();
 
             $this->leaveRequestFacade->save(new SaveLeaveRequestCommand(
-                $dto->leaveType,
+                LeaveRequestTypeDTO::fromEntity($dto->leaveType),
                 $dto->startDate,
                 $dto->endDate,
                 UserDTO::fromEntity($user),

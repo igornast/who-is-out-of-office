@@ -1,10 +1,16 @@
 <div {{ attributes }}>
 
     {{ form_start(form) }}
-
-    {{ form_row(form.leaveType) }}
-    {{ form_row(form.dateRange) }}
-
+    <div class="field-choice form-group">
+        <div class="form-widget">
+            {{ form_row(form.leaveType, {'attr': {'class': 'form-select'}}) }}
+        </div>
+    </div>
+    <div class="field-text form-group mb-0 ">
+        <div class="form-widget">
+            {{ form_row(form.dateRange, {'attr': {'class': 'ea-request-form-date-range'}}) }}
+        </div>
+    </div>
 
     {{ infoBox|raw }}
 

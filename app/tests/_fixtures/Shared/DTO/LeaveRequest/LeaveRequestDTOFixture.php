@@ -6,7 +6,6 @@ namespace App\Tests\_fixtures\Shared\DTO\LeaveRequest;
 
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
-use App\Shared\Enum\LeaveRequestTypeEnum;
 use App\Tests\_fixtures\FixtureInterface;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Faker\Factory;
@@ -29,7 +28,7 @@ class LeaveRequestDTOFixture implements FixtureInterface
             'id' => $faker->uuid(),
             'workDays' => $faker,
             'status' => $faker->randomElement(LeaveRequestStatusEnum::cases()),
-            'leaveType' => $faker->randomElement(LeaveRequestTypeEnum::cases()),
+            'leaveType' => LeaveRequestTypeDTOFixture::create(),
             'startDate' => \DateTimeImmutable::createFromMutable($startDate),
             'endDate' => \DateTimeImmutable::createFromMutable($endDate),
             'user' => UserDTOFixture::create(),

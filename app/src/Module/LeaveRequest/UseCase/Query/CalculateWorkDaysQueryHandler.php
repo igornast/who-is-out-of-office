@@ -31,8 +31,7 @@ class CalculateWorkDaysQueryHandler
                 $query->startDate,
                 $query->endDate,
                 $query->holidayCalendarCountryCode
-            )
-            ;
+            );
             $holidayDates = array_map(
                 fn ($h) => $h->date->format('Y-m-d'),
                 $holidayDTOs

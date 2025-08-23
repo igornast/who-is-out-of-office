@@ -13,8 +13,7 @@
                             {{ userDto.firstName }} {{ userDto.lastName }}
                         </a>
 
-                        {% set typeTranslateKey = 'leave_request.type.' ~ leaveRequestDto.leaveType.value %}
-                        <span class="text-body-secondary"> - {{ typeTranslateKey|trans(domain: 'users_messaging') }} </span>
+                        <span class="text-body-secondary"> - {{  leaveRequestDto.leaveType.name }} </span>
                         <p class="text-body-secondary">
                             {{ leaveRequestDto.startDate|date("Y.m.d") }} - {{ leaveRequestDto.endDate|date("Y.m.d") }}
                         </p>

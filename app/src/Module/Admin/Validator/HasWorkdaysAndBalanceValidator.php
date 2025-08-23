@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Validator;
 
+use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\DTO\NewLeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
-use App\Shared\Enum\LeaveRequestTypeEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Form;
@@ -54,11 +54,11 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
         $newLeaveRequestDTO = $form->getParent()?->getData();
 
         $leaveType = $newLeaveRequestDTO->leaveType;
-        if (!$leaveType instanceof LeaveRequestTypeEnum) {
-            throw new UnexpectedTypeException($leaveType, LeaveRequestTypeEnum::class);
+        if (!$leaveType instanceof LeaveRequestType) {
+            throw new UnexpectedTypeException($leaveType, LeaveRequestType::class);
         }
 
-        if (LeaveRequestTypeEnum::Vacation !== $leaveType) {
+        if (false === $leaveType->isAffectingBalance) {
             return;
         }
 

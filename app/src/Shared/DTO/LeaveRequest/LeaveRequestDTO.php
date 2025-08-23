@@ -7,15 +7,14 @@ namespace App\Shared\DTO\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
-use App\Shared\Enum\LeaveRequestTypeEnum;
 
 class LeaveRequestDTO
 {
     public function __construct(
         public string $id,
         public int $workDays,
+        public LeaveRequestTypeDTO $leaveType,
         public LeaveRequestStatusEnum $status,
-        public LeaveRequestTypeEnum $leaveType,
         public \DateTimeImmutable $startDate,
         public \DateTimeImmutable $endDate,
         public UserDTO $user,
@@ -35,8 +34,8 @@ class LeaveRequestDTO
         return new self(
             id: $leaveRequest->id->toString(),
             workDays: $leaveRequest->workDays,
+            leaveType: LeaveRequestTypeDTO::fromEntity($leaveRequest->leaveType),
             status: $leaveRequest->status,
-            leaveType: $leaveRequest->leaveType,
             startDate: $leaveRequest->startDate,
             endDate: $leaveRequest->endDate,
             user: UserDTO::fromEntity($leaveRequest->user),

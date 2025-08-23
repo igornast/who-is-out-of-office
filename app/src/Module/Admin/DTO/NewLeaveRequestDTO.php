@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\DTO;
 
-use App\Shared\Enum\LeaveRequestTypeEnum;
+use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class NewLeaveRequestDTO
 {
     public function __construct(
         #[Assert\NotBlank]
-        public ?LeaveRequestTypeEnum $leaveType = null,
+        public ?LeaveRequestType $leaveType = null,
         #[Assert\NotBlank]
         public ?\DateTimeImmutable $startDate = null,
         #[Assert\NotBlank]

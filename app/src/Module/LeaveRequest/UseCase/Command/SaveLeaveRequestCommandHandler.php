@@ -9,7 +9,6 @@ use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
-use App\Shared\Enum\LeaveRequestTypeEnum;
 use App\Shared\Facade\UserFacadeInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Ramsey\Uuid\Uuid;
@@ -30,8 +29,8 @@ class SaveLeaveRequestCommandHandler
         $leaveRequestDTO = new LeaveRequestDTO(
             id: Uuid::uuid4()->toString(),
             workDays: $workDaysNumber,
+            leaveType: $command->leaveRequestTypeDTO,
             status: LeaveRequestStatusEnum::Pending,
-            leaveType: $command->leaveRequestType,
             startDate: $command->startDate,
             endDate: $command->endDate,
             user: $userDTO,
@@ -42,7 +41,8 @@ class SaveLeaveRequestCommandHandler
             $this->leaveRequestRepository->beginTransaction();
 
             $this->leaveRequestRepository->saveLeaveRequest($leaveRequestDTO);
-            if (LeaveRequestTypeEnum::Vacation === $command->leaveRequestType) {
+
+            if ($command->leaveRequestTypeDTO->isAffectingBalance) {
                 $this->userFacade->updateUserCurrentLeaveBalance($userDTO->id, -$workDaysNumber);
             }
 
