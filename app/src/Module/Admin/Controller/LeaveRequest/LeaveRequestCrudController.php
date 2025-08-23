@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Module\Admin\Controller\LeaveRequest;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
+use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\AppAbstractCrudController;
-use App\Module\Admin\Validator\HasWorkdaysAndBalance;
 use App\Shared\Enum\LeaveRequestStatusEnum;
-use App\Shared\Enum\LeaveRequestTypeEnum;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminCrud;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -26,11 +25,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Validator\Constraints\Expression;
-use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @extends AppAbstractCrudController<LeaveRequest>
@@ -61,7 +56,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
         return $actions
             ->add(Crud::PAGE_DETAIL, $withdrawAction)
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->disable(Action::NEW)
+            ->disable(Action::NEW, Action::EDIT)
             ->add(
                 Crud::PAGE_INDEX,
                 Action::new('new-request')
@@ -93,20 +88,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
     {
         return $filters
             ->add(ChoiceFilter::new('status')->setChoices(LeaveRequestStatusEnum::getChoices()))
-            ->add(ChoiceFilter::new('leaveType')->setChoices(LeaveRequestTypeEnum::getChoices()));
-    }
-
-    public function createEntity(string $entityFqcn): LeaveRequest
-    {
-        return new LeaveRequest(
-            id: Uuid::uuid4(),
-            user: $this->getUser(),
-            status: LeaveRequestStatusEnum::Pending,
-            leaveType: LeaveRequestTypeEnum::Vacation,
-            startDate: new \DateTimeImmutable(),
-            endDate: new \DateTimeImmutable('tomorrow'),
-            workDays: 1,
-        );
+            ->add('leaveType');
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
@@ -128,34 +110,14 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             AssociationField::new('user', 'Name')
                 ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName))
                 ->setPermission('ROLE_ADMIN'),
-            ChoiceField::new('leaveType', 'Select the type of absence')
-                ->setChoices(LeaveRequestTypeEnum::getChoices())
-                ->setFormTypeOptions(['constraints' => [
-                    new NotBlank(['message' => 'Please choose a leave type.']),
-                ]]),
+
+            AssociationField::new('leaveType', 'Select the type of absence')
+                ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $requestType->name),
+
             DateField::new('startDate', 'From')
-                ->setColumns(6)
-                ->setFormTypeOptions([
-                    'constraints' => [
-                        new NotBlank(['message' => 'Start date cannot be blank.']),
-                        new GreaterThanOrEqual([
-                            'value' => new \DateTimeImmutable('today'),
-                            'message' => 'The start date cannot be in the past.',
-                        ]),
-                    ],
-                ]),
+                ->setColumns(6),
             DateField::new('endDate', 'To')
-                ->setColumns(6)
-                ->setFormTypeOptions([
-                    'constraints' => [
-                        new NotBlank(['message' => 'End date cannot be blank.']),
-                        new Expression([
-                            'expression' => 'value >= context.getObject().getParent().getData().startDate',
-                            'message' => 'The end date must be equal or later than the start date.',
-                        ]),
-                        new HasWorkdaysAndBalance(),
-                    ],
-                ]),
+                ->setColumns(6),
 
             FormField::addColumn(4)->hideWhenCreating(),
             FormField::addFieldset('Details')->hideWhenCreating(),

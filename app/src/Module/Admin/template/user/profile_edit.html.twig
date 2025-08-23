@@ -22,14 +22,21 @@
                     {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
                     <h5>Profile Info</h5>
-                    <div class="form-group">
-                        {{ form_row(form.firstName) }}
+
+                    <div class="field-text form-group">
+                        <div class="form-widget">
+                            {{ form_row(form.firstName, {'attr': {'class': 'form-control'}}) }}
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form_row(form.lastName) }}
+                    <div class="field-text form-group">
+                        <div class="form-widget">
+                            {{ form_row(form.lastName, {'attr': {'class': 'form-control'}}) }}
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form_row(form.holidayCalendar) }}
+                    <div class="field-choice form-group">
+                        <div class="form-widget">
+                            {{ form_row(form.holidayCalendar, {'attr': {'class': 'form-select'}}) }}
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -47,16 +54,23 @@
 
 
                     <h5>Change Password</h5>
-                    <div class="form-group">
-                        {{ form_row(form.plainPassword.first) }}
+
+                    <div class="field-text form-group">
+                        <div class="form-widget">
+                            {{ form_row(form.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                        </div>
                     </div>
-                    <div class="form-group">
-                        {{ form_row(form.plainPassword.second) }}
+                    <div class="field-text form-group">
+                        <div class="form-widget">
+                            {{ form_row(form.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                        </div>
                     </div>
 
                     <h5>Profile Image</h5>
-                    <div class="form-group">
-                        {{ form_row(form.profileImageFile) }}
+                    <div class="field-file form-group">
+                        <div class="form-widget">
+                            {{ form_row(form.profileImageFile, {'attr': {'class': 'form-control'}}) }}
+                        </div>
                     </div>
 
                     {% if app.user.profileImageUrl %}
@@ -85,9 +99,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block body_javascript %}
-    {{ parent() }}
-    {% block importmap %}{{ importmap('app') }}{% endblock %}
 {% endblock %}

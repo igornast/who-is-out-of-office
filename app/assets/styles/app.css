@@ -13,73 +13,18 @@
 
 
 /* new leave request */
-.ea-request-form input,
-.ea-request-form select,
-.ea-request-form textarea {
+.ea-request-form-date-range{
+    background-color: var(--form-control-bg);
+    background-repeat: no-repeat;
+    block-size: 30px;
+    border: 1px solid var(--form-input-border-color);
+    border-radius: var(--bs-border-radius);
+    box-shadow: var(--form-input-shadow);
+    color: var(--form-input-text-color);
+    font-size: .875rem;
     width: 100%;
-    border: 1px solid #ced4da;
-    border-radius: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background-color: #fff;
-}
-
-.ea-request-form .form-group {
-    margin-bottom: 1.25rem;
-}
-
-.ea-request-form label {
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.ea-request-form h5 {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-.ea-request-form .btn-primary {
-    margin-top: 1.5rem;
-}
-
-.checkbox-large input[type="checkbox"] {
-    transform: scale(1.8);
-    margin-right: 8px;
-    margin-bottom: 13px;
-    margin-top: 13px;
-}
-
-
-/* profile_edit */
-.ea-profile-form input,
-.ea-profile-form select,
-.ea-profile-form textarea {
-    width: 100%;
-    border: 1px solid #ced4da;
-    border-radius: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background-color: #fff;
-}
-
-.ea-profile-form .form-group {
-    margin-bottom: 1.25rem;
-}
-
-.ea-profile-form label {
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.ea-profile-form h5 {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-.ea-profile-form .btn-primary {
-    margin-top: 1.5rem;
+    transition: box-shadow .08s ease-in, color .08s ease-in;
+    padding: 3px 7px 4px;
 }
 
 .checkbox-large input[type="checkbox"] {

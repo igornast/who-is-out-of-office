@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Doctrine\Repository;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
+use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
@@ -38,11 +39,17 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
             throw new \RuntimeException('User not found');
         }
 
+        $leaveRequestType = $this->getLeaveRequestType($leaveRequestDTO);
+
+        if (null === $leaveRequestType) {
+            throw new \RuntimeException('LeaveRequestType not found');
+        }
+
         $leaveRequest = new LeaveRequest(
             id: Uuid::fromString($leaveRequestDTO->id),
             user: $user,
             status: $leaveRequestDTO->status,
-            leaveType: $leaveRequestDTO->leaveType,
+            leaveType: $leaveRequestType,
             startDate: $leaveRequestDTO->startDate,
             endDate: $leaveRequestDTO->endDate,
             workDays: $leaveRequestDTO->workDays,
@@ -196,5 +203,10 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
     public function rollback(): void
     {
         $this->getEntityManager()->rollback();
+    }
+
+    private function getLeaveRequestType(LeaveRequestDTO $leaveRequestDTO): ?LeaveRequestType
+    {
+        return $this->getEntityManager()->getRepository(LeaveRequestType::class)->find($leaveRequestDTO->leaveType->id);
     }
 }

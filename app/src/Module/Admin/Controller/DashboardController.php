@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Module\Admin\Controller;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
+use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\LeaveRequest\LeaveRequestFacade;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\UserFacadeInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
@@ -68,11 +70,12 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         $teamCrudLink = MenuItem::linkToCrud('menu.items.my_team', 'fa fa-user', User::class);
+        $leaveRequestTypesCrudLink = MenuItem::linkToCrud('menu.items.leave_request_types', 'fa fa-calendar-day', LeaveRequestType::class);
 
         return [
             MenuItem::linkToLogout('menu.items.logout', 'fa fa-right-from-bracket'),
             MenuItem::linkToDashboard('menu.items.dashboard', 'fa fa-home'),
-            ...($this->isAdmin() ? [$teamCrudLink] : []),
+            ...($this->isAdmin() ? [$teamCrudLink, $leaveRequestTypesCrudLink] : []),
             MenuItem::linkToRoute('menu.items.profile', 'fa fa-user', 'app_user_profile'),
             MenuItem::linkToRoute('menu.items.calendar', 'fa fa-calendar', 'app_calendar_view'),
             MenuItem::linkToCrud('menu.items.absence_requests', 'fa fa-calendar-plus', LeaveRequest::class),
@@ -95,5 +98,11 @@ class DashboardController extends AbstractDashboardController
 
         return parent::configureUserMenu($user)
             ->setAvatarUrl($profileImageUrl);
+    }
+
+    public function configureAssets(): Assets
+    {
+        return Assets::new()
+            ->addAssetMapperEntry('app');
     }
 }

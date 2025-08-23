@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Twig\Components;
 
+use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
-use App\Module\Admin\Form\NewLeaveRequestType;
+use App\Module\Admin\Form\NewLeaveRequestFormType;
 use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
-use App\Shared\Enum\LeaveRequestTypeEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
+use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
@@ -27,9 +28,12 @@ class LeaveRequestForm extends AbstractController
 
     public bool $isSubmitDisabled = true;
 
+    #[LiveProp(writable: true)]
+    public ?LeaveRequestType $leaveType = null;
+
     protected function instantiateForm(): FormInterface
     {
-        return $this->createForm(NewLeaveRequestType::class, null);
+        return $this->createForm(NewLeaveRequestFormType::class, null);
     }
 
     #[LiveAction]
@@ -47,13 +51,11 @@ class LeaveRequestForm extends AbstractController
         }
 
         [$start, $end] = $this->extractStartAndEnd($rangeString);
-        $leaveType = $this->formValues['leaveType'] ?? null;
-
-        if (empty($start) || empty($leaveType)) {
+        if (empty($start) || null === $this->leaveType) {
             return;
         }
 
-        if ($leaveType === LeaveRequestTypeEnum::SickLeave->value) {
+        if (false === $this->leaveType->isAffectingBalance) {
             $this->isSubmitDisabled = false;
 
             return;

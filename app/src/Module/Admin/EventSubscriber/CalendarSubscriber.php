@@ -6,9 +6,9 @@ namespace App\Module\Admin\EventSubscriber;
 
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\LeaveRequest\LeaveRequestCrudController;
+use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
-use App\Shared\Enum\LeaveRequestTypeEnum;
 use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
@@ -58,14 +58,15 @@ class CalendarSubscriber implements EventSubscriberInterface
         $leaveRequestDTOs = $this->leaveRequestFacade->getLeaveRequestsForDates($start, $end, $statuses);
 
         foreach ($leaveRequestDTOs as $dto) {
-            $title = sprintf('%s %s %s', $this->getLeaveIcon($dto->leaveType), $dto->user->firstName, $dto->user->lastName);
-            $style = $this->getLeaveEventStyle($dto->status, $dto->leaveType);
+            $leaveTypeDTO = $dto->leaveType;
 
+            $title = sprintf('%s %s %s', $leaveTypeDTO->icon, $dto->user->firstName, $dto->user->lastName);
             $calendarEvent = new Event(
                 $title,
                 \DateTime::createFromImmutable($dto->startDate),
                 \DateTime::createFromImmutable($dto->endDate->modify('+1 day')),
             );
+            $style = $this->getLeaveEventStyle($dto->status, $leaveTypeDTO);
 
             $calendarEvent->setOptions([
                 'backgroundColor' => $style['backgroundColor'],
@@ -92,7 +93,7 @@ class CalendarSubscriber implements EventSubscriberInterface
     /**
      * @return array{'backgroundColor': string, 'borderColor': string, 'textColor': string}
      */
-    private function getLeaveEventStyle(LeaveRequestStatusEnum $status, LeaveRequestTypeEnum $type): array
+    private function getLeaveEventStyle(LeaveRequestStatusEnum $status, LeaveRequestTypeDTO $type): array
     {
         return match (true) {
             LeaveRequestStatusEnum::Pending === $status => [
@@ -100,29 +101,11 @@ class CalendarSubscriber implements EventSubscriberInterface
                 'borderColor' => '#ffeeba',
                 'textColor' => '#000000',
             ],
-            LeaveRequestStatusEnum::Approved === $status && LeaveRequestTypeEnum::Vacation === $type => [
-                'backgroundColor' => '#d4edda',
-                'borderColor' => '#28a745',
-                'textColor' => '#000000',
-            ],
-            LeaveRequestStatusEnum::Approved === $status && LeaveRequestTypeEnum::SickLeave === $type => [
-                'backgroundColor' => '#ede7f6',
-                'borderColor' => '#b39ddb',
-                'textColor' => '#4527a0',
-            ],
             default => [
-                'backgroundColor' => '#e2e3e5',
-                'borderColor' => '#d6d8db',
-                'textColor' => '#4527a0',
+                'backgroundColor' => $type->backgroundColor,
+                'borderColor' => $type->borderColor,
+                'textColor' => $type->textColor,
             ],
-        };
-    }
-
-    private function getLeaveIcon(LeaveRequestTypeEnum $type): string
-    {
-        return match ($type) {
-            LeaveRequestTypeEnum::SickLeave => '🤒',
-            LeaveRequestTypeEnum::Vacation => '🌴',
         };
     }
 

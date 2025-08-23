@@ -35,17 +35,9 @@ class ImportPublicHolidaysCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!is_string($input->getArgument('country-code')) || !is_string($input->getArgument('country-name'))) {
-            throw new \InvalidArgumentException('Country code and name must be a string');
-        }
-
-        if (!is_integer($input->getArgument('year'))) {
-            throw new \InvalidArgumentException('Year must be integer');
-        }
-
         $countryCode = strtoupper($input->getArgument('country-code'));
         $countryName = ucfirst($input->getArgument('country-name'));
-        $year = $input->getArgument('year');
+        $year = (int) $input->getArgument('year');
 
         $holidays = $this->dateNagerFacade->getHolidaysForCountry($countryCode, $year);
 

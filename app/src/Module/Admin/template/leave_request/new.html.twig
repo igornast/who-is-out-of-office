@@ -30,8 +30,3 @@
         </div>
     </div>
 {% endblock %}
-
-{% block body_javascript %}
-  {{ parent() }}
-    {% block importmap %}{{ importmap('app') }}{% endblock %}
-{% endblock %}

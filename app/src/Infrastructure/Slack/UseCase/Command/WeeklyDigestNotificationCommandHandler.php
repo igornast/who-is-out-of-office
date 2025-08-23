@@ -10,7 +10,6 @@ use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\Messaging\EmojisProvider;
-use App\Shared\Service\UserMessagingTranslator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
@@ -26,7 +25,6 @@ class WeeklyDigestNotificationCommandHandler
         private readonly ChatterInterface $chatter,
         private readonly UserFacadeInterface $userFacade,
         private readonly UsersEventsProvider $usersEventsProvider,
-        private readonly UserMessagingTranslator $translator,
     ) {
     }
 
@@ -95,8 +93,8 @@ class WeeklyDigestNotificationCommandHandler
                 if ($event instanceof LeaveRequestDTO) {
                     $text .= sprintf(
                         "    ‣ %s %s _(%s - %s)_\n",
-                        EmojisProvider::getLeaveTypeEmoji($event->leaveType),
-                        $this->translator->translate(UserMessagingTranslator::LEAVE_REQUEST_TYPE.$event->leaveType->value),
+                        $event->leaveType->icon,
+                        $event->leaveType->name,
                         $event->startDate->format('F d'),
                         $event->endDate->format('F d')
                     );

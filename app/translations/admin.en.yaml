@@ -8,6 +8,7 @@ menu:
         logout: Logout
         dashboard: Dashboard
         my_team: My Team
+        leave_request_types: Leave Types
         profile: Profile Settings
         calendar: Calendar
         absence_requests: Absence Requests
@@ -33,3 +34,15 @@ crud:
     actions:
         leave_requests:
             new: Add Absence Request
+
+    absence_request_type:
+        index:
+            title: Leave Types
+        create:
+            title: Create a new leave type
+        edit:
+            title: Edit the leave type
+        detail:
+            title: The leave type details
+        action:
+            new: Add a new type

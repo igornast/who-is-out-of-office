@@ -67,6 +67,26 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
 
+App\Infrastructure\Doctrine\Entity\LeaveRequestType:
+    leave_request_type_1:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            isAffectingBalance: true
+            name: 'Vacation'
+            backgroundColor: '#d4edda'
+            borderColor: '#28a745'
+            textColor: '#000000'
+            icon: '🌴'
+    leave_request_type_2:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            isAffectingBalance: false
+            name: 'Sick Leave'
+            backgroundColor: '#ede7f6'
+            borderColor: '#db9e9e'
+            textColor: '#4527a0'
+            icon: '🤒'
+
 App\Infrastructure\Doctrine\Entity\LeaveRequest:
     leave_request_{1..10}:
         __construct:
@@ -74,7 +94,7 @@ App\Infrastructure\Doctrine\Entity\LeaveRequest:
             status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
             workDays: <numberBetween(1, 10)>
             comment: <sentence()>
-            leaveType: '<(App\Shared\Enum\LeaveRequestTypeEnum::from(["sick_leave", "vacation"][rand(0,1)]))>'
+            leaveType: '@leave_request_type_<numberBetween(1, 2)>'
             user: '@user_<numberBetween(2, 10)>'
             approvedBy: '@user_1'
             startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-2 days", "now")->format("Y-m-d H:i:s")))>'
@@ -85,7 +105,7 @@ App\Infrastructure\Doctrine\Entity\LeaveRequest:
             status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from(["pending", "approved", "rejected", "cancelled", "withdrawn"][rand(0,4)]))>'
             workDays: <numberBetween(1, 10)>
             comment: <sentence()>
-            leaveType: '<(App\Shared\Enum\LeaveRequestTypeEnum::from(["sick_leave", "vacation"][rand(0,1)]))>'
+            leaveType: '@leave_request_type_<numberBetween(1, 2)>'
             user: '@user_<numberBetween(2, 10)>'
             approvedBy: '@user_1'
             startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-10 days", "-2 days")->format("Y-m-d H:i:s")))>'

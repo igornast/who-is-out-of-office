@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Infrastructure\Ical\Service;
 
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
-use App\Shared\Service\Messaging\EmojisProvider;
-use App\Shared\Service\UserMessagingTranslator;
 use Eluceo\iCal\Domain\Entity\Calendar;
 use Eluceo\iCal\Domain\Entity\Event;
 use Eluceo\iCal\Domain\ValueObject\Date;
@@ -16,10 +14,6 @@ use Eluceo\iCal\Presentation\Factory\CalendarFactory;
 
 class IcalLeaveRequestsTransformer
 {
-    public function __construct(private readonly UserMessagingTranslator $translator)
-    {
-    }
-
     /**
      * @param LeaveRequestDTO[] $leaveRequestDTOs
      */
@@ -30,14 +24,14 @@ class IcalLeaveRequestsTransformer
         foreach ($leaveRequestDTOs as $leaveRequestDTO) {
             $summary = sprintf(
                 '%s %s %s',
-                EmojisProvider::getLeaveTypeEmoji($leaveRequestDTO->leaveType),
+                $leaveRequestDTO->leaveType->icon,
                 $leaveRequestDTO->user->firstName,
                 $leaveRequestDTO->user->lastName
             );
 
             $description = sprintf(
                 '%s (%s - %s) %s',
-                $this->translator->translate(UserMessagingTranslator::LEAVE_REQUEST_TYPE.$leaveRequestDTO->leaveType->value),
+                $leaveRequestDTO->leaveType->name,
                 $leaveRequestDTO->startDate->format('F d'),
                 $leaveRequestDTO->endDate->format('F d'),
                 $leaveRequestDTO->comment

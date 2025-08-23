@@ -12,9 +12,11 @@ use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserIdQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetLeaveTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
 use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
+use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
@@ -25,6 +27,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly CalculateWorkDaysQueryHandler $getCalculateWorkDaysHandler,
         private readonly GetLeaveRequestsForUserQueryHandler $getLeaveRequestsHandler,
         private readonly GetLeaveRequestQueryHandler $getLeaveRequestHandler,
+        private readonly GetLeaveTypeQueryHandler $getLeaveTypeHandler,
         private readonly GetUpcomingLeaveRequestsQueryHandler $getUpcomingLeaveRequestsHandler,
         private readonly UpdateLeaveRequestCommandHandler $updateLeaveRequestCommandHandler,
         private readonly SaveLeaveRequestCommandHandler $saveLeaveRequestCommandHandler,
@@ -60,6 +63,11 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function getById(string $id): ?LeaveRequestDTO
     {
         return $this->getLeaveRequestHandler->handle($id);
+    }
+
+    public function getLeaveTypeById(string $id): ?LeaveRequestTypeDTO
+    {
+        return $this->getLeaveTypeHandler->handle($id);
     }
 
     public function update(LeaveRequestDTO $leaveRequestDTO): void
