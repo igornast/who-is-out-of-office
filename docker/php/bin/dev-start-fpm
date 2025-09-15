@@ -23,7 +23,7 @@ DB_PASS="${DB_PASS:-mysql}"
   composer install --prefer-dist --no-progress --no-suggest
 
   echo "Waiting for database at $DB_HOST:$DB_PORT..."
-  until mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASS" -e "SELECT 1;"; do
+  until mysql -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USER" -p"$DB_PASS" --skip-ssl -e "SELECT 1;"; do
       sleep 2
   done
   echo "Database is ready!"

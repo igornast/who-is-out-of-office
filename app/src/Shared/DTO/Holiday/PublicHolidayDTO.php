@@ -34,7 +34,7 @@ readonly class PublicHolidayDTO
             id: $data['id'],
             description: $data['description'],
             countryCode: $data['country_code'],
-            date: \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['date']),
+            date: \DateTimeImmutable::createFromFormat('Y-m-d', $data['date']),
         );
     }
 
