@@ -1,4 +1,4 @@
-{% extends '@EasyAdmin/layout.html.twig' %}
+{% extends '@AppAdmin/layout.html.twig' %}
 
 {% block page_title %}Profile Settings{% endblock %}
 
@@ -43,7 +43,7 @@
                         <label class="form-label">Working Days</label>
                         <div class="d-flex flex-wrap gap-3">
                             {% for checkbox in form.workingDays %}
-                                <div class="form-check checkbox-large">
+                                <div class="checkbox-large">
                                     {{ form_widget(checkbox) }}
                                     {{ form_label(checkbox) }}
                                 </div>
@@ -52,6 +52,46 @@
                         {{ form_errors(form.workingDays) }}
                     </div>
 
+                    <h5>Employee Of Record</h5>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="field-choice form-group">
+                                <div class="form-widget">
+                                    {{ form_label(form.birthDate) }}
+
+                                    {{ form_widget(form.birthDate, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                                <div class="form-text">{{ form_help(form.birthDate) }}</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="field-choice form-group">
+                                <div class="form-widget">
+                                    {{ form_label(form.contractStartedAt) }}
+
+                                    {{ form_widget(form.contractStartedAt, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label></label>
+                            <div class="field-choice form-group">
+                                <div class="checkbox-large">
+                                    {{ form_widget(form.hasCelebrateWorkAnniversary) }}
+
+                                    {{ form_label(form.hasCelebrateWorkAnniversary) }}
+                                </div>
+
+                                <div class="form-text">{{ form_help(form.hasCelebrateWorkAnniversary) }}</div>
+                            </div>
+                        </div>
+                    </div>
 
                     <h5>Change Password</h5>
 
