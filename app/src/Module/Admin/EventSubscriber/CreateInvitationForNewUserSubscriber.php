@@ -24,6 +24,9 @@ class CreateInvitationForNewUserSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param AfterEntityPersistedEvent<User|object> $event
+     */
     public function createInvitationForNewUser(AfterEntityPersistedEvent $event): void
     {
         $user = $event->getEntityInstance();

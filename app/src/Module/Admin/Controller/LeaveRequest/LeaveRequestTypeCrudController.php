@@ -6,7 +6,7 @@ namespace App\Module\Admin\Controller\LeaveRequest;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Module\Admin\Controller\AppAbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminCrud;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\Uuid;
 /**
  * @extends AppAbstractCrudController<LeaveRequestType>
  */
-#[AdminCrud(routePath: '/leave-request-type', routeName: 'app_leave_request_type')]
+#[AdminRoute(path: '/leave-request-type', name: 'app_leave_request_type')]
 class LeaveRequestTypeCrudController extends AppAbstractCrudController
 {
     public static function getEntityFqcn(): string

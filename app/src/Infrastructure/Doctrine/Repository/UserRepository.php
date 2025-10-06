@@ -82,6 +82,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
                     ELSE STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE())+1, '-', DATE_FORMAT(birth_date, '%m-%d')), '%Y-%m-%d')
                 END
             ) BETWEEN :start AND :end
+            AND is_active = 1
             ORDER BY 
                 CASE 
                     WHEN DATE_FORMAT(birth_date, '%m-%d') >= DATE_FORMAT(CURRENT_DATE(), '%m-%d')

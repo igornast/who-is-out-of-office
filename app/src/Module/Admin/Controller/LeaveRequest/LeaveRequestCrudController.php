@@ -10,7 +10,7 @@ use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\AppAbstractCrudController;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use Doctrine\ORM\QueryBuilder;
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminCrud;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -30,7 +30,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends AppAbstractCrudController<LeaveRequest>
  */
-#[AdminCrud(routePath: '/leave-request', routeName: 'app_leave_request')]
+#[AdminRoute(path: '/leave-request', name: 'app_leave_request')]
 class LeaveRequestCrudController extends AppAbstractCrudController
 {
     public function __construct(

@@ -9,7 +9,9 @@ use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -36,6 +38,25 @@ class UserProfileType extends AbstractType
                 'choice_label' => fn (HolidayCalendar $c) => $c->countryName,
                 'placeholder' => 'Select your calendar',
             ])
+
+            ->add('birthDate', DateType::class, [
+                'label' => 'Birth Date',
+                'required' => false,
+                'help' => 'If you enter a birthdate, our OOO Slackbot will automatically send a friendly reminder to your teammates before your birthday. This helps everyone celebrate together.',
+            ])
+
+            ->add('contractStartedAt', DateType::class, [
+                'label' => 'Contract Start Date',
+                'disabled' => true,
+                'required' => false,
+                'help' => 'Your contract start date is set by HR.',
+            ])
+            ->add('hasCelebrateWorkAnniversary', CheckboxType::class, [
+                'label' => 'Celebrate my work anniversary',
+                'required' => false,
+                'help' => 'Tick this box if you want the OOO Slackbot to send a friendly reminder to your teammates each year.',
+            ])
+
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'required' => false,

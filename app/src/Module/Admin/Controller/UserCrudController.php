@@ -9,13 +9,15 @@ use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
 use App\Shared\Service\RoleTranslator;
 use Doctrine\ORM\EntityManagerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminCrud;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
@@ -28,7 +30,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends AbstractCrudController<User>
  */
-#[AdminCrud(routePath: '/my-team', routeName: 'app_users')]
+#[AdminRoute(path: '/my-team', name: 'app_users')]
 class UserCrudController extends AbstractCrudController
 {
     public function __construct(
@@ -53,11 +55,14 @@ class UserCrudController extends AbstractCrudController
         return $actions
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::DELETE, 'ROLE_ADMIN')
-            ->setPermission(Action::EDIT, new Expression('"ROLE_ADMIN" in role_names or "ROLE_MANAGER" in role_names'));
+            ->setPermission(Action::EDIT, new Expression('"ROLE_ADMIN" in role_names or "ROLE_MANAGER" in role_names'))
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->setPermission(Action::DETAIL, new Expression('"ROLE_ADMIN" in role_names or "ROLE_MANAGER" in role_names'));
     }
 
     public function configureFields(string $pageName): iterable
     {
+        yield FormField::addTab('Profile');
         yield FormField::addColumn(3);
 
         yield ImageField::new('profileImageUrl')
@@ -75,12 +80,34 @@ class UserCrudController extends AbstractCrudController
         yield TextField::new('firstName')->hideWhenCreating();
         yield TextField::new('lastName')->hideWhenCreating();
         yield TextField::new('email');
-        yield NumberField::new('annualLeaveAllowance')->onlyWhenCreating();
+
+
+        yield FormField::addTab('Employee of record');
+        yield FormField::addColumn(7);
+
+        yield FormField::addFieldset('Absence Balance');
+        yield NumberField::new('annualLeaveAllowance')->hideOnIndex();
+        yield NumberField::new('currentLeaveBalance')
+            ->setHelp('The number of available holiday days for the employee.')
+            ->hideOnIndex();
+
+        yield FormField::addFieldset('Contract Details');
+        yield DateField::new('contractStartedAt')
+            ->setColumns(6)
+            ->hideOnIndex();
+        yield BooleanField::new('hasCelebrateWorkAnniversary')
+            ->setHelp('Have the employee enabled work anniversaries celebrations.')
+            ->setColumns(6)
+            ->hideOnIndex()
+            ->setDisabled();
+
+        yield FormField::addColumn(5);
         yield ChoiceField::new('workingDays')
             ->setChoices(UserSettings::WORKING_DAYS)
             ->allowMultipleChoices()
             ->renderExpanded();
 
+        yield FormField::addTab('Security');
         yield ArrayField::new('roles')
             ->hideOnDetail()
             ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
@@ -93,8 +120,7 @@ class UserCrudController extends AbstractCrudController
             ->renderAsHtml();
 
         yield TextField::new('plainPassword')
-            ->onlyWhenUpdating()
-            ->setRequired(Crud::PAGE_EDIT === $pageName);
+            ->onlyWhenUpdating()->setRequired(false);
     }
 
     public function createEntity(string $entityFqcn): User
