@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\_fixtures\Shared\DTO;
 
 use App\Shared\DTO\UserDTO;
+use App\Shared\Enum\RoleEnum;
 use App\Tests\_fixtures\FixtureInterface;
 use Faker\Factory;
 
@@ -24,7 +25,7 @@ class UserDTOFixture implements FixtureInterface
             'firstName' => $faker->firstName(),
             'lastName' => $faker->lastName(),
             'email' => $faker->email(),
-            'roles' => ['ROLE_USER'],
+            'roles' => [RoleEnum::User->value],
             'workingDays' => [1, 2, 3, 4, 5],
             'annualLeaveAllowance' => 24,
             'currentLeaveBalance' => 24,

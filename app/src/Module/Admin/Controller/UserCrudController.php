@@ -7,12 +7,15 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\Invitation;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
+use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\RoleEnum;
 use App\Shared\Service\RoleTranslator;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -22,6 +25,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -31,7 +35,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * @extends AbstractCrudController<User>
  */
 #[AdminRoute(path: '/my-team', name: 'app_users')]
-class UserCrudController extends AbstractCrudController
+class UserCrudController extends AppAbstractCrudController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -47,17 +51,31 @@ class UserCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
+        $crud->setSearchFields(['firstName', 'lastName', 'email']);
+
         return $crud->setPageTitle(Action::INDEX, 'crud.title.user');
     }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        if (!$this->isAdmin()) {
+            return $filters;
+        }
+
+        return $filters
+            ->add('isActive')
+            ->add(ChoiceFilter::new('roles')->setChoices(RoleEnum::getChoices()));
+    }
+
 
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->setPermission(Action::NEW, 'ROLE_ADMIN')
-            ->setPermission(Action::DELETE, 'ROLE_ADMIN')
-            ->setPermission(Action::EDIT, new Expression('"ROLE_ADMIN" in role_names or "ROLE_MANAGER" in role_names'))
+            ->setPermission(Action::NEW, RoleEnum::Admin->value)
+            ->setPermission(Action::DELETE, RoleEnum::Admin->value)
+            ->setPermission(Action::EDIT, new Expression(sprintf('"%s" in role_names or "%s" in role_names', RoleEnum::Admin->value, RoleEnum::Manager->value)))
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->setPermission(Action::DETAIL, new Expression('"ROLE_ADMIN" in role_names or "ROLE_MANAGER" in role_names'));
+            ->setPermission(Action::DETAIL, new Expression(sprintf('"%s" in role_names or "%s" in role_names', RoleEnum::Admin->value, RoleEnum::Manager->value)));
     }
 
     public function configureFields(string $pageName): iterable
@@ -77,9 +95,10 @@ class UserCrudController extends AbstractCrudController
 
         yield FormField::addColumn(9);
 
+        yield TextField::new('email');
         yield TextField::new('firstName')->hideWhenCreating();
         yield TextField::new('lastName')->hideWhenCreating();
-        yield TextField::new('email');
+        yield DateField::new('birthDate')->hideWhenCreating();
 
 
         yield FormField::addTab('Employee of record');
@@ -103,11 +122,12 @@ class UserCrudController extends AbstractCrudController
 
         yield FormField::addColumn(5);
         yield ChoiceField::new('workingDays')
+            ->hideOnIndex()
             ->setChoices(UserSettings::WORKING_DAYS)
             ->allowMultipleChoices()
             ->renderExpanded();
 
-        yield FormField::addTab('Security');
+        yield FormField::addTab('Security')->hideOnDetail();
         yield ArrayField::new('roles')
             ->hideOnDetail()
             ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));

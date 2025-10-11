@@ -9,8 +9,7 @@ services:
     App\:
         resource: '../src/'
         exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
+            - '../src/Infrastructure/Doctrine/Entity'
             - '../src/Kernel.php'
 
     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:

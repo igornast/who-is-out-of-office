@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Service;
 
+use App\Shared\Enum\RoleEnum;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RoleTranslator
@@ -12,9 +13,9 @@ class RoleTranslator
      * @var array<string, string>
      */
     private array $roleMapping = [
-        'ROLE_ADMIN' => 'role.admin',
-        'ROLE_MANAGER' => 'role.manager',
-        'ROLE_USER' => 'role.user',
+        RoleEnum::Admin->value => 'role.admin',
+        RoleEnum::Manager->value => 'role.manager',
+        RoleEnum::User->value => 'role.user',
     ];
 
     public function __construct(private readonly TranslatorInterface $translator)

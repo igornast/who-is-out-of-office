@@ -6,6 +6,7 @@ namespace App\Tests\_fixtures\Shared\DTO\LeaveRequest;
 
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\RoleEnum;
 use App\Tests\_fixtures\FixtureInterface;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Faker\Factory;
@@ -32,7 +33,7 @@ class LeaveRequestDTOFixture implements FixtureInterface
             'startDate' => \DateTimeImmutable::createFromMutable($startDate),
             'endDate' => \DateTimeImmutable::createFromMutable($endDate),
             'user' => UserDTOFixture::create(),
-            'approvedBy' => $faker->randomElement([null, UserDTOFixture::create(['roles' => ['ROLE_MANAGER']])->id]),
+            'approvedBy' => $faker->randomElement([null, UserDTOFixture::create(['roles' => [RoleEnum::Manager->value]])->id]),
             'comment' => $faker->sentence(),
         ];
     }

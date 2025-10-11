@@ -9,6 +9,7 @@ use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\LeaveRequest\LeaveRequestFacade;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\RoleEnum;
 use App\Shared\Facade\UserFacadeInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -64,7 +65,7 @@ class DashboardController extends AbstractDashboardController
 
     private function isAdmin(): bool
     {
-        return $this->isGranted('ROLE_ADMIN');
+        return $this->isGranted(RoleEnum::Admin->value);
     }
 
     public function configureMenuItems(): iterable

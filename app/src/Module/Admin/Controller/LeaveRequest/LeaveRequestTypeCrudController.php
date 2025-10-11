@@ -6,6 +6,7 @@ namespace App\Module\Admin\Controller\LeaveRequest;
 
 use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Module\Admin\Controller\AppAbstractCrudController;
+use App\Shared\Enum\RoleEnum;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -33,7 +34,7 @@ class LeaveRequestTypeCrudController extends AppAbstractCrudController
             ->setPageTitle(Crud::PAGE_EDIT, 'crud.absence_request_type.edit.title')
             ->setPageTitle(Crud::PAGE_NEW, 'crud.absence_request_type.create.title')
             ->setPageTitle(Crud::PAGE_DETAIL, 'crud.absence_request_type.detail.title')
-            ->setEntityPermission('ROLE_ADMIN');
+            ->setEntityPermission(RoleEnum::Admin->value);
     }
 
     public function configureActions(Actions $actions): Actions

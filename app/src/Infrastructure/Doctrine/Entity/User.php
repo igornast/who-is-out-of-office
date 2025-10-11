@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Doctrine\Entity;
 
 use App\Infrastructure\Traits\TimestampableTrait;
+use App\Shared\Enum\RoleEnum;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ramsey\Uuid\UuidInterface;
@@ -28,7 +29,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public string $lastName,
         public string $email,
         public string $password,
-        public array $roles = ['ROLE_USER'],
+        public array $roles = [RoleEnum::User->value],
         public array $workingDays = [1, 2, 3, 4, 5],
         public int $annualLeaveAllowance = 24,
         public int $currentLeaveBalance = 24,
@@ -47,7 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return array_unique(array_merge($this->roles, ['ROLE_USER']));
+        return array_unique(array_merge($this->roles, [RoleEnum::User->value]));
     }
 
     public function eraseCredentials(): void
