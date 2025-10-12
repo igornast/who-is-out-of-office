@@ -73,8 +73,7 @@ class UserCrudController extends AppAbstractCrudController
             ->setPermission(Action::NEW, RoleEnum::Admin->value)
             ->setPermission(Action::DELETE, RoleEnum::Admin->value)
             ->setPermission(Action::EDIT, new Expression(sprintf('"%s" in role_names or "%s" in role_names', RoleEnum::Admin->value, RoleEnum::Manager->value)))
-//            ->add(Crud::PAGE_INDEX, Action::DETAIL);
-            ->setPermission(Action::DETAIL, new Expression(sprintf('"%s" in role_names or "%s" in role_names', RoleEnum::Admin->value, RoleEnum::Manager->value)));
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function configureFields(string $pageName): iterable
