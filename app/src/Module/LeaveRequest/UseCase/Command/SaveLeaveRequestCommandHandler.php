@@ -6,10 +6,10 @@ namespace App\Module\LeaveRequest\UseCase\Command;
 
 use App\Module\LeaveRequest\Event\LeaveRequestSavedEvent;
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
-use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\UserFacadeInterface;
+use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Ramsey\Uuid\Uuid;
 

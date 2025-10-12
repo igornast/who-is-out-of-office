@@ -1,19 +1,21 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Page Not Found - Who is ooo{% endblock %}
+
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/error.css') }}">
 {% endblock %}
 
 {% block body %}
-    <div class="error-fullscreen gradient-blue">
+    <div class="error-fullscreen gradient-purple">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
                     <div class="glass-card">
-                        <div class="error-code-large">Error</div>
-                        <div class="error-title">Oops! Something went wrong</div>
+                        <div class="error-code-large error-code-animated">404</div>
+                        <div class="error-title">Page Not Found</div>
                         <p class="error-description">
-                            An unexpected error occurred. Please try again later.
+                            Oops! The page you're looking for seems to have taken a vacation.
                         </p>
                     </div>
                 </div>

@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is "Who's Out of Office" - an online staff leave planner built with **Symfony 7.2** and **PHP 8.4**. The application manages employee leave requests, public holidays, team calendars, and integrates with Slack for notifications. It follows a modular architecture with clean separation of concerns using Facades, DTOs, and Command/Query patterns.
 
+### Application Structure
+
+- **Application code location**: All source code lives in the `/app` directory
+- **Application URL prefix**: The application is accessible via `/app` URLs (e.g., `http://localhost/app`)
+- **EasyAdmin Bundle**: The application uses **EasyAdmin Bundle v4.25.1** as its primary UI framework
+  - EasyAdmin is used throughout the entire application (not just for admin areas)
+  - It provides easier rendering, CRUD operations, and reusable components
+  - Main dashboard route: `/app/dashboard`
+
 ## Development Environment
 
 ### Docker Setup

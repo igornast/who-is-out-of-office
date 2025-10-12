@@ -104,17 +104,20 @@
             "@auto-scripts"
         ],
         "test:phpunit:u": "./vendor/bin/pest --testsuite Unit --coverage --compact --min=90",
+        "test:arch": "./vendor/bin/pest tests/Architecture --compact",
         "test:cs": "./vendor/bin/php-cs-fixer fix --dry-run --diff -v",
         "test:cs:fix": "./vendor/bin/php-cs-fixer fix --diff -v",
         "test:stan": "./vendor/bin/phpstan analyse -c phpstan.neon",
         "test": [
             "@test:cs",
             "@test:stan",
+            "@test:arch",
             "@test:phpunit:u"
         ],
         "test-ci": [
             "@test:cs",
             "@test:stan",
+            "@test:arch",
             "./vendor/bin/pest --testsuite Unit --coverage --coverage-clover clover.xml"
         ],
         "reset-test-db": [

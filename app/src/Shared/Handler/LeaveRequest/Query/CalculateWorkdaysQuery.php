@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\DTO\LeaveRequest\Query;
+namespace App\Shared\Handler\LeaveRequest\Query;
 
 final readonly class CalculateWorkdaysQuery
 {

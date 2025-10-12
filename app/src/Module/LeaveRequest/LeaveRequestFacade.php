@@ -14,12 +14,12 @@ use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
-use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
-use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
+use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
+use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 
 final class LeaveRequestFacade implements LeaveRequestFacadeInterface
 {

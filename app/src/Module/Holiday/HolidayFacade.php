@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Module\Holiday;
 
 use App\Module\Holiday\UseCase\Command\UpsertHolidayCalendarCommandHandler;
-use App\Module\Holiday\UseCase\Query\GetHolidayCalendarForCountryCommandHandler;
+use App\Module\Holiday\UseCase\Query\GetHolidayCalendarForCountryQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysForCountryBetweenDatesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler;
 use App\Shared\DTO\Holiday\PublicHolidayCalendarDTO;
@@ -17,7 +17,7 @@ final class HolidayFacade implements HolidayFacadeInterface
 {
     public function __construct(
         private readonly UpsertHolidayCalendarCommandHandler $upsertHandler,
-        private readonly GetHolidayCalendarForCountryCommandHandler $holidayCalendarHandler,
+        private readonly GetHolidayCalendarForCountryQueryHandler $holidayCalendarHandler,
         private readonly GetHolidayDaysForCountryBetweenDatesQueryHandler $holidayDaysHandler,
         private readonly GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler $holidayDaysGroupedByUserIdHandler,
     ) {

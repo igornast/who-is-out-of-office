@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Module\LeaveRequest\UseCase\Query;
 
-use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Facade\HolidayFacadeInterface;
+use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 
 class CalculateWorkDaysQueryHandler
 {

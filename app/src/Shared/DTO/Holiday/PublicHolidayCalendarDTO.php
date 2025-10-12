@@ -6,7 +6,7 @@ namespace App\Shared\DTO\Holiday;
 
 use App\Infrastructure\Doctrine\Entity\Holiday;
 use App\Infrastructure\Doctrine\Entity\HolidayCalendar;
-use App\Shared\DTO\DataNager\NagerPublicHolidayDto;
+use App\Shared\DTO\DataNager\NagerPublicHolidayDTO;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -24,7 +24,7 @@ readonly class PublicHolidayCalendarDTO
     }
 
     /**
-     * @param NagerPublicHolidayDto[] $holidays
+     * @param NagerPublicHolidayDTO[] $holidays
      */
     public static function createFromNager(string $countryCode, string $countryName, array $holidays): self
     {
@@ -32,7 +32,7 @@ readonly class PublicHolidayCalendarDTO
             id: Uuid::uuid4(),
             countryCode: $countryCode,
             countryName: $countryName,
-            holidays: array_map(fn (NagerPublicHolidayDto $holiday) => PublicHolidayDTO::fromNager($holiday, $countryCode), $holidays),
+            holidays: array_map(fn (NagerPublicHolidayDTO $holiday) => PublicHolidayDTO::fromNager($holiday, $countryCode), $holidays),
         );
     }
 

@@ -10,6 +10,9 @@ enum RoleEnum: string
     case Manager = 'ROLE_MANAGER';
     case User = 'ROLE_USER';
 
+    /**
+     * @return array<string, RoleEnum>
+     */
     public static function getChoices(): array
     {
         return [

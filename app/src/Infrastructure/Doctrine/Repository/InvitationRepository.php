@@ -27,6 +27,13 @@ class InvitationRepository extends ServiceEntityRepository implements Invitation
         return null !== $invitation ? InvitationDTO::fromEntity($invitation) : null;
     }
 
+    public function findOneByUserId(string $id): ?InvitationDTO
+    {
+        $invitation = $this->findOneBy(['user' => $id]);
+
+        return null !== $invitation ? InvitationDTO::fromEntity($invitation) : null;
+    }
+
     public function remove(InvitationDTO $invitationDTO): void
     {
         $invitation = $this->findOneBy(['token' => $invitationDTO->token]);

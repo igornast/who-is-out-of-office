@@ -7,7 +7,7 @@ namespace App\Module\Holiday\UseCase\Query;
 use App\Module\Holiday\Repository\PublicHolidayCalendarRepositoryInterface;
 use App\Shared\DTO\Holiday\PublicHolidayCalendarDTO;
 
-class GetHolidayCalendarForCountryCommandHandler
+class GetHolidayCalendarForCountryQueryHandler
 {
     public function __construct(
         private PublicHolidayCalendarRepositoryInterface $calendarRepo,

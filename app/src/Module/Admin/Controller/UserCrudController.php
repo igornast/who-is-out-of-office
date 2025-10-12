@@ -7,7 +7,6 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\Invitation;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
-use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\RoleEnum;
 use App\Shared\Service\RoleTranslator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +25,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Security\Permission;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -67,26 +67,24 @@ class UserCrudController extends AppAbstractCrudController
             ->add(ChoiceFilter::new('roles')->setChoices(RoleEnum::getChoices()));
     }
 
-
     public function configureActions(Actions $actions): Actions
     {
         return $actions
             ->setPermission(Action::NEW, RoleEnum::Admin->value)
             ->setPermission(Action::DELETE, RoleEnum::Admin->value)
             ->setPermission(Action::EDIT, new Expression(sprintf('"%s" in role_names or "%s" in role_names', RoleEnum::Admin->value, RoleEnum::Manager->value)))
-            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+//            ->add(Crud::PAGE_INDEX, Action::DETAIL);
             ->setPermission(Action::DETAIL, new Expression(sprintf('"%s" in role_names or "%s" in role_names', RoleEnum::Admin->value, RoleEnum::Manager->value)));
     }
 
     public function configureFields(string $pageName): iterable
     {
         yield FormField::addTab('Profile');
-        yield FormField::addColumn(3);
 
+        yield FormField::addColumn(3);
         yield ImageField::new('profileImageUrl')
             ->setBasePath('uploads/profile_images')
             ->hideOnForm();
-
         yield ImageField::new('profileImageUrl')
             ->setBasePath('uploads/profile_images')
             ->setUploadDir('public/uploads/profile_images')
@@ -94,53 +92,53 @@ class UserCrudController extends AppAbstractCrudController
             ->onlyWhenUpdating();
 
         yield FormField::addColumn(9);
-
         yield TextField::new('email');
         yield TextField::new('firstName')->hideWhenCreating();
         yield TextField::new('lastName')->hideWhenCreating();
         yield DateField::new('birthDate')->hideWhenCreating();
 
+        if($this->isAdminOrManager()) {
+            yield FormField::addTab('Employee of record');
 
-        yield FormField::addTab('Employee of record');
-        yield FormField::addColumn(7);
+            yield FormField::addColumn(7);
+            yield FormField::addFieldset('Absence Balance');
+            yield NumberField::new('annualLeaveAllowance')->hideOnIndex();
+            yield NumberField::new('currentLeaveBalance')
+                ->setHelp('The number of available holiday days for the employee.')
+                ->hideOnIndex();
 
-        yield FormField::addFieldset('Absence Balance');
-        yield NumberField::new('annualLeaveAllowance')->hideOnIndex();
-        yield NumberField::new('currentLeaveBalance')
-            ->setHelp('The number of available holiday days for the employee.')
-            ->hideOnIndex();
+            yield FormField::addFieldset('Contract Details');
+            yield DateField::new('contractStartedAt')
+                ->setColumns(6)
+                ->hideOnIndex();
+            yield BooleanField::new('hasCelebrateWorkAnniversary')
+                ->setHelp('Have the employee enabled work anniversaries celebrations.')
+                ->setColumns(6)
+                ->hideOnIndex()
+                ->setDisabled();
 
-        yield FormField::addFieldset('Contract Details');
-        yield DateField::new('contractStartedAt')
-            ->setColumns(6)
-            ->hideOnIndex();
-        yield BooleanField::new('hasCelebrateWorkAnniversary')
-            ->setHelp('Have the employee enabled work anniversaries celebrations.')
-            ->setColumns(6)
-            ->hideOnIndex()
-            ->setDisabled();
+            yield FormField::addColumn(5);
+            yield ChoiceField::new('workingDays')
+                ->hideOnIndex()
+                ->setChoices(UserSettings::WORKING_DAYS)
+                ->allowMultipleChoices()
+                ->renderExpanded();
 
-        yield FormField::addColumn(5);
-        yield ChoiceField::new('workingDays')
-            ->hideOnIndex()
-            ->setChoices(UserSettings::WORKING_DAYS)
-            ->allowMultipleChoices()
-            ->renderExpanded();
+            yield FormField::addTab('Security')->hideOnDetail();
+            yield ArrayField::new('roles')
+                ->hideOnDetail()
+                ->formatValue(fn(array $roles, User $user): string => $this->roleTranslator->translate($roles));
 
-        yield FormField::addTab('Security')->hideOnDetail();
-        yield ArrayField::new('roles')
-            ->hideOnDetail()
-            ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
+            yield TextField::new('invitationCopy', 'Status')
+                ->setVirtual(true)
+                ->setValue('')
+                ->formatValue(fn($value, $user) => $this->generateInvitationButton($user))
+                ->onlyOnIndex()
+                ->renderAsHtml();
 
-        yield TextField::new('invitationCopy', 'Status')
-            ->setVirtual(true)
-            ->setValue('')
-            ->formatValue(fn ($value, $user) => $this->generateInvitationButton($user))
-            ->onlyOnIndex()
-            ->renderAsHtml();
-
-        yield TextField::new('plainPassword')
-            ->onlyWhenUpdating()->setRequired(false);
+            yield TextField::new('plainPassword')
+                ->onlyWhenUpdating()->setRequired(false);
+        }
     }
 
     public function createEntity(string $entityFqcn): User
