@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
-|--------------------------------------------------------------------------
-| Security Architecture Tests
-|--------------------------------------------------------------------------
-|
-| These tests ensure security best practices are followed.
-|
-*/
-
 describe('Security Best Practices', function () {
     arch('should not use eval')
         ->expect('App')
@@ -37,7 +28,7 @@ describe('Security Best Practices', function () {
         ->not->toUse([
             'md5',
             'sha1',
-            'password_hash', // Use Symfony's PasswordHasherInterface instead
+            'password_hash',
         ]);
 });
 

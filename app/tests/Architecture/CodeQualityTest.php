@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
-|--------------------------------------------------------------------------
-| Code Quality Architecture Tests
-|--------------------------------------------------------------------------
-|
-| These tests enforce general code quality standards.
-|
-*/
-
 describe('Strict Types', function () {
     arch('all PHP files should declare strict types')
         ->expect('App')

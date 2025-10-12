@@ -25,7 +25,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
-use EasyCorp\Bundle\EasyAdminBundle\Security\Permission;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -96,7 +95,7 @@ class UserCrudController extends AppAbstractCrudController
         yield TextField::new('lastName')->hideWhenCreating();
         yield DateField::new('birthDate')->hideWhenCreating();
 
-        if($this->isAdminOrManager()) {
+        if ($this->isAdminOrManager()) {
             yield FormField::addTab('Employee of record');
 
             yield FormField::addColumn(7);
@@ -126,12 +125,12 @@ class UserCrudController extends AppAbstractCrudController
             yield FormField::addTab('Security')->hideOnDetail();
             yield ArrayField::new('roles')
                 ->hideOnDetail()
-                ->formatValue(fn(array $roles, User $user): string => $this->roleTranslator->translate($roles));
+                ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
 
             yield TextField::new('invitationCopy', 'Status')
                 ->setVirtual(true)
                 ->setValue('')
-                ->formatValue(fn($value, $user) => $this->generateInvitationButton($user))
+                ->formatValue(fn ($value, $user) => $this->generateInvitationButton($user))
                 ->onlyOnIndex()
                 ->renderAsHtml();
 
