@@ -95,8 +95,9 @@
     --accent-teal: #5dc8d8;
 }
 
-/* Light theme button improvements - vibrant logo-inspired colors */
+/* Light theme improvements - vibrant logo-inspired colors */
 [data-bs-theme="light"] {
+    /* Buttons */
     .btn-primary {
         background: linear-gradient(135deg, #b090e8 0%, #6ba8e8 100%);
         border-color: #8f7dd1;
@@ -273,6 +274,45 @@
     .flatpickr-time .flatpickr-am-pm:hover {
         background: #ffffff;
         border-color: var(--accent-purple);
+    }
+
+    /* Alerts */
+    .alert-primary {
+        background: linear-gradient(135deg, rgba(176, 144, 232, 0.15) 0%, rgba(107, 168, 232, 0.15) 100%);
+        border-color: var(--accent-purple);
+        color: #6b58a0;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, rgba(93, 200, 216, 0.15) 0%, rgba(52, 184, 197, 0.15) 100%);
+        border-color: var(--accent-teal);
+        color: #3a7c85;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, rgba(255, 150, 119, 0.15) 0%, rgba(231, 122, 181, 0.15) 100%);
+        border-color: var(--accent-coral);
+        color: #c95040;
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 150, 119, 0.15) 100%);
+        border-color: #ffc107;
+        color: #997404;
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, rgba(107, 168, 232, 0.15) 0%, rgba(93, 200, 216, 0.15) 100%);
+        border-color: var(--accent-blue);
+        color: #4870a8;
+    }
+
+    .alert {
+        border-radius: var(--bs-border-radius-lg);
+        border-width: 1px;
+        border-style: solid;
+        padding: 1rem 1.25rem;
+        font-weight: 500;
     }
 }
 
@@ -490,4 +530,44 @@
     .flatpickr-time .flatpickr-am-pm:hover {
         background: var(--bs-tertiary-bg);
     }
+
+    /* Alerts */
+    .alert-primary {
+        background: linear-gradient(135deg, rgba(155, 120, 197, 0.2) 0%, rgba(107, 156, 212, 0.2) 100%);
+        border-color: var(--accent-purple);
+        color: #c0a8f0;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, rgba(77, 184, 196, 0.2) 0%, rgba(74, 110, 115, 0.2) 100%);
+        border-color: var(--accent-teal);
+        color: #6dcdd8;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, rgba(255, 138, 109, 0.2) 0%, rgba(215, 106, 159, 0.2) 100%);
+        border-color: var(--accent-coral);
+        color: #ff9677;
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 138, 109, 0.2) 100%);
+        border-color: #ffc107;
+        color: #ffda6a;
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, rgba(107, 156, 212, 0.2) 0%, rgba(77, 184, 196, 0.2) 100%);
+        border-color: var(--accent-blue);
+        color: #7faae0;
+    }
+
+    .alert {
+        border-radius: var(--bs-border-radius-lg);
+        border-width: 1px;
+        border-style: solid;
+        padding: 1rem 1.25rem;
+        font-weight: 500;
+    }
 }
+
