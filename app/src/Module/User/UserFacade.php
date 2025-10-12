@@ -10,7 +10,7 @@ use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
-use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDates;
+use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDatesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
 use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\UserDTO;
@@ -24,7 +24,7 @@ final class UserFacade implements UserFacadeInterface
         private readonly GetUsersWithIncomingBirthdaysQueryHandler $getUsersWithIncomingBirthdaysHandler,
         private readonly GetUserBySlackMemberIdQueryHandler $getUserBySlackMemberIdQueryHandler,
         private readonly GetUserByIdQueryHandler $getUserByIdQueryHandler,
-        private readonly GetUsersWithBirthdaysForDates $getUsersWithBirthdaysForDatesHandler,
+        private readonly GetUsersWithBirthdaysForDatesQueryHandler $getUsersWithBirthdaysForDatesHandler,
         private readonly AcceptUserInvitationCommandHandler $acceptInvitationHandler,
     ) {
     }

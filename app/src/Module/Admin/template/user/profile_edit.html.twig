@@ -23,6 +23,34 @@
 
                     <h5>Profile Info</h5>
 
+                    <div class="form-group row mt-3">
+                        {% if app.user.profileImageUrl %}
+                            {% set img = app.user.profileImageUrl %}
+                            {% if img starts with 'http://' or img starts with 'https://' %}
+                                {% set src = img %}
+                            {% else %}
+                                {% set src = asset(profile_images_base_path ~ '/' ~ img) %}
+                            {% endif %}
+                            <div class="col-md-5">
+                                <div class="text-center">
+                                    <img src="{{ src }}"
+                                         alt="Profile Image"
+                                         class="img-thumbnail border border-3 border-light shadow-sm"
+                                         style="max-width: 160px;">
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="col-md-7">
+                            <div class="field-file">
+                                <div class="form-widget">
+                                    {{ form_row(form.profileImageFile, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
                     <div class="field-text form-group">
                         <div class="form-widget">
                             {{ form_row(form.firstName, {'attr': {'class': 'form-control'}}) }}
@@ -105,30 +133,6 @@
                             {{ form_row(form.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
                         </div>
                     </div>
-
-                    <h5>Profile Image</h5>
-                    <div class="field-file form-group">
-                        <div class="form-widget">
-                            {{ form_row(form.profileImageFile, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                    </div>
-
-                    {% if app.user.profileImageUrl %}
-                        {% set img = app.user.profileImageUrl %}
-                        {% if img starts with 'http://' or img starts with 'https://' %}
-                            {% set src = img %}
-                        {% else %}
-                            {% set src = asset(profile_images_base_path ~ '/' ~ img) %}
-                        {% endif %}
-
-                        <div class="text-center mb-4">
-                            <img src="{{ src }}"
-                                 alt="Profile Image"
-                                 class="img-thumbnail border border-3 border-light shadow-sm"
-                                 style="max-width: 160px;">
-                        </div>
-                    {% endif %}
-
 
                     {{ form_errors(form) }}
 

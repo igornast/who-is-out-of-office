@@ -7,8 +7,9 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
-use App\Module\LeaveRequest\LeaveRequestFacade;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\RoleEnum;
+use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -26,7 +27,7 @@ class DashboardController extends AbstractDashboardController
     public function __construct(
         #[Autowire('%profile_images_base_path%')]
         private readonly string $profileImagesBasePath,
-        private readonly LeaveRequestFacade $leaveRequestFacade,
+        private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
         private readonly UserFacadeInterface $userFacade,
     ) {
     }
@@ -64,7 +65,7 @@ class DashboardController extends AbstractDashboardController
 
     private function isAdmin(): bool
     {
-        return $this->isGranted('ROLE_ADMIN');
+        return $this->isGranted(RoleEnum::Admin->value);
     }
 
     public function configureMenuItems(): iterable

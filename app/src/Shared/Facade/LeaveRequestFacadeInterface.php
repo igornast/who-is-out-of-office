@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Shared\Facade;
 
-use App\Shared\DTO\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
-use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
+use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 
 interface LeaveRequestFacadeInterface
 {
@@ -35,6 +35,18 @@ interface LeaveRequestFacadeInterface
      * @return array{string, LeaveRequestDTO[]}
      */
     public function getLeaveRequestsForDatesGroupedByUserId(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
+
+    /**
+     * @param LeaveRequestStatusEnum[]|null $status
+     *
+     * @return LeaveRequestDTO[]
+     */
+    public function getLeaveRequestsForUser(string $userId, ?array $status): array;
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function getUpcomingLeaveRequests(): array;
 
     public function remove(LeaveRequestDTO $leaveRequestDTO): void;
 }

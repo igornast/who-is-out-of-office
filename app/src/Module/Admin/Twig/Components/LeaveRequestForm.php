@@ -7,8 +7,8 @@ namespace App\Module\Admin\Twig\Components;
 use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Form\NewLeaveRequestFormType;
-use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
+use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -65,9 +65,16 @@ class LeaveRequestForm extends AbstractController
             $end = $start;
         }
 
+        $startDate = \DateTimeImmutable::createFromFormat('Y-m-d', $start);
+        $endDate = \DateTimeImmutable::createFromFormat('Y-m-d', $end);
+
+        if (!$startDate || !$endDate) {
+            throw new \InvalidArgumentException('Start date and end date are not valid');
+        }
+
         $query = new CalculateWorkdaysQuery(
-            startDate: \DateTimeImmutable::createFromFormat('Y-m-d', $start),
-            endDate: \DateTimeImmutable::createFromFormat('Y-m-d', $end),
+            startDate: $startDate,
+            endDate: $endDate,
             userWorkingDays: $user->workingDays,
             holidayCalendarCountryCode: $user->holidayCalendar?->countryCode
         );

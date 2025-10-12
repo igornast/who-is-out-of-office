@@ -1,20 +1,23 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Access Denied - Who is ooo{% endblock %}
+
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/error.css') }}">
 {% endblock %}
 
 {% block body %}
-    <div class="error-fullscreen gradient-blue">
+    <div class="error-fullscreen gradient-pink">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
                     <div class="glass-card">
-                        <div class="error-code-large">Error</div>
-                        <div class="error-title">Oops! Something went wrong</div>
+                        <div class="error-code-large">403</div>
+                        <div class="error-title">Access Denied</div>
                         <p class="error-description">
-                            An unexpected error occurred. Please try again later.
+                            Sorry, you don't have permission to access this resource.
                         </p>
+                        <button onclick="window.history.back()" class="btn-glass btn-pink">Go Back</button>
                     </div>
                 </div>
             </div>

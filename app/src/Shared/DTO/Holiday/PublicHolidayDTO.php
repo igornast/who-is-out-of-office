@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\DTO\Holiday;
 
 use App\Infrastructure\Doctrine\Entity\Holiday;
-use App\Shared\DTO\DataNager\NagerPublicHolidayDto;
+use App\Shared\DTO\DataNager\NagerPublicHolidayDTO;
 use Ramsey\Uuid\Uuid;
 
 readonly class PublicHolidayDTO
@@ -38,7 +38,7 @@ readonly class PublicHolidayDTO
         );
     }
 
-    public static function fromNager(NagerPublicHolidayDto $holiday, string $countryCode): self
+    public static function fromNager(NagerPublicHolidayDTO $holiday, string $countryCode): self
     {
         return new self(
             id: Uuid::uuid4()->toString(),

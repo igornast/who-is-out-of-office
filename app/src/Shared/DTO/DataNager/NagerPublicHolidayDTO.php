@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\DTO\DataNager;
 
-readonly class NagerPublicHolidayDto
+readonly class NagerPublicHolidayDTO
 {
     public function __construct(
         public \DateTimeImmutable $date,

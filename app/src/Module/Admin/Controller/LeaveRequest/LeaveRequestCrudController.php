@@ -9,6 +9,7 @@ use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\AppAbstractCrudController;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\RoleEnum;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -75,17 +76,24 @@ class LeaveRequestCrudController extends AppAbstractCrudController
 
         if ($this->isAdmin()) {
             return $crud
-                ->setSearchFields(['status', 'leaveType'])
+                ->setSearchFields(['user', 'status', 'leaveType'])
                 ->setDefaultSort(['createdAt' => 'DESC']);
         }
 
         return $crud
-            ->setSearchFields(null)
+            ->setSearchFields(['status', 'leaveType'])
             ->setDefaultSort(['createdAt' => 'DESC']);
     }
 
     public function configureFilters(Filters $filters): Filters
     {
+        if ($this->isAdmin()) {
+            return $filters
+                ->add(ChoiceFilter::new('status')->setChoices(LeaveRequestStatusEnum::getChoices()))
+                ->add('user')
+                ->add('leaveType');
+        }
+
         return $filters
             ->add(ChoiceFilter::new('status')->setChoices(LeaveRequestStatusEnum::getChoices()))
             ->add('leaveType');
@@ -107,11 +115,11 @@ class LeaveRequestCrudController extends AppAbstractCrudController
         return [
             FormField::addColumn(8),
             FormField::addFieldset('Request absence'),
-            AssociationField::new('user', 'Name')
+            AssociationField::new('user', 'Person')
                 ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName))
-                ->setPermission('ROLE_ADMIN'),
+                ->setPermission(RoleEnum::Admin->value),
 
-            AssociationField::new('leaveType', 'Select the type of absence')
+            AssociationField::new('leaveType', 'Type of the absence')
                 ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $requestType->name),
 
             DateField::new('startDate', 'From')
@@ -123,7 +131,8 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             FormField::addFieldset('Details')->hideWhenCreating(),
             ChoiceField::new('status')->setChoices(LeaveRequestStatusEnum::cases())->setDisabled()->hideWhenCreating(),
             NumberField::new('workDays')->setDisabled()->hideWhenCreating(),
-            DateField::new('createdAt')->onlyOnIndex(),
+            AssociationField::new('approvedBy')->setDisabled()->hideWhenCreating(),
+            DateField::new('createdAt')->setDisabled()->hideWhenCreating(),
         ];
     }
 

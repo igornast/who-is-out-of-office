@@ -24,6 +24,7 @@ App\Infrastructure\Doctrine\Entity\User:
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 days", "+2 days")->format("Y-m-d H:i:s")))>'
+            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "-1 month")->format("Y-m-d H:i:s")))>'
     user_2:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -38,6 +39,7 @@ App\Infrastructure\Doctrine\Entity\User:
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
+            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
     user_{3..6}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -52,6 +54,7 @@ App\Infrastructure\Doctrine\Entity\User:
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
+            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
     user_{7..10}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -66,6 +69,7 @@ App\Infrastructure\Doctrine\Entity\User:
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
+            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
 
 App\Infrastructure\Doctrine\Entity\LeaveRequestType:
     leave_request_type_1:

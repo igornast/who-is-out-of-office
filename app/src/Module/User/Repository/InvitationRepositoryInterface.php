@@ -10,6 +10,8 @@ interface InvitationRepositoryInterface
 {
     public function findOneByToken(string $token): ?InvitationDTO;
 
+    public function findOneByUserId(string $id): ?InvitationDTO;
+
     public function remove(InvitationDTO $invitationDTO): void;
 
     /**

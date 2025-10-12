@@ -21,6 +21,7 @@ class NewLeaveRequestDTO
 
     /**
      * A virtual field for the form transformer.
+     * NewLeaveRequestFormType::dateRange.
      *
      * @param array{}|array{'start': \DateTimeImmutable, 'end': \DateTimeImmutable} $dates
      */

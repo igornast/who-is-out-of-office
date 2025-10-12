@@ -23,7 +23,7 @@ return new PhpCsFixer\Config()
         'ternary_to_null_coalescing' => true,
         'trim_array_spaces' => true,
         'use_arrow_functions' => true,
-        'visibility_required' => true,
+        'modifier_keywords' => true,
         'method_argument_space' => ['on_multiline' => 'ensure_fully_multiline'],
         'binary_operator_spaces' => [
             'operators' => ['=' => 'single_space'],

@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Module\LeaveRequest\UseCase\Query\CalculateWorkDaysQueryHandler;
-use App\Shared\DTO\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Shared\Facade\HolidayFacadeInterface;
+use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Tests\_fixtures\Shared\DTO\Holiday\PublicHolidayDTOFixture;
 
 beforeEach(function (): void {

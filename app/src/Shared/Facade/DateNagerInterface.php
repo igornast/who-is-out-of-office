@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Shared\Facade;
 
-use App\Shared\DTO\DataNager\NagerPublicHolidayDto;
+use App\Shared\DTO\DataNager\NagerPublicHolidayDTO;
 
 interface DateNagerInterface
 {
     /**
-     * @return NagerPublicHolidayDto[]
+     * @return NagerPublicHolidayDTO[]
      */
     public function getHolidaysForCountry(string $country, int $year): array;
 }

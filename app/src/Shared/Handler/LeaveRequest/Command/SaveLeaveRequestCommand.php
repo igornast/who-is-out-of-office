@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\DTO\LeaveRequest\Command;
+namespace App\Shared\Handler\LeaveRequest\Command;
 
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\DTO\UserDTO;

@@ -1,28 +1,149 @@
-body {
-    background-color: #f8f9fa;
+/* Reusable error page components */
+
+/* Full viewport container with gradient background */
+.error-fullscreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+/* Gradient backgrounds - can be combined with error-fullscreen */
+.gradient-purple {
+    background: linear-gradient(135deg, var(--bs-indigo) 0%, var(--bs-purple) 100%);
+}
+
+.gradient-pink {
+    background: linear-gradient(135deg, #f093fb 0%, var(--bs-pink) 100%);
+}
+
+.gradient-blue {
+    background: linear-gradient(135deg, var(--bs-cyan) 0%, var(--bs-blue) 100%);
+}
+
+/* Glassmorphism card effect */
+.glass-card {
+    text-align: center;
+    color: var(--bs-white);
+    padding: 40px;
+    background: rgba(var(--bs-white-rgb), 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: var(--bs-border-radius-lg);
+    box-shadow: var(--bs-box-shadow-lg);
+}
+
+/* Error code styling */
+.error-code-large {
+    font-size: 150px;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(var(--bs-black-rgb), 0.3);
+}
+
+.error-code-animated {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Error text styling */
+.error-title {
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.error-description {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 30px;
+}
+
+/* Button styling */
+.btn-glass {
+    background: var(--bs-white);
+    padding: 12px 40px;
+    border-radius: var(--bs-border-radius-pill);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px 0 rgba(var(--bs-white-rgb), 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-glass:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px 0 rgba(var(--bs-white-rgb), 0.4);
+    text-decoration: none;
+}
+
+/* Color variants for buttons */
+.btn-purple {
+    color: var(--bs-indigo);
+}
+
+.btn-purple:hover {
+    color: var(--bs-indigo);
+}
+
+.btn-pink {
+    color: var(--bs-pink);
+}
+
+.btn-pink:hover {
+    color: var(--bs-pink);
+}
+
+.btn-blue {
+    color: var(--bs-blue);
+}
+
+.btn-blue:hover {
+    color: var(--bs-blue);
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Legacy simple error page styles */
+body {
+    background-color: var(--bs-gray-100);
+}
+
 .error-container {
     text-align: center;
     padding: 100px 0;
 }
+
 .error-code {
     font-size: 100px;
-    color: #4a6bff;
+    color: var(--bs-primary);
     margin-bottom: 20px;
 }
+
 .error-message {
     font-size: 24px;
     margin-bottom: 30px;
-    color: #333;
+    color: var(--bs-gray-800);
 }
+
 .btn-custom {
-    background-color: #4a6bff;
-    color: white;
-    border-radius: 50px;
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+    border-radius: var(--bs-border-radius-pill);
     padding: 10px 30px;
     transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
 }
+
 .btn-custom:hover {
-    background-color: #3a5bef;
+    background-color: var(--bs-link-hover-color);
     transform: translateY(-2px);
+    color: var(--bs-white);
+    text-decoration: none;
 }
