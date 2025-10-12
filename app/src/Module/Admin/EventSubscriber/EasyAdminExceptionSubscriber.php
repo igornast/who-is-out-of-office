@@ -10,13 +10,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Twig\Environment;
 
-readonly class EasyAdminExceptionSubscriber implements EventSubscriberInterface
+class EasyAdminExceptionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Environment $twig,
+        private readonly Environment $twig,
     ) {
     }
 
@@ -38,7 +37,6 @@ readonly class EasyAdminExceptionSubscriber implements EventSubscriberInterface
 
         if ($exception instanceof ForbiddenActionException
             || $exception instanceof InsufficientEntityPermissionException
-            || $exception instanceof AccessDeniedException
         ) {
             $html = $this->twig->render('@Twig/Exception/error403.html.twig');
             $response = new Response($html, Response::HTTP_FORBIDDEN);
