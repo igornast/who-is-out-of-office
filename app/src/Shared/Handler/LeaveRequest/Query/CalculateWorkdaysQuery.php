@@ -6,6 +6,9 @@ namespace App\Shared\Handler\LeaveRequest\Query;
 
 final readonly class CalculateWorkdaysQuery
 {
+    /**
+     * @param int[] $userWorkingDays
+     */
     public function __construct(
         public \DateTimeImmutable $startDate,
         public \DateTimeImmutable $endDate,

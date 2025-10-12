@@ -65,9 +65,16 @@ class LeaveRequestForm extends AbstractController
             $end = $start;
         }
 
+        $startDate = \DateTimeImmutable::createFromFormat('Y-m-d', $start);
+        $endDate = \DateTimeImmutable::createFromFormat('Y-m-d', $end);
+
+        if (!$startDate || !$endDate) {
+            throw new \InvalidArgumentException('Start date and end date are not valid');
+        }
+
         $query = new CalculateWorkdaysQuery(
-            startDate: \DateTimeImmutable::createFromFormat('Y-m-d', $start),
-            endDate: \DateTimeImmutable::createFromFormat('Y-m-d', $end),
+            startDate: $startDate,
+            endDate: $endDate,
             userWorkingDays: $user->workingDays,
             holidayCalendarCountryCode: $user->holidayCalendar?->countryCode
         );

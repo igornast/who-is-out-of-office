@@ -14,3 +14,5 @@ parameters:
         - '#generateBirthdaysSection\(\) should return#'
         - '#generateHeaderSection\(\) should return#'
         - '#generateEmptyDigestMessage\(\) should return#'
+        - '~Parameter #2 \$startDate of class App\\Shared\\Handler\\LeaveRequest\\Command\\SaveLeaveRequestCommand constructor expects DateTimeImmutable, DateTimeImmutable\|null given\.~'
+        - '~Parameter #3 \$endDate of class App\\Shared\\Handler\\LeaveRequest\\Command\\SaveLeaveRequestCommand constructor expects DateTimeImmutable, DateTimeImmutable\|null given\.~'
