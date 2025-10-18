@@ -41,6 +41,7 @@ services:
             - "3306:3306"
         volumes:
             - mysql:/var/lib/mysql:delegated
+            - ./docker/mysql/init-grants.sql:/docker-entrypoint-initdb.d/init-grants.sql
 
 volumes:
     mysql:
