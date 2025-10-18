@@ -18,15 +18,15 @@
     </php>
 
     <testsuites>
-<!--        <testsuite name="Architecture">-->
-<!--            <directory>tests/Architecture</directory>-->
-<!--        </testsuite>-->
+        <testsuite name="Architecture">
+            <directory>tests/Architecture</directory>
+        </testsuite>
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
         </testsuite>
-<!--        <testsuite name="Functional">-->
-<!--            <directory>tests/Functional</directory>-->
-<!--        </testsuite>-->
+        <testsuite name="Functional">
+            <directory>tests/Functional</directory>
+        </testsuite>
     </testsuites>
 
     <source>

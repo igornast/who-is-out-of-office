@@ -13,8 +13,8 @@ App\Infrastructure\Doctrine\Entity\User:
     user_1:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            firstName: <firstName()>
-            lastName: <lastName()>
+            firstName: 'Hans'
+            lastName: 'Müller'
             email: 'admin@ooo.com'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_ADMIN']
@@ -28,8 +28,8 @@ App\Infrastructure\Doctrine\Entity\User:
     user_2:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            firstName: <firstName()>
-            lastName: <lastName()>
+            firstName: 'Petra'
+            lastName: 'Schmidt'
             email: 'manager@ooo.com'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_MANAGER']
@@ -92,7 +92,40 @@ App\Infrastructure\Doctrine\Entity\LeaveRequestType:
             icon: '🤒'
 
 App\Infrastructure\Doctrine\Entity\LeaveRequest:
-    leave_request_{1..10}:
+    leave_request_1:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: 5
+            comment: 'Going on vacation to the Alps'
+            leaveType: '@leave_request_type_1'
+            user: '@user_2'
+            approvedBy: '@user_1'
+            startDate: '<(new \DateTimeImmutable((new DateTime("+2 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+6 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_2:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: 2
+            comment: 'Feeling under the weather'
+            leaveType: '@leave_request_type_2'
+            user: '@user_2'
+            approvedBy: '@user_1'
+            startDate: '<(new \DateTimeImmutable((new DateTime("+8 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+9 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_{3..5}:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: <numberBetween(1, 10)>
+            comment: <sentence()>
+            leaveType: '@leave_request_type_<numberBetween(1, 2)>'
+            user: '@user_<numberBetween(3, 10)>'
+            approvedBy: '@user_1'
+            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+3 days")->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+4 days", "+10 days")->format("Y-m-d H:i:s")))>'
+    leave_request_{6..10}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
@@ -103,10 +136,20 @@ App\Infrastructure\Doctrine\Entity\LeaveRequest:
             approvedBy: '@user_1'
             startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-2 days", "now")->format("Y-m-d H:i:s")))>'
             endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+10 days")->format("Y-m-d H:i:s")))>'
-    leave_request_{11..16}:
+    leave_request_{11..13}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from(["pending", "approved", "rejected", "cancelled", "withdrawn"][rand(0,4)]))>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("pending"))>'
+            workDays: <numberBetween(1, 5)>
+            comment: <sentence()>
+            leaveType: '@leave_request_type_<numberBetween(1, 2)>'
+            user: '@user_1'
+            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+5 days")->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+6 days", "+10 days")->format("Y-m-d H:i:s")))>'
+    leave_request_{14..16}:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from(["rejected", "cancelled", "withdrawn"][rand(0,2)]))>'
             workDays: <numberBetween(1, 10)>
             comment: <sentence()>
             leaveType: '@leave_request_type_<numberBetween(1, 2)>'
