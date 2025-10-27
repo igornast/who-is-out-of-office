@@ -101,7 +101,6 @@ The bot will post a summary of:
 
 ### 6. Slack Bot Setup & Approval Workflow
 
-
 1. **Install the Leave Planner Bot**
    - Create a new Slack App and add it to your workspace.
    - Generate an OAuth token and set `SLACK_DSN` to include it.
