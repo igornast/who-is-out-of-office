@@ -65,7 +65,7 @@ class UserDTO
             isActive: (bool) $data['is_active'],
             createdAt: \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['created_at']),
             profileImageUrl: $data['profile_image_url'],
-            birthDate: \DateTimeImmutable::createFromFormat('Y-m-d', $data['birth_date']),
+            birthDate: isset($data['birth_date']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['birth_date']) : null,
         );
     }
 }
