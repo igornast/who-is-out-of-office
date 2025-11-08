@@ -83,7 +83,7 @@ class CalendarSubscriber implements EventSubscriberInterface
                 $this->adminUrlGenerator
                 ->setController(LeaveRequestCrudController::class)
                 ->setAction(Action::DETAIL)
-                ->setEntityId($dto->id)
+                ->setEntityId($dto->id->toString())
                 ->generateUrl()
             );
             $event->addEvent($calendarEvent);

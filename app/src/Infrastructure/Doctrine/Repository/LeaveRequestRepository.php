@@ -12,7 +12,6 @@ use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<LeaveRequest>
@@ -46,7 +45,7 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         }
 
         $leaveRequest = new LeaveRequest(
-            id: Uuid::fromString($leaveRequestDTO->id),
+            id: $leaveRequestDTO->id,
             user: $user,
             status: $leaveRequestDTO->status,
             leaveType: $leaveRequestType,

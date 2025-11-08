@@ -10,6 +10,7 @@ use App\Shared\Enum\RoleEnum;
 use App\Tests\_fixtures\FixtureInterface;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Faker\Factory;
+use Ramsey\Uuid\Uuid;
 
 class LeaveRequestDTOFixture implements FixtureInterface
 {
@@ -26,14 +27,14 @@ class LeaveRequestDTOFixture implements FixtureInterface
         $endDate = $startDate->modify('+'.$faker->numberBetween(1, 20).' days');
 
         return [
-            'id' => $faker->uuid(),
-            'workDays' => $faker,
+            'id' => Uuid::fromString($faker->uuid()),
+            'workDays' => $startDate->diff($endDate)->days,
             'status' => $faker->randomElement(LeaveRequestStatusEnum::cases()),
             'leaveType' => LeaveRequestTypeDTOFixture::create(),
             'startDate' => \DateTimeImmutable::createFromMutable($startDate),
             'endDate' => \DateTimeImmutable::createFromMutable($endDate),
             'user' => UserDTOFixture::create(),
-            'approvedBy' => $faker->randomElement([null, UserDTOFixture::create(['roles' => [RoleEnum::Manager->value]])->id]),
+            'approvedBy' => $faker->randomElement([null, UserDTOFixture::create(['roles' => [RoleEnum::Manager->value]])]),
             'comment' => $faker->sentence(),
         ];
     }

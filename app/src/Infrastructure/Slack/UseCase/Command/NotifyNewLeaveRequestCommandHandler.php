@@ -80,7 +80,7 @@ class NotifyNewLeaveRequestCommandHandler
                             'value' => sprintf(
                                 'leave-request_%s_%s',
                                 LeaveRequestStatusEnum::Approved->value,
-                                $leaveRequestDTO->id
+                                $leaveRequestDTO->id->toString()
                             ),
                         ],
                         [
@@ -89,7 +89,7 @@ class NotifyNewLeaveRequestCommandHandler
                             'value' => sprintf(
                                 'leave-request_%s_%s',
                                 LeaveRequestStatusEnum::Rejected->value,
-                                $leaveRequestDTO->id
+                                $leaveRequestDTO->id->toString()
                             ),
                         ],
                     ],
