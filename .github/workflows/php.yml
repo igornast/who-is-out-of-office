@@ -61,3 +61,4 @@ jobs:
               run: composer run test-ci --working-dir=app
               env:
                   DATABASE_URL: 'mysql://mysql:mysql@127.0.0.1:${{ job.services.mysql.ports[3306] }}/ooo_db?serverVersion=8.4&charset=utf8'
+                  APP_ENV: 'test'
