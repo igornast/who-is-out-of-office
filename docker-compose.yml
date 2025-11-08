@@ -21,7 +21,7 @@ services:
             dockerfile: ./docker/php/Dockerfile
             target: local
         environment:
-            PHP_IDE_CONFIG: '${PHP_IDE_CONFIG:-serverName=php_ooo}'
+            PHP_IDE_CONFIG: 'serverName=php_ooo'
             MARIADB_TLS_DISABLE_PEER_VERIFICATION: 1
         volumes:
             - ./app:/var/www
