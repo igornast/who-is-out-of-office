@@ -69,7 +69,7 @@ it('sends digest with leave requests and birthdays', function () {
     $this->chatter
         ->expects('send')
         ->once()
-        ->withArgs(function (ChatMessage $message) use ($user1, $user2) {
+        ->withArgs(function (ChatMessage $message) {
             $options = $message->getOptions();
 
             expect($options)->toBeInstanceOf(SlackOptions::class);

@@ -53,7 +53,8 @@ class NotifyNewLeaveRequestCommandHandler
                             'type' => 'mrkdwn',
                             'text' => sprintf(
                                 '*Created by:* <%s|%s %s>',
-                                $this->urlGenerator->generate('app_dashboard_app_users_detail',
+                                $this->urlGenerator->generate(
+                                    'app_dashboard_app_users_detail',
                                     ['entityId' => $leaveRequestDTO->user->id],
                                     UrlGeneratorInterface::ABSOLUTE_URL
                                 ),

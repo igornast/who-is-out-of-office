@@ -84,7 +84,8 @@ class NotifyUserLeaveRequestStatusChangeCommandHandler
                             'type' => 'mrkdwn',
                             'text' => sprintf(
                                 '<%s|View the absence request>',
-                                $this->urlGenerator->generate('app_dashboard_app_leave_request_detail',
+                                $this->urlGenerator->generate(
+                                    'app_dashboard_app_leave_request_detail',
                                     ['entityId' => $leaveRequestDTO->id->toString()],
                                     UrlGeneratorInterface::ABSOLUTE_URL
                                 ),

@@ -35,7 +35,7 @@ class SendChangeConfirmationToAbsenceChannelCommandHandler
             $leaveRequestDTO->endDate->format('M d, Y')
         );
 
-        if(!is_null($leaveRequestDTO->approvedBy)) {
+        if (!is_null($leaveRequestDTO->approvedBy)) {
             $messageReply .= sprintf(
                 ' By: %s %s',
                 $leaveRequestDTO->approvedBy->firstName,
@@ -45,7 +45,8 @@ class SendChangeConfirmationToAbsenceChannelCommandHandler
 
         $messageReply .= sprintf(
             ' <%s|Details>',
-            $this->urlGenerator->generate('app_dashboard_app_leave_request_detail',
+            $this->urlGenerator->generate(
+                'app_dashboard_app_leave_request_detail',
                 ['entityId' => $leaveRequestDTO->id->toString()],
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
