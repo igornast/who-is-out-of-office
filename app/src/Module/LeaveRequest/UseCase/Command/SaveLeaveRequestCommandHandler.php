@@ -27,7 +27,7 @@ class SaveLeaveRequestCommandHandler
         $userDTO = $command->userDTO;
 
         $leaveRequestDTO = new LeaveRequestDTO(
-            id: Uuid::uuid4()->toString(),
+            id: Uuid::uuid4(),
             workDays: $workDaysNumber,
             leaveType: $command->leaveRequestTypeDTO,
             status: LeaveRequestStatusEnum::Pending,

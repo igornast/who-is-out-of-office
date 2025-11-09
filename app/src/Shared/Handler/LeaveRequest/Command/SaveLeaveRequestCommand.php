@@ -7,7 +7,7 @@ namespace App\Shared\Handler\LeaveRequest\Command;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\DTO\UserDTO;
 
-class SaveLeaveRequestCommand
+final readonly class SaveLeaveRequestCommand
 {
     public function __construct(
         public LeaveRequestTypeDTO $leaveRequestTypeDTO,

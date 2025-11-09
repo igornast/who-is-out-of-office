@@ -10,12 +10,14 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class NotifyNewLeaveRequestCommandHandler
 {
     public function __construct(
         #[Autowire(env: 'SLACK_AR_APPROVE_CHANNEL_ID')]
         private readonly string $requestsApproveChannelId,
+        private readonly UrlGeneratorInterface $urlGenerator,
         private readonly ChatterInterface $chatter,
     ) {
     }
@@ -50,7 +52,11 @@ class NotifyNewLeaveRequestCommandHandler
                         [
                             'type' => 'mrkdwn',
                             'text' => sprintf(
-                                '*Created by:* <example.com|%s %s>',
+                                '*Created by:* <%s|%s %s>',
+                                $this->urlGenerator->generate('app_dashboard_app_users_detail',
+                                    ['entityId' => $leaveRequestDTO->user->id],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                ),
                                 $leaveRequestDTO->user->firstName,
                                 $leaveRequestDTO->user->lastName
                             ),
