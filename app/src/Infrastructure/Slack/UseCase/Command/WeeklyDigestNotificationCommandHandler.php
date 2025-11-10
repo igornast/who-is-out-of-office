@@ -91,12 +91,19 @@ class WeeklyDigestNotificationCommandHandler
             foreach ($userEvents as $event) {
 
                 if ($event instanceof LeaveRequestDTO) {
+
+                    $startDate = $event->startDate->format('F d');
+                    $endDate = $event->endDate->format('F d');
+
+                    $datesPart = $startDate !== $endDate
+                        ? sprintf('%s - %s', $startDate, $endDate)
+                        : $startDate;
+
                     $text .= sprintf(
-                        "    ‣ %s %s _(%s - %s)_\n",
+                        "    ‣ %s %s _(%s)_\n",
                         $event->leaveType->icon,
                         $event->leaveType->name,
-                        $event->startDate->format('F d'),
-                        $event->endDate->format('F d')
+                        $datesPart,
                     );
                 }
 
@@ -146,9 +153,7 @@ class WeeklyDigestNotificationCommandHandler
 
         return [
             ['type' => 'divider'],
-            ['type' => 'section', 'text' => ['type' => 'mrkdwn', 'text' => '🍰 | *Birthdays*']],
-            ['type' => 'section', 'text' => ['type' => 'mrkdwn', 'text' => $text],
-            ],
+            ['type' => 'section', 'text' => ['type' => 'mrkdwn', 'text' => "🍰 | *Birthdays*\n\n".$text]],
         ];
     }
 
