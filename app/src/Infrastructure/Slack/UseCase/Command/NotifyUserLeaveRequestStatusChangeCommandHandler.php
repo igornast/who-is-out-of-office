@@ -8,11 +8,13 @@ use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class NotifyUserLeaveRequestStatusChangeCommandHandler
 {
     public function __construct(
         private readonly ChatterInterface $chatter,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -63,6 +65,30 @@ class NotifyUserLeaveRequestStatusChangeCommandHandler
                                 '*When:* %s - %s',
                                 $leaveRequestDTO->startDate->format('M d, Y'),
                                 $leaveRequestDTO->endDate->format('M d, Y')
+                            ),
+                        ],
+                        [
+                            'type' => 'mrkdwn',
+                            'text' => $leaveRequestDTO->approvedBy ? sprintf(
+                                '*By:* %s %s',
+                                $leaveRequestDTO->approvedBy->firstName,
+                                $leaveRequestDTO->approvedBy->lastName,
+                            ) : '',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'section',
+                    'fields' => [
+                        [
+                            'type' => 'mrkdwn',
+                            'text' => sprintf(
+                                '<%s|View the absence request>',
+                                $this->urlGenerator->generate(
+                                    'app_dashboard_app_leave_request_detail',
+                                    ['entityId' => $leaveRequestDTO->id->toString()],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                ),
                             ),
                         ],
                     ],

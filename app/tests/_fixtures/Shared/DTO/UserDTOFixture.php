@@ -30,12 +30,12 @@ class UserDTOFixture implements FixtureInterface
             'annualLeaveAllowance' => 24,
             'currentLeaveBalance' => 24,
             'isActive' => true,
-            'createdAt' => $faker->dateTime(),
+            'createdAt' => \DateTimeImmutable::createFromMutable($faker->dateTime()),
             'password' => $faker->password(),
             'profileImageUrl' => null,
             'slackMemberId' => null,
             'calendarCountryCode' => $faker->countryCode(),
-            'birthDate' => $faker->dateTimeThisDecade(),
+            'birthDate' => \DateTimeImmutable::createFromMutable($faker->dateTimeThisDecade()),
         ];
     }
 }

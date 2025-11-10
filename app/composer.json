@@ -57,6 +57,8 @@
         "pestphp/pest": "^3.8.2",
         "phpstan/phpstan": "^2.1.30",
         "phpunit/phpunit": "^11.5.15",
+        "symfony/browser-kit": "7.3.*",
+        "symfony/css-selector": "7.3.*",
         "symfony/stopwatch": "7.2.*",
         "symfony/web-profiler-bundle": "7.2.*"
     },
@@ -104,6 +106,7 @@
             "@auto-scripts"
         ],
         "test:phpunit:u": "./vendor/bin/pest --testsuite Unit --coverage --compact --min=90",
+        "test:phpunit:f": "./vendor/bin/pest --testsuite Functional --display-warnings --display-errors",
         "test:arch": "./vendor/bin/pest tests/Architecture --compact",
         "test:cs": "./vendor/bin/php-cs-fixer fix --dry-run --diff -v",
         "test:cs:fix": "./vendor/bin/php-cs-fixer fix --diff -v",
@@ -118,7 +121,9 @@
             "@test:cs",
             "@test:stan",
             "@test:arch",
-            "./vendor/bin/pest --testsuite Unit --coverage --coverage-clover clover.xml"
+            "./vendor/bin/pest --testsuite Unit --coverage --coverage-clover clover.xml",
+            "@reset-test-db",
+            "@test:phpunit:f"
         ],
         "reset-test-db": [
             "php bin/console doctrine:database:drop --if-exists --force --env=test",

@@ -11,9 +11,9 @@ readonly class UserPublicHolidaysDTO
     /**
      * @param PublicHolidayDTO[] $holidays
      */
-    private function __construct(
-        private(set) UserDTO $user,
-        private(set) array $holidays,
+    public function __construct(
+        public UserDTO $user,
+        public array $holidays,
     ) {
     }
 

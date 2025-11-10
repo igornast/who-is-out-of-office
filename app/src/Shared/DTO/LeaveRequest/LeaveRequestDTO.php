@@ -7,11 +7,12 @@ namespace App\Shared\DTO\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use Ramsey\Uuid\UuidInterface;
 
 class LeaveRequestDTO
 {
     public function __construct(
-        public string $id,
+        public UuidInterface $id,
         public int $workDays,
         public LeaveRequestTypeDTO $leaveType,
         public LeaveRequestStatusEnum $status,
@@ -32,7 +33,7 @@ class LeaveRequestDTO
         }
 
         return new self(
-            id: $leaveRequest->id->toString(),
+            id: $leaveRequest->id,
             workDays: $leaveRequest->workDays,
             leaveType: LeaveRequestTypeDTO::fromEntity($leaveRequest->leaveType),
             status: $leaveRequest->status,
