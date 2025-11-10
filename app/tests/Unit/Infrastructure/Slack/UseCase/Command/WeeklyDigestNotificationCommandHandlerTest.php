@@ -89,9 +89,8 @@ it('sends digest with leave requests and birthdays', function () {
                 ->and($blocks[5]['type'])->toBe('divider')
                 ->and($blocks[6]['type'])->toBe('section')
                 ->and($blocks[6]['text']['text'])->toContain('🍰 | *Birthdays*')
-                ->and($blocks[7]['type'])->toBe('section')
-                ->and($blocks[7]['text']['text'])->toContain('*Jane Smith*')
-                ->and($blocks[7]['text']['text'])->toContain('January 15')
+                ->and($blocks[6]['text']['text'])->toContain('*Jane Smith*')
+                ->and($blocks[6]['text']['text'])->toContain('January 15')
                 ->and($message->getSubject())->toBe('Absences Weekly Digest')
                 ->and($options->toArray()['channel'])->toBe($this->dailyDigestChannelId);
 
@@ -178,10 +177,11 @@ it('sends digest with only birthdays when no absences', function () {
 
             expect($blocks[0]['type'])->toBe('header')
                 ->and($blocks[2]['type'])->toBe('divider')
+                ->and($blocks[3]['type'])->toBe('section')
                 ->and($blocks[3]['text']['text'])->toContain('🍰 | *Birthdays*')
-                ->and($blocks[4]['text']['text'])->toContain('*Bob Wilson*')
-                ->and($blocks[4]['text']['text'])->toContain('March 20')
-                ->and(count($blocks))->toBe(5);
+                ->and($blocks[3]['text']['text'])->toContain('*Bob Wilson*')
+                ->and($blocks[3]['text']['text'])->toContain('March 20')
+                ->and(count($blocks))->toBe(4);
 
             return true;
         });
@@ -391,8 +391,60 @@ it('sends digest with multiple users having different events', function () {
                 ->and($blocks[4]['text']['text'])->toContain('🌴 Annual Leave')
                 ->and($blocks[4]['text']['text'])->toContain('*Lisa White*')
                 ->and($blocks[4]['text']['text'])->toContain('🏠 Work From Home')
-                ->and($blocks[7]['text']['text'])->toContain('*Lisa White*')
-                ->and($blocks[7]['text']['text'])->toContain('June 10');
+                ->and($blocks[6]['text']['text'])->toContain('*Lisa White*')
+                ->and($blocks[6]['text']['text'])->toContain('June 10');
+
+            return true;
+        });
+
+    $this->handler->handle();
+});
+
+it('sends digest with single day leave request', function () {
+    $user = UserDTOFixture::create([
+        'id' => 'user-1',
+        'firstName' => 'David',
+        'lastName' => 'Miller',
+    ]);
+
+    $leaveRequest = LeaveRequestDTOFixture::create([
+        'user' => $user,
+        'startDate' => new DateTimeImmutable('2025-08-15'),
+        'endDate' => new DateTimeImmutable('2025-08-15'),
+        'approvedBy' => null,
+    ]);
+    $leaveRequest->leaveType->icon = '🏥';
+    $leaveRequest->leaveType->name = 'Doctor Appointment';
+
+    $mergedEvents = [
+        'user-1' => [$leaveRequest],
+    ];
+
+    $this->usersEventsProvider
+        ->expects('provideMergedAbsencesPerUser')
+        ->once()
+        ->andReturn($mergedEvents);
+
+    $this->userFacade
+        ->expects('getUsersWithBirthdaysForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->chatter
+        ->expects('send')
+        ->once()
+        ->withArgs(function (ChatMessage $message) {
+            $options = $message->getOptions();
+            $blocks = $options->toArray()['blocks'];
+
+            expect($blocks[0]['type'])->toBe('header')
+                ->and($blocks[2]['type'])->toBe('divider')
+                ->and($blocks[3]['text']['text'])->toContain('📆 | *Who is out this week? *')
+                ->and($blocks[4]['text']['text'])->toContain('*David Miller*')
+                ->and($blocks[4]['text']['text'])->toContain('🏥 Doctor Appointment')
+                ->and($blocks[4]['text']['text'])->toContain('August 15')
+                ->and($blocks[4]['text']['text'])->not()->toContain('August 15 - August 15')
+                ->and(count($blocks))->toBe(5);
 
             return true;
         });
