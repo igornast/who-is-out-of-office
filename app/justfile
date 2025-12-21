@@ -1,0 +1,46 @@
+# Show available commands
+default:
+    @just --list
+
+# Detect if running inside container
+in_container := if path_exists("/.dockerenv") == "true" { "" } else { "docker exec -it app_ooo_php " }
+
+# Docker commands
+up:
+    docker-compose up -d
+
+down:
+    docker-compose down
+
+build:
+    docker-compose build
+    docker-compose up -d
+
+shell:
+    docker exec -it app_ooo_php bash
+
+cs:
+    {{ in_container }}composer test:cs:fix
+
+stan:
+    {{ in_container }}composer test:stan
+
+# Testing commands
+test: db-reset-test
+    {{ in_container }}composer test
+
+test-unit: db-reset-test
+    {{ in_container }}composer test:phpunit:u
+
+test-functional: db-reset-test
+    {{ in_container }}composer test:phpunit:f
+
+pest-filter filter: db-reset-test
+    {{ in_container }}./vendor/bin/pest --filter {{ filter }}
+
+pest-file file:
+    {{ in_container }}./vendor/bin/pest {{ file }}
+
+# Database
+db-reset-test:
+    {{ in_container }}composer reset-test-db

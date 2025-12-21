@@ -15,6 +15,7 @@ use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -57,7 +58,7 @@ class LeaveRequestActionController extends AbstractController
         return $this->redirect($url);
     }
 
-    #[Route('/app/leave-request/new', name: 'app_leave_request_new')]
+    #[AdminRoute('/leave-requests/new', name: 'requests_new')] // app_dashboard_requests_new
     public function new(Request $request): Response
     {
         $dto = new NewLeaveRequestDTO();

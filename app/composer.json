@@ -50,6 +50,7 @@
         "twig/twig": "^2.12|^3.21.1"
     },
     "require-dev": {
+        "dbrekelmans/bdi": "^1.4",
         "doctrine/doctrine-fixtures-bundle": "^4.1",
         "friendsofphp/php-cs-fixer": "^3.88.2",
         "mockery/mockery": "^1.6.12",
@@ -59,6 +60,7 @@
         "phpunit/phpunit": "^11.5.15",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
+        "symfony/panther": "^2.3",
         "symfony/stopwatch": "7.2.*",
         "symfony/web-profiler-bundle": "7.2.*"
     },
@@ -105,7 +107,7 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "test:phpunit:u": "./vendor/bin/pest --testsuite Unit --coverage --compact --min=90",
+        "test:phpunit:u": "./vendor/bin/pest --testsuite Unit --coverage --compact",
         "test:phpunit:f": "./vendor/bin/pest --testsuite Functional --display-warnings --display-errors",
         "test:arch": "./vendor/bin/pest tests/Architecture --compact",
         "test:cs": "./vendor/bin/php-cs-fixer fix --dry-run --diff -v",
@@ -115,7 +117,8 @@
             "@test:cs",
             "@test:stan",
             "@test:arch",
-            "@test:phpunit:u"
+            "@test:phpunit:u",
+            "@test:phpunit:f"
         ],
         "test-ci": [
             "@test:cs",

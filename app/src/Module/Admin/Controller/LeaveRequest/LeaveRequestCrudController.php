@@ -63,7 +63,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
                 Action::new('new-request')
                     ->setLabel('crud.actions.leave_requests.new')
                     ->setIcon('fa fa-plus')
-                    ->linkToRoute('app_leave_request_new')
+                    ->linkToRoute('app_dashboard_requests_new')
                     ->addCssClass('btn btn-success')
                     ->createAsGlobalAction()
             )
