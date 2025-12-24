@@ -17,7 +17,6 @@ function modules(): array
     return array_diff(scandir(srcDirectory('/Module')), ['.', '..']);
 }
 
-
 function createPantherClient(array $options = [], array $kernelOptions = [], array $managerOptions = []): Client
 {
     $reflection = new ReflectionMethod(PantherTestCase::class, 'createPantherClient');

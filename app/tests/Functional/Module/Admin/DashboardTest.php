@@ -15,14 +15,12 @@ beforeEach(function (): void {
         ->findOneBy(['email' => 'admin@ooo.com']);
 });
 
-afterEach(fn () => self::ensureKernelShutdown());
-
 it('redirects unauthenticated users to login', function (): void {
     $client = createPantherClient();
     $client->request('GET', '/app/dashboard');
 
-    expect($client->getCurrentURL())
-        ->toContain('/login');
+    $content = $client->getCrawler()->text();
+    expect($content)->toContain('Who is ooo login');
 });
 
 it('displays error message for invalid credentials', function (): void {
@@ -37,10 +35,10 @@ it('displays user information on dashboard', function (): void {
     $client = createPantherClient();
     loginUserWithLoginForm($client, 'admin@ooo.com', '123');
 
+    $client->waitForVisibility('#main-menu');
+
     $content = $client->getCrawler()->text();
-    expect($content)
-        ->toContain('admin@ooo.com')
-        ->toContain('Hans Müller');
+    expect($content)->toContain('Hans Müller (admin@ooo.com)');
 });
 
 it('admin can access menu items', function (): void {

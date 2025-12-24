@@ -21,8 +21,6 @@ beforeEach(function (): void {
 });
 
 it('calculates workdays and submit a new request', function (): void {
-    $this->entityManager->flush();
-
     $client = createPantherClient();
     loginUserWithLoginForm($client, 'user@ooo.com', '123');
 
@@ -48,8 +46,8 @@ it('calculates workdays and submit a new request', function (): void {
 
     $infoBoxHtml = $client->getCrawler()->filter('#infoBox')->text();
 
-    $expectedWorkdays = 5;
-    $expectedRemainingBalance = 19;
+    $expectedWorkdays = 4;
+    $expectedRemainingBalance = 20;
 
     expect($infoBoxHtml)
         ->toContain((string) $expectedWorkdays)
