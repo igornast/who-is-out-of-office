@@ -103,7 +103,7 @@ class LeaveRequestForm extends AbstractController
     private function generateInfoBox(int $workdaysNumber, int $remainingBalance): string
     {
         return <<<HTML
-        <div class="alert alert-info mt-3">
+        <div class="alert alert-info mt-3" id="infoBox">
             <strong>{$workdaysNumber}</strong> workdays will be taken.
             Remaining balance: <strong>{$remainingBalance}</strong>.
         </div>
@@ -114,7 +114,7 @@ HTML;
     private function generateNoBalanceBox(int $remainingBalance): string
     {
         return <<<HTML
-        <div class="alert alert-warning mt-3">
+        <div class="alert alert-warning mt-3" id="noBalanceBox">
             Oops! It looks like you don’t have enough leave days to cover this request.</br>
             You currently have <strong>{$remainingBalance}</strong> days of leave balance remaining.
         </div>

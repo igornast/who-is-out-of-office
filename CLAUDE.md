@@ -264,6 +264,15 @@ tests/
 - DTOs are excluded from PHPStan checks (see `phpstan.neon`)
 - All commands should run successfully before committing
 
+### Code Documentation Standards
+
+- **No comments**: Code should be self-documenting through clear naming and structure
+- Use descriptive variable names, method names, and class names that explain intent
+- Prefer extracting complex logic into well-named private methods over adding comments
+- Only use comments when absolutely necessary to explain "why" (not "what") in exceptional cases
+- PHPDoc blocks are acceptable for type hints where PHP's type system is insufficient
+- **Use sprintf for string formatting**: Prefer `sprintf()` over concatenation for better readability
+
 ## Configuration
 
 - **Services**: `app/config/services.yaml` - Uses autowiring by default

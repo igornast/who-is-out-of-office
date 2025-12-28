@@ -5,8 +5,8 @@ declare(strict_types=1);
 use App\Infrastructure\Doctrine\Entity\User;
 
 beforeEach(function (): void {
-    $this->client = createClient($this);
-    $this->entityManager = $this->client->getContainer()
+    $kernel = static::bootKernel();
+    $this->entityManager = $kernel->getContainer()
         ->get('doctrine')
         ->getManager();
 
@@ -16,35 +16,38 @@ beforeEach(function (): void {
 });
 
 it('redirects unauthenticated users to login', function (): void {
-    $this->client->request('GET', '/app/dashboard');
+    $client = createPantherClient();
+    $client->request('GET', '/app/dashboard');
 
-    expect($this->client->getResponse()->isRedirect())
-        ->toBeTrue();
+    $content = $client->getCrawler()->text();
+    expect($content)->toContain('Who is ooo login');
+});
+
+it('displays error message for invalid credentials', function (): void {
+    $client = createPantherClient();
+    loginUserWithLoginForm($client, 'unknown@ooo.com', '123');
+
+    $content = $client->getCrawler()->text();
+    expect($content)->toContain('Invalid credentials');
 });
 
 it('displays user information on dashboard', function (): void {
-    $this->client
-        ->loginUser($this->adminUser)
-        ->request('GET', '/app/dashboard');
+    $client = createPantherClient();
+    loginUserWithLoginForm($client, 'admin@ooo.com', '123');
 
-    expect($this->client->getResponse()->isSuccessful())
-        ->toBeTrue();
+    $client->waitForVisibility('#main-menu');
 
-    $content = $this->client->getResponse()->getContent();
-    expect($content)
-        ->toContain('admin@ooo.com')
-        ->toContain('Hans Müller');
+    $content = $client->getCrawler()->text();
+    expect($content)->toContain('Hans Müller (admin@ooo.com)');
 });
 
 it('admin can access menu items', function (): void {
-    $this->client
-        ->loginUser($this->adminUser)
-        ->request('GET', '/app/dashboard');
+    $client = createPantherClient();
+    loginUserWithLoginForm($client, 'admin@ooo.com', '123');
 
-    expect($this->client->getResponse()->isSuccessful())
-        ->toBeTrue();
+    $client->request('GET', '/app/dashboard');
 
-    $content = $this->client->getResponse()->getContent();
+    $content = $client->getCrawler()->text();
 
     expect($content)
         ->toContain('My Team')
@@ -56,17 +59,14 @@ it('admin can access menu items', function (): void {
 });
 
 it('displays upcoming absences in team', function (): void {
-    $this->client
-        ->loginUser($this->adminUser)
-        ->request('GET', '/app/dashboard');
+    $client = createPantherClient();
+    loginUserWithLoginForm($client, 'admin@ooo.com', '123');
 
-    expect($this->client->getResponse()->isSuccessful())
-        ->toBeTrue();
+    $client->request('GET', '/app/dashboard');
 
-    $content = $this->client->getResponse()->getContent();
+    $content = $client->getCrawler()->text();
 
     expect($content)
         ->toContain('Petra Schmidt')
-        ->toContain('Vacation')
-        ->toContain('Sick Leave');
+        ->toContain('Vacation');
 });

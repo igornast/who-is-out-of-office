@@ -40,7 +40,22 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
-    user_{3..6}:
+    user_3:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'John'
+            lastName: 'Doe'
+            email: 'user@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 24
+            isActive: true
+            profileImageUrl: <randomElement($profileImages)>
+            holidayCalendar: '@holiday_calendar_fr'
+            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
+            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
+    user_{4..6}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: <firstName()>

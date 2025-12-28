@@ -38,6 +38,8 @@ RUN curl --insecure https://getcomposer.org/composer.phar -o /usr/bin/composer &
 
 RUN pecl install xdebug-3.4.1 && composer self-update
 
+RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+
 COPY docker/php/bin /usr/local/bin/
 RUN chmod -R +x /usr/local/bin/
 
@@ -64,7 +66,13 @@ CMD ["start-fpm"]
 FROM app AS local
 RUN docker-php-ext-enable xdebug
 
-RUN apt-get clean && apt-get update && apt-get install -y --fix-missing --no-install-recommends default-mysql-client-core
+RUN apt-get clean && apt-get update && apt-get install -y --fix-missing --no-install-recommends \
+    default-mysql-client-core \
+    chromium \
+    chromium-driver
+
+ENV PANTHER_NO_SANDBOX=1
+ENV PANTHER_CHROME_ARGUMENTS='--disable-dev-shm-usage --no-sandbox'
 
 WORKDIR /var/www
 
