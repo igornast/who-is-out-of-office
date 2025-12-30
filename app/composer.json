@@ -118,6 +118,7 @@
             "@test:stan",
             "@test:arch",
             "@test:phpunit:u",
+            "@reset-test-db",
             "@test:phpunit:f"
         ],
         "test-ci": [

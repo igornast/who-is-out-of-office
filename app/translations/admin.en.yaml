@@ -25,6 +25,9 @@ dashboard:
         birthdays: Time to celebrate
     birthdays:
         no_upcoming: No upcoming birthdays
+    work_anniversaries:
+        title: Work Anniversaries
+        no_upcoming: No upcoming work anniversaries
 
 crud:
     title:

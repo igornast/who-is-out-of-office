@@ -52,6 +52,7 @@ class DashboardController extends AbstractDashboardController
             'is_admin' => $this->isAdmin(),
             'my_team' => $this->userFacade->getTeamMembersForUserId($userId),
             'users_with_birthdays' => $this->userFacade->getUsersWithIncomingBirthdays(),
+            'users_with_work_anniversaries' => $this->userFacade->getUsersWithIncomingWorkAnniversaries(),
             'pending_requests' => $this->leaveRequestFacade->getLeaveRequestsForUser(
                 $userId,
                 [LeaveRequestStatusEnum::Pending]

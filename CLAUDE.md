@@ -280,6 +280,161 @@ tests/
 - **Environment**: `.env.local` for local overrides
 - **Assets**: Configured via `importmap.php` and `config/packages/asset_mapper.yaml`
 
+## Critical Patterns and Best Practices
+
+### Testing with Dynamic Dates
+
+**CRITICAL**: Never hardcode year values or date calculations in test assertions that will fail over time.
+
+**Bad Practice:**
+```php
+// This will fail next year
+->and($blocks[8]['text']['text'])->toContain('(10 years)')
+```
+
+**Good Practice:**
+```php
+// Calculate years dynamically
+$workYears = new DateTimeImmutable()->diff($user3->contractStartedAt)->y;
+
+// Use calculated value in assertions
+->withArgs(function (ChatMessage $message) use ($workYears) {
+    // ...
+    ->and($blocks[8]['text']['text'])->toContain(sprintf('%s years', $workYears))
+}
+```
+
+For relative dates in fixtures:
+```php
+// Guarantee a specific future date relative to "now"
+'contractStartedAt' => new DateTimeImmutable('2015-04-22'), // Static date
+// Better: Dynamic date that's always X days/years from now
+'contractStartedAt' => (new DateTime('+5 days'))->modify('-5 years') // Always 5 years ago, anniversary in 5 days
+```
+
+### Recurring User Events Pattern (Birthdays, Work Anniversaries)
+
+When implementing recurring user events (birthdays, work anniversaries, etc.), follow this consistent pattern:
+
+**1. Repository Layer**: SQL with CASE statement to calculate next occurrence
+```sql
+CASE
+    WHEN DATE_FORMAT(contract_started_at, '%m-%d') >= DATE_FORMAT(CURRENT_DATE(), '%m-%d')
+        THEN STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE()), '-', DATE_FORMAT(contract_started_at, '%m-%d')), '%Y-%m-%d')
+    ELSE STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE())+1, '-', DATE_FORMAT(contract_started_at, '%m-%d')), '%Y-%m-%d')
+END BETWEEN :start AND :end
+```
+
+**2. Query Handlers**: Two handlers per feature
+- `GetUsersWithIncoming[Event]QueryHandler` - Default 20-day range for dashboard
+- `GetUsersWithIncoming[Event]ForDatesQueryHandler` - Custom date range for Slack digest
+
+**3. Facade Methods**: Expose through UserFacade
+```php
+public function getUsersWithIncoming[Event](): array;
+public function getUsersWithIncoming[Event]ForDates(\DateTimeImmutable $start, \DateTimeImmutable $end): array;
+```
+
+**4. Dashboard Integration**:
+- Pass data from controller: `'users_with_[event]' => $this->userFacade->getUsersWithIncoming[Event]()`
+- Create separate template partial: `_upcoming_[event].html.twig`
+- Follow same structure as existing sections (panel, avatar, date display)
+
+**5. Slack Integration**:
+- Fetch data in `handle()`: `$users = $this->userFacade->getUsersWithIncoming[Event]ForDates($monday, $sunday)`
+- Create `generate[Event]Section()` method returning Slack blocks
+- Include in empty state condition check
+- Add to blocks array in options
+
+### Fixture Design for Tests
+
+**Principles**:
+1. **Guarantee conditions**: Design fixtures to always meet test requirements
+2. **Use relative dates**: Ensure fixtures remain valid over time
+3. **Explicit data**: Make test data obvious and readable
+
+**Example from `fixtures.yaml`**:
+```yaml
+user_1:
+    contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+5 days"))->modify("-5 years")->format("Y-m-d H:i:s")))>'
+```
+This guarantees user_1 always has a work anniversary exactly 5 days from "now", making tests predictable.
+
+**Example from test fixtures**:
+```php
+// UserDTOFixture.php
+'contractStartedAt' => \DateTimeImmutable::createFromMutable($faker->dateTimeThisDecade()),
+'hasCelebrateWorkAnniversary' => $faker->boolean(),
+```
+
+### Slack Block Kit Structure
+
+Slack notifications follow a consistent block structure:
+
+```php
+[
+    // Header section
+    ['type' => 'header', 'text' => ['type' => 'plain_text', 'text' => '✨ Weekly digest']],
+
+    // Context section (metadata)
+    ['type' => 'context', 'elements' => [...]],
+
+    // Content sections (repeating pattern)
+    ['type' => 'divider'],
+    ['type' => 'section', 'text' => ['type' => 'mrkdwn', 'text' => '📆 | *Section Title*']],
+    ['type' => 'section', 'text' => ['type' => 'mrkdwn', 'text' => $contentText]],
+]
+```
+
+**Key patterns**:
+- Each major section starts with a divider
+- Section headers use emoji + bold title with mrkdwn format
+- User names are always bold: `*FirstName LastName*`
+- Use bullet character `‣` for list items with indentation
+- Calculate years/age dynamically: `$currentYear - $startYear`
+- Handle singular/plural: `1 === $years ? 'year' : 'years'`
+
+### Dashboard Template Patterns
+
+Dashboard sections follow consistent patterns:
+
+```twig
+<div class="panel panel-primary">
+    <div class="panel-heading border-bottom mb-4 d-flex align-items-center pb-3">
+        <div class="me-3">
+            {# Bootstrap icon SVG #}
+        </div>
+        <h6 class="panel-title text-body-emphasis mb-0">
+            {{ 'dashboard.[section].title'|trans(domain: 'admin') }}
+        </h6>
+    </div>
+    <div class="panel-body card">
+        <div class="card-body d-flex h-25">
+            {% for userDto in users %}
+                <div>
+                    {{ avatar.userDtoAvatar(userDto) }}
+                    <div class="w-100 pe-3 text-center text-secondary">
+                        {{ userDto.[dateField]|date("m.d") }}
+                        {# Additional info like years #}
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if users is empty %}
+                <div class="alert alert-secondary w-100 text-center">
+                    {{ 'dashboard.[section].no_upcoming'|trans(domain: 'admin') }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+```
+
+**Icons used**:
+- Birthdays: `bi-cake2-fill`
+- Work Anniversaries: `bi-trophy-fill`
+- Leave Requests: `bi-calendar-event-fill`
+
 ## Important Notes
 
 - The application requires PHP 8.4+
