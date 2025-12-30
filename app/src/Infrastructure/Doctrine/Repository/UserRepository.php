@@ -105,6 +105,49 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $userDTOs;
     }
 
+    /**
+     * @return UserDTO[]
+     */
+    public function findUsersWithIncomingWorkAnniversaries(\DateTimeImmutable $start, \DateTimeImmutable $end): array
+    {
+        $em = $this->getEntityManager();
+        $conn = $em->getConnection();
+
+        $sql = "
+            SELECT *
+            FROM user
+            WHERE (
+                CASE
+                    WHEN DATE_FORMAT(contract_started_at, '%m-%d') >= DATE_FORMAT(:start, '%m-%d')
+                        THEN STR_TO_DATE(CONCAT(YEAR(:start), '-', DATE_FORMAT(contract_started_at, '%m-%d')), '%Y-%m-%d')
+                    ELSE STR_TO_DATE(CONCAT(YEAR(:start)+1, '-', DATE_FORMAT(contract_started_at, '%m-%d')), '%Y-%m-%d')
+                END
+            ) BETWEEN :start AND :end
+            AND is_active = 1
+            AND celebrate_work_anniversary = 1
+            AND contract_started_at IS NOT NULL
+            ORDER BY
+                CASE
+                    WHEN DATE_FORMAT(contract_started_at, '%m-%d') >= DATE_FORMAT(:start, '%m-%d')
+                        THEN STR_TO_DATE(CONCAT(YEAR(:start), '-', DATE_FORMAT(contract_started_at, '%m-%d')), '%Y-%m-%d')
+                    ELSE STR_TO_DATE(CONCAT(YEAR(:start)+1, '-', DATE_FORMAT(contract_started_at, '%m-%d')), '%Y-%m-%d')
+                END ASC
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':start', $start->format('Y-m-d'));
+        $stmt->bindValue(':end', $end->format('Y-m-d'));
+        $resultSet = $stmt->executeQuery();
+        $rows = $resultSet->fetchAllAssociative();
+
+        $userDTOs = [];
+        foreach ($rows as $row) {
+            $userDTOs[] = UserDTO::fromArray($row);
+        }
+
+        return $userDTOs;
+    }
+
     public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO
     {
         $em = $this->getEntityManager();

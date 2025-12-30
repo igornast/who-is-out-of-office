@@ -29,6 +29,16 @@ interface UserFacadeInterface
      */
     public function getUsersWithBirthdaysForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
 
+    /**
+     * @return UserDTO[]
+     */
+    public function getUsersWithIncomingWorkAnniversaries(): array;
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getUsersWithWorkAnniversariesForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
+
     public function acceptUserInvitation(UserInvitationRequestDTO $invitationRequestDTO, InvitationDTO $invitationDTO): void;
 
     public function getUser(string $userId): ?UserDTO;

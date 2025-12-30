@@ -22,5 +22,10 @@ interface UserRepositoryInterface
      */
     public function findUsersWithIncomingBirthdays(\DateTimeImmutable $start, \DateTimeImmutable $end): array;
 
+    /**
+     * @return UserDTO[]
+     */
+    public function findUsersWithIncomingWorkAnniversaries(\DateTimeImmutable $start, \DateTimeImmutable $end): array;
+
     public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO;
 }

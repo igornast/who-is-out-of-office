@@ -8,6 +8,7 @@ use App\Shared\Facade\UserFacadeInterface;
 use App\Tests\_fixtures\Shared\DTO\Holiday\PublicHolidayDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\Holiday\UserPublicHolidaysDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestDTOFixture;
+use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestTypeDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
@@ -27,7 +28,7 @@ beforeEach(function (): void {
     );
 });
 
-it('sends digest with leave requests and birthdays', function () {
+it('sends digest with leave requests, birthdays and work anniversaries', function () {
     $user1 = UserDTOFixture::create([
         'id' => 'user-1',
         'firstName' => 'John',
@@ -41,14 +42,22 @@ it('sends digest with leave requests and birthdays', function () {
         'birthDate' => new DateTimeImmutable('1990-01-15'),
     ]);
 
+    $user3 = UserDTOFixture::create([
+        'id' => 'user-3',
+        'firstName' => 'Tony',
+        'lastName' => 'Stark',
+        'contractStartedAt' => new DateTimeImmutable('2015-04-22'),
+        'hasCelebrateWorkAnniversary' => true,
+    ]);
+    $workYears = new DateTimeImmutable()->diff($user3->contractStartedAt)->y;
+
     $leaveRequest = LeaveRequestDTOFixture::create([
         'user' => $user1,
         'startDate' => new DateTimeImmutable('2025-01-13'),
         'endDate' => new DateTimeImmutable('2025-01-17'),
         'approvedBy' => null,
+        'leaveType' => LeaveRequestTypeDTOFixture::create(['icon' => '🏖️', 'name' => 'Vacation']),
     ]);
-    $leaveRequest->leaveType->icon = '🏖️';
-    $leaveRequest->leaveType->name = 'Vacation';
 
     $mergedEvents = [
         'user-1' => [$leaveRequest],
@@ -66,10 +75,15 @@ it('sends digest with leave requests and birthdays', function () {
         ->once()
         ->andReturn($birthdayUsers);
 
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
+        ->once()
+        ->andReturn([$user3]);
+
     $this->chatter
         ->expects('send')
         ->once()
-        ->withArgs(function (ChatMessage $message) {
+        ->withArgs(function (ChatMessage $message) use ($workYears) {
             $options = $message->getOptions();
 
             expect($options)->toBeInstanceOf(SlackOptions::class);
@@ -91,6 +105,12 @@ it('sends digest with leave requests and birthdays', function () {
                 ->and($blocks[6]['text']['text'])->toContain('🍰 | *Birthdays*')
                 ->and($blocks[6]['text']['text'])->toContain('*Jane Smith*')
                 ->and($blocks[6]['text']['text'])->toContain('January 15')
+                ->and($blocks[7]['type'])->toBe('divider')
+                ->and($blocks[8]['type'])->toBe('section')
+                ->and($blocks[8]['text']['text'])->toContain('🎉 | *Work Anniversaries*')
+                ->and($blocks[8]['text']['text'])->toContain('*Tony Stark*')
+                ->and($blocks[8]['text']['text'])->toContain('April 22')
+                ->and($blocks[8]['text']['text'])->toContain(sprintf('%s years', $workYears))
                 ->and($message->getSubject())->toBe('Absences Weekly Digest')
                 ->and($options->toArray()['channel'])->toBe($this->dailyDigestChannelId);
 
@@ -127,6 +147,11 @@ it('sends digest with only leave requests when no birthdays', function () {
 
     $this->userFacade
         ->expects('getUsersWithBirthdaysForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
         ->once()
         ->andReturn([]);
 
@@ -168,6 +193,11 @@ it('sends digest with only birthdays when no absences', function () {
         ->once()
         ->andReturn([$user]);
 
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
+        ->once()
+        ->andReturn([]);
+
     $this->chatter
         ->expects('send')
         ->once()
@@ -189,7 +219,7 @@ it('sends digest with only birthdays when no absences', function () {
     $this->handler->handle();
 });
 
-it('sends empty digest when no absences and no birthdays', function () {
+it('sends empty digest when no absences and no birthdays and no anniversaries', function () {
     $this->usersEventsProvider
         ->expects('provideMergedAbsencesPerUser')
         ->once()
@@ -197,6 +227,11 @@ it('sends empty digest when no absences and no birthdays', function () {
 
     $this->userFacade
         ->expects('getUsersWithBirthdaysForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
         ->once()
         ->andReturn([]);
 
@@ -250,6 +285,11 @@ it('sends digest with public holidays', function () {
 
     $this->userFacade
         ->expects('getUsersWithBirthdaysForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
         ->once()
         ->andReturn([]);
 
@@ -310,6 +350,11 @@ it('sends digest with mixed leave requests and public holidays for same user', f
 
     $this->userFacade
         ->expects('getUsersWithBirthdaysForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
         ->once()
         ->andReturn([]);
 
@@ -380,6 +425,11 @@ it('sends digest with multiple users having different events', function () {
         ->once()
         ->andReturn([$user2]);
 
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
+        ->once()
+        ->andReturn([]);
+
     $this->chatter
         ->expects('send')
         ->once()
@@ -427,6 +477,11 @@ it('sends digest with single day leave request', function () {
 
     $this->userFacade
         ->expects('getUsersWithBirthdaysForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
         ->once()
         ->andReturn([]);
 

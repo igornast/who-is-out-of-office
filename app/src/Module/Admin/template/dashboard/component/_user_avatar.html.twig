@@ -11,16 +11,15 @@
             {% endif %}
 
             <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}"
-               class="btn btn-lg p-0 align-content-center"
-               role="button">
+               class="p-0 align-content-center">
                 <img src="{{ src }}" class="avatar-img"
                      style="width:65px;"
                      alt="{{ userDto.firstName }} {{ userDto.lastName }} avatar"/>
             </a>
         {% else %}
             <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}"
-               class="btn btn-primary btn-lg fs-3 align-content-center avatar" role="button">
-                {{ userDto.firstName[:1] }}{{ userDto.lastName[:1] }}
+               class="btn btn-primary btn-lg fs-3 avatar-placeholder">
+                <span class="avatar-placeholder-text">{{ userDto.firstName[:1] }}{{ userDto.lastName[:1] }}</span>
             </a>
         {% endif %}
     </div>

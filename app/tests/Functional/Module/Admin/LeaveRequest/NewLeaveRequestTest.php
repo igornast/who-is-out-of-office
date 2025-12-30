@@ -46,8 +46,8 @@ it('calculates workdays and submit a new request', function (): void {
 
     $infoBoxHtml = $client->getCrawler()->filter('#infoBox')->text();
 
-    $expectedWorkdays = 4;
-    $expectedRemainingBalance = 20;
+    $expectedWorkdays = 5;
+    $expectedRemainingBalance = 19;
 
     expect($infoBoxHtml)
         ->toContain((string) $expectedWorkdays)

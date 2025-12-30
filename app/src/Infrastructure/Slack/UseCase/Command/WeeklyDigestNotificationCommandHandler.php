@@ -39,12 +39,14 @@ class WeeklyDigestNotificationCommandHandler
         $mergedEvents = $this->usersEventsProvider->provideMergedAbsencesPerUser($monday, $sunday);
 
         $birthdayUsers = $this->userFacade->getUsersWithBirthdaysForDates($monday, $sunday);
+        $anniversaryUsers = $this->userFacade->getUsersWithWorkAnniversariesForDates($monday, $sunday);
 
         $oooSection = $this->generateWhoIsOutSection($mergedEvents);
         $birthdaysSection = $this->generateBirthdaysSection($birthdayUsers);
+        $anniversariesSection = $this->generateWorkAnniversariesSection($anniversaryUsers);
         $contextSection = $this->generateHeaderSection();
 
-        if (0 === sizeof($oooSection) && 0 === sizeof($birthdaysSection)) {
+        if (0 === sizeof($oooSection) && 0 === sizeof($birthdaysSection) && 0 === sizeof($anniversariesSection)) {
             $this->handleNoLeaveAndBirthdaysDigest($contextSection);
 
             return;
@@ -56,6 +58,7 @@ class WeeklyDigestNotificationCommandHandler
                 ...$contextSection,
                 ...$oooSection,
                 ...$birthdaysSection,
+                ...$anniversariesSection,
             ],
         ]);
 
@@ -154,6 +157,43 @@ class WeeklyDigestNotificationCommandHandler
         return [
             ['type' => 'divider'],
             ['type' => 'section', 'text' => ['type' => 'mrkdwn', 'text' => "🍰 | *Birthdays*\n\n".$text]],
+        ];
+    }
+
+    /**
+     * @param UserDTO[] $anniversaryUserDTOs
+     *
+     * @return array<array{type: string, text?: array{type: string, text: string}}>
+     */
+    private function generateWorkAnniversariesSection(array $anniversaryUserDTOs): array
+    {
+        if (0 === sizeof($anniversaryUserDTOs)) {
+            return [];
+        }
+
+        $text = '';
+        foreach ($anniversaryUserDTOs as $userDTO) {
+            $years = null;
+            if ($userDTO->contractStartedAt) {
+                $currentYear = (int) new \DateTimeImmutable()->format('Y');
+                $startYear = (int) $userDTO->contractStartedAt->format('Y');
+                $years = $currentYear - $startYear;
+            }
+
+            $yearText = $years ? sprintf(' (%d %s)', $years, 1 === $years ? 'year' : 'years') : '';
+
+            $text .= sprintf(
+                "    ‣ *%s %s* - %s%s\n",
+                $userDTO->firstName,
+                $userDTO->lastName,
+                $userDTO->contractStartedAt?->format('F d') ?? '',
+                $yearText,
+            );
+        }
+
+        return [
+            ['type' => 'divider'],
+            ['type' => 'section', 'text' => ['type' => 'mrkdwn', 'text' => "🎉 | *Work Anniversaries*\n\n".$text]],
         ];
     }
 

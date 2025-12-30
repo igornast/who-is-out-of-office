@@ -12,6 +12,8 @@ use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDatesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
+use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHandler;
+use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
 use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Facade\UserFacadeInterface;
@@ -26,6 +28,8 @@ final class UserFacade implements UserFacadeInterface
         private readonly GetUserByIdQueryHandler $getUserByIdQueryHandler,
         private readonly GetUsersWithBirthdaysForDatesQueryHandler $getUsersWithBirthdaysForDatesHandler,
         private readonly AcceptUserInvitationCommandHandler $acceptInvitationHandler,
+        private readonly GetUsersWithIncomingWorkAnniversariesQueryHandler $getUsersWithIncomingWorkAnniversariesHandler,
+        private readonly GetUsersWithWorkAnniversariesForDatesQueryHandler $getUsersWithWorkAnniversariesForDatesHandler,
     ) {
     }
 
@@ -71,5 +75,21 @@ final class UserFacade implements UserFacadeInterface
     public function getUser(string $userId): ?UserDTO
     {
         return $this->getUserByIdQueryHandler->handle($userId);
+    }
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getUsersWithIncomingWorkAnniversaries(): array
+    {
+        return $this->getUsersWithIncomingWorkAnniversariesHandler->handle();
+    }
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getUsersWithWorkAnniversariesForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        return $this->getUsersWithWorkAnniversariesForDatesHandler->handle($startDate, $endDate);
     }
 }

@@ -21,10 +21,11 @@ App\Infrastructure\Doctrine\Entity\User:
             annualLeaveAllowance: 30
             currentLeaveBalance: 30
             isActive: true
+            hasCelebrateWorkAnniversary: true
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 days", "+2 days")->format("Y-m-d H:i:s")))>'
-            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "-1 month")->format("Y-m-d H:i:s")))>'
+            contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+5 days"))->modify("-5 years")->format("Y-m-d H:i:s")))>'
     user_2:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -36,6 +37,7 @@ App\Infrastructure\Doctrine\Entity\User:
             annualLeaveAllowance: 30
             currentLeaveBalance: 30
             isActive: true
+            hasCelebrateWorkAnniversary: true
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
@@ -51,6 +53,7 @@ App\Infrastructure\Doctrine\Entity\User:
             annualLeaveAllowance: 24
             currentLeaveBalance: 24
             isActive: true
+            hasCelebrateWorkAnniversary: false
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
@@ -66,6 +69,7 @@ App\Infrastructure\Doctrine\Entity\User:
             annualLeaveAllowance: 24
             currentLeaveBalance: 24
             isActive: true
+            hasCelebrateWorkAnniversary: <boolean()>
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
@@ -81,6 +85,7 @@ App\Infrastructure\Doctrine\Entity\User:
             annualLeaveAllowance: 24
             currentLeaveBalance: 24
             isActive: true
+            hasCelebrateWorkAnniversary: <boolean()>
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
@@ -196,7 +201,7 @@ App\Infrastructure\Doctrine\Entity\Holiday:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             holidayCalendar: '@holiday_calendar_fr'
             description: <word()>
-            date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+10 days")->format("Y-m-d H:i:s")))>'
+            date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+5 days", "+20 days")->format("Y-m-d H:i:s")))>'
     holiday_{4..6}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
