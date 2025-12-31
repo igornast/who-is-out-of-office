@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Module\Settings;
 
 use App\Module\Settings\Exception\InvalidAppSettingTypeException;
+use App\Module\Settings\UseCase\Command\UpdateAppSettingsValueCommandHandler;
+use App\Module\Settings\UseCase\Query\GetAllAppSettingsQueryHandler;
 use App\Module\Settings\UseCase\Query\GetAppSettingsValueQueryHandler;
+use App\Shared\DTO\Settings\AppSettingsDTO;
 use App\Shared\Enum\AppSettingsEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 
@@ -13,6 +16,8 @@ final class AppSettingsFacade implements AppSettingsFacadeInterface
 {
     public function __construct(
         private readonly GetAppSettingsValueQueryHandler $appSettingValueHandler,
+        private readonly GetAllAppSettingsQueryHandler $getAllAppSettingsQueryHandler,
+        private readonly UpdateAppSettingsValueCommandHandler $updateAppSettingsValueCommandHandler,
     ) {
     }
 
@@ -37,5 +42,15 @@ final class AppSettingsFacade implements AppSettingsFacadeInterface
         }
 
         return $value;
+    }
+
+    public function getAllSettings(): AppSettingsDTO
+    {
+        return $this->getAllAppSettingsQueryHandler->handle();
+    }
+
+    public function updateAllSettings(AppSettingsDTO $settingsDTO): void
+    {
+        $this->updateAppSettingsValueCommandHandler->handle($settingsDTO);
     }
 }

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Module\Settings\UseCase\Command;
+namespace App\Module\Settings\UseCase\Query;
 
 use App\Shared\DTO\Settings\AppSettingsDTO;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Yaml\Yaml;
 
-class UpdateAppSettingsValueCommandHandler
+class GetAllAppSettingsQueryHandler
 {
     public function __construct(
         #[Autowire(env: 'resolve:APP_SETTINGS_FILE')]
@@ -16,10 +16,10 @@ class UpdateAppSettingsValueCommandHandler
     ) {
     }
 
-    public function handle(AppSettingsDTO $settingsDTO): void
+    public function handle(): AppSettingsDTO
     {
-        $yamlContent = Yaml::dump($settingsDTO->toArray());
+        $content = Yaml::parseFile($this->appSettingsFilename);
 
-        file_put_contents($this->appSettingsFilename, $yamlContent);
+        return AppSettingsDTO::fromArray($content);
     }
 }

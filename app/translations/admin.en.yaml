@@ -9,6 +9,7 @@ menu:
         dashboard: Dashboard
         my_team: My Team
         leave_request_types: Leave Types
+        app_settings: App Settings
         profile: Profile Settings
         calendar: Calendar
         absence_requests: Absence Requests
@@ -38,6 +39,20 @@ crud:
         leave_requests:
             new: Add Absence Request
 
+    user_profile:
+        edit:
+            page_title: Profile Settings
+            title: Edit Profile
+        section:
+            profile_info: Profile Info
+            employee_of_record: Employee Of Record
+            change_password: Change Password
+        field:
+            profile_image: Profile Image
+            working_days: Working Days
+        action:
+            save_changes: Save Changes
+
     absence_request_type:
         index:
             title: Leave Types
@@ -49,3 +64,13 @@ crud:
             title: The leave type details
         action:
             new: Add a new type
+
+    app_settings:
+        edit:
+            title: Application Settings
+        panel:
+            leave_request: Leave Request Settings
+        field:
+            auto_approve: Auto Approve
+            auto_approve_delay: Auto Approve Delay (seconds)
+            auto_approve_delay_help: Number of seconds to wait before automatically approving leave requests
