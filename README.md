@@ -9,9 +9,26 @@ The database migrations include a default admin account for initial access:
 - **Email:** `admin@ooo.com`
 - **Password:** `admin`
 
-> ⚠️ **Important:** This account is intended for development and testing purposes only.  
+> ⚠️ **Important:** This account is intended for development and testing purposes only.
 > Please update the password or remove it after deploying to a production environment.
- 
+
+
+## ⚙️ Application Settings
+
+The application uses a YAML-based settings system that allows administrators to configure application behavior without code changes.
+
+**Available Settings:**
+- `auto_approve` - Enable/disable automatic approval of leave requests
+- `auto_approve_delay` - Delay in seconds before automatically approving leave requests
+
+**Managing Settings:**
+1. Log in with an admin account
+2. Navigate to **App Settings** in the sidebar menu
+3. Update settings and click **Save Changes**
+
+Settings are stored in `app/src/Module/Settings/Config/app_setting.yaml` and can be relocated using the `APP_SETTINGS_FILE` environment variable.
+
+📖 **[Read the detailed Settings documentation](app/src/Module/Settings/README.md)** for architecture details, adding new settings, and advanced configuration.
 
 ## 📅 Public Holiday Import
 

@@ -1,10 +1,10 @@
 {% extends '@AppAdmin/layout.html.twig' %}
 
-{% block page_title %}Profile Settings{% endblock %}
+{% block page_title %}{{ 'crud.user_profile.edit.page_title'|trans(domain='admin') }}{% endblock %}
 
 {% block content_header %}
     <div class="content-header-title">
-        <h1 class="title">Edit Profile</h1>
+        <h1 class="title">{{ 'crud.user_profile.edit.title'|trans(domain='admin') }}</h1>
     </div>
 
     <div class="page-actions">
@@ -21,7 +21,7 @@
                 <div class="card-body ea-profile-form">
                     {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
-                    <h5>Profile Info</h5>
+                    <h5>{{ 'crud.user_profile.section.profile_info'|trans(domain='admin') }}</h5>
 
                     <div class="form-group row mt-3">
                         {% if app.user.profileImageUrl %}
@@ -34,7 +34,7 @@
                             <div class="col-md-5">
                                 <div class="text-center">
                                     <img src="{{ src }}"
-                                         alt="Profile Image"
+                                         alt="{{ 'crud.user_profile.field.profile_image'|trans(domain='admin') }}"
                                          class="img-thumbnail border border-3 border-light shadow-sm"
                                          style="max-width: 160px;">
                                 </div>
@@ -68,7 +68,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Working Days</label>
+                        <label class="form-label">{{ 'crud.user_profile.field.working_days'|trans(domain='admin') }}</label>
                         <div class="d-flex flex-wrap gap-3">
                             {% for checkbox in form.workingDays %}
                                 <div class="checkbox-large">
@@ -80,7 +80,7 @@
                         {{ form_errors(form.workingDays) }}
                     </div>
 
-                    <h5>Employee Of Record</h5>
+                    <h5>{{ 'crud.user_profile.section.employee_of_record'|trans(domain='admin') }}</h5>
 
                     <div class="row">
                         <div class="col">
@@ -121,7 +121,7 @@
                         </div>
                     </div>
 
-                    <h5>Change Password</h5>
+                    <h5>{{ 'crud.user_profile.section.change_password'|trans(domain='admin') }}</h5>
 
                     <div class="field-text form-group">
                         <div class="form-widget">
@@ -136,7 +136,7 @@
 
                     {{ form_errors(form) }}
 
-                    <button class="btn btn-primary">Save Changes</button>
+                    <button class="btn btn-primary">{{ 'crud.user_profile.action.save_changes'|trans(domain='admin') }}</button>
 
                     {{ form_end(form) }}
                 </div>

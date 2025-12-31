@@ -73,11 +73,12 @@ class DashboardController extends AbstractDashboardController
     {
         $teamCrudLink = MenuItem::linkToCrud('menu.items.my_team', 'fa fa-user', User::class);
         $leaveRequestTypesCrudLink = MenuItem::linkToCrud('menu.items.leave_request_types', 'fa fa-calendar-day', LeaveRequestType::class);
+        $appSettingsLink = MenuItem::linkToRoute('menu.items.app_settings', 'fa fa-gear', 'app_settings');
 
         return [
             MenuItem::linkToLogout('menu.items.logout', 'fa fa-right-from-bracket'),
             MenuItem::linkToDashboard('menu.items.dashboard', 'fa fa-home'),
-            ...($this->isAdmin() ? [$teamCrudLink, $leaveRequestTypesCrudLink] : []),
+            ...($this->isAdmin() ? [$teamCrudLink, $leaveRequestTypesCrudLink, $appSettingsLink] : []),
             MenuItem::linkToRoute('menu.items.profile', 'fa fa-user', 'app_user_profile'),
             MenuItem::linkToRoute('menu.items.calendar', 'fa fa-calendar', 'app_calendar_view'),
             MenuItem::linkToCrud('menu.items.absence_requests', 'fa fa-calendar-plus', LeaveRequest::class),
