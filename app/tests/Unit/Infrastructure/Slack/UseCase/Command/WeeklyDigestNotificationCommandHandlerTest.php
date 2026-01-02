@@ -49,7 +49,7 @@ it('sends digest with leave requests, birthdays and work anniversaries', functio
         'contractStartedAt' => new DateTimeImmutable('2015-04-22'),
         'hasCelebrateWorkAnniversary' => true,
     ]);
-    $workYears = new DateTimeImmutable()->diff($user3->contractStartedAt)->y;
+    $workYears = (int) new DateTimeImmutable()->format('Y') - (int) $user3->contractStartedAt->format('Y');
 
     $leaveRequest = LeaveRequestDTOFixture::create([
         'user' => $user1,

@@ -8,6 +8,7 @@ use App\Module\Admin\Form\AppSettingsFormType;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,6 +19,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AppSettingsController extends AbstractController
 {
     public function __construct(
+        #[Autowire(env: 'resolve:APP_SETTINGS_FILE')]
+        private readonly string $settingFilename,
         private readonly AppSettingsFacadeInterface $appSettingsFacade,
         private readonly AdminUrlGenerator $urlGenerator,
     ) {
@@ -40,6 +43,7 @@ class AppSettingsController extends AbstractController
         }
 
         return $this->render('@AppAdmin/settings/edit.html.twig', [
+            'app_settings_filename' => $this->settingFilename,
             'form' => $form->createView(),
         ]);
     }

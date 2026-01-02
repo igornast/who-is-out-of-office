@@ -66,6 +66,7 @@ crud:
             new: Add a new type
 
     app_settings:
+        source_filename: The app settings source file
         edit:
             title: Application Settings
         panel:

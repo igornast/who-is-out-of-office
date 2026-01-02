@@ -32,7 +32,7 @@ class CalendarViewController extends AbstractController
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return $this->render('@AppAdmin/calendar_view.html.twig', [
-            'calendarSubscriptionUrl' => $calendarSubscriptionUrl,
+            'calendar_subscription_url' => $calendarSubscriptionUrl,
         ]);
     }
 }

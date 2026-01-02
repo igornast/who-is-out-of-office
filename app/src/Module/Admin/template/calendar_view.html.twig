@@ -20,7 +20,7 @@
 
     <div class="page-actions">
         <div class="global-actions">
-            <a class="btn btn-outline-secondary" href="#" onclick="copyCalendarSubscribeUrl(this)">
+            <a class="btn btn-secondary" href="#" onclick="copyCalendarSubscribeUrl(this)">
                 <span class="action-label">Calendar Subscription Url</span>
             </a>
         </div>
@@ -75,7 +75,7 @@
 
     <script>
       function copyCalendarSubscribeUrl(button) {
-        navigator.clipboard.writeText("{{ calendarSubscriptionUrl }}");
+        navigator.clipboard.writeText("{{ calendar_subscription_url }}");
         button.innerText = 'Copied to clipboard!';
         setTimeout(() => button.innerText = 'Calendar Subscription Url', 2000);
       }

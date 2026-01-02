@@ -25,3 +25,5 @@
 ###< symfony/asset-mapper ###
 /clover.xml
 /tests/_output/
+
+/app_setting.local.yaml

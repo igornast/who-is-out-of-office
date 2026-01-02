@@ -167,18 +167,15 @@ class WeeklyDigestNotificationCommandHandler
      */
     private function generateWorkAnniversariesSection(array $anniversaryUserDTOs): array
     {
-        if (0 === sizeof($anniversaryUserDTOs)) {
-            return [];
-        }
-
         $text = '';
         foreach ($anniversaryUserDTOs as $userDTO) {
-            $years = null;
-            if ($userDTO->contractStartedAt) {
-                $currentYear = (int) new \DateTimeImmutable()->format('Y');
-                $startYear = (int) $userDTO->contractStartedAt->format('Y');
-                $years = $currentYear - $startYear;
+            if (null === $userDTO->contractStartedAt) {
+                continue;
             }
+
+            $currentYear = (int) new \DateTimeImmutable()->format('Y');
+            $startYear = (int) $userDTO->contractStartedAt->format('Y');
+            $years = $currentYear - $startYear;
 
             $yearText = $years ? sprintf(' (%d %s)', $years, 1 === $years ? 'year' : 'years') : '';
 
@@ -186,9 +183,13 @@ class WeeklyDigestNotificationCommandHandler
                 "    ‣ *%s %s* - %s%s\n",
                 $userDTO->firstName,
                 $userDTO->lastName,
-                $userDTO->contractStartedAt?->format('F d') ?? '',
+                $userDTO->contractStartedAt->format('F d'),
                 $yearText,
             );
+        }
+
+        if (0 === sizeof($anniversaryUserDTOs) || empty($text)) {
+            return [];
         }
 
         return [
