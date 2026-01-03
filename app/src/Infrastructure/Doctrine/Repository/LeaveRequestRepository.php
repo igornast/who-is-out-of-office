@@ -75,6 +75,7 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
 
         $leaveRequestEntity->status = $leaveRequestDTO->status;
         $leaveRequestEntity->approvedBy = $approvedBy;
+        $leaveRequestEntity->isAutoApproved = $leaveRequestDTO->isAutoApproved;
 
         $this->getEntityManager()->persist($leaveRequestEntity);
         $this->getEntityManager()->flush();
@@ -177,6 +178,24 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         }
 
         return $result;
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findPendingCreatedBefore(\DateTimeImmutable $createdBefore): array
+    {
+        $qb = $this->createQueryBuilder('lr');
+        /** @var LeaveRequest[] $items */
+        $items = $qb->where('lr.status = :status')
+            ->andWhere('lr.createdAt <= :createdBefore')
+            ->setParameter('status', LeaveRequestStatusEnum::Pending)
+            ->setParameter('createdBefore', $createdBefore)
+            ->orderBy('lr.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
     }
 
     public function delete(LeaveRequestDTO $leaveRequestDTO): void

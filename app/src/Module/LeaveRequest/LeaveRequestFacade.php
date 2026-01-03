@@ -13,6 +13,7 @@ use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserI
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveTypeQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetPendingLeaveRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
@@ -34,6 +35,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetLeaveRequestsForDatesQueryHandler $getLeaveRequestForDatesHandler,
         private readonly GetLeaveRequestsForDatesGroupedByUserIdQueryHandler $getLeaveRequestForDatesGroupedByUserIdHandler,
         private readonly RemoveLeaveRequestCommandHandler $removeRequestHandler,
+        private readonly GetPendingLeaveRequestsQueryHandler $getPendingLeaveRequestsHandler,
     ) {
     }
 
@@ -97,6 +99,14 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function getLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array
     {
         return $this->getLeaveRequestForDatesHandler->handle($startDate, $endDate, $statuses);
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function getPendingLeaveRequests(\DateTimeImmutable $createdBefore): array
+    {
+        return $this->getPendingLeaveRequestsHandler->handle($createdBefore);
     }
 
     /**

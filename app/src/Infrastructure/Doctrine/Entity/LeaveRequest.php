@@ -20,8 +20,9 @@ class LeaveRequest
         public \DateTimeImmutable $startDate,
         public \DateTimeImmutable $endDate,
         public int $workDays = 0,
-        public ?User $approvedBy = null,
+        public ?bool $isAutoApproved = false,
         public ?string $comment = null,
+        public ?User $approvedBy = null,
     ) {
         $this->initializeTimestamps();
     }
