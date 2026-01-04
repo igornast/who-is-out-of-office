@@ -17,6 +17,7 @@
         "doctrine/doctrine-bundle": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^3.7.0",
         "doctrine/orm": "^3.6.0",
+        "dragonmantank/cron-expression": "^3.6",
         "easycorp/easyadmin-bundle": "^4.27.5",
         "eluceo/ical": "^2.15",
         "guzzlehttp/psr7": "^2.8.0",
