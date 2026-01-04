@@ -43,6 +43,16 @@ class SendChangeConfirmationToAbsenceChannelCommandHandler
             );
         }
 
+        if (true === $leaveRequestDTO->isAutoApproved) {
+            $messageReply = sprintf(
+                'Already auto approved - %s %s (%s - %s).',
+                $userDTO->firstName,
+                $userDTO->lastName,
+                $leaveRequestDTO->startDate->format('M d, Y'),
+                $leaveRequestDTO->endDate->format('M d, Y')
+            );
+        }
+
         $messageReply .= sprintf(
             ' <%s|Details>',
             $this->urlGenerator->generate(

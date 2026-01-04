@@ -4,10 +4,13 @@ framework:
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
-                     auto_setup: false
+                    auto_setup: false
 
-# when@test:
-#    framework:
-#        messenger:
-#            transports:
-#                async: 'in-memory://'
+        routing:
+            'App\Module\LeaveRequest\Message\LeaveRequestAutoApprovedMessage': async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'

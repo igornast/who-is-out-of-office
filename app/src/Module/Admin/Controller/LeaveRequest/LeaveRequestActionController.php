@@ -39,13 +39,15 @@ class LeaveRequestActionController extends AbstractController
     {
 
         if (!in_array($leaveRequest->status, [LeaveRequestStatusEnum::Pending, LeaveRequestStatusEnum::Approved])) {
-            $this->addFlash('warning', 'Only pending requests can be withdrawn.');
+            $this->addFlash('warning', 'Only pending or approved requests can be withdrawn.');
         }
 
         $leaveRequest->status = LeaveRequestStatusEnum::Withdrawn;
         $this->em->flush();
 
-        $this->userFacade->updateUserCurrentLeaveBalance($leaveRequest->user->id->toString(), $leaveRequest->workDays);
+        if (true === $leaveRequest->leaveType->isAffectingBalance) {
+            $this->userFacade->updateUserCurrentLeaveBalance($leaveRequest->user->id->toString(), $leaveRequest->workDays);
+        }
 
         $this->addFlash('success', 'Leave request withdrawn.');
 

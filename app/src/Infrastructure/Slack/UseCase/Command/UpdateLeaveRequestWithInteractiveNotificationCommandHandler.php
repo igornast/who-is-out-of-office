@@ -26,7 +26,7 @@ class UpdateLeaveRequestWithInteractiveNotificationCommandHandler
             throw new \RuntimeException(sprintf('Leave request with id "%s" not found', $notificationDTO->identifier));
         }
 
-        if ($this->isAlreadyWithdrawn($leaveRequestDTO)) {
+        if ($this->isAlreadyWithdrawn($leaveRequestDTO) || true === $leaveRequestDTO->isAutoApproved) {
             return $leaveRequestDTO;
         }
 
