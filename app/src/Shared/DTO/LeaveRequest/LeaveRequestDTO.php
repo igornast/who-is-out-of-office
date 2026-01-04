@@ -19,8 +19,9 @@ class LeaveRequestDTO
         public \DateTimeImmutable $startDate,
         public \DateTimeImmutable $endDate,
         public UserDTO $user,
-        public ?UserDTO $approvedBy = null,
+        public ?bool $isAutoApproved = false,
         public ?string $comment = null,
+        public ?UserDTO $approvedBy = null,
     ) {
     }
 
@@ -40,8 +41,9 @@ class LeaveRequestDTO
             startDate: $leaveRequest->startDate,
             endDate: $leaveRequest->endDate,
             user: UserDTO::fromEntity($leaveRequest->user),
-            approvedBy: $approver,
+            isAutoApproved: $leaveRequest->isAutoApproved,
             comment: $leaveRequest->comment,
+            approvedBy: $approver,
         );
     }
 }

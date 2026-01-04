@@ -26,6 +26,9 @@ class NotifyUserLeaveRequestStatusChangeCommandHandler
             return;
         }
 
+        $approvedByText = $this->generateApprovedByText($leaveRequestDTO);
+
+
         $options = new SlackOptions([
             'channel' => $slackMemberId,
             'blocks' => [
@@ -69,11 +72,7 @@ class NotifyUserLeaveRequestStatusChangeCommandHandler
                         ],
                         [
                             'type' => 'mrkdwn',
-                            'text' => $leaveRequestDTO->approvedBy ? sprintf(
-                                '*By:* %s %s',
-                                $leaveRequestDTO->approvedBy->firstName,
-                                $leaveRequestDTO->approvedBy->lastName,
-                            ) : '',
+                            'text' => $approvedByText,
                         ],
                     ],
                 ],
@@ -97,5 +96,18 @@ class NotifyUserLeaveRequestStatusChangeCommandHandler
         ]);
 
         $this->chatter->send(new ChatMessage('Absence Request Update')->options($options));
+    }
+
+    public function generateApprovedByText(LeaveRequestDTO $leaveRequestDTO): string
+    {
+        if (true === $leaveRequestDTO->isAutoApproved) {
+            return '*By:* auto approved';
+        }
+
+        return $leaveRequestDTO->approvedBy ? sprintf(
+            '*By:* %s %s',
+            $leaveRequestDTO->approvedBy->firstName,
+            $leaveRequestDTO->approvedBy->lastName,
+        ) : '-';
     }
 }

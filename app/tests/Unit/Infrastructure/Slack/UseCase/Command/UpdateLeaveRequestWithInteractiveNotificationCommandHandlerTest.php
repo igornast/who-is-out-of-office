@@ -305,3 +305,45 @@ it('updates leave request without approver when member id is null', function () 
         ->toBe(LeaveRequestStatusEnum::Approved)
         ->and($result->approvedBy)->toBeNull();
 });
+
+it('returns leave request unchanged when auto approved', function () {
+    $leaveRequestDTO = LeaveRequestDTOFixture::create([
+        'id' => Uuid::fromString('555e6666-e77b-88d9-a000-111111111111'),
+        'status' => LeaveRequestStatusEnum::Pending,
+        'approvedBy' => null,
+        'isAutoApproved' => true,
+    ]);
+
+    $notificationDTO = new InteractiveNotificationDTO(
+        status: LeaveRequestStatusEnum::Approved,
+        type: 'leave-request',
+        identifier: $leaveRequestDTO->id->toString(),
+        channel: 'C1234567890',
+        responseUrl: 'https://hooks.slack.com/test',
+        memberId: 'U123456'
+    );
+
+    $this->leaveRequestFacade
+        ->expects('getById')
+        ->once()
+        ->with($leaveRequestDTO->id->toString())
+        ->andReturn($leaveRequestDTO);
+
+    $this->userFacade
+        ->expects('getUserBySlackMemberId')
+        ->never();
+
+    $this->leaveRequestFacade
+        ->expects('update')
+        ->never();
+
+    $this->leaveRequestFacade
+        ->expects('remove')
+        ->never();
+
+    $result = $this->handler->handle($notificationDTO);
+
+    expect($result->status)
+        ->toBe(LeaveRequestStatusEnum::Pending)
+        ->and($result->isAutoApproved)->toBeTrue();
+});

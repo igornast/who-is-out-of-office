@@ -48,7 +48,7 @@ class PublicHolidayRepository extends ServiceEntityRepository implements PublicH
      */
     public function findBetweenDatesGroupedByUser(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
     {
-        $query = <<<SQL
+        $sql = <<<SQL
             SELECT h.id, h.date, h.description, hc.country_code,
                    u.id as user_id, u.first_name, u.last_name, u.email, u.roles, u.working_days, 
                    u.annual_leave_allowance, u.current_leave_balance, u.is_active, u.profile_image_url, u.birth_date,
@@ -60,18 +60,16 @@ class PublicHolidayRepository extends ServiceEntityRepository implements PublicH
 SQL;
 
         $em = $this->getEntityManager();
-        /** @var array{int, array{string, string|int}} $items */
-        $items = $em
-            ->getConnection()
-            ->prepare($query)
-            ->executeQuery([
-                'startDate' => $startDate->format('Y-m-d'),
-                'endDate' => $endDate->format('Y-m-d'),
-            ])
-            ->fetchAllAssociative();
+        $conn = $em->getConnection();
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':startDate', $startDate->format('Y-m-d'));
+        $stmt->bindValue(':endDate', $endDate->format('Y-m-d'));
+        $resultSet = $stmt->executeQuery();
+        $rows = $resultSet->fetchAllAssociative();
 
         $grouped = [];
-        foreach ($items as $holidayData) {
+        foreach ($rows as $holidayData) {
             if (!isset($holidayData['user_id'])) {
                 continue;
             }

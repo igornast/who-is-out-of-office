@@ -17,9 +17,9 @@ final class SlackFacade implements SlackFacadeInterface
 {
     public function __construct(
         private readonly NotifyNewLeaveRequestCommandHandler $notifyNewLeaveRequestHandler,
-        private readonly UpdateLeaveRequestWithInteractiveNotificationCommandHandler $interactiveNotificationHandler,
+        private readonly UpdateLeaveRequestWithInteractiveNotificationCommandHandler $updateLeaveRequestWithNotificationHandler,
         private readonly SendChangeConfirmationToAbsenceChannelCommandHandler $sendConfirmationToChannelHandler,
-        private readonly NotifyUserLeaveRequestStatusChangeCommandHandler $notifyUserCommandHandler,
+        private readonly NotifyUserLeaveRequestStatusChangeCommandHandler $notifyUserLeaveRequestStatusChanged,
         private readonly WeeklyDigestNotificationCommandHandler $weeklyNotificationHandler,
     ) {
     }
@@ -31,10 +31,20 @@ final class SlackFacade implements SlackFacadeInterface
 
     public function handleInteractiveNotification(InteractiveNotificationDTO $interactiveNotificationDTO): void
     {
-        $leaveRequestDTO = $this->interactiveNotificationHandler->handle($interactiveNotificationDTO);
+        $leaveRequestDTO = $this->updateLeaveRequestWithNotificationHandler->handle($interactiveNotificationDTO);
 
         $this->sendConfirmationToChannelHandler->handle($leaveRequestDTO, $interactiveNotificationDTO);
-        $this->notifyUserCommandHandler->handle($leaveRequestDTO);
+
+        if (true === $leaveRequestDTO->isAutoApproved) {
+            return;
+        }
+
+        $this->notifyUserLeaveRequestStatusChanged->handle($leaveRequestDTO);
+    }
+
+    public function notifyUserOnLeaveRequestChange(LeaveRequestDTO $leaveRequestDTO): void
+    {
+        $this->notifyUserLeaveRequestStatusChanged->handle($leaveRequestDTO);
     }
 
     public function sendWeeklyDigestNotification(): void

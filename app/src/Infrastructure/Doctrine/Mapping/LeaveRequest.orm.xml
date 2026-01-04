@@ -9,6 +9,7 @@
         <field name="status" column="status" enum-type="App\Shared\Enum\LeaveRequestStatusEnum" length="30" />
         <field name="workDays" type="integer" column="work_days" />
         <field name="comment" column="comment" nullable="true" />
+        <field name="isAutoApproved" type="boolean" column="is_auto_approved" />
         <field name="startDate" type="datetime_immutable" column="start_date" />
         <field name="endDate" type="datetime_immutable" column="end_date" />
 

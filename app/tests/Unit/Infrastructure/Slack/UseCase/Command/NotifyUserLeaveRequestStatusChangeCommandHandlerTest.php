@@ -140,7 +140,7 @@ it('sends slack notification to user without approved by information', function 
                     $leaveRequestDTO->endDate->format('M d, Y')
                 ))
                 ->and($blocks[3]['fields'][1]['type'])->toBe('mrkdwn')
-                ->and($blocks[3]['fields'][1]['text'])->toBe('')
+                ->and($blocks[3]['fields'][1]['text'])->toBe('-')
                 ->and($blocks[4]['type'])->toBe('section')
                 ->and($blocks[4]['fields'][0]['type'])->toBe('mrkdwn')
                 ->and($blocks[4]['fields'][0]['text'])->toBe(sprintf('<%s|View the absence request>', $expectedUrl))
@@ -167,6 +167,68 @@ it('does not send notification when user has no slack member id', function () {
     $this->chatter
         ->expects('send')
         ->never();
+
+    $this->handler->handle($leaveRequestDTO);
+});
+
+it('sends slack notification with auto approved text when request is auto approved', function () {
+    $leaveRequestDTO = LeaveRequestDTOFixture::create([
+        'id' => Uuid::fromString('abc12345-e89b-12d3-a456-426614174111'),
+        'status' => LeaveRequestStatusEnum::Approved,
+        'isAutoApproved' => true,
+        'approvedBy' => null,
+    ]);
+    $leaveRequestDTO->user->slackMemberId = 'U1111111111';
+
+    $expectedUrl = 'https://example.com/app/dashboard/leave-request/'.$leaveRequestDTO->id->toString();
+
+    $this->urlGenerator
+        ->expects('generate')
+        ->once()
+        ->with(
+            'app_dashboard_app_leave_request_detail',
+            ['entityId' => $leaveRequestDTO->id->toString()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        )
+        ->andReturn($expectedUrl);
+
+    $this->chatter
+        ->expects('send')
+        ->once()
+        ->withArgs(function (ChatMessage $message) use ($leaveRequestDTO, $expectedUrl) {
+            $options = $message->getOptions();
+
+            expect($options)->toBeInstanceOf(SlackOptions::class);
+
+            $blocks = $options->toArray()['blocks'];
+
+            expect($blocks[0]['type'])->toBe('header')
+                ->and($blocks[0]['text']['type'])->toBe('plain_text')
+                ->and($blocks[0]['text']['text'])->toBe('Absence request status change')
+                ->and($blocks[0]['text']['emoji'])->toBeTrue()
+                ->and($blocks[1]['type'])->toBe('divider')
+                ->and($blocks[2]['type'])->toBe('section')
+                ->and($blocks[2]['fields'][0]['type'])->toBe('mrkdwn')
+                ->and($blocks[2]['fields'][0]['text'])->toBe(sprintf('*Type:* %s', $leaveRequestDTO->leaveType->name))
+                ->and($blocks[2]['fields'][1]['type'])->toBe('mrkdwn')
+                ->and($blocks[2]['fields'][1]['text'])->toBe(sprintf('*Staus:* %s', $leaveRequestDTO->status->name))
+                ->and($blocks[3]['type'])->toBe('section')
+                ->and($blocks[3]['fields'][0]['type'])->toBe('mrkdwn')
+                ->and($blocks[3]['fields'][0]['text'])->toBe(sprintf(
+                    '*When:* %s - %s',
+                    $leaveRequestDTO->startDate->format('M d, Y'),
+                    $leaveRequestDTO->endDate->format('M d, Y')
+                ))
+                ->and($blocks[3]['fields'][1]['type'])->toBe('mrkdwn')
+                ->and($blocks[3]['fields'][1]['text'])->toBe('*By:* auto approved')
+                ->and($blocks[4]['type'])->toBe('section')
+                ->and($blocks[4]['fields'][0]['type'])->toBe('mrkdwn')
+                ->and($blocks[4]['fields'][0]['text'])->toBe(sprintf('<%s|View the absence request>', $expectedUrl))
+                ->and($options->toArray()['channel'])->toBe($leaveRequestDTO->user->slackMemberId)
+                ->and($message->getSubject())->toBe('Absence Request Update');
+
+            return true;
+        });
 
     $this->handler->handle($leaveRequestDTO);
 });

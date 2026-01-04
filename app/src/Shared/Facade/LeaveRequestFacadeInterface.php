@@ -30,6 +30,11 @@ interface LeaveRequestFacadeInterface
     public function getLeaveRequestsForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, array $statuses): array;
 
     /**
+     * @return LeaveRequestDTO[]
+     */
+    public function getPendingLeaveRequests(\DateTimeImmutable $createdBefore): array;
+
+    /**
      * @param LeaveRequestStatusEnum[] $statuses
      *
      * @return array{string, LeaveRequestDTO[]}
