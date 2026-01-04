@@ -16,11 +16,11 @@ use App\Shared\Facade\SlackFacadeInterface;
 final class SlackFacade implements SlackFacadeInterface
 {
     public function __construct(
-        private readonly NotifyNewLeaveRequestCommandHandler                         $notifyNewLeaveRequestHandler,
+        private readonly NotifyNewLeaveRequestCommandHandler $notifyNewLeaveRequestHandler,
         private readonly UpdateLeaveRequestWithInteractiveNotificationCommandHandler $updateLeaveRequestWithNotificationHandler,
-        private readonly SendChangeConfirmationToAbsenceChannelCommandHandler        $sendConfirmationToChannelHandler,
-        private readonly NotifyUserLeaveRequestStatusChangeCommandHandler            $notifyUserLeaveRequestStatusChanged,
-        private readonly WeeklyDigestNotificationCommandHandler                      $weeklyNotificationHandler,
+        private readonly SendChangeConfirmationToAbsenceChannelCommandHandler $sendConfirmationToChannelHandler,
+        private readonly NotifyUserLeaveRequestStatusChangeCommandHandler $notifyUserLeaveRequestStatusChanged,
+        private readonly WeeklyDigestNotificationCommandHandler $weeklyNotificationHandler,
     ) {
     }
 
