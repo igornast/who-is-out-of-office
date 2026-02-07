@@ -103,6 +103,9 @@ class UserCrudController extends AppAbstractCrudController
             yield NumberField::new('currentLeaveBalance')
                 ->setHelp('The number of available holiday days for the employee.')
                 ->hideOnIndex();
+            yield DateField::new('absenceBalanceResetDay')
+                ->setHelp('The next date when the absence balance will be reset annually.')
+                ->hideOnIndex();
 
             yield FormField::addFieldset('Contract Details');
             yield DateField::new('contractStartedAt')

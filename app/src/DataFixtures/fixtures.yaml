@@ -26,6 +26,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 days", "+2 days")->format("Y-m-d H:i:s")))>'
             contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+5 days"))->modify("-5 years")->format("Y-m-d H:i:s")))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
     user_2:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -42,6 +43,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
     user_3:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -58,6 +60,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
     user_{4..6}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -74,6 +77,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
     user_{7..10}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -90,6 +94,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
 
 App\Infrastructure\Doctrine\Entity\LeaveRequestType:
     leave_request_type_1:

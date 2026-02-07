@@ -28,4 +28,9 @@ interface UserRepositoryInterface
     public function findUsersWithIncomingWorkAnniversaries(\DateTimeImmutable $start, \DateTimeImmutable $end): array;
 
     public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO;
+
+    /**
+     * @return UserDTO[]
+     */
+    public function findUsersWithBalanceResetToday(): array;
 }

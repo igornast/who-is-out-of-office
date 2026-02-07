@@ -108,6 +108,19 @@
                             </div>
                         </div>
                         <div class="col">
+                            <div class="field-choice form-group">
+                                <div class="form-widget">
+                                    {{ form_label(form.absenceBalanceResetDay) }}
+
+                                    {{ form_widget(form.absenceBalanceResetDay, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                                <div class="form-text">{{ form_help(form.absenceBalanceResetDay) }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
                             <label></label>
                             <div class="field-choice form-group">
                                 <div class="checkbox-large">
@@ -118,6 +131,8 @@
 
                                 <div class="form-text">{{ form_help(form.hasCelebrateWorkAnniversary) }}</div>
                             </div>
+                        </div>
+                        <div class="col">
                         </div>
                     </div>
 

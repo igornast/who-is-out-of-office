@@ -51,6 +51,12 @@ class UserProfileType extends AbstractType
                 'required' => false,
                 'help' => 'Your contract start date is set by HR.',
             ])
+            ->add('absenceBalanceResetDay', DateType::class, [
+                'label' => 'Next Absence Balance Reset',
+                'disabled' => true,
+                'required' => false,
+                'help' => 'The next date when your absence balance will be reset. This is set by HR.',
+            ])
             ->add('hasCelebrateWorkAnniversary', CheckboxType::class, [
                 'label' => 'Celebrate my work anniversary',
                 'required' => false,

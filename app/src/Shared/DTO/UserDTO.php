@@ -29,6 +29,7 @@ class UserDTO
         public ?bool $hasCelebrateWorkAnniversary = false,
         public ?\DateTimeImmutable $birthDate = null,
         public ?\DateTimeImmutable $contractStartedAt = null,
+        public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
     ) {
     }
 
@@ -52,6 +53,7 @@ class UserDTO
             hasCelebrateWorkAnniversary: $user->hasCelebrateWorkAnniversary,
             birthDate: $user->birthDate,
             contractStartedAt: $user->contractStartedAt,
+            absenceBalanceResetDay: $user->absenceBalanceResetDay,
         );
     }
 
@@ -72,6 +74,7 @@ class UserDTO
             hasCelebrateWorkAnniversary: (bool) ($data['celebrate_work_anniversary'] ?? false),
             birthDate: isset($data['birth_date']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['birth_date']) : null,
             contractStartedAt: isset($data['contract_started_at']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['contract_started_at']) : null,
+            absenceBalanceResetDay: \DateTimeImmutable::createFromFormat('Y-m-d', $data['absence_balance_reset_day']),
         );
     }
 }

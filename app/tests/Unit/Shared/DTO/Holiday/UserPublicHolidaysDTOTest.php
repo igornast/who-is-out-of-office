@@ -25,6 +25,7 @@ it('creates from grouped array with single holiday', function () {
             'birth_date' => '1990-01-15',
             'slack_member_id' => null,
             'calendar_country_code' => 'US',
+            'absence_balance_reset_day' => '2027-01-01',
         ],
     ];
 
@@ -63,6 +64,7 @@ it('creates from grouped array with multiple holidays', function () {
             'birth_date' => '1985-06-20',
             'slack_member_id' => 'U12345',
             'calendar_country_code' => 'GB',
+            'absence_balance_reset_day' => '2027-01-01',
         ],
         [
             'id' => 'holiday-2',
@@ -83,6 +85,7 @@ it('creates from grouped array with multiple holidays', function () {
             'birth_date' => '1985-06-20',
             'slack_member_id' => 'U12345',
             'calendar_country_code' => 'GB',
+            'absence_balance_reset_day' => '2027-01-01',
         ],
     ];
 
@@ -120,6 +123,7 @@ it('extracts user id from user_id field in grouped array', function () {
             'birth_date' => '1995-09-10',
             'slack_member_id' => null,
             'calendar_country_code' => 'US',
+            'absence_balance_reset_day' => '2027-01-01',
         ],
     ];
 

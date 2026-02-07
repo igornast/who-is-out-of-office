@@ -6,6 +6,7 @@ namespace App\Module\User;
 
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
+use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
@@ -30,6 +31,7 @@ final class UserFacade implements UserFacadeInterface
         private readonly AcceptUserInvitationCommandHandler $acceptInvitationHandler,
         private readonly GetUsersWithIncomingWorkAnniversariesQueryHandler $getUsersWithIncomingWorkAnniversariesHandler,
         private readonly GetUsersWithWorkAnniversariesForDatesQueryHandler $getUsersWithWorkAnniversariesForDatesHandler,
+        private readonly ResetAbsenceBalanceCommandHandler $resetAbsenceBalanceHandler,
     ) {
     }
 
@@ -91,5 +93,10 @@ final class UserFacade implements UserFacadeInterface
     public function getUsersWithWorkAnniversariesForDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
     {
         return $this->getUsersWithWorkAnniversariesForDatesHandler->handle($startDate, $endDate);
+    }
+
+    public function resetAbsenceBalance(): void
+    {
+        $this->resetAbsenceBalanceHandler->handle();
     }
 }
