@@ -54,6 +54,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->currentLeaveBalance = $userDTO->currentLeaveBalance;
         $user->isActive = $userDTO->isActive;
         $user->birthDate = $userDTO->birthDate;
+        $user->absenceBalanceResetDay = $userDTO->absenceBalanceResetDay;
 
         if (null !== $userDTO->password) {
             $user->password = $userDTO->password;
@@ -137,6 +138,33 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $stmt = $conn->prepare($sql);
         $stmt->bindValue(':start', $start->format('Y-m-d'));
         $stmt->bindValue(':end', $end->format('Y-m-d'));
+        $resultSet = $stmt->executeQuery();
+        $rows = $resultSet->fetchAllAssociative();
+
+        $userDTOs = [];
+        foreach ($rows as $row) {
+            $userDTOs[] = UserDTO::fromArray($row);
+        }
+
+        return $userDTOs;
+    }
+
+    /**
+     * @return UserDTO[]
+     */
+    public function findUsersWithBalanceResetToday(): array
+    {
+        $em = $this->getEntityManager();
+        $conn = $em->getConnection();
+
+        $sql = '
+            SELECT *
+            FROM user
+            WHERE absence_balance_reset_day <= CURRENT_DATE()
+            AND is_active = 1
+        ';
+
+        $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         $rows = $resultSet->fetchAllAssociative();
 

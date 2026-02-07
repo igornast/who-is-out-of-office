@@ -169,6 +169,20 @@ Business logic is organized using Command and Query handlers in each module's `U
 - **Commands**: Modify state (e.g., `SaveLeaveRequestCommandHandler`, `UpdateLeaveRequestCommandHandler`)
 - **Queries**: Read state (e.g., `GetLeaveRequestsForUserQueryHandler`, `CalculateWorkDaysQueryHandler`)
 
+**Adding a new feature — full wiring flow:**
+
+1. **Repository layer** — Add method to `UserRepositoryInterface` + implement in `UserRepository`
+2. **Handler** — Create `UseCase/Command/` or `UseCase/Query/` handler that injects the repository interface
+3. **Facade interface** — Add method to `Shared/Facade/[Module]FacadeInterface`
+4. **Facade implementation** — Inject handler in constructor, delegate to `$this->handler->handle()`
+5. **Consumer** — Controller, console command, or event listener calls the facade method
+
+```
+Controller/Command → FacadeInterface → Facade → Handler → RepositoryInterface → Repository
+```
+
+All dependencies are injected via constructor and autowired. Facades are the **only** entry point into a module from outside.
+
 #### 3. Data Transfer Objects (DTOs)
 
 All data passed between layers uses DTOs from `Shared/DTO/`:
@@ -394,6 +408,72 @@ Slack notifications follow a consistent block structure:
 - Calculate years/age dynamically: `$currentYear - $startYear`
 - Handle singular/plural: `1 === $years ? 'year' : 'years'`
 
+### Template Architecture
+
+Templates use **custom rendering** (not Symfony's default `form(form)`) — each field is rendered individually with `form_row()`, `form_widget()`, `form_label()`, and `form_help()`.
+
+**Twig namespaces** (configured in `config/packages/twig.yaml`):
+- `@AppAdmin` → `src/Module/Admin/template/`
+- `@AppUser` → `src/Module/User/template/`
+
+**Template structure:**
+```
+Module/Admin/template/
+├── layout.html.twig                    # Base layout, extends @EasyAdmin/layout.html.twig
+├── dashboard.html.twig                 # Main dashboard, includes partials
+├── dashboard/
+│   ├── _employ_info.html.twig          # User info + balance sidebar
+│   ├── _slack_integration_info.html.twig
+│   ├── _my_team.html.twig             # Team avatars
+│   ├── _upcoming_absences.html.twig
+│   ├── _upcoming_birthdays.html.twig
+│   ├── _upcoming_work_anniversaries.html.twig
+│   └── component/_user_avatar.html.twig  # Reusable avatar macro
+├── user/
+│   └── profile_edit.html.twig          # User profile form (custom rendering)
+├── settings/
+│   └── edit.html.twig                  # App settings form
+├── leave_request/
+│   └── new.html.twig                   # New leave request page
+├── component/
+│   └── LeaveRequestForm.html.twig      # Symfony UX TwigComponent
+└── calendar_view.html.twig
+```
+
+**Form rendering pattern** (used in `profile_edit.html.twig` and `settings/edit.html.twig`):
+```twig
+{# Text/date fields #}
+<div class="field-text form-group">
+    <div class="form-widget">
+        {{ form_row(form.fieldName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+</div>
+
+{# Disabled/readonly date field with label + help #}
+<div class="field-choice form-group">
+    <div class="form-widget">
+        {{ form_label(form.fieldName) }}
+        {{ form_widget(form.fieldName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-text">{{ form_help(form.fieldName) }}</div>
+</div>
+
+{# Checkbox field #}
+<div class="field-checkbox form-group">
+    <div class="checkbox-large">
+        {{ form_widget(form.fieldName) }}
+        {{ form_label(form.fieldName) }}
+    </div>
+    <div class="form-text">{{ form_help(form.fieldName) }}</div>
+</div>
+```
+
+**Reusable avatar macro** (`_user_avatar.html.twig`):
+```twig
+{% import "@AppAdmin/dashboard/component/_user_avatar.html.twig" as avatar %}
+{{ avatar.userDtoAvatar(userDto) }}
+```
+
 ### Dashboard Template Patterns
 
 Dashboard sections follow consistent patterns:
@@ -434,6 +514,48 @@ Dashboard sections follow consistent patterns:
 - Birthdays: `bi-cake2-fill`
 - Work Anniversaries: `bi-trophy-fill`
 - Leave Requests: `bi-calendar-event-fill`
+
+### Scheduled Task Pattern
+
+All scheduled commands use the same style: do **not** extend `Command`, use `__invoke()`, no `parent::__construct()`. The scheduling attribute varies:
+
+- **AsCronTask**: Cron expression (e.g., `'0 0 * * *'`). Example: `WeeklyDigestCommand`, `AbsenceBalanceResetCommand`.
+- **AsPeriodicTask**: Frequency string (e.g., `'1 minute'`). Example: `LeaveRequestAutoApproveCommand`.
+
+```php
+#[
+    AsCommand(name: 'example:command', description: 'Example scheduled command'),
+    AsCronTask(expression: '0 0 * * *'),
+]
+class ExampleCommand
+{
+    public function __construct(private readonly SomeFacadeInterface $facade)
+    {
+    }
+
+    public function __invoke(): int
+    {
+        $this->facade->doSomething();
+
+        return Command::SUCCESS;
+    }
+}
+```
+
+### Console Command Location Convention
+
+Commands live within their domain module, not centralized:
+- `Infrastructure/Slack/Command/` — Slack-related commands
+- `Module/LeaveRequest/Command/` — Leave request commands
+- `Module/User/Command/` — User commands
+
+### UserRepository::update() Manual Mapping
+
+When adding new fields to the User entity/DTO, you **must** also add explicit mapping in `UserRepository::update()`. It does not auto-map — each field is assigned individually from DTO to entity.
+
+### UserDTO::fromArray() Null Safety
+
+Raw SQL queries use `UserDTO::fromArray()`. When adding fields, handle cases where the column may not exist in older data or test fixtures that build arrays manually (use `isset()` check or provide defaults).
 
 ## Important Notes
 
