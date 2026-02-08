@@ -8,6 +8,7 @@ use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
 use App\Infrastructure\Slack\UseCase\Command\NotifyNewLeaveRequestCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\NotifyUserLeaveRequestStatusChangeCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\SendChangeConfirmationToAbsenceChannelCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\UpdateAutoApprovedSlackNotificationCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\UpdateLeaveRequestWithInteractiveNotificationCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\WeeklyDigestNotificationCommandHandler;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
@@ -21,6 +22,7 @@ final class SlackFacade implements SlackFacadeInterface
         private readonly SendChangeConfirmationToAbsenceChannelCommandHandler $sendConfirmationToChannelHandler,
         private readonly NotifyUserLeaveRequestStatusChangeCommandHandler $notifyUserLeaveRequestStatusChanged,
         private readonly WeeklyDigestNotificationCommandHandler $weeklyNotificationHandler,
+        private readonly UpdateAutoApprovedSlackNotificationCommandHandler $updateAutoApprovedSlackNotificationHandler,
     ) {
     }
 
@@ -50,5 +52,10 @@ final class SlackFacade implements SlackFacadeInterface
     public function sendWeeklyDigestNotification(): void
     {
         $this->weeklyNotificationHandler->handle();
+    }
+
+    public function updateLeaveRequestNotificationAsAutoApproved(LeaveRequestDTO $leaveRequestDTO): void
+    {
+        $this->updateAutoApprovedSlackNotificationHandler->handle($leaveRequestDTO);
     }
 }

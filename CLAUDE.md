@@ -195,7 +195,7 @@ All data passed between layers uses DTOs from `Shared/DTO/`:
 
 #### 4. Doctrine with XML Mapping
 
-Entities are in `Infrastructure/Doctrine/Entity/` and mapped using XML files in `Infrastructure/Doctrine/Mapping/`. This keeps entities as pure data objects without annotations.
+Entities are in `Infrastructure/Doctrine/Entity/` and mapped using XML files in `Infrastructure/Doctrine/Mapping/`. This keeps entities as pure data objects without annotations. New entities should use `TimestampableTrait` to automatically track `createdAt`/`updatedAt` fields (with corresponding lifecycle callbacks in the XML mapping).
 
 #### 5. Event-Driven Architecture
 
@@ -274,6 +274,7 @@ tests/
 ## Code Quality
 
 - **PHP-CS-Fixer**: Enforces consistent code style
+  - **No spaces around `.` concatenation**: `$a.$b` not `$a . $b`
 - **PHPStan**: Static analysis at level 8
 - DTOs are excluded from PHPStan checks (see `phpstan.neon`)
 - All commands should run successfully before committing

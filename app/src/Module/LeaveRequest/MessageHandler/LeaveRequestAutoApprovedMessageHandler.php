@@ -26,6 +26,7 @@ class LeaveRequestAutoApprovedMessageHandler
             return;
         }
 
+        $this->slackFacade->updateLeaveRequestNotificationAsAutoApproved($leaveRequestDTO);
         $this->slackFacade->notifyUserOnLeaveRequestChange($leaveRequestDTO);
     }
 }

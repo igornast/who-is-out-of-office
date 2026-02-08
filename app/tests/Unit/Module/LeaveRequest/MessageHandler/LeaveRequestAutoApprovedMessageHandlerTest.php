@@ -30,6 +30,11 @@ it('sends Slack notification when leave request is found', function () {
         ->andReturn($leaveRequestDTO);
 
     $this->slackFacade
+        ->expects('updateLeaveRequestNotificationAsAutoApproved')
+        ->once()
+        ->with($leaveRequestDTO);
+
+    $this->slackFacade
         ->expects('notifyUserOnLeaveRequestChange')
         ->once()
         ->with($leaveRequestDTO);
@@ -48,6 +53,10 @@ it('does not send notification when leave request is not found', function () {
         ->andReturn(null);
 
     $this->slackFacade
+        ->expects('updateLeaveRequestNotificationAsAutoApproved')
+        ->never();
+
+    $this->slackFacade
         ->expects('notifyUserOnLeaveRequestChange')
         ->never();
 
@@ -64,6 +73,11 @@ it('passes correct leave request DTO to Slack facade', function () {
         ->once()
         ->with($leaveRequestId)
         ->andReturn($leaveRequestDTO);
+
+    $this->slackFacade
+        ->expects('updateLeaveRequestNotificationAsAutoApproved')
+        ->once()
+        ->withArgs(fn ($dto) => $dto === $leaveRequestDTO);
 
     $this->slackFacade
         ->expects('notifyUserOnLeaveRequestChange')
