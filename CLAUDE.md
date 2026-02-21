@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is "Who's Out of Office" - an online staff leave planner built with **Symfony 7.2** and **PHP 8.4**. The application manages employee leave requests, public holidays, team calendars, and integrates with Slack for notifications. It follows a modular architecture with clean separation of concerns using Facades, DTOs, and Command/Query patterns.
+This is "Who's Out of Office" - an online staff leave planner built with **Symfony 7.4** and **PHP 8.5**. The application manages employee leave requests, public holidays, team calendars, and integrates with Slack for notifications. It follows a modular architecture with clean separation of concerns using Facades, DTOs, and Command/Query patterns.
 
 ### Application Structure
 
 - **Application code location**: All source code lives in the `/app` directory
 - **Application URL prefix**: The application is accessible via `/app` URLs (e.g., `http://localhost/app`)
-- **EasyAdmin Bundle**: The application uses **EasyAdmin Bundle v4.25.1** as its primary UI framework
+- **EasyAdmin Bundle**: The application uses **EasyAdmin Bundle** as its primary UI framework
   - EasyAdmin is used throughout the entire application (not just for admin areas)
   - It provides easier rendering, CRUD operations, and reusable components
   - Main dashboard route: `/app/dashboard`
@@ -51,11 +51,17 @@ All commands should be run from the `app/` directory or from within the PHP cont
 ### Testing
 
 ```bash
-# Run all tests (CS, PHPStan, PHPUnit)
+# Run all tests (CS, PHPStan, Architecture, Unit, Functional)
 composer test
 
 # Run unit tests with coverage (requires 90% minimum)
 composer test:phpunit:u
+
+# Run functional tests (requires test DB)
+composer test:phpunit:f
+
+# Run architecture tests (module isolation, naming conventions, layer deps)
+composer test:arch
 
 # Run code style check
 composer test:cs
@@ -141,11 +147,13 @@ app/src/
 │   ├── Admin/           # Admin panel (EasyAdmin controllers, forms, templates)
 │   ├── Holiday/         # Public holiday management
 │   ├── LeaveRequest/    # Leave request business logic
+│   ├── Settings/        # Application settings management
 │   └── User/            # User management and profiles
 └── Shared/              # Cross-cutting concerns
     ├── DTO/             # Data Transfer Objects
     ├── Enum/            # Enums (LeaveRequestStatusEnum, RoleEnum)
     ├── Facade/          # Facade interfaces for modules
+    ├── Handler/         # Command/Query objects (e.g., SaveLeaveRequestCommand)
     └── Service/         # Shared services (RoleTranslator, etc.)
 ```
 
@@ -158,7 +166,9 @@ Each module exposes a `Facade` that provides a high-level API. Facades implement
 - `LeaveRequestFacade` → `LeaveRequestFacadeInterface`
 - `UserFacade` → `UserFacadeInterface`
 - `HolidayFacade` → `HolidayFacadeInterface`
+- `AppSettingsFacade` → `AppSettingsFacadeInterface`
 - `SlackFacade` → `SlackFacadeInterface`
+- `DateNagerFacade` → `DateNagerInterface`
 
 Controllers and services interact with modules exclusively through these facades.
 
@@ -185,13 +195,10 @@ All dependencies are injected via constructor and autowired. Facades are the **o
 
 #### 3. Data Transfer Objects (DTOs)
 
-All data passed between layers uses DTOs from `Shared/DTO/`:
+All data passed between layers uses DTOs and command/query objects:
 
-- `LeaveRequestDTO`
-- `UserDTO`
-- `PublicHolidayDTO`
-- `SaveLeaveRequestCommand`
-- `CalculateWorkdaysQuery`
+- **DTOs** in `Shared/DTO/`: `LeaveRequestDTO`, `UserDTO`, `PublicHolidayDTO`
+- **Command/Query objects** in `Shared/Handler/`: `SaveLeaveRequestCommand`, `CalculateWorkdaysQuery`
 
 #### 4. Doctrine with XML Mapping
 
@@ -223,6 +230,10 @@ The application uses Symfony events for cross-cutting concerns:
 - Team member relationships
 - User invitation system
 - Profile customization (working days, birthday, Slack integration)
+
+#### Settings Module
+- Application-wide settings management (e.g., absence balance reset day)
+- Key-value store pattern via `AppSettingsFacade`
 
 #### Holiday Module
 - Public holiday calendar management
@@ -265,18 +276,30 @@ SLACK_AR_HR_DIGEST_CHANNEL_ID=
 Tests are organized in `tests/`:
 ```
 tests/
+├── Architecture/         # Pest arch tests (module isolation, naming, layer deps)
+├── Functional/           # Functional tests (requires test DB + fixtures)
 ├── Unit/                 # Unit tests
 │   ├── Infrastructure/
 │   └── Module/
 └── _fixtures/            # Test fixtures (DTOs, builders)
 ```
 
+### Architecture Tests
+
+Pest architecture tests in `tests/Architecture/` enforce critical boundaries:
+- **Module isolation**: Modules cannot depend on each other directly (only via `Shared/Facade/` interfaces)
+- **UseCase handlers** cannot use Symfony HttpFoundation or Doctrine entities directly
+- **Shared layer** facades must be interfaces, enums must be pure
+- **Facades must be final** and implement their interface
+
+These tests run via `composer test:arch`. Violating these rules will fail CI.
+
 ## Code Quality
 
 - **PHP-CS-Fixer**: Enforces consistent code style
   - **No spaces around `.` concatenation**: `$a.$b` not `$a . $b`
 - **PHPStan**: Static analysis at level 8
-- DTOs are excluded from PHPStan checks (see `phpstan.neon`)
+- DTOs and DataFixtures are excluded from PHPStan checks (see `phpstan.neon`)
 - All commands should run successfully before committing
 
 ### Code Documentation Standards
@@ -560,7 +583,8 @@ Raw SQL queries use `UserDTO::fromArray()`. When adding fields, handle cases whe
 
 ## Important Notes
 
-- The application requires PHP 8.4+
+- The project uses **Laravel Collections** (`illuminate/collections`) for data manipulation
+- The application requires PHP 8.5+
 - Always run commands from the `app/` directory
 - Doctrine entities are in `Infrastructure/` layer, not `Module/`
 - Use facades when accessing module functionality from controllers
