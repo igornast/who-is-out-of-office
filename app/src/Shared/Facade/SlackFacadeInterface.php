@@ -16,4 +16,6 @@ interface SlackFacadeInterface
     public function notifyUserOnLeaveRequestChange(LeaveRequestDTO $leaveRequestDTO): void;
 
     public function sendWeeklyDigestNotification(): void;
+
+    public function updateLeaveRequestNotificationAsAutoApproved(LeaveRequestDTO $leaveRequestDTO): void;
 }

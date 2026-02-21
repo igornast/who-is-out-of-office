@@ -1,0 +1,25 @@
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\Infrastructure\Doctrine\Entity\LeaveRequestSlackNotification" table="leave_request_slack_notification">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="CUSTOM"/>
+            <custom-id-generator class="Ramsey\Uuid\Doctrine\UuidGenerator" />
+        </id>
+
+        <many-to-one field="leaveRequest" target-entity="App\Infrastructure\Doctrine\Entity\LeaveRequest">
+            <join-column name="leave_request_id" on-delete="CASCADE" />
+        </many-to-one>
+
+        <field name="channelId" column="channel_id" length="100" />
+        <field name="messageTs" column="message_ts" length="50" />
+
+        <field name="createdAt" column="created_at" type="datetime_immutable"/>
+        <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="preUpdate" method="updateTimestamp" />
+        </lifecycle-callbacks>
+    </entity>
+</doctrine-mapping>

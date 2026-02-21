@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Slack\UseCase\Command;
 
+use App\Infrastructure\Slack\Repository\LeaveRequestSlackNotificationRepositoryInterface;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -19,6 +20,7 @@ class NotifyNewLeaveRequestCommandHandler
         private readonly string $requestsApproveChannelId,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly ChatterInterface $chatter,
+        private readonly LeaveRequestSlackNotificationRepositoryInterface $slackNotificationRepository,
     ) {
     }
 
@@ -104,6 +106,14 @@ class NotifyNewLeaveRequestCommandHandler
             ],
         ]);
 
-        $this->chatter->send(new ChatMessage('Absence Approval Request')->options($options));
+        $sentMessage = $this->chatter->send(new ChatMessage('Absence Approval Request')->options($options));
+
+        if (null !== $sentMessage && null !== $sentMessage->getMessageId()) {
+            $this->slackNotificationRepository->save(
+                $leaveRequestDTO->id->toString(),
+                $this->requestsApproveChannelId,
+                $sentMessage->getMessageId(),
+            );
+        }
     }
 }

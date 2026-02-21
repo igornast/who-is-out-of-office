@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Infrastructure\Slack\Repository\LeaveRequestSlackNotificationRepositoryInterface;
 use App\Infrastructure\Slack\UseCase\Command\NotifyNewLeaveRequestCommandHandler;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestDTOFixture;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Component\Notifier\Bridge\Slack\SlackSentMessage;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -15,11 +17,13 @@ beforeEach(function (): void {
     $this->requestsApproveChannelId = 'C1234567890';
     $this->urlGenerator = mock(UrlGeneratorInterface::class);
     $this->chatter = mock(ChatterInterface::class);
+    $this->slackNotificationRepository = mock(LeaveRequestSlackNotificationRepositoryInterface::class);
 
     $this->handler = new NotifyNewLeaveRequestCommandHandler(
         requestsApproveChannelId: $this->requestsApproveChannelId,
         urlGenerator: $this->urlGenerator,
-        chatter: $this->chatter
+        chatter: $this->chatter,
+        slackNotificationRepository: $this->slackNotificationRepository,
     );
 });
 
@@ -41,6 +45,13 @@ it('sends slack notification with correct message structure', function () {
             UrlGeneratorInterface::ABSOLUTE_URL
         )
         ->andReturn($expectedUrl);
+
+    $sentMessage = new SlackSentMessage(
+        new ChatMessage('test'),
+        'slack',
+        $this->requestsApproveChannelId,
+        '1234567890.123456',
+    );
 
     $this->chatter
         ->expects('send')
@@ -98,7 +109,41 @@ it('sends slack notification with correct message structure', function () {
                 ->and($message->getSubject())->toBe('Absence Approval Request');
 
             return true;
-        });
+        })
+        ->andReturn($sentMessage);
+
+    $this->slackNotificationRepository
+        ->expects('save')
+        ->once()
+        ->with(
+            $leaveRequestDTO->id->toString(),
+            $this->requestsApproveChannelId,
+            '1234567890.123456',
+        );
+
+    $this->handler->handle($leaveRequestDTO);
+});
+
+it('does not save notification when chatter returns null', function () {
+    $leaveRequestDTO = LeaveRequestDTOFixture::create([
+        'id' => Uuid::fromString('123e4567-e89b-12d3-a456-426614174000'),
+        'status' => LeaveRequestStatusEnum::Pending,
+        'approvedBy' => null,
+    ]);
+
+    $this->urlGenerator
+        ->expects('generate')
+        ->once()
+        ->andReturn('https://example.com/test');
+
+    $this->chatter
+        ->expects('send')
+        ->once()
+        ->andReturn(null);
+
+    $this->slackNotificationRepository
+        ->expects('save')
+        ->never();
 
     $this->handler->handle($leaveRequestDTO);
 });
