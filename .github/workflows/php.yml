@@ -9,7 +9,7 @@ on:
             - main
 
 env:
-    default-php-version: '8.4'
+    default-php-version: '8.5'
 
 jobs:
     test:

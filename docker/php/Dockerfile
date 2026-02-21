@@ -1,4 +1,4 @@
-FROM php:8.4-fpm AS app
+FROM php:8.5-fpm AS app
 
 RUN apt-get clean && apt-get update && apt-get install -y --fix-missing --no-install-recommends \
     zlib1g-dev \
@@ -19,24 +19,20 @@ RUN apt-get clean && apt-get update && apt-get install -y --fix-missing --no-ins
     libpq-dev
 
 RUN docker-php-ext-install \
-    iconv \
     zip \
-    ctype \
-    simplexml \
     mysqli \
-    pdo \
     pdo_mysql \
     soap \
     gettext \
-    mbstring \
     bcmath \
-    intl \
-    opcache
+    intl
 
 RUN rm -rf /var/cache/apk/* && rm -rf /tmp/* && rm -rf /var/lib/apt/lists/*
 RUN curl --insecure https://getcomposer.org/composer.phar -o /usr/bin/composer && chmod +x /usr/bin/composer
 
-RUN pecl install xdebug-3.4.1 && composer self-update
+RUN curl -fsSL https://github.com/php/pie/releases/latest/download/pie.phar -o /usr/local/bin/pie && chmod +x /usr/local/bin/pie
+RUN pie install xdebug/xdebug:^3.5.1
+RUN composer self-update
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
 

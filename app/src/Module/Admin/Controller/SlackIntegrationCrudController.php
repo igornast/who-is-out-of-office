@@ -48,6 +48,9 @@ class SlackIntegrationCrudController extends AppAbstractCrudController
         return new UserSlackIntegration(user: $this->getUser(), slackMemberId: '');
     }
 
+    /**
+     * @param AdminContext<UserSlackIntegration> $context
+     */
     protected function getRedirectResponseAfterSave(AdminContext $context, string $action): RedirectResponse
     {
         $url = match ($action) {

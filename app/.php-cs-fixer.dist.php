@@ -16,6 +16,7 @@ return new PhpCsFixer\Config()
         '@PSR12' => true,
         'array_indentation' => true,
         'assign_null_coalescing_to_coalesce_equal' => true,
+        'attribute_block_no_spaces' => false,
         'attribute_empty_parentheses' => true,
         'combine_consecutive_issets' => true,
         'combine_consecutive_unsets' => true,

@@ -20,7 +20,6 @@ function modules(): array
 function createPantherClient(array $options = [], array $kernelOptions = [], array $managerOptions = []): Client
 {
     $reflection = new ReflectionMethod(PantherTestCase::class, 'createPantherClient');
-    $reflection->setAccessible(true);
     $client = $reflection->invoke(null, $options, $kernelOptions, $managerOptions);
 
     return $client;
