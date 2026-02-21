@@ -1,6 +1,12 @@
 /* ============================================
    DASHBOARD — Welcome Banner
    ============================================ */
+body.ea .content-header:has(.welcome-banner) {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+}
+
 .welcome-banner {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     border-radius: var(--radius-xl);
@@ -12,6 +18,7 @@
     margin-bottom: 24px;
     position: relative;
     overflow: hidden;
+    width: 100%;
 }
 
 .welcome-banner::after {

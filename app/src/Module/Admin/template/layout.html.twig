@@ -24,7 +24,7 @@
             var saved = localStorage.getItem('whosooo-theme');
             var isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
             if (isDark) {
-                document.documentElement.classList.add('dark');
+                document.documentElement.classList.add('dark', 'ea-dark-scheme');
                 document.documentElement.dataset.bsTheme = 'dark';
             } else {
                 document.documentElement.dataset.bsTheme = 'light';

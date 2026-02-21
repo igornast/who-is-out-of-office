@@ -17,10 +17,10 @@ class LoginController extends AbstractController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('@EasyAdmin/page/login.html.twig', [
+        return $this->render('@AppAdmin/page/login.html.twig', [
             'error' => $error,
             'last_username' => $lastUsername,
-            'page_title' => 'Who is ooo login',
+            'page_title' => 'Who\'s OOO — Sign In',
             'csrf_token_intention' => 'login',
             'target_path' => $this->generateUrl('app_dashboard'),
         ]);

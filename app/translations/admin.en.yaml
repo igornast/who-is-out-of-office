@@ -48,6 +48,7 @@ dashboard:
         pending_requests: Pending Requests
         upcoming_absences: Upcoming Absences
         team_members: Team Members
+        absences_this_week: Absences This Week
         vacation_balance: My Vacation Balance
         days: days
     welcome:
@@ -64,6 +65,9 @@ dashboard:
             dates: Dates
             duration: Duration
             status: Status
+            actions: Actions
+        action:
+            view: View details
         showing: 'Showing %count% requests'
         see_all: 'See all requests'
         empty: No upcoming absences

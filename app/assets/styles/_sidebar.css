@@ -402,6 +402,10 @@ body.ea .sidebar-wrapper.sidebar-collapsed .sidebar {
     width: var(--sidebar-collapsed);
 }
 
+body.ea .wrapper:has(.sidebar-wrapper.sidebar-collapsed) {
+    grid-template-columns: var(--sidebar-collapsed) auto;
+}
+
 .sidebar-collapsed .ooo-sidebar-item[title] {
     position: relative;
 }

@@ -25,6 +25,7 @@ body.ea .datagrid {
     border: 1px solid var(--border-light);
 }
 
+
 /* Sort headers */
 body.ea .datagrid .table > thead > tr > th a {
     color: var(--text-muted);
@@ -209,6 +210,46 @@ body.ea .toast-header {
     background-color: var(--app-surface-sunken);
     border-bottom: 1px solid var(--border-light);
     color: var(--text-primary);
+}
+
+html.dark body.ea .datagrid .table > tbody > tr > td,
+html.dark body.ea .datagrid .table > thead > tr > th {
+    border-color: var(--border-light);
+}
+
+html.dark body.ea .datagrid .table > tbody > tr > td {
+    color: var(--text-secondary);
+}
+
+html.dark body.ea .datagrid .table > thead > tr > th {
+    background-color: var(--app-bg-alt);
+    color: var(--text-muted);
+}
+
+html.dark body.ea .datagrid .table > thead > tr > th a {
+    color: var(--text-muted);
+}
+
+html.dark body.ea .datagrid .table > tbody > tr:hover > td {
+    background-color: var(--app-bg-alt);
+}
+
+html.dark body.ea .badge-outline {
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+
+html.dark body.ea .content-panel-footer {
+    background-color: var(--app-surface);
+    border-color: var(--border-light);
+}
+
+html.dark body.ea .content-header {
+    background-color: var(--app-bg);
+}
+
+html.dark body.ea .datagrid .table > tbody > tr > td .icon svg {
+    color: var(--text-muted);
 }
 
 @media (max-width: 768px) {

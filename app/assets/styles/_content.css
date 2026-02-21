@@ -1,15 +1,17 @@
 body.ea .main-content {
     background: var(--app-bg);
     transition: background-color 0.25s ease;
+    min-width: 0;
 }
 
 body.ea .main-content .content-wrapper {
     padding: 24px;
     background: var(--app-bg);
+    width: 100%;
 }
 
 body.ea .main-content .content {
-    max-width: var(--content-max-width);
+    min-width: 0;
 }
 
 body.ea .main-content .content-header .title {
@@ -23,6 +25,7 @@ body.ea .main-content .content-header .title {
 body.ea .main-content .content-header {
     margin-bottom: 20px;
 }
+
 
 body.ea .main-content .content-body {
     color: var(--text-secondary);

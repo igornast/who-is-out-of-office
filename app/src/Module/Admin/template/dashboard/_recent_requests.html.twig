@@ -17,6 +17,7 @@
                             <th>{{ 'dashboard.recent_requests.col.dates'|trans(domain: 'admin') }}</th>
                             <th>{{ 'dashboard.recent_requests.col.duration'|trans(domain: 'admin') }}</th>
                             <th>{{ 'dashboard.recent_requests.col.status'|trans(domain: 'admin') }}</th>
+                            <th style="text-align: right;">{{ 'dashboard.recent_requests.col.actions'|trans(domain: 'admin') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,6 +62,15 @@
                                     <span class="status-badge status-{{ leaveRequestDto.status.value }}">
                                         {{ leaveRequestDto.status.value|capitalize }}
                                     </span>
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a class="table-action-btn"
+                                           href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('detail').setEntityId(leaveRequestDto.id) }}"
+                                           title="{{ 'dashboard.recent_requests.action.view'|trans(domain: 'admin') }}">
+                                            <i data-lucide="eye"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}
