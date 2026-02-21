@@ -14,6 +14,14 @@ menu:
         calendar: Calendar
         absence_requests: Absence Requests
 
+sidebar:
+    section:
+        my_leave: My Leave
+        organization: Organization
+        settings: Settings
+        account: Account
+    theme_toggle: Toggle dark mode
+
 
 
 dashboard:

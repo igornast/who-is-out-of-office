@@ -13,6 +13,7 @@ use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
@@ -101,6 +102,12 @@ class DashboardController extends AbstractDashboardController
 
         return parent::configureUserMenu($user)
             ->setAvatarUrl($profileImageUrl);
+    }
+
+    public function configureCrud(): Crud
+    {
+        return Crud::new()
+            ->overrideTemplate('layout', '@AppAdmin/layout.html.twig');
     }
 
     public function configureAssets(): Assets

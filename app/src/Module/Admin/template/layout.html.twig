@@ -34,6 +34,123 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 {% endblock %}
 
+{% block sidebar %}
+    {% set _current_route = app.request.attributes.get('_route') %}
+    {% set _current_crud = app.request.attributes.get('crudControllerFqcn') ?? app.request.query.get('crudControllerFqcn') %}
+
+    <div class="ooo-sidebar">
+        <div class="ooo-sidebar-logo">
+            <h1><a href="{{ path('app_dashboard') }}">Who's <span>OOO</span></a></h1>
+        </div>
+
+        <nav class="ooo-sidebar-nav">
+            <a class="ooo-sidebar-item {{ _current_route == 'app_dashboard' ? 'active' }}"
+               href="{{ path('app_dashboard') }}">
+                <i data-lucide="layout-dashboard"></i>
+                {{ 'menu.items.dashboard'|trans(domain: 'admin') }}
+            </a>
+
+            <div class="ooo-sidebar-section-label">{{ 'sidebar.section.my_leave'|trans(domain: 'admin') }}</div>
+            <a class="ooo-sidebar-item {{ _current_crud == 'App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController' ? 'active' }}"
+               href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('index') }}">
+                <i data-lucide="calendar-clock"></i>
+                {{ 'menu.items.absence_requests'|trans(domain: 'admin') }}
+            </a>
+            <a class="ooo-sidebar-item {{ _current_route == 'app_calendar_view' ? 'active' }}"
+               href="{{ path('app_calendar_view') }}">
+                <i data-lucide="calendar-days"></i>
+                {{ 'menu.items.calendar'|trans(domain: 'admin') }}
+            </a>
+
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_MANAGER') %}
+                <div class="ooo-sidebar-section-label">{{ 'sidebar.section.organization'|trans(domain: 'admin') }}</div>
+                <a class="ooo-sidebar-item {{ _current_crud == 'App\\Module\\Admin\\Controller\\UserCrudController' ? 'active' }}"
+                   href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\UserCrudController').setAction('index') }}">
+                    <i data-lucide="users"></i>
+                    {{ 'menu.items.my_team'|trans(domain: 'admin') }}
+                </a>
+            {% endif %}
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="ooo-sidebar-section-label">{{ 'sidebar.section.settings'|trans(domain: 'admin') }}</div>
+                <a class="ooo-sidebar-item {{ _current_route == 'app_settings' ? 'active' }}"
+                   href="{{ path('app_settings') }}">
+                    <i data-lucide="settings"></i>
+                    {{ 'menu.items.app_settings'|trans(domain: 'admin') }}
+                </a>
+                <a class="ooo-sidebar-item {{ _current_crud == 'App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestTypeCrudController' ? 'active' }}"
+                   href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestTypeCrudController').setAction('index') }}">
+                    <i data-lucide="list-checks"></i>
+                    {{ 'menu.items.leave_request_types'|trans(domain: 'admin') }}
+                </a>
+            {% endif %}
+
+            <div class="ooo-sidebar-section-label">{{ 'sidebar.section.account'|trans(domain: 'admin') }}</div>
+            <a class="ooo-sidebar-item {{ _current_route == 'app_user_profile' ? 'active' }}"
+               href="{{ path('app_user_profile') }}">
+                <i data-lucide="user-circle"></i>
+                {{ 'menu.items.profile'|trans(domain: 'admin') }}
+            </a>
+        </nav>
+
+        <div class="ooo-sidebar-footer">
+            {% set _user = app.user %}
+            <div class="ooo-sidebar-avatar">
+                {% if _user.profileImageUrl %}
+                    {% if _user.profileImageUrl starts with 'http://' or _user.profileImageUrl starts with 'https://' %}
+                        <img src="{{ _user.profileImageUrl }}" alt="">
+                    {% else %}
+                        <img src="/{{ profile_images_base_path }}/{{ _user.profileImageUrl }}" alt="">
+                    {% endif %}
+                {% else %}
+                    {{ _user.firstName|first }}{{ _user.lastName|first }}
+                {% endif %}
+            </div>
+            <div class="ooo-sidebar-user-info">
+                <div class="ooo-sidebar-user-name">{{ _user.firstName }} {{ _user.lastName }}</div>
+                <div class="ooo-sidebar-user-role">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        {{ 'role.admin'|trans(domain: 'admin') }}
+                    {% elseif is_granted('ROLE_MANAGER') %}
+                        {{ 'role.manager'|trans(domain: 'admin') }}
+                    {% else %}
+                        {{ 'role.user'|trans(domain: 'admin') }}
+                    {% endif %}
+                </div>
+            </div>
+            <button class="ooo-theme-toggle"
+                    data-controller="theme-toggle"
+                    data-action="click->theme-toggle#toggle"
+                    title="{{ 'sidebar.theme_toggle'|trans(domain: 'admin') }}">
+                <i data-lucide="moon" class="icon-moon"></i>
+                <i data-lucide="sun" class="icon-sun"></i>
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block header_custom_menu %}
+    {% set _topbar_user = app.user %}
+    <div class="topbar-actions">
+        <a class="btn-quick-add" href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('new') }}" title="{{ 'crud.actions.leave_requests.new'|trans(domain: 'admin') }}">
+            <i data-lucide="plus"></i>
+        </a>
+        <div class="topbar-avatar">
+            {% if _topbar_user.profileImageUrl %}
+                {% if _topbar_user.profileImageUrl starts with 'http://' or _topbar_user.profileImageUrl starts with 'https://' %}
+                    <img src="{{ _topbar_user.profileImageUrl }}" alt="">
+                {% else %}
+                    <img src="/{{ profile_images_base_path }}/{{ _topbar_user.profileImageUrl }}" alt="">
+                {% endif %}
+            {% else %}
+                {{ _topbar_user.firstName|first }}{{ _topbar_user.lastName|first }}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block settings_dropdown_wrapper %}{% endblock %}
+
 {% block body_javascript %}
     {{ parent() }}
     <script>

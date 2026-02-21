@@ -1,3 +1,6 @@
 @import './_tokens-light.css';
 @import './_tokens-dark.css';
 @import './_typography.css';
+@import './_sidebar.css';
+@import './_topbar.css';
+@import './_content.css';

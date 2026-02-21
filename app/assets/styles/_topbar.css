@@ -1,0 +1,192 @@
+body.ea .main-content .content-top {
+    height: var(--topbar-height);
+    min-height: var(--topbar-height);
+    max-height: var(--topbar-height);
+    background: var(--topbar-bg);
+    border-bottom: 1px solid var(--topbar-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+body.ea .main-content .content-top .content-search {
+    display: flex;
+    align-items: center;
+}
+
+body.ea .main-content .content-top .ooo-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+body.ea .main-content .content-top .ooo-breadcrumb-item {
+    color: var(--text-tertiary);
+}
+
+body.ea .main-content .content-top .ooo-breadcrumb-item a {
+    color: var(--text-tertiary);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+body.ea .main-content .content-top .ooo-breadcrumb-item a:hover {
+    color: var(--primary);
+}
+
+body.ea .main-content .content-top .ooo-breadcrumb-sep {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+body.ea .main-content .content-top .ooo-breadcrumb-current {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+body.ea .main-content .content-top .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+body.ea .main-content .content-top .search-wrapper {
+    position: relative;
+}
+
+body.ea .main-content .content-top .search-wrapper i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+}
+
+body.ea .main-content .content-top .ooo-search-input {
+    height: 34px;
+    width: 200px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--app-surface-sunken);
+    padding: 0 12px 0 34px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+body.ea .main-content .content-top .ooo-search-input:focus {
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-focus);
+    width: 260px;
+}
+
+body.ea .main-content .content-top .ooo-search-input::placeholder {
+    color: var(--text-muted);
+}
+
+body.ea .main-content .content-top .topbar-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: transparent;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+body.ea .main-content .content-top .topbar-btn:hover {
+    background: var(--primary-subtle);
+    color: var(--primary);
+}
+
+body.ea .main-content .content-top .topbar-btn .notif-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    background: var(--cta);
+    border-radius: 50%;
+    border: 1.5px solid var(--topbar-bg);
+}
+
+body.ea .main-content .content-top .btn-quick-add {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--cta);
+    color: var(--cta-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(232, 135, 111, 0.3);
+    padding: 0;
+    text-decoration: none;
+}
+
+body.ea .main-content .content-top .btn-quick-add i {
+    width: 18px;
+    height: 18px;
+}
+
+body.ea .main-content .content-top .btn-quick-add:hover {
+    background: var(--cta-hover);
+}
+
+body.ea .main-content .content-top .topbar-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    color: var(--text-on-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+body.ea .main-content .content-top .topbar-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-full);
+}
+
+body.ea .main-content .content-top .navbar-custom-menu {
+    display: flex;
+    align-items: center;
+}
+
+body.ea .main-content .content-top .navbar-custom-menu .user-menu-wrapper {
+    display: flex;
+    align-items: center;
+}
