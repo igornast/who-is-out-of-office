@@ -3,38 +3,131 @@
 {% block page_title %}Who's OOO App{% endblock %}
 
 {% block main %}
-    <div class="container-lg">
-        <div class="row">
-            <div class="col-12 col-md-3 mb-5 pe-md-3">
-                {% include '@AppAdmin/dashboard/_employ_info.html.twig' %}
-                {% include '@AppAdmin/dashboard/_slack_integration_info.html.twig' %}
-            </div>
-            <div class="col-12 col-md-9  ps-md-3">
-                <div class="row mb-5">
-                    <div class="col-md">
-                        <div class="row mb-lg-4">
-                            {% include '@AppAdmin/dashboard/_my_team.html.twig' %}
-                        </div>
+    {% include '@AppAdmin/dashboard/_welcome_banner.html.twig' %}
 
-                        <div class="row">
-                            <div class="col-12 col-lg-5">
-                                {% include '@AppAdmin/dashboard/_upcoming_absences.html.twig' %}
-                            </div>
-                            <div class="col-12 col-lg-7">
-                                {% include '@AppAdmin/dashboard/_upcoming_birthdays.html.twig' %}
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                {% include '@AppAdmin/dashboard/_upcoming_work_anniversaries.html.twig' %}
-                            </div>
-                        </div>
-                    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon sand">
+                    <i data-lucide="clock"></i>
                 </div>
             </div>
+            <div class="stat-value">{{ pending_requests|length }}</div>
+            <div class="stat-label">{{ 'dashboard.stats.pending_requests'|trans(domain: 'admin') }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon teal">
+                    <i data-lucide="user-check"></i>
+                </div>
+            </div>
+            <div class="stat-value">{{ upcoming_absences_in_team|length }}</div>
+            <div class="stat-label">{{ 'dashboard.stats.upcoming_absences'|trans(domain: 'admin') }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon lavender">
+                    <i data-lucide="users"></i>
+                </div>
+            </div>
+            <div class="stat-value">{{ my_team|length }}</div>
+            <div class="stat-label">{{ 'dashboard.stats.team_members'|trans(domain: 'admin') }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon sand">
+                    <i data-lucide="palmtree"></i>
+                </div>
+            </div>
+            <div class="stat-value">{{ user.currentLeaveBalance }}<span style="font-size:16px;font-weight:400;color:var(--text-muted)"> {{ 'dashboard.stats.days'|trans(domain: 'admin') }}</span></div>
+            <div class="stat-label">{{ 'dashboard.stats.vacation_balance'|trans(domain: 'admin') }}</div>
         </div>
     </div>
 
+    <div class="dashboard-grid">
+        <div class="dashboard-left-column">
+            {% include '@AppAdmin/dashboard/_recent_requests.html.twig' %}
 
+            <div style="margin-top: 20px;">
+                {% include '@AppAdmin/dashboard/_my_team.html.twig' %}
+            </div>
+
+            <div style="margin-top: 20px;">
+                {% include '@AppAdmin/dashboard/_upcoming_absences.html.twig' %}
+            </div>
+        </div>
+
+        <div class="dashboard-right-column">
+            {% include '@AppAdmin/dashboard/_quick_links.html.twig' %}
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">{{ 'dashboard.title.birthdays'|trans(domain: 'admin') }}</span>
+                </div>
+                <div class="card-body" style="padding: 16px 20px;">
+                    {% if users_with_birthdays is not empty %}
+                        {% import "@AppAdmin/dashboard/component/_user_avatar.html.twig" as avatar %}
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for userDto in users_with_birthdays %}
+                                <div class="text-center">
+                                    {{ avatar.userDtoAvatar(userDto) }}
+                                    <div class="text-center" style="font-size: 12px; color: var(--text-muted);">
+                                        {{ userDto.birthDate|date("m.d") }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="padding: 8px 0; text-align: center; color: var(--text-muted); font-size: 13px;">
+                            {{ 'dashboard.birthdays.no_upcoming'|trans(domain: 'admin') }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">{{ 'dashboard.work_anniversaries.title'|trans(domain: 'admin') }}</span>
+                </div>
+                <div class="card-body" style="padding: 16px 20px;">
+                    {% if users_with_work_anniversaries is not empty %}
+                        {% import "@AppAdmin/dashboard/component/_user_avatar.html.twig" as avatar %}
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for userDto in users_with_work_anniversaries %}
+                                <div class="text-center">
+                                    {{ avatar.userDtoAvatar(userDto) }}
+                                    <div class="text-center" style="font-size: 12px; color: var(--text-muted);">
+                                        {{ userDto.contractStartedAt|date("m.d") }}
+                                        {% if userDto.contractStartedAt %}
+                                            {% set years = "now"|date("Y") - userDto.contractStartedAt|date("Y") %}
+                                            {% if years > 0 %}
+                                                <small class="d-block" style="color: var(--text-tertiary);">{{ years }}y</small>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="padding: 8px 0; text-align: center; color: var(--text-muted); font-size: 13px;">
+                            {{ 'dashboard.work_anniversaries.no_upcoming'|trans(domain: 'admin') }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if slack_integration is not null %}
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">{{ 'dashboard.title.slack'|trans(domain: 'admin') }}</span>
+                    </div>
+                    <div class="card-body" style="padding: 16px 20px;">
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            Slack Member ID: {{ user.slackIntegration.slackMemberId }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock main %}

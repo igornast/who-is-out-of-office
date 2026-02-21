@@ -29,7 +29,7 @@ dashboard:
         my_team: My Team
         employee: Employee
         absences: Absences
-        upcoming_absences: UPCOMING ABSENCES
+        upcoming_absences: Upcoming Absences
         slack: Slack Notifications
         birthdays: Time to celebrate
     birthdays:
@@ -37,6 +37,58 @@ dashboard:
     work_anniversaries:
         title: Work Anniversaries
         no_upcoming: No upcoming work anniversaries
+    my_team:
+        members: members
+        empty: No team members
+    upcoming_absences:
+        empty: No upcoming absences
+    stats:
+        pending_requests: Pending Requests
+        upcoming_absences: Upcoming Absences
+        team_members: Team Members
+        vacation_balance: My Vacation Balance
+        days: days
+    welcome:
+        greeting: 'Good morning, %name%'
+        balance: 'You have %days% vacation days remaining this year'
+        request_leave: Request Leave
+        view_calendar: View Calendar
+    recent_requests:
+        title: Recent Leave Requests
+        view_all: View All
+        col:
+            employee: Employee
+            type: Type
+            dates: Dates
+            duration: Duration
+            status: Status
+        showing: 'Showing %count% requests'
+        see_all: 'See all requests'
+        empty: No upcoming absences
+    quick_links:
+        title: Quick Links
+        new_request: New Leave Request
+        team_calendar: Team Calendar
+        leave_requests: Leave Requests
+        my_profile: My Profile
+
+leave_request:
+    new:
+        page_title: New Absence Request
+        heading: Create New Absence Request
+        cancel: Cancel
+        submit: Submit Request
+        loading: Loading...
+
+calendar:
+    page_title: Team Calendar
+    subscribe: Subscribe
+    subscription:
+        title: Calendar Subscription
+        url_label: Subscription URL
+        copy_url: Copy URL
+        copied: Copied!
+        description: Add this URL to Google Calendar, Outlook, or Apple Calendar to sync team absences automatically.
 
 crud:
     title:
@@ -79,7 +131,10 @@ crud:
             title: Application Settings
         panel:
             leave_request: Leave Request Settings
+            leave_request_desc: Configure automatic approval and delay settings for leave requests.
         field:
             auto_approve: Auto Approve
             auto_approve_delay: Auto Approve Delay (seconds)
             auto_approve_delay_help: Number of seconds to wait before automatically approving leave requests
+        action:
+            save: Save Changes

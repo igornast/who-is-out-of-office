@@ -1,12 +1,12 @@
 <div {{ attributes }}>
 
     {{ form_start(form) }}
-    <div class="field-choice form-group">
+    <div class="field-choice form-group mb-3">
         <div class="form-widget">
             {{ form_row(form.leaveType, {'attr': {'class': 'form-select'}}) }}
         </div>
     </div>
-    <div class="field-text form-group mb-0 ">
+    <div class="field-text form-group mb-3">
         <div class="form-widget">
             {{ form_row(form.dateRange, {'attr': {'class': 'ea-request-form-date-range'}}) }}
         </div>
@@ -14,12 +14,18 @@
 
     {{ infoBox|raw }}
 
-    <button data-loading="hide" id="submit-btn" class="btn btn-primary mt-2" {% if isSubmitDisabled %}disabled{% endif %}>
-        Submit
-    </button>
-    <button data-loading="show" id="spinner" class="btn btn-primary mt-2" disabled>
-        <span class="spinner-border spinner-border-sm"></span> Loading...
-    </button>
+    <div class="d-flex justify-content-end gap-2 mt-4" style="border-top: 1px solid var(--border-light); padding-top: 20px;">
+        <a href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('index') }}"
+           class="btn btn-ghost">
+            {{ 'leave_request.new.cancel'|trans(domain: 'admin') }}
+        </a>
+        <button data-loading="hide" id="submit-btn" class="btn btn-cta" {% if isSubmitDisabled %}disabled{% endif %}>
+            {{ 'leave_request.new.submit'|trans(domain: 'admin') }}
+        </button>
+        <button data-loading="show" id="spinner" class="btn btn-cta" disabled>
+            <span class="spinner-border spinner-border-sm"></span> {{ 'leave_request.new.loading'|trans(domain: 'admin') }}
+        </button>
+    </div>
 
     {{ form_end(form) }}
 </div>

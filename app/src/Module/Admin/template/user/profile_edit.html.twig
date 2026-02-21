@@ -4,26 +4,23 @@
 
 {% block content_header %}
     <div class="content-header-title">
-        <h1 class="title">{{ 'crud.user_profile.edit.title'|trans(domain='admin') }}</h1>
-    </div>
-
-    <div class="page-actions">
-        <div class="global-actions">
-        </div>
+        <h1 class="title" style="font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);">
+            {{ 'crud.user_profile.edit.title'|trans(domain='admin') }}
+        </h1>
     </div>
 {% endblock %}
 
-
 {% block main %}
-    <div class="col-lg-10 col-xl-11">
-        <div class="row justify-content-center">
-            <div class="card shadow-sm">
-                <div class="card-body ea-profile-form">
-                    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 
-                    <h5>{{ 'crud.user_profile.section.profile_info'|trans(domain='admin') }}</h5>
-
-                    <div class="form-group row mt-3">
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'crud.user_profile.section.profile_info'|trans(domain='admin') }}</h3>
+                </div>
+                <div class="settings-card-body">
+                    <div class="form-group row mb-3">
                         {% if app.user.profileImageUrl %}
                             {% set img = app.user.profileImageUrl %}
                             {% if img starts with 'http://' or img starts with 'https://' %}
@@ -31,37 +28,41 @@
                             {% else %}
                                 {% set src = asset(profile_images_base_path ~ '/' ~ img) %}
                             {% endif %}
-                            <div class="col-md-5">
+                            <div class="col-md-4 mb-3">
                                 <div class="text-center">
                                     <img src="{{ src }}"
                                          alt="{{ 'crud.user_profile.field.profile_image'|trans(domain='admin') }}"
-                                         class="img-thumbnail border border-3 border-light shadow-sm"
-                                         style="max-width: 160px;">
+                                         style="max-width: 140px; border-radius: var(--radius-lg); border: 2px solid var(--border-light); box-shadow: var(--shadow-sm);">
                                 </div>
                             </div>
                         {% endif %}
-
-                        <div class="col-md-7">
+                        <div class="{{ app.user.profileImageUrl ? 'col-md-8' : 'col-12' }}">
                             <div class="field-file">
                                 <div class="form-widget">
                                     {{ form_row(form.profileImageFile, {'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-                    <div class="field-text form-group">
-                        <div class="form-widget">
-                            {{ form_row(form.firstName, {'attr': {'class': 'form-control'}}) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="field-text form-group mb-3">
+                                <div class="form-widget">
+                                    {{ form_row(form.firstName, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="field-text form-group mb-3">
+                                <div class="form-widget">
+                                    {{ form_row(form.lastName, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="field-text form-group">
-                        <div class="form-widget">
-                            {{ form_row(form.lastName, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                    </div>
-                    <div class="field-choice form-group">
+
+                    <div class="field-choice form-group mb-3">
                         <div class="form-widget">
                             {{ form_row(form.holidayCalendar, {'attr': {'class': 'form-select'}}) }}
                         </div>
@@ -79,39 +80,39 @@
                         </div>
                         {{ form_errors(form.workingDays) }}
                     </div>
+                </div>
+            </div>
 
-                    <h5>{{ 'crud.user_profile.section.employee_of_record'|trans(domain='admin') }}</h5>
-
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'crud.user_profile.section.employee_of_record'|trans(domain='admin') }}</h3>
+                </div>
+                <div class="settings-card-body">
                     <div class="row">
-                        <div class="col">
-                            <div class="field-choice form-group">
+                        <div class="col-md-6">
+                            <div class="field-choice form-group mb-3">
                                 <div class="form-widget">
                                     {{ form_label(form.birthDate) }}
-
                                     {{ form_widget(form.birthDate, {'attr': {'class': 'form-control'}}) }}
                                 </div>
                                 <div class="form-text">{{ form_help(form.birthDate) }}</div>
                             </div>
                         </div>
-                        <div class="col">
-                        </div>
                     </div>
 
                     <div class="row">
-                        <div class="col">
-                            <div class="field-choice form-group">
+                        <div class="col-md-6">
+                            <div class="field-choice form-group mb-3">
                                 <div class="form-widget">
                                     {{ form_label(form.contractStartedAt) }}
-
                                     {{ form_widget(form.contractStartedAt, {'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
                         </div>
-                        <div class="col">
-                            <div class="field-choice form-group">
+                        <div class="col-md-6">
+                            <div class="field-choice form-group mb-3">
                                 <div class="form-widget">
                                     {{ form_label(form.absenceBalanceResetDay) }}
-
                                     {{ form_widget(form.absenceBalanceResetDay, {'attr': {'class': 'form-control'}}) }}
                                 </div>
                                 <div class="form-text">{{ form_help(form.absenceBalanceResetDay) }}</div>
@@ -119,43 +120,45 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col">
-                            <label></label>
-                            <div class="field-choice form-group">
-                                <div class="checkbox-large">
-                                    {{ form_widget(form.hasCelebrateWorkAnniversary) }}
-
-                                    {{ form_label(form.hasCelebrateWorkAnniversary) }}
-                                </div>
-
-                                <div class="form-text">{{ form_help(form.hasCelebrateWorkAnniversary) }}</div>
-                            </div>
+                    <div class="field-choice form-group mb-0">
+                        <div class="checkbox-large">
+                            {{ form_widget(form.hasCelebrateWorkAnniversary) }}
+                            {{ form_label(form.hasCelebrateWorkAnniversary) }}
                         </div>
-                        <div class="col">
-                        </div>
+                        <div class="form-text">{{ form_help(form.hasCelebrateWorkAnniversary) }}</div>
                     </div>
-
-                    <h5>{{ 'crud.user_profile.section.change_password'|trans(domain='admin') }}</h5>
-
-                    <div class="field-text form-group">
-                        <div class="form-widget">
-                            {{ form_row(form.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                    </div>
-                    <div class="field-text form-group">
-                        <div class="form-widget">
-                            {{ form_row(form.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
-                        </div>
-                    </div>
-
-                    {{ form_errors(form) }}
-
-                    <button class="btn btn-primary">{{ 'crud.user_profile.action.save_changes'|trans(domain='admin') }}</button>
-
-                    {{ form_end(form) }}
                 </div>
             </div>
+
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'crud.user_profile.section.change_password'|trans(domain='admin') }}</h3>
+                </div>
+                <div class="settings-card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="field-text form-group mb-3">
+                                <div class="form-widget">
+                                    {{ form_row(form.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="field-text form-group mb-3">
+                                <div class="form-widget">
+                                    {{ form_row(form.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-card-footer">
+                    {{ form_errors(form) }}
+                    <button class="btn btn-primary">{{ 'crud.user_profile.action.save_changes'|trans(domain='admin') }}</button>
+                </div>
+            </div>
+
+            {{ form_end(form) }}
         </div>
     </div>
 {% endblock %}

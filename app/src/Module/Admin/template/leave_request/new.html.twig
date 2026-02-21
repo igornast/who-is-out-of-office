@@ -1,6 +1,6 @@
 {% extends '@AppAdmin/layout.html.twig' %}
 
-{% block page_title %}New Absence Request{% endblock %}
+{% block page_title %}{{ 'leave_request.new.page_title'|trans(domain: 'admin') }}{% endblock %}
 
 {% block head_stylesheets %}
     {{ parent() }}
@@ -9,21 +9,17 @@
 
 {% block content_header %}
     <div class="content-header-title">
-        <h1 class="title">Create New Absence Request</h1>
-    </div>
-
-    <div class="page-actions">
-        <div class="global-actions">
-        </div>
+        <h1 class="title" style="font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);">
+            {{ 'leave_request.new.heading'|trans(domain: 'admin') }}
+        </h1>
     </div>
 {% endblock %}
 
-
 {% block main %}
     <div class="row justify-content-center">
-        <div class="col-lg-10 col-xl-11">
-            <div class="card shadow-sm">
-                <div class="card-body ea-request-form">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card" style="border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+                <div class="card-body" style="padding: 32px;">
                     {{ component('LeaveRequestForm') }}
                 </div>
             </div>

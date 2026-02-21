@@ -1,4 +1,6 @@
-/* Reusable error page components */
+/* ============================================
+   ERROR PAGES — Design Token Based
+   ============================================ */
 
 /* Full viewport container with gradient background */
 .error-fullscreen {
@@ -6,144 +8,105 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: 'Sora', -apple-system, sans-serif;
 }
 
-/* Gradient backgrounds - can be combined with error-fullscreen */
+/* Gradient backgrounds using design tokens */
 .gradient-purple {
-    background: linear-gradient(135deg, var(--bs-indigo) 0%, var(--bs-purple) 100%);
+    background: linear-gradient(135deg, #3D9B8F 0%, #2A7A72 100%);
 }
 
 .gradient-pink {
-    background: linear-gradient(135deg, #f093fb 0%, var(--bs-pink) 100%);
+    background: linear-gradient(135deg, #E8876F 0%, #D4755D 100%);
 }
 
 .gradient-blue {
-    background: linear-gradient(135deg, var(--bs-cyan) 0%, var(--bs-blue) 100%);
+    background: linear-gradient(135deg, #3D9B8F 0%, #2A3F4F 100%);
 }
 
-/* Glassmorphism card effect */
+/* Glass card */
 .glass-card {
     text-align: center;
-    color: var(--bs-white);
-    padding: 40px;
-    background: rgba(var(--bs-white-rgb), 0.1);
+    color: #FFFFFF;
+    padding: 48px 40px;
+    background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    border-radius: var(--bs-border-radius-lg);
-    box-shadow: var(--bs-box-shadow-lg);
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(42, 63, 79, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* Error code styling */
 .error-code-large {
-    font-size: 150px;
-    font-weight: bold;
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 120px;
+    font-weight: 700;
     line-height: 1;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(var(--bs-black-rgb), 0.3);
+    margin-bottom: 16px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .error-code-animated {
     animation: float 3s ease-in-out infinite;
 }
 
-/* Error text styling */
+/* Error text */
 .error-title {
-    font-size: 36px;
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 28px;
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .error-description {
-    font-size: 18px;
-    opacity: 0.9;
-    margin-bottom: 30px;
+    font-family: 'Sora', -apple-system, sans-serif;
+    font-size: 15px;
+    opacity: 0.85;
+    margin-bottom: 28px;
+    font-weight: 300;
+    line-height: 1.6;
 }
 
 /* Button styling */
 .btn-glass {
-    background: var(--bs-white);
-    padding: 12px 40px;
-    border-radius: var(--bs-border-radius-pill);
+    background: rgba(255, 255, 255, 0.9);
+    color: #2A3F4F;
+    padding: 10px 32px;
+    border-radius: 9999px;
     text-decoration: none;
-    font-weight: 600;
+    font-family: 'Sora', -apple-system, sans-serif;
+    font-weight: 500;
+    font-size: 13px;
     display: inline-block;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px 0 rgba(var(--bs-white-rgb), 0.3);
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: none;
     cursor: pointer;
 }
 
 .btn-glass:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px 0 rgba(var(--bs-white-rgb), 0.4);
+    background: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     text-decoration: none;
+    color: #2A3F4F;
 }
 
-/* Color variants for buttons */
-.btn-purple {
-    color: var(--bs-indigo);
-}
-
-.btn-purple:hover {
-    color: var(--bs-indigo);
-}
-
-.btn-pink {
-    color: var(--bs-pink);
-}
-
-.btn-pink:hover {
-    color: var(--bs-pink);
-}
-
+/* Color variants */
+.btn-purple,
+.btn-pink,
 .btn-blue {
-    color: var(--bs-blue);
+    color: #2A3F4F;
 }
 
+.btn-purple:hover,
+.btn-pink:hover,
 .btn-blue:hover {
-    color: var(--bs-blue);
+    color: #1A2E2E;
 }
 
 /* Animations */
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-}
-
-/* Legacy simple error page styles */
-body {
-    background-color: var(--bs-gray-100);
-}
-
-.error-container {
-    text-align: center;
-    padding: 100px 0;
-}
-
-.error-code {
-    font-size: 100px;
-    color: var(--bs-primary);
-    margin-bottom: 20px;
-}
-
-.error-message {
-    font-size: 24px;
-    margin-bottom: 30px;
-    color: var(--bs-gray-800);
-}
-
-.btn-custom {
-    background-color: var(--bs-primary);
-    color: var(--bs-white);
-    border-radius: var(--bs-border-radius-pill);
-    padding: 10px 30px;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-}
-
-.btn-custom:hover {
-    background-color: var(--bs-link-hover-color);
-    transform: translateY(-2px);
-    color: var(--bs-white);
-    text-decoration: none;
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
 }

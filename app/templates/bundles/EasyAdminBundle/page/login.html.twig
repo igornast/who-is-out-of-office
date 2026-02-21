@@ -4,6 +4,62 @@
     <link rel="shortcut icon" href="{{ asset('image/icons/icon_pride.png') }}">
 {% endblock %}
 
+{% block head_stylesheets %}
+    {{ parent() }}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body.ea-login {
+            font-family: 'Sora', -apple-system, sans-serif;
+            background-color: #FAFCFB;
+        }
+        .ea-login .wrapper {
+            background: linear-gradient(135deg, #3D9B8F 0%, #2A3F4F 100%);
+        }
+        .ea-login .login-form {
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(42, 63, 79, 0.12);
+        }
+        .ea-login .login-form h1 {
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-weight: 600;
+        }
+        .ea-login .login-form .form-control {
+            border-radius: 6px;
+            border: 1px solid #D5DDD9;
+            background: #F3F8F7;
+            font-family: 'Sora', -apple-system, sans-serif;
+            transition: all 0.15s ease;
+        }
+        .ea-login .login-form .form-control:focus {
+            border-color: #3D9B8F;
+            box-shadow: 0 0 0 3px rgba(61, 155, 143, 0.25);
+        }
+        .ea-login .login-form .btn-primary {
+            background-color: #3D9B8F;
+            border-color: #3D9B8F;
+            border-radius: 8px;
+            font-family: 'Sora', -apple-system, sans-serif;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        .ea-login .login-form .btn-primary:hover {
+            background-color: #348A7F;
+            border-color: #348A7F;
+        }
+        .ea-login .login-form .btn-primary:focus {
+            box-shadow: 0 0 0 3px rgba(61, 155, 143, 0.25);
+        }
+        .ea-login .login-form label {
+            font-family: 'Sora', -apple-system, sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: #3A4A4A;
+        }
+    </style>
+{% endblock %}
+
 {% block body_javascript %}
     {{ parent() }}
     {% block importmap %}{{ importmap('app') }}{% endblock %}
