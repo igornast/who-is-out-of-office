@@ -1,0 +1,218 @@
+body.ea .btn,
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 16px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.btn i {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-sm {
+    height: 30px;
+    font-size: 12px;
+    padding: 0 12px;
+}
+
+.btn-lg {
+    height: 44px;
+    font-size: 14px;
+    padding: 0 20px;
+}
+
+body.ea .btn-primary,
+.btn-primary {
+    background-color: var(--primary);
+    color: var(--text-on-primary);
+    border-color: var(--primary);
+}
+
+body.ea .btn-primary:hover,
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: var(--text-on-primary);
+}
+
+body.ea .btn-primary:active,
+body.ea .btn-primary:focus,
+.btn-primary:active,
+.btn-primary:focus {
+    background-color: var(--primary-active);
+    border-color: var(--primary-active);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-focus);
+}
+
+.btn-cta {
+    background-color: var(--cta);
+    color: var(--cta-text);
+}
+
+.btn-cta:hover {
+    background-color: var(--cta-hover);
+}
+
+.btn-cta:focus {
+    box-shadow: var(--shadow-focus);
+}
+
+body.ea .btn-danger,
+.btn-danger {
+    background-color: var(--danger);
+    color: var(--text-on-primary);
+    border-color: var(--danger);
+}
+
+body.ea .btn-danger:hover,
+.btn-danger:hover {
+    background-color: var(--danger-hover);
+    border-color: var(--danger-hover);
+    color: var(--text-on-primary);
+}
+
+body.ea .btn-danger:focus,
+.btn-danger:focus {
+    box-shadow: var(--shadow-focus);
+}
+
+body.ea .btn-outline-primary,
+.btn-outline,
+.btn-outline-primary {
+    background: transparent;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+}
+
+body.ea .btn-outline-primary:hover,
+.btn-outline:hover,
+.btn-outline-primary:hover {
+    background-color: var(--primary-subtle);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+body.ea .btn-outline-primary:focus,
+.btn-outline:focus,
+.btn-outline-primary:focus {
+    box-shadow: var(--shadow-focus);
+}
+
+.btn-outline-white {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-on-primary);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-outline-white:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-tertiary);
+}
+
+.btn-ghost:hover {
+    background-color: var(--primary-subtle);
+    color: var(--primary);
+}
+
+.btn-danger-ghost {
+    background: transparent;
+    color: var(--danger);
+}
+
+.btn-danger-ghost:hover {
+    background-color: var(--danger-subtle);
+}
+
+body.ea .btn-secondary,
+.btn-secondary {
+    background-color: var(--app-bg-alt);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+body.ea .btn-secondary:hover,
+.btn-secondary:hover {
+    background-color: var(--border-light);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+
+body.ea .btn-secondary:focus,
+.btn-secondary:focus {
+    box-shadow: var(--shadow-focus);
+}
+
+.action-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.action-btn i {
+    width: 15px;
+    height: 15px;
+}
+
+.action-btn:hover {
+    background-color: var(--primary-subtle);
+    color: var(--primary);
+}
+
+.action-btn.approve:hover {
+    background-color: var(--success-subtle);
+    color: var(--success);
+}
+
+.action-btn.reject:hover {
+    background-color: var(--danger-subtle);
+    color: var(--danger);
+}
+
+.action-btns {
+    display: flex;
+    gap: 4px;
+}
+
+body.ea .btn-quick-add,
+.btn-quick-add {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    border: none;
+    background-color: var(--cta);
+    color: var(--cta-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-quick-add:hover {
+    background-color: var(--cta-hover);
+}

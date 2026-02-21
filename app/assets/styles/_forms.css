@@ -1,0 +1,230 @@
+body.ea .form-control,
+body.ea .form-select,
+.form-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background-color: var(--app-surface-sunken);
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.15s ease;
+}
+
+body.ea .form-control:focus,
+body.ea .form-select:focus,
+.form-input:focus {
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-focus);
+}
+
+body.ea .form-control::placeholder,
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+body.ea .form-control:disabled,
+.form-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form-input-sm {
+    height: 34px;
+    font-size: 12px;
+}
+
+body.ea textarea.form-control,
+textarea.form-input {
+    height: auto;
+    min-height: 100px;
+    padding: 10px 12px;
+    resize: vertical;
+}
+
+body.ea .form-select,
+.form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B8080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+body.ea .form-label,
+.form-label {
+    display: block;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.form-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+body.ea .form-group {
+    margin-bottom: 20px;
+}
+
+body.ea .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.form-separator {
+    height: 1px;
+    background-color: var(--border-light);
+    margin: 20px 0;
+}
+
+body.ea .form-check-input,
+body.ea .form-check-input:checked {
+    accent-color: var(--primary);
+}
+
+body.ea .form-check-input:focus {
+    box-shadow: var(--shadow-focus);
+    border-color: var(--border-focus);
+}
+
+body.ea .has-error .form-control,
+body.ea .is-invalid {
+    border-color: var(--danger);
+    background-color: var(--danger-subtle);
+}
+
+body.ea .has-error .form-control:focus,
+body.ea .is-invalid:focus {
+    border-color: var(--danger);
+    box-shadow: var(--shadow-focus-danger);
+}
+
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.toggle-row:last-child {
+    border-bottom: none;
+}
+
+.toggle-info {
+    flex: 1;
+    min-width: 0;
+    padding-right: 16px;
+}
+
+.toggle-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.toggle-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggle-track {
+    position: absolute;
+    inset: 0;
+    background-color: var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background-color: var(--app-surface);
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.toggle-switch input:checked + .toggle-track {
+    background-color: var(--primary);
+}
+
+.toggle-switch input:checked + .toggle-track::after {
+    transform: translateX(20px);
+}
+
+.toggle-switch input:focus-visible + .toggle-track {
+    box-shadow: var(--shadow-focus);
+}
+
+.info-panel {
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.info-panel i {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.info-panel.info {
+    background-color: var(--primary-subtle);
+    color: var(--primary);
+    border-left: 3px solid var(--primary);
+}
+
+.info-panel.warn {
+    background-color: var(--pending-subtle);
+    color: var(--pending);
+    border-left: 3px solid var(--pending);
+}
+
+.info-panel.danger {
+    background-color: var(--danger-subtle);
+    color: var(--danger);
+    border-left: 3px solid var(--danger);
+}

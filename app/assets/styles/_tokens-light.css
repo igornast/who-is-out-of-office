@@ -58,13 +58,18 @@
     --shadow-md: 0 2px 8px rgba(42, 63, 79, 0.08);
     --shadow-lg: 0 4px 16px rgba(42, 63, 79, 0.12);
     --shadow-focus: 0 0 0 3px rgba(61, 155, 143, 0.25);
+    --shadow-focus-danger: 0 0 0 3px rgba(212, 85, 94, 0.25);
 
     --leave-vacation: #3D9B8F;
     --leave-sick: #D4555E;
     --leave-personal: #C5B8D9;
     --leave-remote: #7EC8BA;
     --leave-parental: #F5D5A8;
+    --leave-remote-subtle: rgba(126, 200, 186, 0.15);
+    --leave-personal-subtle: rgba(197, 184, 217, 0.2);
     --leave-other: #8A9E9E;
+
+    --cta-subtle: rgba(232, 135, 111, 0.12);
 
     --space-1: 0.25rem;
     --space-2: 0.5rem;

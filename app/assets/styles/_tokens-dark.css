@@ -58,11 +58,16 @@ html.dark {
     --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
     --shadow-focus: 0 0 0 3px rgba(79, 179, 166, 0.35);
+    --shadow-focus-danger: 0 0 0 3px rgba(224, 107, 115, 0.35);
 
     --leave-vacation: #4FB3A6;
     --leave-sick: #E06B73;
     --leave-personal: #D0C5E2;
     --leave-remote: #8ED8CC;
     --leave-parental: #F5D5A8;
+    --leave-remote-subtle: rgba(142, 216, 204, 0.1);
+    --leave-personal-subtle: rgba(208, 197, 226, 0.15);
     --leave-other: #7A9494;
+
+    --cta-subtle: rgba(232, 135, 111, 0.15);
 }

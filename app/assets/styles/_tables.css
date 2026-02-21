@@ -1,0 +1,186 @@
+body.ea .table-responsive,
+.table-wrapper {
+    overflow-x: auto;
+}
+
+body.ea table,
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+body.ea thead th,
+thead th {
+    padding: 10px 20px;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    background-color: var(--app-bg-alt);
+    border-bottom: 1px solid var(--border-light);
+}
+
+body.ea tbody td,
+tbody td {
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+}
+
+body.ea tbody tr,
+tbody tr {
+    transition: background-color 0.1s ease;
+}
+
+body.ea tbody tr:hover,
+tbody tr:hover {
+    background-color: var(--app-bg-alt);
+}
+
+body.ea tbody tr:last-child td,
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+body.ea .datagrid {
+    background-color: var(--app-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.table-card {
+    background-color: var(--app-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: background-color 0.2s ease;
+}
+
+.table-footer {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-light);
+}
+
+.table-footer-text {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.employee-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.employee-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-on-primary);
+    flex-shrink: 0;
+}
+
+.employee-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.employee-dept {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.leave-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.leave-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.checkbox-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox-cell input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+body.ea .datagrid-header-action,
+body.ea .datagrid .table > thead > tr > th {
+    background-color: var(--app-bg-alt);
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+body.ea .datagrid .table > tbody > tr > td {
+    border-bottom: 1px solid var(--border-light);
+    padding: 12px 16px;
+    vertical-align: middle;
+}
+
+body.ea .datagrid .table > tbody > tr:hover {
+    background-color: var(--app-bg-alt);
+}
+
+body.ea .datagrid .table > tbody > tr:last-child > td {
+    border-bottom: none;
+}
+
+.mini-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.mini-table th {
+    text-align: left;
+    padding: 8px 0;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.mini-table td {
+    padding: 10px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+}
+
+.mini-table tr:last-child td {
+    border-bottom: none;
+}

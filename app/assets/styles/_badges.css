@@ -1,0 +1,178 @@
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.status-approved {
+    background-color: var(--success-subtle);
+    color: var(--success);
+}
+
+.status-pending {
+    background-color: var(--pending-subtle);
+    color: var(--pending);
+}
+
+.status-rejected {
+    background-color: var(--danger-subtle);
+    color: var(--danger);
+}
+
+.badge-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--app-bg-alt);
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.leave-type-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+}
+
+.leave-type-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.whos-out-badge {
+    font-size: 10px;
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+}
+
+.badge-vacation {
+    background-color: var(--success-subtle);
+    color: var(--primary);
+}
+
+.badge-sick {
+    background-color: var(--danger-subtle);
+    color: var(--danger);
+}
+
+.badge-remote {
+    background-color: var(--leave-remote-subtle);
+    color: var(--primary-active);
+}
+
+html.dark .badge-remote {
+    color: var(--leave-remote);
+}
+
+.badge-personal {
+    background-color: var(--leave-personal-subtle);
+    color: var(--leave-personal);
+}
+
+.policy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    background-color: var(--primary-subtle);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.tag-remove {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0.6;
+    transition: opacity 0.1s;
+}
+
+.tag-remove:hover {
+    opacity: 1;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background-color: var(--app-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.filter-pill:hover {
+    background-color: var(--app-bg-alt);
+    border-color: var(--border);
+}
+
+.filter-pill.active {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--text-on-primary);
+}
+
+.filter-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+}
+
+.filter-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.member-badge {
+    background-color: var(--primary-subtle);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 600;
+}
