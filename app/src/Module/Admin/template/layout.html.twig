@@ -11,5 +11,40 @@
 
 {% block head_stylesheets %}
     {{ parent() }}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+{% endblock %}
+
+{% block head_javascript %}
+    {{ parent() }}
+    <script>
+        (function() {
+            var saved = localStorage.getItem('whosooo-theme');
+            var isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.dataset.bsTheme = 'dark';
+            } else {
+                document.documentElement.dataset.bsTheme = 'light';
+            }
+        })();
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+            document.addEventListener('turbo:load', function() {
+                lucide.createIcons();
+            });
+            document.addEventListener('turbo:frame-load', function() {
+                lucide.createIcons();
+            });
+        }
+    </script>
 {% endblock %}
