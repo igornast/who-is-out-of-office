@@ -90,14 +90,9 @@
     background-color: var(--app-surface-sunken);
 }
 
-html.dark .fc .fc-day-sat,
-html.dark .fc .fc-day-sun {
-    background-color: rgba(0, 0, 0, 0.08);
-}
-
 /* Today highlight */
 .fc .fc-day-today {
-    background-color: rgba(61, 155, 143, 0.04) !important;
+    background-color: var(--primary-subtle) !important;
 }
 
 .fc .fc-daygrid-day-number {
@@ -237,6 +232,11 @@ html.dark .fc .fc-day-sun {
     color: var(--primary);
 }
 
+.cal-subscribe-popover-close:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
 .cal-subscribe-popover-close i {
     width: 16px;
     height: 16px;
@@ -299,4 +299,49 @@ html.dark .fc .fc-day-sun {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+@media (max-width: 768px) {
+    #calendar {
+        padding: 12px;
+    }
+
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 16px;
+    }
+
+    .fc .fc-button {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .cal-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .cal-page-title {
+        font-size: 18px;
+    }
+
+    .cal-subscribe-popover-content {
+        width: 95%;
+        max-width: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cal-subscribe-popover-content {
+        animation: none;
+    }
+
+    .fc .fc-event {
+        transition: none;
+    }
 }

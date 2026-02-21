@@ -77,13 +77,13 @@
 .alert-primary {
     background-color: var(--primary-subtle);
     border-color: var(--primary);
-    color: var(--primary-active);
+    color: var(--primary);
 }
 
 .alert-success {
     background-color: var(--success-subtle);
     border-color: var(--success);
-    color: var(--primary-active);
+    color: var(--success);
 }
 
 .alert-danger {
@@ -101,7 +101,7 @@
 .alert-info {
     background-color: var(--primary-subtle);
     border-color: var(--primary);
-    color: var(--primary-active);
+    color: var(--primary);
 }
 
 /* Dark mode EasyAdmin synchronization */
@@ -122,4 +122,27 @@ html.dark {
 /* Smooth theme transition */
 body {
     transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-muted);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
 }

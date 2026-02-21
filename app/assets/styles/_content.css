@@ -27,3 +27,17 @@ body.ea .main-content .content-header {
 body.ea .main-content .content-body {
     color: var(--text-secondary);
 }
+
+@media (max-width: 768px) {
+    body.ea .main-content .content-wrapper {
+        padding: 16px;
+    }
+
+    body.ea .main-content .content-header .title {
+        font-size: 18px;
+    }
+
+    body.ea .main-content .content-top {
+        padding: 0 16px;
+    }
+}

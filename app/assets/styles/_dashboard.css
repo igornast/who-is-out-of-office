@@ -130,3 +130,28 @@
         grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 768px) {
+    .welcome-banner {
+        padding: 20px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .welcome-text h2 {
+        font-size: 20px;
+    }
+
+    .welcome-illustration {
+        display: none;
+    }
+
+    .welcome-actions {
+        flex-wrap: wrap;
+    }
+
+    .dashboard-recent-requests thead th,
+    .dashboard-recent-requests tbody td {
+        padding: 10px 12px;
+    }
+}

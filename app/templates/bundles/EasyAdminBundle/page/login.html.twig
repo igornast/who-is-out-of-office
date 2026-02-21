@@ -11,51 +11,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body.ea-login {
-            font-family: 'Sora', -apple-system, sans-serif;
-            background-color: #FAFCFB;
+            font-family: var(--font-body);
+            background-color: var(--app-bg);
         }
         .ea-login .wrapper {
-            background: linear-gradient(135deg, #3D9B8F 0%, #2A3F4F 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--sidebar-bg) 100%);
         }
         .ea-login .login-form {
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(42, 63, 79, 0.12);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            background-color: var(--app-surface);
         }
         .ea-login .login-form h1 {
-            font-family: 'Crimson Pro', Georgia, serif;
+            font-family: var(--font-display);
             font-weight: 600;
+            color: var(--text-primary);
         }
         .ea-login .login-form .form-control {
-            border-radius: 6px;
-            border: 1px solid #D5DDD9;
-            background: #F3F8F7;
-            font-family: 'Sora', -apple-system, sans-serif;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--app-surface-sunken);
+            color: var(--text-primary);
+            font-family: var(--font-body);
             transition: all 0.15s ease;
         }
         .ea-login .login-form .form-control:focus {
-            border-color: #3D9B8F;
-            box-shadow: 0 0 0 3px rgba(61, 155, 143, 0.25);
+            border-color: var(--border-focus);
+            box-shadow: var(--shadow-focus);
         }
         .ea-login .login-form .btn-primary {
-            background-color: #3D9B8F;
-            border-color: #3D9B8F;
-            border-radius: 8px;
-            font-family: 'Sora', -apple-system, sans-serif;
+            background-color: var(--primary);
+            border-color: var(--primary);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
             font-weight: 500;
             transition: all 0.15s ease;
         }
         .ea-login .login-form .btn-primary:hover {
-            background-color: #348A7F;
-            border-color: #348A7F;
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
         .ea-login .login-form .btn-primary:focus {
-            box-shadow: 0 0 0 3px rgba(61, 155, 143, 0.25);
+            box-shadow: var(--shadow-focus);
         }
         .ea-login .login-form label {
-            font-family: 'Sora', -apple-system, sans-serif;
+            font-family: var(--font-body);
             font-size: 13px;
             font-weight: 500;
-            color: #3A4A4A;
+            color: var(--text-secondary);
         }
     </style>
 {% endblock %}

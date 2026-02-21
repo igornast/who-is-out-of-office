@@ -22,10 +22,10 @@
 {% block main %}
     <div id="calendar"></div>
 
-    <div id="cal-subscribe-popover" class="cal-subscribe-popover">
+    <div id="cal-subscribe-popover" class="cal-subscribe-popover" role="dialog" aria-modal="true" aria-labelledby="cal-subscribe-title">
         <div class="cal-subscribe-popover-content">
             <div class="cal-subscribe-popover-header">
-                <h3>{{ 'calendar.subscription.title'|trans(domain: 'admin') }}</h3>
+                <h3 id="cal-subscribe-title">{{ 'calendar.subscription.title'|trans(domain: 'admin') }}</h3>
                 <button class="cal-subscribe-popover-close" id="cal-subscribe-close" type="button" aria-label="Close">
                     <i data-lucide="x"></i>
                 </button>

@@ -1,44 +1,38 @@
-/* ============================================
-   ERROR PAGES — Design Token Based
-   ============================================ */
+@import './_tokens-light.css';
 
-/* Full viewport container with gradient background */
 .error-fullscreen {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Sora', -apple-system, sans-serif;
+    font-family: var(--font-body);
 }
 
-/* Gradient backgrounds using design tokens */
 .gradient-purple {
-    background: linear-gradient(135deg, #3D9B8F 0%, #2A7A72 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
 }
 
 .gradient-pink {
-    background: linear-gradient(135deg, #E8876F 0%, #D4755D 100%);
+    background: linear-gradient(135deg, var(--cta) 0%, var(--cta-hover) 100%);
 }
 
 .gradient-blue {
-    background: linear-gradient(135deg, #3D9B8F 0%, #2A3F4F 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--sidebar-bg) 100%);
 }
 
-/* Glass card */
 .glass-card {
     text-align: center;
-    color: #FFFFFF;
+    color: var(--text-on-primary);
     padding: 48px 40px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(42, 63, 79, 0.12);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Error code styling */
 .error-code-large {
-    font-family: 'Crimson Pro', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 120px;
     font-weight: 700;
     line-height: 1;
@@ -50,16 +44,21 @@
     animation: float 3s ease-in-out infinite;
 }
 
-/* Error text */
+@media (prefers-reduced-motion: reduce) {
+    .error-code-animated {
+        animation: none;
+    }
+}
+
 .error-title {
-    font-family: 'Crimson Pro', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 28px;
     font-weight: 600;
     margin-bottom: 12px;
 }
 
 .error-description {
-    font-family: 'Sora', -apple-system, sans-serif;
+    font-family: var(--font-body);
     font-size: 15px;
     opacity: 0.85;
     margin-bottom: 28px;
@@ -67,45 +66,42 @@
     line-height: 1.6;
 }
 
-/* Button styling */
 .btn-glass {
     background: rgba(255, 255, 255, 0.9);
-    color: #2A3F4F;
+    color: var(--sidebar-bg);
     padding: 10px 32px;
-    border-radius: 9999px;
+    border-radius: var(--radius-full);
     text-decoration: none;
-    font-family: 'Sora', -apple-system, sans-serif;
+    font-family: var(--font-body);
     font-weight: 500;
     font-size: 13px;
     display: inline-block;
     transition: all 0.15s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
     border: none;
     cursor: pointer;
 }
 
 .btn-glass:hover {
-    background: #FFFFFF;
+    background: var(--text-on-primary);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg);
     text-decoration: none;
-    color: #2A3F4F;
+    color: var(--sidebar-bg);
 }
 
-/* Color variants */
 .btn-purple,
 .btn-pink,
 .btn-blue {
-    color: #2A3F4F;
+    color: var(--sidebar-bg);
 }
 
 .btn-purple:hover,
 .btn-pink:hover,
 .btn-blue:hover {
-    color: #1A2E2E;
+    color: var(--text-primary);
 }
 
-/* Animations */
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-15px); }

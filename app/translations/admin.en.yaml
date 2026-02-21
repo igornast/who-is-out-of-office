@@ -21,6 +21,8 @@ sidebar:
         settings: Settings
         account: Account
     theme_toggle: Toggle dark mode
+    collapse: Toggle sidebar
+    menu: Open menu
 
 
 

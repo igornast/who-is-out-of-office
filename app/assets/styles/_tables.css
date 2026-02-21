@@ -184,3 +184,41 @@ body.ea .datagrid .table > tbody > tr:last-child > td {
 .mini-table tr:last-child td {
     border-bottom: none;
 }
+
+@media (max-width: 768px) {
+    body.ea .table-responsive,
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body.ea thead th,
+    thead th {
+        padding: 8px 12px;
+        font-size: 10px;
+    }
+
+    body.ea tbody td,
+    tbody td {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    body.ea .datagrid .table > thead > tr > th {
+        padding: 8px 12px;
+    }
+
+    body.ea .datagrid .table > tbody > tr > td {
+        padding: 10px 12px;
+    }
+
+    .employee-cell {
+        gap: 6px;
+    }
+
+    .employee-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+}

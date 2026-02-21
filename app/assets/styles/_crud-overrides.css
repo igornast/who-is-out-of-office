@@ -157,8 +157,77 @@ body.ea .modal-content {
 
 body.ea .modal-header {
     border-bottom: 1px solid var(--border-light);
+    background-color: var(--app-surface);
+    color: var(--text-primary);
 }
 
 body.ea .modal-footer {
     border-top: 1px solid var(--border-light);
+    background-color: var(--app-surface-sunken);
+}
+
+body.ea .modal-title {
+    color: var(--text-primary);
+}
+
+body.ea .modal-body {
+    background-color: var(--app-surface);
+    color: var(--text-secondary);
+}
+
+body.ea .dropdown-menu {
+    background-color: var(--app-surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-md);
+}
+
+body.ea .dropdown-item {
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 13px;
+}
+
+body.ea .dropdown-item:hover,
+body.ea .dropdown-item:focus {
+    background-color: var(--primary-subtle);
+    color: var(--primary);
+}
+
+body.ea .dropdown-divider {
+    border-color: var(--border-light);
+}
+
+body.ea .toast {
+    background-color: var(--app-surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    color: var(--text-primary);
+}
+
+body.ea .toast-header {
+    background-color: var(--app-surface-sunken);
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    body.ea .list-pagination {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px 16px;
+    }
+
+    body.ea .form-action-search .form-control {
+        width: 100%;
+    }
+
+    body.ea .content-header-title .title {
+        font-size: 18px;
+    }
+
+    body.ea .global-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
 }

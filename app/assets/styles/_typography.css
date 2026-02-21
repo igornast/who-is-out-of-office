@@ -77,3 +77,9 @@ a {
 a:hover {
     color: var(--text-link-hover);
 }
+
+a:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+    border-radius: var(--radius-sm);
+}

@@ -2,6 +2,7 @@ body.ea .sidebar-wrapper {
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
     flex-shrink: 0;
+    transition: width 0.25s ease, min-width 0.25s ease;
 }
 
 body.ea .sidebar-wrapper .sidebar {
@@ -12,7 +13,7 @@ body.ea .sidebar-wrapper .sidebar {
     left: 0;
     bottom: 0;
     z-index: 100;
-    transition: background-color 0.25s ease;
+    transition: width 0.25s ease, background-color 0.25s ease;
     padding: 0;
     border-right: none;
     overflow: visible;
@@ -26,11 +27,16 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow: hidden;
 }
 
 .ooo-sidebar-logo {
     padding: 20px 20px 16px;
     border-bottom: 1px solid var(--sidebar-divider);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 62px;
 }
 
 .ooo-sidebar-logo h1 {
@@ -41,6 +47,8 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
     letter-spacing: -0.3px;
     margin: 0;
     line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .ooo-sidebar-logo h1 a {
@@ -50,6 +58,38 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
 
 .ooo-sidebar-logo h1 span {
     color: var(--sidebar-icon);
+}
+
+.ooo-sidebar-collapse-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--sidebar-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.ooo-sidebar-collapse-btn:hover {
+    background: var(--sidebar-bg-hover);
+    color: var(--sidebar-text-hover);
+}
+
+.ooo-sidebar-collapse-btn:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--sidebar-icon);
+}
+
+.ooo-sidebar-collapse-btn i {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.25s ease;
 }
 
 .ooo-sidebar-nav {
@@ -70,6 +110,9 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
     opacity: 0.55;
     padding: 16px 12px 6px;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: opacity 0.2s ease;
 }
 
 .ooo-sidebar-item {
@@ -87,6 +130,8 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
     transition: all 0.15s ease;
     margin-bottom: 2px;
     position: relative;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .ooo-sidebar-item i {
@@ -101,6 +146,11 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
     background: var(--sidebar-bg-hover);
     color: var(--sidebar-text-hover);
     text-decoration: none;
+}
+
+.ooo-sidebar-item:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--sidebar-icon);
 }
 
 .ooo-sidebar-item:hover i {
@@ -163,6 +213,7 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
 .ooo-sidebar-user-info {
     flex: 1;
     min-width: 0;
+    overflow: hidden;
 }
 
 .ooo-sidebar-user-name {
@@ -194,11 +245,17 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
     justify-content: center;
     transition: all 0.15s ease;
     padding: 0;
+    flex-shrink: 0;
 }
 
 .ooo-theme-toggle:hover {
     background: var(--sidebar-bg-hover);
     color: var(--sidebar-text-hover);
+}
+
+.ooo-theme-toggle:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--sidebar-icon);
 }
 
 .ooo-theme-toggle i {
@@ -233,4 +290,153 @@ html.dark .ooo-theme-toggle .icon-moon {
     border-radius: 10px;
     min-width: 20px;
     text-align: center;
+}
+
+.ooo-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    backdrop-filter: blur(2px);
+    transition: opacity 0.25s ease;
+    opacity: 0;
+}
+
+.ooo-sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.ooo-mobile-toggle {
+    display: none;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: transparent;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.ooo-mobile-toggle:hover {
+    background: var(--primary-subtle);
+    color: var(--primary);
+}
+
+.ooo-mobile-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+.ooo-mobile-toggle i {
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-collapsed .ooo-sidebar-collapse-btn i {
+    transform: rotate(180deg);
+}
+
+.sidebar-collapsed .ooo-sidebar-logo h1 {
+    opacity: 0;
+    width: 0;
+}
+
+.sidebar-collapsed .ooo-sidebar-section-label {
+    opacity: 0;
+    height: 12px;
+    padding: 6px 0;
+}
+
+.sidebar-collapsed .ooo-sidebar-item {
+    justify-content: center;
+    padding: 9px 0;
+}
+
+.sidebar-collapsed .ooo-sidebar-label {
+    display: none;
+}
+
+.sidebar-collapsed .ooo-sidebar-item::before {
+    display: none;
+}
+
+.sidebar-collapsed .ooo-sidebar-footer {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 8px;
+}
+
+.sidebar-collapsed .ooo-sidebar-user-info {
+    display: none;
+}
+
+.sidebar-collapsed .ooo-sidebar-badge {
+    display: none;
+}
+
+.sidebar-collapsed .ooo-sidebar-logo {
+    justify-content: center;
+    padding: 20px 8px 16px;
+}
+
+.sidebar-collapsed .ooo-sidebar-collapse-btn {
+    margin: 0;
+}
+
+.sidebar-collapsed .ooo-sidebar-nav {
+    padding: 12px 6px;
+}
+
+body.ea .sidebar-wrapper.sidebar-collapsed {
+    width: var(--sidebar-collapsed);
+    min-width: var(--sidebar-collapsed);
+}
+
+body.ea .sidebar-wrapper.sidebar-collapsed .sidebar {
+    width: var(--sidebar-collapsed);
+}
+
+.sidebar-collapsed .ooo-sidebar-item[title] {
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    body.ea .sidebar-wrapper {
+        width: 0;
+        min-width: 0;
+    }
+
+    body.ea .sidebar-wrapper .sidebar {
+        width: var(--sidebar-width);
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+    }
+
+    body.ea .sidebar-wrapper.sidebar-mobile-open .sidebar {
+        transform: translateX(0);
+    }
+
+    .ooo-sidebar-collapse-btn {
+        display: none;
+    }
+
+    .ooo-mobile-toggle {
+        display: flex;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.ea .sidebar-wrapper,
+    body.ea .sidebar-wrapper .sidebar,
+    .ooo-sidebar-collapse-btn i,
+    .ooo-sidebar-section-label,
+    .ooo-sidebar-overlay {
+        transition: none;
+    }
 }
