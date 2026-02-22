@@ -29,6 +29,9 @@
             } else {
                 document.documentElement.dataset.bsTheme = 'light';
             }
+            if (window.innerWidth > 768 && localStorage.getItem('whosooo-sidebar') === 'collapsed') {
+                document.documentElement.classList.add('sidebar-collapsed');
+            }
         })();
     </script>
     <script src="https://unpkg.com/lucide@0.575.0/dist/umd/lucide.min.js" integrity="sha384-GzE8qT1LzDfRNjtvLN/dXDLPlJOB3BBom3Twb9/RwHkXCgNl6OU1pBxM9397HWGU" crossorigin="anonymous"></script>

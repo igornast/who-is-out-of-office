@@ -11,7 +11,6 @@ export default class extends Controller {
             return;
         }
         this.createOverlay();
-        this.applyState(this.isCollapsed());
         this.mediaQuery = window.matchMedia('(max-width: 768px)');
         this.boundHandleResize = this.handleResize.bind(this);
         this.boundToggleFromEvent = this.toggle.bind(this);
@@ -70,7 +69,7 @@ export default class extends Controller {
 
     handleResize() {
         if (this.mediaQuery.matches) {
-            this.wrapper.classList.remove('sidebar-collapsed');
+            document.documentElement.classList.remove('sidebar-collapsed');
             this.closeMobile();
         } else {
             this.wrapper.classList.remove('sidebar-mobile-open');
@@ -88,9 +87,9 @@ export default class extends Controller {
 
     applyState(collapsed) {
         if (collapsed) {
-            this.wrapper.classList.add('sidebar-collapsed');
+            document.documentElement.classList.add('sidebar-collapsed');
         } else {
-            this.wrapper.classList.remove('sidebar-collapsed');
+            document.documentElement.classList.remove('sidebar-collapsed');
         }
     }
 }

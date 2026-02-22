@@ -338,75 +338,75 @@ html.dark .ooo-theme-toggle .icon-moon {
     height: 20px;
 }
 
-.sidebar-collapsed .ooo-sidebar-collapse-btn i {
+html.sidebar-collapsed .ooo-sidebar-collapse-btn i {
     transform: rotate(180deg);
 }
 
-.sidebar-collapsed .ooo-sidebar-logo h1 {
+html.sidebar-collapsed .ooo-sidebar-logo h1 {
     opacity: 0;
     width: 0;
 }
 
-.sidebar-collapsed .ooo-sidebar-section-label {
+html.sidebar-collapsed .ooo-sidebar-section-label {
     opacity: 0;
     height: 12px;
     padding: 6px 0;
 }
 
-.sidebar-collapsed .ooo-sidebar-item {
+html.sidebar-collapsed .ooo-sidebar-item {
     justify-content: center;
     padding: 9px 0;
 }
 
-.sidebar-collapsed .ooo-sidebar-label {
+html.sidebar-collapsed .ooo-sidebar-label {
     display: none;
 }
 
-.sidebar-collapsed .ooo-sidebar-item::before {
+html.sidebar-collapsed .ooo-sidebar-item::before {
     display: none;
 }
 
-.sidebar-collapsed .ooo-sidebar-footer {
+html.sidebar-collapsed .ooo-sidebar-footer {
     flex-direction: column;
     gap: 8px;
     padding: 12px 8px;
 }
 
-.sidebar-collapsed .ooo-sidebar-user-info {
+html.sidebar-collapsed .ooo-sidebar-user-info {
     display: none;
 }
 
-.sidebar-collapsed .ooo-sidebar-badge {
+html.sidebar-collapsed .ooo-sidebar-badge {
     display: none;
 }
 
-.sidebar-collapsed .ooo-sidebar-logo {
+html.sidebar-collapsed .ooo-sidebar-logo {
     justify-content: center;
     padding: 20px 8px 16px;
 }
 
-.sidebar-collapsed .ooo-sidebar-collapse-btn {
+html.sidebar-collapsed .ooo-sidebar-collapse-btn {
     margin: 0;
 }
 
-.sidebar-collapsed .ooo-sidebar-nav {
+html.sidebar-collapsed .ooo-sidebar-nav {
     padding: 12px 6px;
 }
 
-body.ea .sidebar-wrapper.sidebar-collapsed {
+html.sidebar-collapsed body.ea .sidebar-wrapper {
     width: var(--sidebar-collapsed);
     min-width: var(--sidebar-collapsed);
 }
 
-body.ea .sidebar-wrapper.sidebar-collapsed .sidebar {
+html.sidebar-collapsed body.ea .sidebar-wrapper .sidebar {
     width: var(--sidebar-collapsed);
 }
 
-body.ea .wrapper:has(.sidebar-wrapper.sidebar-collapsed) {
+html.sidebar-collapsed body.ea .wrapper {
     grid-template-columns: var(--sidebar-collapsed) auto;
 }
 
-.sidebar-collapsed .ooo-sidebar-item[title] {
+html.sidebar-collapsed .ooo-sidebar-item[title] {
     position: relative;
 }
 
