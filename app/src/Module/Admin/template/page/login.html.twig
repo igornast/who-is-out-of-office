@@ -154,7 +154,7 @@
             var saved = localStorage.getItem('whosooo-theme');
             var isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
             if (isDark) {
-                document.documentElement.classList.add('dark');
+                document.documentElement.classList.add('dark', 'ea-dark-scheme');
                 document.documentElement.dataset.bsTheme = 'dark';
             }
         })();
@@ -167,7 +167,7 @@
         </div>
 
         <div class="login-card">
-            <h2>Sign in</h2>
+            <h2>{{ _sign_in_label }}</h2>
 
             {% if error|default(false) %}
                 <div class="alert-error">

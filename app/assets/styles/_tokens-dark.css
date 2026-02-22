@@ -71,4 +71,7 @@ html.dark {
     --leave-other: #7A9494;
 
     --cta-subtle: rgba(232, 135, 111, 0.15);
+
+    --avatar-placeholder-bg: #2E5252;
+    --avatar-placeholder-color: #7EC8BA;
 }

@@ -410,6 +410,13 @@ body.ea .wrapper:has(.sidebar-wrapper.sidebar-collapsed) {
     position: relative;
 }
 
+@media (min-width: 769px) and (max-width: 991px) {
+    body.ea .wrapper {
+        display: grid;
+        grid-template-columns: var(--sidebar-width) auto;
+    }
+}
+
 @media (max-width: 768px) {
     body.ea .sidebar-wrapper {
         width: 0;

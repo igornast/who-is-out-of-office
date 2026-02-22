@@ -72,6 +72,9 @@
 
     --cta-subtle: rgba(232, 135, 111, 0.12);
 
+    --avatar-placeholder-bg: #D0E8E4;
+    --avatar-placeholder-color: #2A7A72;
+
     --space-1: 0.25rem;
     --space-2: 0.5rem;
     --space-3: 0.75rem;

@@ -124,12 +124,18 @@ body.ea .content-header:has(.welcome-banner) {
     display: grid;
     grid-template-columns: 1fr 340px;
     gap: 20px;
+    min-width: 0;
+}
+
+.dashboard-left-column {
+    min-width: 0;
 }
 
 .dashboard-right-column {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-width: 0;
 }
 
 @media (max-width: 1200px) {

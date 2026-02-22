@@ -2,7 +2,7 @@
 
 /* avatar */
 .avatar-img {
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-full);
     height: 65px;
     width: 65px;
     object-fit: cover;
@@ -11,14 +11,34 @@
 .avatar-placeholder {
     height: 65px;
     width: 65px;
-    padding: 0 !important;
+    border-radius: var(--radius-full);
+    background: var(--avatar-placeholder-bg);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 20px;
+    font-weight: 600;
 }
+
+.avatar-placeholder:hover {
+    opacity: 0.85;
+    color: #fff;
+    text-decoration: none;
+}
+
+.avatar-color-0 { background: #3D9B8F; }
+.avatar-color-1 { background: #E8876F; }
+.avatar-color-2 { background: #D4A843; }
+.avatar-color-3 { background: #8B7BAE; }
+.avatar-color-4 { background: #5B8A72; }
+.avatar-color-5 { background: #7A8A9E; }
 
 .avatar-placeholder-text {
     text-align: center;
-    width: 100%;
-    height: 100%;
-    line-height: 63px;
+    line-height: 1;
 }
 
 /* new leave request */
