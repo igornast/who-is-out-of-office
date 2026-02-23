@@ -58,4 +58,6 @@ interface LeaveRequestFacadeInterface
     public function countOnLeaveToday(): int;
 
     public function countAbsencesThisWeek(): int;
+
+    public function countAllPendingRequests(): int;
 }

@@ -46,6 +46,7 @@ dashboard:
         empty: No upcoming absences
     stats:
         pending_requests: Pending Requests
+        awaiting_approval: Awaiting Approval
         on_leave_today: On Leave Today
         team_members: Team Members
         absences_this_week: Absences This Week
@@ -53,6 +54,9 @@ dashboard:
         days: days
     welcome:
         greeting: 'Good morning, %name%'
+        greeting_morning: Good morning
+        greeting_afternoon: Good afternoon
+        greeting_evening: Good evening
         balance: 'You have %days% vacation days remaining this year'
         request_leave: Request Leave
         view_calendar: View Calendar

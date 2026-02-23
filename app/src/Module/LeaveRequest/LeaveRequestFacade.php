@@ -9,6 +9,7 @@ use App\Module\LeaveRequest\UseCase\Command\SaveLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Query\CalculateWorkDaysQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAbsencesThisWeekQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\CountAllPendingRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountOnLeaveTodayQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserIdQueryHandler;
@@ -40,6 +41,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetPendingLeaveRequestsQueryHandler $getPendingLeaveRequestsHandler,
         private readonly CountOnLeaveTodayQueryHandler $countOnLeaveTodayHandler,
         private readonly CountAbsencesThisWeekQueryHandler $countAbsencesThisWeekHandler,
+        private readonly CountAllPendingRequestsQueryHandler $countAllPendingRequestsHandler,
     ) {
     }
 
@@ -136,5 +138,10 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function countAbsencesThisWeek(): int
     {
         return $this->countAbsencesThisWeekHandler->handle();
+    }
+
+    public function countAllPendingRequests(): int
+    {
+        return $this->countAllPendingRequestsHandler->handle();
     }
 }

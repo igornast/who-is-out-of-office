@@ -238,6 +238,20 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         return $count;
     }
 
+    public function countAllPendingRequests(): int
+    {
+        $qb = $this->createQueryBuilder('lr');
+
+        /** @var int $count */
+        $count = $qb->select('COUNT(lr.id)')
+            ->where('lr.status = :pending')
+            ->setParameter('pending', LeaveRequestStatusEnum::Pending->value)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $count;
+    }
+
     public function delete(LeaveRequestDTO $leaveRequestDTO): void
     {
         $qb = $this->createQueryBuilder('lr');

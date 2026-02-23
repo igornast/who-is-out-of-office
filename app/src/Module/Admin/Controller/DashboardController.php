@@ -51,6 +51,7 @@ class DashboardController extends AbstractDashboardController
         $parameters = [
             'user' => $user,
             'is_admin' => $this->isAdmin(),
+            'is_manager' => $this->isGranted(RoleEnum::Manager->value),
             'my_team' => $this->userFacade->getTeamMembersForUserId($userId),
             'users_with_birthdays' => $this->userFacade->getUsersWithIncomingBirthdays(),
             'users_with_work_anniversaries' => $this->userFacade->getUsersWithIncomingWorkAnniversaries(),
@@ -59,6 +60,7 @@ class DashboardController extends AbstractDashboardController
                 [LeaveRequestStatusEnum::Pending]
             ),
             'upcoming_absences_in_team' => $this->leaveRequestFacade->getUpcomingLeaveRequests(),
+            'all_pending_requests_count' => $this->leaveRequestFacade->countAllPendingRequests(),
             'on_leave_today' => $this->leaveRequestFacade->countOnLeaveToday(),
             'absences_this_week' => $this->leaveRequestFacade->countAbsencesThisWeek(),
             'slack_integration' => $user->slackIntegration,

@@ -12,18 +12,33 @@
         {% set today = "now"|date("Y-m-d") ~ 'T00:00' %}
         {% set monday = "monday this week"|date("Y-m-d") ~ 'T00:00' %}
         {% set sunday = "sunday this week"|date("Y-m-d") ~ 'T23:59' %}
-        <a class="stat-card stat-card-link"
-           href="{{ ea_url().setController(lr_crud).setAction('index').set('filters', {
-               'status': {'comparison': '=', 'value': 0}
-           }) }}">
-            <div class="stat-header">
-                <div class="stat-icon sand">
-                    <i data-lucide="clock"></i>
+        {% if is_admin or is_manager %}
+            <a class="stat-card stat-card-link"
+               href="{{ ea_url().setController(lr_crud).setAction('index').set('filters', {
+                   'status': {'comparison': '=', 'value': 0}
+               }) }}">
+                <div class="stat-header">
+                    <div class="stat-icon sand">
+                        <i data-lucide="inbox"></i>
+                    </div>
                 </div>
-            </div>
-            <div class="stat-value">{{ pending_requests|length }}</div>
-            <div class="stat-label">{{ 'dashboard.stats.pending_requests'|trans(domain: 'admin') }}</div>
-        </a>
+                <div class="stat-value">{{ all_pending_requests_count }}</div>
+                <div class="stat-label">{{ 'dashboard.stats.awaiting_approval'|trans(domain: 'admin') }}</div>
+            </a>
+        {% else %}
+            <a class="stat-card stat-card-link"
+               href="{{ ea_url().setController(lr_crud).setAction('index').set('filters', {
+                   'status': {'comparison': '=', 'value': 0}
+               }) }}">
+                <div class="stat-header">
+                    <div class="stat-icon sand">
+                        <i data-lucide="clock"></i>
+                    </div>
+                </div>
+                <div class="stat-value">{{ pending_requests|length }}</div>
+                <div class="stat-label">{{ 'dashboard.stats.pending_requests'|trans(domain: 'admin') }}</div>
+            </a>
+        {% endif %}
         <a class="stat-card stat-card-link"
            href="{{ ea_url().setController(lr_crud).setAction('index').set('filters', {
                'status': {'comparison': '=', 'value': 1},
@@ -68,10 +83,11 @@
     <div class="dashboard-grid">
         <div class="dashboard-left-column">
             {% include '@AppAdmin/dashboard/_upcoming_absences.html.twig' %}
-            <div style="margin-top: 20px;">
-
-                {% include '@AppAdmin/dashboard/_recent_requests.html.twig' %}
-            </div>
+            {% if is_admin or is_manager %}
+                <div style="margin-top: 20px;">
+                    {% include '@AppAdmin/dashboard/_recent_requests.html.twig' %}
+                </div>
+            {% endif %}
 
             <div style="margin-top: 20px;">
                 {% include '@AppAdmin/dashboard/_my_team.html.twig' %}

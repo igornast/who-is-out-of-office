@@ -1,6 +1,11 @@
 <div class="welcome-banner">
     <div class="welcome-text">
-        <h2>{{ 'dashboard.welcome.greeting'|trans({'%name%': user.firstName}, domain: 'admin') }}</h2>
+        <h2 data-controller="greeting"
+            data-greeting-name-value="{{ user.firstName }}"
+            data-greeting-morning-value="{{ 'dashboard.welcome.greeting_morning'|trans(domain: 'admin') }}"
+            data-greeting-afternoon-value="{{ 'dashboard.welcome.greeting_afternoon'|trans(domain: 'admin') }}"
+            data-greeting-evening-value="{{ 'dashboard.welcome.greeting_evening'|trans(domain: 'admin') }}"
+        >{{ 'dashboard.welcome.greeting'|trans({'%name%': user.firstName}, domain: 'admin') }}</h2>
         <p>{{ 'dashboard.welcome.balance'|trans({'%days%': user.currentLeaveBalance}, domain: 'admin') }}</p>
         <div class="welcome-actions">
             <a class="btn btn-cta"

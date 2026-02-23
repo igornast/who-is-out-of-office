@@ -47,6 +47,8 @@ interface LeaveRequestRepositoryInterface
 
     public function countAbsencesThisWeek(): int;
 
+    public function countAllPendingRequests(): int;
+
     public function beginTransaction(): void;
 
     public function commit(): void;
