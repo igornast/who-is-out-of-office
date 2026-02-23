@@ -8,7 +8,14 @@
 
 {% block main %}
     <div class="stats-grid">
-        <div class="stat-card">
+        {% set lr_crud = 'App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController' %}
+        {% set today = "now"|date("Y-m-d") ~ 'T00:00' %}
+        {% set monday = "monday this week"|date("Y-m-d") ~ 'T00:00' %}
+        {% set sunday = "sunday this week"|date("Y-m-d") ~ 'T23:59' %}
+        <a class="stat-card stat-card-link"
+           href="{{ ea_url().setController(lr_crud).setAction('index').set('filters', {
+               'status': {'comparison': '=', 'value': 0}
+           }) }}">
             <div class="stat-header">
                 <div class="stat-icon sand">
                     <i data-lucide="clock"></i>
@@ -16,8 +23,13 @@
             </div>
             <div class="stat-value">{{ pending_requests|length }}</div>
             <div class="stat-label">{{ 'dashboard.stats.pending_requests'|trans(domain: 'admin') }}</div>
-        </div>
-        <div class="stat-card">
+        </a>
+        <a class="stat-card stat-card-link"
+           href="{{ ea_url().setController(lr_crud).setAction('index').set('filters', {
+               'status': {'comparison': '=', 'value': 1},
+               'startDate': {'comparison': '<=', 'value': today, 'value2': ''},
+               'endDate': {'comparison': '>=', 'value': today, 'value2': ''}
+           }) }}">
             <div class="stat-header">
                 <div class="stat-icon teal">
                     <i data-lucide="user-check"></i>
@@ -25,8 +37,13 @@
             </div>
             <div class="stat-value">{{ on_leave_today }}</div>
             <div class="stat-label">{{ 'dashboard.stats.on_leave_today'|trans(domain: 'admin') }}</div>
-        </div>
-        <div class="stat-card">
+        </a>
+        <a class="stat-card stat-card-link"
+           href="{{ ea_url().setController(lr_crud).setAction('index').set('filters', {
+               'status': {'comparison': '=', 'value': 1},
+               'startDate': {'comparison': '<=', 'value': sunday, 'value2': ''},
+               'endDate': {'comparison': '>=', 'value': monday, 'value2': ''}
+           }) }}">
             <div class="stat-header">
                 <div class="stat-icon lavender">
                     <i data-lucide="calendar-range"></i>
@@ -34,7 +51,7 @@
             </div>
             <div class="stat-value">{{ absences_this_week }}</div>
             <div class="stat-label">{{ 'dashboard.stats.absences_this_week'|trans(domain: 'admin') }}</div>
-        </div>
+        </a>
         <div class="stat-card">
             <div class="stat-header">
                 <div class="stat-icon sand">

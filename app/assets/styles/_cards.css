@@ -53,6 +53,12 @@ body.ea .card-body,
     transition: all 0.2s ease;
 }
 
+a.stat-card-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
 .stat-card:hover {
     box-shadow: var(--shadow-md);
     transform: translateY(-1px);

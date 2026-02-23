@@ -92,6 +92,8 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             return $filters
                 ->add(ChoiceFilter::new('status')->setChoices(LeaveRequestStatusEnum::getChoices()))
                 ->add('user')
+                ->add('startDate')
+                ->add('endDate')
                 ->add('leaveType');
         }
 
