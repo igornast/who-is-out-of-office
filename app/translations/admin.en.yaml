@@ -46,7 +46,7 @@ dashboard:
         empty: No upcoming absences
     stats:
         pending_requests: Pending Requests
-        upcoming_absences: Upcoming Absences
+        on_leave_today: On Leave Today
         team_members: Team Members
         absences_this_week: Absences This Week
         vacation_balance: My Vacation Balance

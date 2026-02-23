@@ -198,6 +198,46 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
     }
 
+    public function countOnLeaveToday(): int
+    {
+        $today = new \DateTimeImmutable('today');
+
+        $qb = $this->createQueryBuilder('lr');
+
+        /** @var int $count */
+        $count = $qb->select('COUNT(DISTINCT IDENTITY(lr.user))')
+            ->where('lr.status = :approved')
+            ->andWhere('lr.startDate <= :today')
+            ->andWhere('lr.endDate >= :today')
+            ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
+            ->setParameter('today', $today)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $count;
+    }
+
+    public function countAbsencesThisWeek(): int
+    {
+        $monday = new \DateTimeImmutable('monday this week');
+        $sunday = new \DateTimeImmutable('sunday this week');
+
+        $qb = $this->createQueryBuilder('lr');
+
+        /** @var int $count */
+        $count = $qb->select('COUNT(DISTINCT IDENTITY(lr.user))')
+            ->where('lr.status = :approved')
+            ->andWhere('lr.startDate <= :sunday')
+            ->andWhere('lr.endDate >= :monday')
+            ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
+            ->setParameter('sunday', $sunday)
+            ->setParameter('monday', $monday)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $count;
+    }
+
     public function delete(LeaveRequestDTO $leaveRequestDTO): void
     {
         $qb = $this->createQueryBuilder('lr');

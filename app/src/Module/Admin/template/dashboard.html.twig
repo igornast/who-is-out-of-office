@@ -23,20 +23,16 @@
                     <i data-lucide="user-check"></i>
                 </div>
             </div>
-            <div class="stat-value">{{ upcoming_absences_in_team|length }}</div>
-            <div class="stat-label">{{ 'dashboard.stats.upcoming_absences'|trans(domain: 'admin') }}</div>
+            <div class="stat-value">{{ on_leave_today }}</div>
+            <div class="stat-label">{{ 'dashboard.stats.on_leave_today'|trans(domain: 'admin') }}</div>
         </div>
-        {# TODO Backend: Wire a dedicated `absences_this_week` count variable (see backend-tasks.md §1.4 countAbsencesThisWeek).
-           Current approximation filters upcoming_absences_in_team (max 4 approved, next 30d) — inaccurate for a real count. #}
-        {% set week_end = "sunday this week"|date("Y-m-d") %}
-        {% set absences_this_week = upcoming_absences_in_team|filter(lr => lr.startDate|date("Y-m-d") <= week_end) %}
         <div class="stat-card">
             <div class="stat-header">
                 <div class="stat-icon lavender">
                     <i data-lucide="calendar-range"></i>
                 </div>
             </div>
-            <div class="stat-value">{{ absences_this_week|length }}</div>
+            <div class="stat-value">{{ absences_this_week }}</div>
             <div class="stat-label">{{ 'dashboard.stats.absences_this_week'|trans(domain: 'admin') }}</div>
         </div>
         <div class="stat-card">

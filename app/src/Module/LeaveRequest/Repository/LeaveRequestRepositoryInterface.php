@@ -43,6 +43,10 @@ interface LeaveRequestRepositoryInterface
 
     public function delete(LeaveRequestDTO $leaveRequestDTO): void;
 
+    public function countOnLeaveToday(): int;
+
+    public function countAbsencesThisWeek(): int;
+
     public function beginTransaction(): void;
 
     public function commit(): void;

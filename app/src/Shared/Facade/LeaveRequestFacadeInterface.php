@@ -54,4 +54,8 @@ interface LeaveRequestFacadeInterface
     public function getUpcomingLeaveRequests(): array;
 
     public function remove(LeaveRequestDTO $leaveRequestDTO): void;
+
+    public function countOnLeaveToday(): int;
+
+    public function countAbsencesThisWeek(): int;
 }
