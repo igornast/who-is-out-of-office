@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Facade;
 
+use App\Shared\DTO\Dashboard\DailyAbsenceSummaryDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
@@ -65,4 +66,9 @@ interface LeaveRequestFacadeInterface
     public function countAbsencesThisWeek(): int;
 
     public function countAllPendingRequests(): int;
+
+    /**
+     * @return DailyAbsenceSummaryDTO[]
+     */
+    public function getDailyAbsenceSummary(?\DateTimeImmutable $weekStart = null): array;
 }

@@ -13,6 +13,7 @@ use App\Module\LeaveRequest\UseCase\Query\CountAllPendingRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountOnLeaveTodayQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\FindOnLeaveTodayQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetDailyAbsenceSummaryQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserIdQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
@@ -44,6 +45,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly CountOnLeaveTodayQueryHandler $countOnLeaveTodayHandler,
         private readonly CountAbsencesThisWeekQueryHandler $countAbsencesThisWeekHandler,
         private readonly CountAllPendingRequestsQueryHandler $countAllPendingRequestsHandler,
+        private readonly GetDailyAbsenceSummaryQueryHandler $getDailyAbsenceSummaryHandler,
     ) {
     }
 
@@ -153,5 +155,13 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function countAllPendingRequests(): int
     {
         return $this->countAllPendingRequestsHandler->handle();
+    }
+
+    /**
+     * @return \App\Shared\DTO\Dashboard\DailyAbsenceSummaryDTO[]
+     */
+    public function getDailyAbsenceSummary(?\DateTimeImmutable $weekStart = null): array
+    {
+        return $this->getDailyAbsenceSummaryHandler->handle($weekStart);
     }
 }

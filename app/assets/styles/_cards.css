@@ -414,6 +414,163 @@ body.ea .panel-body {
     gap: 4px;
 }
 
+/* Week strip */
+
+.week-strip {
+    padding: 16px 20px;
+}
+
+.week-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.week-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.week-nav {
+    display: flex;
+    gap: 4px;
+}
+
+.week-nav button {
+    width: 26px;
+    height: 26px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--app-surface);
+    color: var(--text-tertiary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.week-nav button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.week-nav button i {
+    width: 14px;
+    height: 14px;
+}
+
+.week-days {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.week-day {
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: var(--radius-md);
+    transition: all 0.15s ease;
+}
+
+.week-day:hover {
+    background: var(--app-bg-alt);
+}
+
+.week-day.today {
+    background: var(--primary-subtle);
+}
+
+.week-day-name {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.week-day-num {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    margin: 2px 0;
+}
+
+.week-day.today .week-day-num {
+    color: var(--primary);
+}
+
+.week-day-count {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.week-day-count.has-leaves {
+    color: var(--cta);
+    font-weight: 500;
+}
+
+.week-day-avatars {
+    display: flex;
+    justify-content: center;
+    margin-top: 6px;
+}
+
+.mini-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--app-surface);
+    margin-left: -6px;
+    font-size: 8px;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.mini-avatar:first-child {
+    margin-left: 0;
+}
+
+.mini-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.mini-avatar--overflow {
+    background-color: var(--primary-subtle);
+    color: var(--primary);
+    font-size: 8px;
+    font-weight: 600;
+}
+
+html.dark .mini-avatar {
+    border-color: var(--app-bg);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+html.dark .mini-avatar--overflow {
+    background-color: var(--app-surface-raised);
+    color: var(--primary);
+    box-shadow: 0 0 0 1px var(--border);
+}
+
+.week-day.today .mini-avatar {
+    border-color: var(--primary-subtle);
+}
+
+html.dark .week-day.today .mini-avatar {
+    border-color: var(--primary-dark);
+}
+
 @media (prefers-reduced-motion: reduce) {
     body.ea .card,
     .card,

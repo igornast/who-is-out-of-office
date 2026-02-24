@@ -80,8 +80,10 @@
         </div>
     </div>
 
+
     <div class="dashboard-grid">
         <div class="dashboard-left-column">
+            {{ component('AbsenceWeekView') }}
             {% include '@AppAdmin/dashboard/_upcoming_absences.html.twig' %}
             {% if is_admin or is_manager %}
                 <div style="margin-top: 20px;">

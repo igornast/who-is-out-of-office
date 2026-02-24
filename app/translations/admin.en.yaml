@@ -49,6 +49,11 @@ dashboard:
         returns: 'Returns %date%'
         showing: 'Showing %visible% of %total%'
         see_all: 'View calendar'
+    week_strip:
+        title: This Week
+        out: out
+        prev: Previous week
+        next: Next week
     upcoming_absences:
         empty: No upcoming absences
     stats:
