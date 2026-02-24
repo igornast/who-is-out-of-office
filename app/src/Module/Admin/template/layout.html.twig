@@ -158,16 +158,119 @@
         <a class="btn-quick-add" href="{{ url('app_dashboard_requests_new') }}">
             <i data-lucide="plus"></i>
         </a>
-        <div class="topbar-avatar">
-            {% if _topbar_user.profileImageUrl %}
-                {% if _topbar_user.profileImageUrl starts with 'http://' or _topbar_user.profileImageUrl starts with 'https://' %}
-                    <img src="{{ _topbar_user.profileImageUrl }}" alt="">
+        <div class="avatar-dropdown-wrapper"
+             data-controller="avatar-dropdown">
+            <button class="topbar-avatar avatar-dropdown-trigger"
+                    data-avatar-dropdown-target="trigger"
+                    data-action="click->avatar-dropdown#toggle"
+                    aria-haspopup="menu"
+                    aria-expanded="false">
+                {% if _topbar_user.profileImageUrl %}
+                    {% if _topbar_user.profileImageUrl starts with 'http://' or _topbar_user.profileImageUrl starts with 'https://' %}
+                        <img src="{{ _topbar_user.profileImageUrl }}" alt="">
+                    {% else %}
+                        <img src="/{{ profile_images_base_path }}/{{ _topbar_user.profileImageUrl }}" alt="">
+                    {% endif %}
                 {% else %}
-                    <img src="/{{ profile_images_base_path }}/{{ _topbar_user.profileImageUrl }}" alt="">
+                    {{ _topbar_user.firstName|first }}{{ _topbar_user.lastName|first }}
                 {% endif %}
-            {% else %}
-                {{ _topbar_user.firstName|first }}{{ _topbar_user.lastName|first }}
-            {% endif %}
+            </button>
+            <div class="avatar-dropdown-menu"
+                 data-avatar-dropdown-target="menu"
+                 role="menu">
+                <div class="avatar-dropdown-header">
+                    <div class="avatar-dropdown-avatar">
+                        {% if _topbar_user.profileImageUrl %}
+                            {% if _topbar_user.profileImageUrl starts with 'http://' or _topbar_user.profileImageUrl starts with 'https://' %}
+                                <img src="{{ _topbar_user.profileImageUrl }}" alt="">
+                            {% else %}
+                                <img src="/{{ profile_images_base_path }}/{{ _topbar_user.profileImageUrl }}" alt="">
+                            {% endif %}
+                        {% else %}
+                            {{ _topbar_user.firstName|first }}{{ _topbar_user.lastName|first }}
+                        {% endif %}
+                    </div>
+                    <div class="avatar-dropdown-user-details">
+                        <div class="avatar-dropdown-user-name">{{ _topbar_user.firstName }} {{ _topbar_user.lastName }}</div>
+                        <div class="avatar-dropdown-user-email">{{ _topbar_user.email }}</div>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <span class="avatar-dropdown-role-badge role-admin">{{ 'role.admin'|trans(domain: 'admin') }}</span>
+                        {% elseif is_granted('ROLE_MANAGER') %}
+                            <span class="avatar-dropdown-role-badge role-manager">{{ 'role.manager'|trans(domain: 'admin') }}</span>
+                        {% else %}
+                            <span class="avatar-dropdown-role-badge role-employee">{{ 'role.user'|trans(domain: 'admin') }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="avatar-dropdown-links">
+                    <a class="avatar-dropdown-link"
+                       href="{{ path('app_user_profile') }}"
+                       role="menuitem">
+                        <i data-lucide="user-circle"></i>
+                        {{ 'dropdown.my_profile'|trans(domain: 'admin') }}
+                    </a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a class="avatar-dropdown-link"
+                           href="{{ path('app_settings') }}"
+                           role="menuitem">
+                            <i data-lucide="palette"></i>
+                            {{ 'dropdown.appearance'|trans(domain: 'admin') }}
+                        </a>
+                    {% endif %}
+                    {% if _topbar_user.slackIntegration is not null %}
+                        <a class="avatar-dropdown-status"
+                           href="{{ path('app_user_profile') }}"
+                           role="menuitem">
+                            <span class="avatar-dropdown-status-dot connected"></span>
+                            {{ 'dropdown.slack_connected'|trans(domain: 'admin') }}
+                        </a>
+                    {% else %}
+                        <a class="avatar-dropdown-status"
+                           href="{{ path('app_user_profile') }}"
+                           role="menuitem">
+                            <span class="avatar-dropdown-status-dot disconnected"></span>
+                            {{ 'dropdown.slack_not_configured'|trans(domain: 'admin') }}
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="avatar-dropdown-theme">
+                    <div class="avatar-dropdown-theme-label">{{ 'dropdown.theme'|trans(domain: 'admin') }}</div>
+                    <div class="avatar-dropdown-theme-switcher" role="radiogroup" aria-label="{{ 'dropdown.theme'|trans(domain: 'admin') }}">
+                        <button class="avatar-dropdown-theme-option"
+                                data-theme="light"
+                                data-action="click->avatar-dropdown#setTheme"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="{{ 'dropdown.theme_light'|trans(domain: 'admin') }}">
+                            <i data-lucide="sun"></i>
+                        </button>
+                        <button class="avatar-dropdown-theme-option"
+                                data-theme="dark"
+                                data-action="click->avatar-dropdown#setTheme"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="{{ 'dropdown.theme_dark'|trans(domain: 'admin') }}">
+                            <i data-lucide="moon"></i>
+                        </button>
+                        <button class="avatar-dropdown-theme-option"
+                                data-theme="auto"
+                                data-action="click->avatar-dropdown#setTheme"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="{{ 'dropdown.theme_auto'|trans(domain: 'admin') }}">
+                            <i data-lucide="monitor"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="avatar-dropdown-signout">
+                    <a class="avatar-dropdown-signout-btn"
+                       href="{{ path('_logout_main') }}"
+                       role="menuitem">
+                        <i data-lucide="log-out"></i>
+                        {{ 'dropdown.sign_out'|trans(domain: 'admin') }}
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -176,6 +279,37 @@
 
 {% block body_javascript %}
     {{ parent() }}
+
+    {% set _current_route = app.request.attributes.get('_route') %}
+    {% set _current_crud = app.request.attributes.get('crudControllerFqcn') ?? app.request.query.get('crudControllerFqcn') %}
+    <nav class="bottom-nav" aria-label="{{ 'bottom_nav.label'|trans(domain: 'admin') }}">
+        <a class="bottom-nav-item {{ _current_route == 'app_dashboard' ? 'active' }}"
+           href="{{ path('app_dashboard') }}">
+            <i data-lucide="layout-dashboard"></i>
+            <span>{{ 'bottom_nav.home'|trans(domain: 'admin') }}</span>
+        </a>
+        <a class="bottom-nav-item {{ _current_route == 'app_calendar_view' ? 'active' }}"
+           href="{{ path('app_calendar_view') }}">
+            <i data-lucide="calendar-days"></i>
+            <span>{{ 'bottom_nav.calendar'|trans(domain: 'admin') }}</span>
+        </a>
+        <a class="bottom-nav-item cta"
+           href="{{ url('app_dashboard_requests_new') }}">
+            <i data-lucide="plus-circle"></i>
+            <span>{{ 'bottom_nav.request'|trans(domain: 'admin') }}</span>
+        </a>
+        <a class="bottom-nav-item {{ _current_crud == 'App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController' ? 'active' }}"
+           href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('index') }}">
+            <i data-lucide="clipboard-list"></i>
+            <span>{{ 'bottom_nav.requests'|trans(domain: 'admin') }}</span>
+        </a>
+        <a class="bottom-nav-item {{ _current_route == 'app_user_profile' ? 'active' }}"
+           href="{{ path('app_user_profile') }}">
+            <i data-lucide="user"></i>
+            <span>{{ 'bottom_nav.profile'|trans(domain: 'admin') }}</span>
+        </a>
+    </nav>
+
     <script>
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();

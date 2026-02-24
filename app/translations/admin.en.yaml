@@ -24,6 +24,25 @@ sidebar:
     collapse: Toggle sidebar
     menu: Open menu
 
+dropdown:
+    my_profile: My Profile
+    appearance: Appearance
+    slack_connected: Slack connected
+    slack_not_configured: Slack not configured
+    theme: Theme
+    theme_light: Light
+    theme_dark: Dark
+    theme_auto: Auto
+    sign_out: Sign Out
+
+bottom_nav:
+    label: Main navigation
+    home: Home
+    calendar: Calendar
+    request: Request
+    requests: Requests
+    profile: Profile
+
 
 
 dashboard:

@@ -1,13 +1,18 @@
-<div {{ attributes }} class="card" style="margin-bottom: 20px;">
+<div {{ attributes }} class="card" style="margin-bottom: 20px;" data-controller="week-scroll">
     <div class="week-strip">
         <div class="week-header">
-            <span class="week-title">
-                {%- if this.isCurrentWeek -%}
-                    {{ 'dashboard.week_strip.title'|trans(domain: 'admin') }} — {{ this.formattedDateRange }}
-                {%- else -%}
-                    {{ this.formattedDateRange }}
-                {%- endif -%}
-            </span>
+            <div class="week-header-text">
+                <span class="week-title">
+                    {%- if this.isCurrentWeek -%}
+                        {{ 'dashboard.week_strip.title'|trans(domain: 'admin') }}
+                    {%- else -%}
+                        {{ this.formattedDateRange }}
+                    {%- endif -%}
+                </span>
+                {% if this.isCurrentWeek %}
+                    <span class="week-subtitle">{{ this.formattedDateRange }}</span>
+                {% endif %}
+            </div>
             <div class="week-nav">
                 <button data-action="live#action" data-live-action-param="prev" title="{{ 'dashboard.week_strip.prev'|trans(domain: 'admin') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -17,9 +22,9 @@
                 </button>
             </div>
         </div>
-        <div class="week-days">
+        <div class="week-days" data-week-scroll-target="container">
             {% for day in this.days %}
-                <div class="week-day{{ day.isToday ? ' today' : '' }}">
+                <div class="week-day{{ day.isToday ? ' today' : '' }}" data-week-scroll-target="day">
                     <div class="week-day-name">{{ day.dayName }}</div>
                     <div class="week-day-num">{{ day.dayNumber }}</div>
                     {% if day.absenceCount > 0 %}
@@ -49,6 +54,11 @@
                         <div class="week-day-count">&nbsp;</div>
                     {% endif %}
                 </div>
+            {% endfor %}
+        </div>
+        <div class="week-strip-dots" data-week-scroll-target="dots">
+            {% for day in this.days %}
+                <span class="week-strip-dot{{ day.isToday ? ' active' : (loop.first and not this.isCurrentWeek ? ' active' : '') }}" data-week-scroll-target="dot"></span>
             {% endfor %}
         </div>
     </div>

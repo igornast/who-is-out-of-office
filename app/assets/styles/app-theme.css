@@ -14,3 +14,5 @@
 @import './_dashboard.css';
 @import './_calendar.css';
 @import './_crud-overrides.css';
+@import './_avatar-dropdown.css';
+@import './_responsive.css';

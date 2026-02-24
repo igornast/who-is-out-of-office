@@ -161,12 +161,12 @@ a.stat-card-link {
 
 @media (max-width: 576px) {
     .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
 
     .stat-card {
-        padding: 14px 16px;
+        padding: 14px;
     }
 
     .stat-value {
@@ -427,10 +427,22 @@ body.ea .panel-body {
     margin-bottom: 12px;
 }
 
+.week-header-text {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
 .week-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.week-subtitle {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-muted);
 }
 
 .week-nav {
