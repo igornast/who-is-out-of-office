@@ -43,6 +43,11 @@ interface LeaveRequestRepositoryInterface
 
     public function delete(LeaveRequestDTO $leaveRequestDTO): void;
 
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findOnLeaveToday(): array;
+
     public function countOnLeaveToday(): int;
 
     public function countAbsencesThisWeek(): int;

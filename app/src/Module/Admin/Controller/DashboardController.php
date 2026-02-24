@@ -62,6 +62,7 @@ class DashboardController extends AbstractDashboardController
             'upcoming_absences_in_team' => $this->leaveRequestFacade->getUpcomingLeaveRequests(),
             'all_pending_requests_count' => $this->leaveRequestFacade->countAllPendingRequests(),
             'on_leave_today' => $this->leaveRequestFacade->countOnLeaveToday(),
+            'whos_out_today' => $this->leaveRequestFacade->findOnLeaveToday(),
             'absences_this_week' => $this->leaveRequestFacade->countAbsencesThisWeek(),
             'slack_integration' => $user->slackIntegration,
         ];

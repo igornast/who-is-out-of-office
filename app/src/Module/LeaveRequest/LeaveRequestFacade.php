@@ -11,6 +11,7 @@ use App\Module\LeaveRequest\UseCase\Query\CalculateWorkDaysQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAbsencesThisWeekQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAllPendingRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountOnLeaveTodayQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\FindOnLeaveTodayQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserIdQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
@@ -39,6 +40,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetLeaveRequestsForDatesGroupedByUserIdQueryHandler $getLeaveRequestForDatesGroupedByUserIdHandler,
         private readonly RemoveLeaveRequestCommandHandler $removeRequestHandler,
         private readonly GetPendingLeaveRequestsQueryHandler $getPendingLeaveRequestsHandler,
+        private readonly FindOnLeaveTodayQueryHandler $findOnLeaveTodayHandler,
         private readonly CountOnLeaveTodayQueryHandler $countOnLeaveTodayHandler,
         private readonly CountAbsencesThisWeekQueryHandler $countAbsencesThisWeekHandler,
         private readonly CountAllPendingRequestsQueryHandler $countAllPendingRequestsHandler,
@@ -128,6 +130,14 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function remove(LeaveRequestDTO $leaveRequestDTO): void
     {
         $this->removeRequestHandler->handle($leaveRequestDTO);
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findOnLeaveToday(): array
+    {
+        return $this->findOnLeaveTodayHandler->handle();
     }
 
     public function countOnLeaveToday(): int

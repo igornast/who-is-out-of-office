@@ -24,6 +24,12 @@ body.ea .card-header,
     color: var(--text-primary);
 }
 
+.card-header-badge {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
 body.ea .card-body,
 .card-body {
     padding: 0;

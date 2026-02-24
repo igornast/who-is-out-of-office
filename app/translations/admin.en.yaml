@@ -42,6 +42,13 @@ dashboard:
     my_team:
         members: members
         empty: No team members
+    whos_out_today:
+        title: Who's Out Today
+        count: '%count% people'
+        empty: No one is out today
+        returns: 'Returns %date%'
+        showing: 'Showing %visible% of %total%'
+        see_all: 'View calendar'
     upcoming_absences:
         empty: No upcoming absences
     stats:

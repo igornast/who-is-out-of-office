@@ -198,6 +198,28 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
     }
 
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findOnLeaveToday(): array
+    {
+        $today = new \DateTimeImmutable('today');
+
+        $qb = $this->createQueryBuilder('lr');
+
+        /** @var LeaveRequest[] $items */
+        $items = $qb->where('lr.status = :approved')
+            ->andWhere('lr.startDate <= :today')
+            ->andWhere('lr.endDate >= :today')
+            ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
+            ->setParameter('today', $today)
+            ->orderBy('lr.endDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
+    }
+
     public function countOnLeaveToday(): int
     {
         $today = new \DateTimeImmutable('today');
