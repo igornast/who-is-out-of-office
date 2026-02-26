@@ -51,7 +51,44 @@ body.ea .datagrid {
     background-color: var(--app-surface);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    overflow: hidden;
+}
+
+/* Scroll fade overlay — shown by table_scroll_controller when table overflows */
+.table-scroll-fade {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 32px;
+    background: linear-gradient(to right, transparent, var(--app-bg));
+    pointer-events: none;
+    z-index: 2;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.table-scroll-fade.is-hidden {
+    opacity: 0;
+}
+
+/* Sticky first column for overflowing datagrid tables */
+.content-body.is-overflowing .datagrid > thead > tr > th:first-child,
+.content-body.is-overflowing .datagrid > tbody > tr > td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+}
+
+.content-body.is-overflowing .datagrid > thead > tr > th:first-child {
+    background-color: var(--app-bg-alt);
+}
+
+.content-body.is-overflowing .datagrid > tbody > tr > td:first-child {
+    background-color: var(--app-surface);
+}
+
+.content-body.is-overflowing .datagrid > tbody > tr:hover > td:first-child {
+    background-color: var(--app-bg-alt);
 }
 
 .table-card {

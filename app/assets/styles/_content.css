@@ -2,6 +2,7 @@ body.ea .main-content {
     background: var(--app-bg);
     transition: background-color 0.25s ease;
     min-width: 0;
+    overflow: hidden;
 }
 
 body.ea .main-content .content-wrapper {
@@ -29,6 +30,11 @@ body.ea .main-content .content-header {
 
 body.ea .main-content .content-body {
     color: var(--text-secondary);
+    overflow-x: auto;
+}
+
+body.ea .main-content .content-body:has(.datagrid) {
+    display: grid;
 }
 
 @media (max-width: 768px) {

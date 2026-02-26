@@ -364,5 +364,18 @@
                 lucide.createIcons();
             });
         }
+
+        (function wireTableScroll() {
+            function apply() {
+                document.querySelectorAll('.content-body .datagrid').forEach(function(table) {
+                    var content = table.closest('.content');
+                    if (content && !content.hasAttribute('data-controller')) {
+                        content.setAttribute('data-controller', 'table-scroll');
+                    }
+                });
+            }
+            apply();
+            document.addEventListener('turbo:load', apply);
+        })();
     </script>
 {% endblock %}
