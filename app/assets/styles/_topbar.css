@@ -10,7 +10,7 @@ body.ea .main-content .content-top {
     padding: 0 24px;
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 1000;
     transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 

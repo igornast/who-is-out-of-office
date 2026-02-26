@@ -83,6 +83,31 @@
     --bs-border-radius: var(--radius-md);
     --bs-border-radius-lg: var(--radius-lg);
     --bs-border-radius-sm: var(--radius-sm);
+
+    --body-bg: var(--app-bg);
+    --content-bg: var(--app-bg);
+    --page-bg: var(--app-bg);
+    --text-color: var(--text-primary);
+    --text-color-dark: var(--text-primary);
+    --text-muted-color: var(--text-muted);
+    --link-color: var(--text-link);
+    --link-hover-color: var(--text-link-hover);
+    --color-primary: var(--primary);
+    --white: var(--app-surface);
+    --gray-50: var(--app-surface-raised);
+    --gray-100: var(--app-bg-alt);
+    --gray-200: var(--border-light);
+    --gray-300: var(--border);
+    --gray-800: var(--text-secondary);
+    --gray-900: var(--text-primary);
+    --table-cell-color: var(--text-secondary);
+    --table-thead-color: var(--text-muted);
+    --table-thead-marker-color: var(--text-muted);
+    --table-cell-border-color: var(--border-light);
+    --table-hover-cell-bg: var(--app-bg-alt);
+    --table-selected-cell-bg: var(--primary-subtle);
+    --table-thead-sorted-color: var(--text-primary);
+    --table-thead-sorted-marker-color: var(--primary);
 }
 
 /* Alerts */

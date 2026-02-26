@@ -1,0 +1,105 @@
+/* Palette: Soft Lavender (Direction D) */
+
+[data-palette="lavender"] {
+    --app-bg: #F3F0F8;
+    --app-bg-alt: #EDE8F5;
+    --app-surface-sunken: #EBE6F2;
+
+    --sidebar-bg: #2E2840;
+    --sidebar-bg-hover: #3D3555;
+    --sidebar-bg-active: #8B7AAF;
+    --sidebar-text: #9A8EAD;
+    --sidebar-text-active: #FFFFFF;
+    --sidebar-text-hover: #D8D0E8;
+    --sidebar-divider: #443C5A;
+    --sidebar-icon: #B5A8D0;
+    --sidebar-icon-active: #FFFFFF;
+
+    --topbar-border: #D5D0E0;
+    --topbar-text: #1E1A2E;
+
+    --primary: #8B7AAF;
+    --primary-hover: #7A6A9E;
+    --primary-active: #6A5A8E;
+    --primary-dark: #5A4A7E;
+    --primary-subtle: #EDE8F5;
+    --primary-subtle-hover: #DDD5EC;
+
+    --success: #8B7AAF;
+    --success-subtle: #EDE8F5;
+
+    --text-primary: #1E1A2E;
+    --text-secondary: #3A3A4A;
+    --text-tertiary: #5F5F73;
+    --text-muted: #8A8A9E;
+    --text-on-dark: #D8D0E8;
+    --text-link: #8B7AAF;
+    --text-link-hover: #6A5A8E;
+
+    --border: #CCC5D9;
+    --border-light: #DDD8E8;
+    --border-strong: #2E2840;
+    --border-focus: #8B7AAF;
+
+    --shadow-focus: 0 0 0 3px rgba(139, 122, 175, 0.25);
+
+    --leave-vacation: #8B7AAF;
+
+    --avatar-placeholder-bg: #DDD5EC;
+    --avatar-placeholder-color: #5A4A7E;
+}
+
+html.dark[data-palette="lavender"] {
+    --app-bg: #1A1A24;
+    --app-bg-alt: #1E1E2C;
+    --app-surface: #282834;
+    --app-surface-raised: #2E2E3E;
+    --app-surface-sunken: #161620;
+
+    --sidebar-bg: #141418;
+    --sidebar-bg-hover: #1E1E2E;
+    --sidebar-bg-active: #8B7AAF;
+    --sidebar-text: #7A7A94;
+    --sidebar-text-active: #FFFFFF;
+    --sidebar-text-hover: #B8A8D8;
+    --sidebar-divider: #2A2A3A;
+    --sidebar-icon: #B5A8D0;
+    --sidebar-icon-active: #FFFFFF;
+
+    --topbar-bg: #1E1E2C;
+    --topbar-border: #2A2A3A;
+    --topbar-text: #D0D0E0;
+
+    --primary: #A090C8;
+    --primary-hover: #B0A0D8;
+    --primary-active: #8B7AAF;
+    --primary-dark: #5A4A7A;
+    --primary-subtle: #252035;
+    --primary-subtle-hover: #2E2840;
+
+    --success: #A090C8;
+    --success-subtle: #252035;
+
+    --text-primary: #E0E0EF;
+    --text-secondary: #B0B0C8;
+    --text-tertiary: #7A7A94;
+    --text-muted: #686880;
+    --text-on-dark: #D8D0E8;
+    --text-link: #A090C8;
+    --text-link-hover: #B0A0D8;
+
+    --border: #2E2E42;
+    --border-light: #2E2E40;
+    --border-strong: #A090C8;
+    --border-focus: #A090C8;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+    --shadow-focus: 0 0 0 3px rgba(160, 144, 200, 0.35);
+
+    --leave-vacation: #A090C8;
+
+    --avatar-placeholder-bg: #352E52;
+    --avatar-placeholder-color: #B5A8D0;
+}

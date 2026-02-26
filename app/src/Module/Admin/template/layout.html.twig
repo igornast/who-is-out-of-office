@@ -29,6 +29,9 @@
             } else {
                 document.documentElement.dataset.bsTheme = 'light';
             }
+            var palette = localStorage.getItem('whosooo-palette') || 'teal';
+            if (['teal','sage','sunset','lavender'].indexOf(palette) === -1) palette = 'teal';
+            document.documentElement.dataset.palette = palette;
             if (window.innerWidth > 768 && localStorage.getItem('whosooo-sidebar') === 'collapsed') {
                 document.documentElement.classList.add('sidebar-collapsed');
             }
@@ -219,14 +222,14 @@
                     {% endif %}
                     {% if _topbar_user.slackIntegration is not null %}
                         <a class="avatar-dropdown-status"
-                           href="{{ path('app_user_profile') }}"
+                           href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\SlackIntegrationCrudController').setAction('edit').setEntityId(_topbar_user.id) }}"
                            role="menuitem">
                             <span class="avatar-dropdown-status-dot connected"></span>
                             {{ 'dropdown.slack_connected'|trans(domain: 'admin') }}
                         </a>
                     {% else %}
                         <a class="avatar-dropdown-status"
-                           href="{{ path('app_user_profile') }}"
+                           href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\SlackIntegrationCrudController').setAction('new') }}"
                            role="menuitem">
                             <span class="avatar-dropdown-status-dot disconnected"></span>
                             {{ 'dropdown.slack_not_configured'|trans(domain: 'admin') }}
@@ -259,6 +262,47 @@
                                 aria-checked="false"
                                 aria-label="{{ 'dropdown.theme_auto'|trans(domain: 'admin') }}">
                             <i data-lucide="monitor"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="avatar-dropdown-palette">
+                    <div class="avatar-dropdown-theme-label">{{ 'dropdown.palette'|trans(domain: 'admin') }}</div>
+                    <div class="avatar-dropdown-palette-options" role="radiogroup" aria-label="{{ 'dropdown.palette'|trans(domain: 'admin') }}">
+                        <button class="avatar-dropdown-palette-swatch"
+                                data-palette="teal"
+                                data-action="click->avatar-dropdown#setPalette"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="Warm Teal"
+                                style="--swatch-color: #3D9B8F"
+                                title="Warm Teal">
+                        </button>
+                        <button class="avatar-dropdown-palette-swatch"
+                                data-palette="sage"
+                                data-action="click->avatar-dropdown#setPalette"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="Sage Green"
+                                style="--swatch-color: #7FA030"
+                                title="Sage Green">
+                        </button>
+                        <button class="avatar-dropdown-palette-swatch"
+                                data-palette="sunset"
+                                data-action="click->avatar-dropdown#setPalette"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="Sunset Warm"
+                                style="--swatch-color: #E8876F"
+                                title="Sunset Warm">
+                        </button>
+                        <button class="avatar-dropdown-palette-swatch"
+                                data-palette="lavender"
+                                data-action="click->avatar-dropdown#setPalette"
+                                role="radio"
+                                aria-checked="false"
+                                aria-label="Soft Lavender"
+                                style="--swatch-color: #8B7AAF"
+                                title="Soft Lavender">
                         </button>
                     </div>
                 </div>

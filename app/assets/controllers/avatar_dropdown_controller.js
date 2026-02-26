@@ -10,6 +10,7 @@ export default class extends Controller {
         this.boundClose = this.closeOnOutsideClick.bind(this);
         this.boundEscape = this.closeOnEscape.bind(this);
         this.initThemeSwitcher();
+        this.initPalettePicker();
     }
 
     initThemeSwitcher() {
@@ -129,5 +130,34 @@ export default class extends Controller {
 
     syncSidebarToggle(mode) {
         window.dispatchEvent(new CustomEvent('theme:changed', { detail: { mode } }));
+    }
+
+    initPalettePicker() {
+        const validPalettes = ['teal', 'sage', 'sunset', 'lavender'];
+        const raw = localStorage.getItem('whosooo-palette') || 'teal';
+        const saved = validPalettes.includes(raw) ? raw : 'teal';
+        this.menuTarget.querySelectorAll('.avatar-dropdown-palette-swatch').forEach(swatch => {
+            const isActive = swatch.dataset.palette === saved;
+            swatch.classList.toggle('active', isActive);
+            swatch.setAttribute('aria-checked', isActive ? 'true' : 'false');
+        });
+    }
+
+    setPalette(event) {
+        const palette = event.currentTarget.dataset.palette;
+
+        this.menuTarget.querySelectorAll('.avatar-dropdown-palette-swatch').forEach(swatch => {
+            const isActive = swatch.dataset.palette === palette;
+            swatch.classList.toggle('active', isActive);
+            swatch.setAttribute('aria-checked', isActive ? 'true' : 'false');
+        });
+
+        document.documentElement.dataset.palette = palette;
+
+        if (palette === 'teal') {
+            localStorage.removeItem('whosooo-palette');
+        } else {
+            localStorage.setItem('whosooo-palette', palette);
+        }
     }
 }

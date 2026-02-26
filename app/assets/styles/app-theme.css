@@ -1,5 +1,8 @@
 @import './_tokens-light.css';
 @import './_tokens-dark.css';
+@import './_palette-sage.css';
+@import './_palette-sunset.css';
+@import './_palette-lavender.css';
 @import './_typography.css';
 @import './_sidebar.css';
 @import './_topbar.css';

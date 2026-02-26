@@ -34,6 +34,7 @@ dropdown:
     theme_dark: Dark
     theme_auto: Auto
     sign_out: Sign Out
+    palette: Color palette
 
 bottom_nav:
     label: Main navigation
@@ -165,6 +166,15 @@ crud:
             title: The leave type details
         action:
             new: Add a new type
+
+    slack_integration:
+        new:
+            title: Connect Slack
+        edit:
+            title: Slack Integration
+        field:
+            slack_member_id: Slack Member ID
+            slack_member_id_help: 'Open Slack, click on your profile picture, select "Profile", then click the three-dot menu (⋯) and choose "Copy member ID".'
 
     app_settings:
         source_filename: The app settings source file

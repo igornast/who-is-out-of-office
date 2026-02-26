@@ -283,7 +283,43 @@ body.ea .avatar-dropdown-theme-option:focus-visible {
     box-shadow: var(--shadow-focus);
 }
 
-/* Section 5: Sign out */
+/* Section 5: Palette picker */
+body.ea .avatar-dropdown-palette {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-light);
+}
+
+body.ea .avatar-dropdown-palette-options {
+    display: flex;
+    gap: 10px;
+}
+
+body.ea .avatar-dropdown-palette-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: var(--swatch-color);
+    cursor: pointer;
+    padding: 0;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+body.ea .avatar-dropdown-palette-swatch:hover {
+    box-shadow: 0 0 0 2px var(--app-surface), 0 0 0 3px var(--swatch-color);
+}
+
+body.ea .avatar-dropdown-palette-swatch.active {
+    border-color: var(--swatch-color);
+    box-shadow: 0 0 0 2px var(--app-surface), 0 0 0 4px var(--swatch-color);
+}
+
+body.ea .avatar-dropdown-palette-swatch:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--app-surface), 0 0 0 4px var(--swatch-color);
+}
+
+/* Section 6: Sign out */
 body.ea .avatar-dropdown-signout {
     padding: 8px;
     border-top: 1px solid var(--border-light);
@@ -340,6 +376,7 @@ body.ea .avatar-dropdown-signout-btn:focus-visible {
     body.ea .avatar-dropdown-trigger,
     body.ea .avatar-dropdown-link,
     body.ea .avatar-dropdown-theme-option,
+    body.ea .avatar-dropdown-palette-swatch,
     body.ea .avatar-dropdown-signout-btn {
         transition: none;
     }
