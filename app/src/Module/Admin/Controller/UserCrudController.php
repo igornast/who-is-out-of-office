@@ -16,6 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
@@ -105,6 +106,10 @@ class UserCrudController extends AppAbstractCrudController
                 ->hideOnIndex();
             yield DateField::new('absenceBalanceResetDay')
                 ->setHelp('The next date when the absence balance will be reset annually.')
+                ->hideOnIndex();
+
+            yield AssociationField::new('manager')
+                ->setHelp('The direct manager of this employee.')
                 ->hideOnIndex();
 
             yield FormField::addFieldset('Contract Details');

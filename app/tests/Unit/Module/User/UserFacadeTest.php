@@ -6,6 +6,7 @@ use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
+use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
@@ -28,6 +29,7 @@ beforeEach(function (): void {
     $this->getUsersWithIncomingWorkAnniversariesHandler = mock(GetUsersWithIncomingWorkAnniversariesQueryHandler::class);
     $this->getUsersWithWorkAnniversariesForDatesHandler = mock(GetUsersWithWorkAnniversariesForDatesQueryHandler::class);
     $this->resetAbsenceBalanceHandler = mock(ResetAbsenceBalanceCommandHandler::class);
+    $this->getDirectReportsHandler = mock(GetDirectReportsQueryHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -40,6 +42,7 @@ beforeEach(function (): void {
         getUsersWithIncomingWorkAnniversariesHandler: $this->getUsersWithIncomingWorkAnniversariesHandler,
         getUsersWithWorkAnniversariesForDatesHandler: $this->getUsersWithWorkAnniversariesForDatesHandler,
         resetAbsenceBalanceHandler: $this->resetAbsenceBalanceHandler,
+        getDirectReportsHandler: $this->getDirectReportsHandler,
     );
 });
 
@@ -179,4 +182,18 @@ it('delegates resetAbsenceBalance to handler', function () {
         ->once();
 
     $this->facade->resetAbsenceBalance();
+});
+
+it('delegates getDirectReports to handler', function () {
+    $expectedUsers = [UserDTOFixture::create()];
+
+    $this->getDirectReportsHandler
+        ->expects('handle')
+        ->once()
+        ->with('manager-1')
+        ->andReturn($expectedUsers);
+
+    $result = $this->facade->getDirectReports('manager-1');
+
+    expect($result)->toBe($expectedUsers);
 });

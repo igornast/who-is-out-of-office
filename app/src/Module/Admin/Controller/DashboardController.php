@@ -65,6 +65,10 @@ class DashboardController extends AbstractDashboardController
             'whos_out_today' => $this->leaveRequestFacade->findOnLeaveToday(),
             'absences_this_week' => $this->leaveRequestFacade->countAbsencesThisWeek(),
             'slack_integration' => $user->slackIntegration,
+            'leave_balances' => $this->leaveRequestFacade->getLeaveBalancesPerType(
+                $userId,
+                $user->absenceBalanceResetDay
+            ),
         ];
 
         return $this->render('@AppAdmin/dashboard.html.twig', $parameters);

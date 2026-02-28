@@ -274,6 +274,38 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         return $count;
     }
 
+    public function findUsedDaysPerTypeForUser(string $userId, \DateTimeImmutable $periodStart): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT
+                lt.name AS leave_type_name,
+                lt.icon AS leave_type_icon,
+                lt.background_color,
+                lt.border_color,
+                lt.text_color,
+                lt.is_affecting_balance,
+                COALESCE(SUM(lr.work_days), 0) AS used_days
+            FROM leave_request_type lt
+            LEFT JOIN leave_request lr
+                ON lr.leave_type = lt.id
+                AND lr.user_id = :userId
+                AND lr.status = :approved
+                AND lr.start_date >= :periodStart
+            GROUP BY lt.id
+            ORDER BY lt.is_affecting_balance DESC, lt.name ASC
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('userId', $userId);
+        $stmt->bindValue('approved', LeaveRequestStatusEnum::Approved->value);
+        $stmt->bindValue('periodStart', $periodStart->format('Y-m-d'));
+        $resultSet = $stmt->executeQuery();
+
+        return $resultSet->fetchAllAssociative();
+    }
+
     public function delete(LeaveRequestDTO $leaveRequestDTO): void
     {
         $qb = $this->createQueryBuilder('lr');

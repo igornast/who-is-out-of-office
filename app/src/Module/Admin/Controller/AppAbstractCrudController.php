@@ -34,6 +34,6 @@ abstract class AppAbstractCrudController extends AbstractCrudController
 
     protected function isAdminOrManager(): bool
     {
-        return $this->isGranted(RoleEnum::Admin->value) || $this->isGranted(RoleEnum::Manager);
+        return $this->isGranted(RoleEnum::Admin->value) || $this->isGranted(RoleEnum::Manager->value);
     }
 }

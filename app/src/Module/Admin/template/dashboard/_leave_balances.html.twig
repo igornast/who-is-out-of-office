@@ -1,0 +1,40 @@
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">{{ 'dashboard.leave_balances.title'|trans(domain: 'admin') }}</span>
+    </div>
+    <div class="card-body">
+        {% if leave_balances is not empty %}
+            <div class="balance-list">
+                {% for balance in leave_balances %}
+                    <div class="balance-item">
+                        <div class="balance-icon" style="background-color: {{ balance.leaveTypeBackgroundColor }}; color: {{ balance.leaveTypeTextColor }};">
+                            <span style="font-size: 16px;">{{ balance.leaveTypeIcon }}</span>
+                        </div>
+                        <div class="balance-info">
+                            <div class="balance-type">{{ balance.leaveTypeName }}</div>
+                            {% if balance.isAffectingBalance and user.annualLeaveAllowance > 0 %}
+                                {% set percentage = (balance.usedDays / user.annualLeaveAllowance * 100)|round(0) %}
+                                {% set percentage = percentage > 100 ? 100 : percentage %}
+                                <div class="balance-bar-track">
+                                    <div class="balance-bar-fill" style="width: {{ percentage }}%; background-color: {{ balance.leaveTypeBorderColor }};"></div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="balance-numbers">
+                            <div class="balance-used">{{ balance.usedDays }}</div>
+                            {% if balance.isAffectingBalance %}
+                                <div class="balance-total">/ {{ user.annualLeaveAllowance }} {{ 'dashboard.stats.days'|trans(domain: 'admin') }}</div>
+                            {% else %}
+                                <div class="balance-total">{{ 'dashboard.stats.days'|trans(domain: 'admin') }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="padding: 16px 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+                {{ 'dashboard.leave_balances.empty'|trans(domain: 'admin') }}
+            </div>
+        {% endif %}
+    </div>
+</div>

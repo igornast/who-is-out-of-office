@@ -38,6 +38,10 @@
             <join-column name="holiday_calendar_id" referenced-column-name="id" nullable="true" />
         </many-to-one>
 
+        <many-to-one field="manager" target-entity="App\Infrastructure\Doctrine\Entity\User">
+            <join-column name="manager_id" referenced-column-name="id" nullable="true" />
+        </many-to-one>
+
         <lifecycle-callbacks>
             <lifecycle-callback type="preUpdate" method="updateTimestamp" />
         </lifecycle-callbacks>

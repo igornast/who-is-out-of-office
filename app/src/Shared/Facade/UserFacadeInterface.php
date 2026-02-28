@@ -44,4 +44,9 @@ interface UserFacadeInterface
     public function getUser(string $userId): ?UserDTO;
 
     public function resetAbsenceBalance(): void;
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getDirectReports(string $managerId): array;
 }

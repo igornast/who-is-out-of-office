@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\Facade;
 
 use App\Shared\DTO\Dashboard\DailyAbsenceSummaryDTO;
+use App\Shared\DTO\Dashboard\LeaveBalanceDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
@@ -71,4 +72,9 @@ interface LeaveRequestFacadeInterface
      * @return DailyAbsenceSummaryDTO[]
      */
     public function getDailyAbsenceSummary(?\DateTimeImmutable $weekStart = null): array;
+
+    /**
+     * @return LeaveBalanceDTO[]
+     */
+    public function getLeaveBalancesPerType(string $userId, \DateTimeImmutable $periodStart): array;
 }

@@ -33,4 +33,9 @@ interface UserRepositoryInterface
      * @return UserDTO[]
      */
     public function findUsersWithBalanceResetToday(): array;
+
+    /**
+     * @return UserDTO[]
+     */
+    public function findByManagerId(string $managerId): array;
 }

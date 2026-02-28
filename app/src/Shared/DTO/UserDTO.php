@@ -30,6 +30,7 @@ class UserDTO
         public ?\DateTimeImmutable $birthDate = null,
         public ?\DateTimeImmutable $contractStartedAt = null,
         public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
+        public ?string $managerId = null,
     ) {
     }
 
@@ -54,6 +55,7 @@ class UserDTO
             birthDate: $user->birthDate,
             contractStartedAt: $user->contractStartedAt,
             absenceBalanceResetDay: $user->absenceBalanceResetDay,
+            managerId: $user->manager?->id->toString(),
         );
     }
 
@@ -75,6 +77,7 @@ class UserDTO
             birthDate: isset($data['birth_date']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['birth_date']) : null,
             contractStartedAt: isset($data['contract_started_at']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['contract_started_at']) : null,
             absenceBalanceResetDay: \DateTimeImmutable::createFromFormat('Y-m-d', $data['absence_balance_reset_day']),
+            managerId: $data['manager_id'] ?? null,
         );
     }
 }

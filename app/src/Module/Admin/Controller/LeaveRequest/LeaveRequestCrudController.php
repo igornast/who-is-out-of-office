@@ -28,6 +28,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * @extends AppAbstractCrudController<LeaveRequest>
@@ -37,6 +38,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
 {
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly CsrfTokenManagerInterface $csrfTokenManager,
     ) {
     }
 
@@ -49,14 +51,41 @@ class LeaveRequestCrudController extends AppAbstractCrudController
     {
         $withdrawAction = Action::new('withdraw', 'Withdraw')
             ->linkToUrl(
-                fn (LeaveRequest $entity) => $this->urlGenerator->generate('app_leave_request_withdraw', ['id' => $entity->id])
+                fn (LeaveRequest $entity) => $this->urlGenerator->generate('app_leave_request_withdraw', [
+                    'id' => $entity->id,
+                    '_token' => $this->csrfTokenManager->getToken(sprintf('withdraw%s', $entity->id))->getValue(),
+                ])
             )
             ->setIcon('fa fa-ban')
             ->addCssClass('btn btn-outline')
             ->displayIf($this->shouldDisplayWithdrawAction());
 
+        $approveAction = Action::new('approve', 'Approve')
+            ->linkToUrl(
+                fn (LeaveRequest $entity) => $this->urlGenerator->generate('app_leave_request_approve', [
+                    'id' => $entity->id,
+                    '_token' => $this->csrfTokenManager->getToken(sprintf('approve%s', $entity->id))->getValue(),
+                ])
+            )
+            ->setIcon('fa fa-check')
+            ->addCssClass('btn btn-success')
+            ->displayIf($this->shouldDisplayApproveRejectAction());
+
+        $rejectAction = Action::new('reject', 'Reject')
+            ->linkToUrl(
+                fn (LeaveRequest $entity) => $this->urlGenerator->generate('app_leave_request_reject', [
+                    'id' => $entity->id,
+                    '_token' => $this->csrfTokenManager->getToken(sprintf('reject%s', $entity->id))->getValue(),
+                ])
+            )
+            ->setIcon('fa fa-times')
+            ->addCssClass('btn btn-danger')
+            ->displayIf($this->shouldDisplayApproveRejectAction());
+
         return $actions
             ->add(Crud::PAGE_DETAIL, $withdrawAction)
+            ->add(Crud::PAGE_DETAIL, $approveAction)
+            ->add(Crud::PAGE_DETAIL, $rejectAction)
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->disable(Action::NEW, Action::EDIT)
             ->add(
@@ -143,5 +172,10 @@ class LeaveRequestCrudController extends AppAbstractCrudController
     private function shouldDisplayWithdrawAction(): \Closure
     {
         return fn (LeaveRequest $request) => in_array($request->status, [LeaveRequestStatusEnum::Pending, LeaveRequestStatusEnum::Approved], true) && $this->getUser() === $request->user;
+    }
+
+    private function shouldDisplayApproveRejectAction(): \Closure
+    {
+        return fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status && $this->isAdminOrManager();
     }
 }

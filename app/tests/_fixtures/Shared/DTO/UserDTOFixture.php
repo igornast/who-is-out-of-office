@@ -39,6 +39,7 @@ class UserDTOFixture implements FixtureInterface
             'birthDate' => \DateTimeImmutable::createFromMutable($faker->dateTimeThisDecade()),
             'contractStartedAt' => \DateTimeImmutable::createFromMutable($faker->dateTimeThisDecade()),
             'absenceBalanceResetDay' => new \DateTimeImmutable(date('Y').'-01-01'),
+            'managerId' => null,
         ];
     }
 }

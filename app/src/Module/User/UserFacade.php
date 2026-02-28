@@ -8,6 +8,7 @@ use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
+use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
@@ -32,6 +33,7 @@ final class UserFacade implements UserFacadeInterface
         private readonly GetUsersWithIncomingWorkAnniversariesQueryHandler $getUsersWithIncomingWorkAnniversariesHandler,
         private readonly GetUsersWithWorkAnniversariesForDatesQueryHandler $getUsersWithWorkAnniversariesForDatesHandler,
         private readonly ResetAbsenceBalanceCommandHandler $resetAbsenceBalanceHandler,
+        private readonly GetDirectReportsQueryHandler $getDirectReportsHandler,
     ) {
     }
 
@@ -98,5 +100,13 @@ final class UserFacade implements UserFacadeInterface
     public function resetAbsenceBalance(): void
     {
         $this->resetAbsenceBalanceHandler->handle();
+    }
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getDirectReports(string $managerId): array
+    {
+        return $this->getDirectReportsHandler->handle($managerId);
     }
 }

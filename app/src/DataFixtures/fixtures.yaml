@@ -44,6 +44,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
     user_3:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -61,6 +62,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_2'
     user_{4..6}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -78,6 +80,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_2'
     user_{7..10}:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -95,6 +98,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
 
 App\Infrastructure\Doctrine\Entity\LeaveRequestType:
     leave_request_type_1:

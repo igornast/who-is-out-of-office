@@ -14,12 +14,14 @@ use App\Module\LeaveRequest\UseCase\Query\CountOnLeaveTodayQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\FindOnLeaveTodayQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetDailyAbsenceSummaryQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetLeaveBalancesPerTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserIdQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetPendingLeaveRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
+use App\Shared\DTO\Dashboard\LeaveBalanceDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
@@ -46,6 +48,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly CountAbsencesThisWeekQueryHandler $countAbsencesThisWeekHandler,
         private readonly CountAllPendingRequestsQueryHandler $countAllPendingRequestsHandler,
         private readonly GetDailyAbsenceSummaryQueryHandler $getDailyAbsenceSummaryHandler,
+        private readonly GetLeaveBalancesPerTypeQueryHandler $getLeaveBalancesPerTypeHandler,
     ) {
     }
 
@@ -163,5 +166,13 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function getDailyAbsenceSummary(?\DateTimeImmutable $weekStart = null): array
     {
         return $this->getDailyAbsenceSummaryHandler->handle($weekStart);
+    }
+
+    /**
+     * @return LeaveBalanceDTO[]
+     */
+    public function getLeaveBalancesPerType(string $userId, \DateTimeImmutable $periodStart): array
+    {
+        return $this->getLeaveBalancesPerTypeHandler->handle($userId, $periodStart);
     }
 }

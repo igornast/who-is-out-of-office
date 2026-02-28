@@ -60,6 +60,12 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
             $user->password = $userDTO->password;
         }
 
+        if (null !== $userDTO->managerId) {
+            $user->manager = $this->find($userDTO->managerId);
+        } else {
+            $user->manager = null;
+        }
+
         $em = $this->getEntityManager();
         $em->persist($user);
         $em->flush();
@@ -174,6 +180,16 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         }
 
         return $userDTOs;
+    }
+
+    /**
+     * @return UserDTO[]
+     */
+    public function findByManagerId(string $managerId): array
+    {
+        $users = $this->findBy(['manager' => $managerId, 'isActive' => true]);
+
+        return array_map(fn (User $user) => UserDTO::fromEntity($user), $users);
     }
 
     public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO

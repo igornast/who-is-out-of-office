@@ -54,6 +54,11 @@ interface LeaveRequestRepositoryInterface
 
     public function countAllPendingRequests(): int;
 
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function findUsedDaysPerTypeForUser(string $userId, \DateTimeImmutable $periodStart): array;
+
     public function beginTransaction(): void;
 
     public function commit(): void;

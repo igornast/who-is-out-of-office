@@ -107,6 +107,9 @@ dashboard:
         showing: 'Showing %count% requests'
         see_all: 'See all requests'
         empty: No upcoming absences
+    leave_balances:
+        title: Leave Balances
+        empty: No leave types configured
     quick_links:
         title: Quick Links
         new_request: New Leave Request
