@@ -52,8 +52,10 @@
       document.addEventListener('DOMContentLoaded', () => {
         const calendarEl = document.getElementById('calendar');
 
+        const isMobile = window.innerWidth < 768;
+
         const calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
+          initialView: isMobile ? 'listWeek' : 'dayGridMonth',
           firstDay: 1,
           editable: false,
           eventSources: [
@@ -75,7 +77,26 @@
           headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth',
+            right: isMobile ? 'listWeek,dayGridMonth' : 'dayGridMonth',
+          },
+          windowResize: function(arg) {
+            const nowMobile = arg.view.calendar.el.offsetWidth < 768;
+            const currentView = arg.view.type;
+            if (nowMobile && currentView === 'dayGridMonth') {
+              calendar.changeView('listWeek');
+              calendar.setOption('headerToolbar', {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'listWeek,dayGridMonth',
+              });
+            } else if (!nowMobile && currentView === 'listWeek') {
+              calendar.changeView('dayGridMonth');
+              calendar.setOption('headerToolbar', {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth',
+              });
+            }
           },
           timeZone: 'UTC',
         });

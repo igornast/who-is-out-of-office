@@ -3,6 +3,21 @@ body.ea .main-content {
     transition: background-color 0.25s ease;
     min-width: 0;
     overflow: hidden;
+    isolation: isolate;
+}
+
+/* Flash messages — fixed toast above all navigation */
+body.ea #flash-messages {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1100;
+    max-width: 420px;
+    width: calc(100% - 32px);
+}
+
+body.ea #flash-messages .alert {
+    box-shadow: var(--shadow-lg);
 }
 
 body.ea .main-content .content-wrapper {
@@ -30,10 +45,10 @@ body.ea .main-content .content-header {
 
 body.ea .main-content .content-body {
     color: var(--text-secondary);
-    overflow-x: auto;
 }
 
 body.ea .main-content .content-body:has(.datagrid) {
+    overflow-x: auto;
     display: grid;
 }
 

@@ -7,7 +7,6 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Form\UserProfileType;
 use Doctrine\ORM\EntityManagerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -24,7 +23,6 @@ class UserProfileSettingsController extends AbstractController
         private readonly string $profileImagesBasePath,
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $hasher,
-        private readonly AdminUrlGenerator $urlGenerator,
     ) {
     }
 
@@ -57,9 +55,7 @@ class UserProfileSettingsController extends AbstractController
 
             $this->addFlash('success', 'Profile updated successfully!');
 
-            $url = $this->urlGenerator->setRoute('app_user_profile')->generateUrl();
-
-            return $this->redirect($url);
+            return $this->redirectToRoute('app_user_profile');
         }
 
         return $this->render('@AppAdmin/user/profile_edit.html.twig', [

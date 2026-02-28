@@ -12,6 +12,16 @@
     display: none;
 }
 
+/* ---- Leave Request form base styles (body.ea for specificity over EA reset) ---- */
+body.ea .lr-form-card-body {
+    padding: 32px;
+}
+
+.lr-form-actions {
+    border-top: 1px solid var(--border-light);
+    padding-top: 20px;
+}
+
 /* ===========================================
    Small Desktop: 1024–1199px
    Stats 2x2 (already handled at 1200px in _cards.css)
@@ -382,6 +392,50 @@
     .dashboard-left-column > *,
     .dashboard-right-column > * {
         margin-bottom: 0;
+    }
+
+    /* -- Leave Request form: compact padding + sticky submit -- */
+    body.ea .lr-form-card-body {
+        padding: 16px;
+    }
+
+    .lr-form-actions {
+        position: sticky;
+        bottom: 0;
+        flex-direction: column;
+        background: var(--app-surface);
+        border-top: 1px solid var(--border-light);
+        margin: 16px -16px -16px;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+        z-index: 10;
+    }
+
+    body.ea .lr-form-actions .btn {
+        width: 100%;
+    }
+
+    /* -- Profile & Settings: full-width buttons (body.ea for specificity) -- */
+    body.ea .settings-card-footer {
+        flex-direction: column;
+    }
+
+    body.ea .settings-card-footer .btn {
+        width: 100%;
+    }
+
+    /* Profile image: center on mobile */
+    .settings-card-body .form-group.row .text-center img {
+        max-width: 100px !important;
+    }
+
+    .settings-card-body .field-file .form-control {
+        width: 100%;
+    }
+
+    /* -- Full-width centered columns: remove excess horizontal margin on row -- */
+    .row.justify-content-center {
+        margin-left: 0;
+        margin-right: 0;
     }
 }
 

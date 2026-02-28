@@ -6,7 +6,6 @@ namespace App\Module\Admin\Controller;
 
 use App\Module\Admin\Form\AppSettingsFormType;
 use App\Shared\Facade\AppSettingsFacadeInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +21,6 @@ class AppSettingsController extends AbstractController
         #[Autowire(env: 'resolve:APP_SETTINGS_FILE')]
         private readonly string $settingFilename,
         private readonly AppSettingsFacadeInterface $appSettingsFacade,
-        private readonly AdminUrlGenerator $urlGenerator,
     ) {
     }
 
@@ -37,9 +35,7 @@ class AppSettingsController extends AbstractController
 
             $this->addFlash('success', 'Settings updated successfully!');
 
-            $url = $this->urlGenerator->setRoute('app_settings')->generateUrl();
-
-            return $this->redirect($url);
+            return $this->redirectToRoute('app_settings');
         }
 
         return $this->render('@AppAdmin/settings/edit.html.twig', [

@@ -261,6 +261,8 @@ html.dark body.ea .datagrid .table > tbody > tr > td .icon svg {
 
     body.ea .form-action-search .form-control {
         width: 100%;
+        height: 36px;
+        font-size: 13px;
     }
 
     body.ea .content-header-title .title {
@@ -270,5 +272,39 @@ html.dark body.ea .datagrid .table > tbody > tr > td .icon svg {
     body.ea .global-actions {
         flex-wrap: wrap;
         gap: 8px;
+    }
+
+    /* Hide checkbox column on mobile (batch actions impractical on touch) */
+    body.ea .datagrid .table th.checkbox-column,
+    body.ea .datagrid .table td.checkbox-column,
+    body.ea .form-check.form-switch.field-boolean {
+        display: none;
+    }
+
+    /* Compact table cell padding */
+    body.ea .datagrid .table > thead > tr > th,
+    body.ea .datagrid .table > tbody > tr > td {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    /* Responsive header (EA's built-in mobile header) */
+    body.ea .responsive-header {
+        background-color: var(--app-surface);
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    body.ea .responsive-header .title {
+        font-family: var(--font-display);
+        color: var(--text-primary);
+    }
+
+    /* Reduce global-actions spacing */
+    body.ea .content-header .global-actions {
+        margin-bottom: 8px;
+    }
+
+    body.ea .content-header {
+        padding: 12px 0;
     }
 }

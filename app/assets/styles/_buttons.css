@@ -33,68 +33,82 @@ body.ea .btn,
     padding: 0 20px;
 }
 
+/* --- Primary button --- */
 body.ea .btn-primary,
 .btn-primary {
-    background-color: var(--primary);
+    background: var(--primary);
     color: var(--text-on-primary);
     border-color: var(--primary);
 }
 
-body.ea .btn-primary:hover,
-.btn-primary:hover {
-    background-color: var(--primary-hover);
+body.ea .btn-primary:not(:disabled):hover {
+    background: var(--primary-hover);
     border-color: var(--primary-hover);
     color: var(--text-on-primary);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
-body.ea .btn-primary:active,
-body.ea .btn-primary:focus,
-.btn-primary:active,
-.btn-primary:focus {
-    background-color: var(--primary-active);
+body.ea .btn-primary:not(:disabled):active,
+body.ea .btn-primary:not(:disabled):focus,
+body.ea .btn-primary:not(:disabled):not(.disabled):focus-visible {
+    background: var(--primary-active);
     border-color: var(--primary-active);
     color: var(--text-on-primary);
     box-shadow: var(--shadow-focus);
+    outline: none;
 }
 
+/* --- CTA button --- */
+body.ea .btn-cta,
 .btn-cta {
-    background-color: var(--cta);
+    background: var(--cta);
     color: var(--cta-text);
 }
 
-.btn-cta:hover {
-    background-color: var(--cta-hover);
+body.ea .btn-cta:not(:disabled):hover {
+    background: var(--cta-hover);
+    color: var(--cta-text);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
-.btn-cta:focus {
+body.ea .btn-cta:not(:disabled):active,
+body.ea .btn-cta:not(:disabled):focus,
+body.ea .btn-cta:not(:disabled):not(.disabled):focus-visible {
+    background: var(--cta-hover);
+    color: var(--cta-text);
     box-shadow: var(--shadow-focus);
+    outline: none;
 }
 
+/* --- Danger button --- */
 body.ea .btn-danger,
 .btn-danger {
-    background-color: var(--danger);
+    background: var(--danger);
     color: var(--text-on-primary);
     border-color: var(--danger);
 }
 
-body.ea .btn-danger:hover,
-.btn-danger:hover {
-    background-color: var(--danger-hover);
+body.ea .btn-danger:not(:disabled):hover {
+    background: var(--danger-hover);
     border-color: var(--danger-hover);
     color: var(--text-on-primary);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
-body.ea .btn-danger:focus,
-.btn-danger:focus {
+body.ea .btn-danger:not(:disabled):active,
+body.ea .btn-danger:not(:disabled):focus,
+body.ea .btn-danger:not(:disabled):not(.disabled):focus-visible {
+    background: var(--danger-hover);
+    border-color: var(--danger-hover);
+    color: var(--text-on-primary);
     box-shadow: var(--shadow-focus);
+    outline: none;
 }
 
+/* --- Outline Primary button --- */
 body.ea .btn-outline-primary,
 .btn-outline,
 .btn-outline-primary {
@@ -103,20 +117,22 @@ body.ea .btn-outline-primary,
     border: 1.5px solid var(--primary);
 }
 
-body.ea .btn-outline-primary:hover,
-.btn-outline:hover,
-.btn-outline-primary:hover {
-    background-color: var(--primary-subtle);
+body.ea .btn-outline-primary:not(:disabled):hover {
+    background: var(--primary-subtle);
     border-color: var(--primary);
     color: var(--primary);
 }
 
-body.ea .btn-outline-primary:focus,
-.btn-outline:focus,
-.btn-outline-primary:focus {
+body.ea .btn-outline-primary:not(:disabled):active,
+body.ea .btn-outline-primary:not(:disabled):focus,
+body.ea .btn-outline-primary:not(:disabled):not(.disabled):focus-visible {
+    background: var(--primary-subtle);
+    color: var(--primary);
     box-shadow: var(--shadow-focus);
+    outline: none;
 }
 
+/* --- Outline White button --- */
 .btn-outline-white {
     background: rgba(255, 255, 255, 0.15);
     color: var(--text-on-primary);
@@ -127,44 +143,52 @@ body.ea .btn-outline-primary:focus,
     background: rgba(255, 255, 255, 0.25);
 }
 
+/* --- Ghost button --- */
 .btn-ghost {
     background: transparent;
     color: var(--text-tertiary);
 }
 
 .btn-ghost:hover {
-    background-color: var(--primary-subtle);
+    background: var(--primary-subtle);
     color: var(--primary);
 }
 
+/* --- Danger Ghost button --- */
 .btn-danger-ghost {
     background: transparent;
     color: var(--danger);
 }
 
 .btn-danger-ghost:hover {
-    background-color: var(--danger-subtle);
+    background: var(--danger-subtle);
 }
 
+/* --- Secondary button --- */
 body.ea .btn-secondary,
 .btn-secondary {
-    background-color: var(--app-bg-alt);
+    background: var(--app-bg-alt);
     border: 1px solid var(--border);
     color: var(--text-secondary);
 }
 
-body.ea .btn-secondary:hover,
-.btn-secondary:hover {
-    background-color: var(--border-light);
+body.ea .btn-secondary:not(:disabled):hover {
+    background: var(--border-light);
     border-color: var(--border);
     color: var(--text-secondary);
 }
 
-body.ea .btn-secondary:focus,
-.btn-secondary:focus {
+body.ea .btn-secondary:not(:disabled):active,
+body.ea .btn-secondary:not(:disabled):focus,
+body.ea .btn-secondary:not(:disabled):not(.disabled):focus-visible {
+    background: var(--border-light);
+    border-color: var(--border);
+    color: var(--text-secondary);
     box-shadow: var(--shadow-focus);
+    outline: none;
 }
 
+/* --- Action buttons --- */
 .action-btn {
     width: 28px;
     height: 28px;
@@ -185,7 +209,7 @@ body.ea .btn-secondary:focus,
 }
 
 .action-btn:hover {
-    background-color: var(--primary-subtle);
+    background: var(--primary-subtle);
     color: var(--primary);
 }
 
@@ -195,12 +219,12 @@ body.ea .btn-secondary:focus,
 }
 
 .action-btn.approve:hover {
-    background-color: var(--success-subtle);
+    background: var(--success-subtle);
     color: var(--success);
 }
 
 .action-btn.reject:hover {
-    background-color: var(--danger-subtle);
+    background: var(--danger-subtle);
     color: var(--danger);
 }
 
@@ -209,13 +233,14 @@ body.ea .btn-secondary:focus,
     gap: 4px;
 }
 
+/* --- Quick Add button --- */
 body.ea .btn-quick-add,
 .btn-quick-add {
     width: 34px;
     height: 34px;
     border-radius: var(--radius-md);
     border: none;
-    background-color: var(--cta);
+    background: var(--cta);
     color: var(--cta-text);
     cursor: pointer;
     display: flex;
@@ -225,7 +250,7 @@ body.ea .btn-quick-add,
 }
 
 .btn-quick-add:hover {
-    background-color: var(--cta-hover);
+    background: var(--cta-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -236,11 +261,9 @@ body.ea .btn-quick-add,
         transition: none;
     }
 
-    body.ea .btn-primary:hover,
-    .btn-primary:hover,
-    .btn-cta:hover,
-    body.ea .btn-danger:hover,
-    .btn-danger:hover {
+    body.ea .btn-primary:not(:disabled):hover,
+    body.ea .btn-cta:not(:disabled):hover,
+    body.ea .btn-danger:not(:disabled):hover {
         transform: none;
     }
 }
