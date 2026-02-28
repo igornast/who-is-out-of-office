@@ -3,7 +3,6 @@ body.ea .main-content {
     transition: background-color 0.25s ease;
     min-width: 0;
     overflow: hidden;
-    isolation: isolate;
 }
 
 /* Flash messages — fixed toast above all navigation */
