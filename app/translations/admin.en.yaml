@@ -13,10 +13,18 @@ menu:
         profile: Profile Settings
         calendar: Calendar
         absence_requests: Absence Requests
+        team_leave_requests: Team Leave Requests
+        team_members: Team Members
+    section:
+        my_team: My Team
+        organization: Organization
+        settings: Settings
+        account: Account
 
 sidebar:
     section:
         my_leave: My Leave
+        my_team: My Team
         organization: Organization
         settings: Settings
         account: Account
@@ -138,6 +146,8 @@ calendar:
 crud:
     title:
         leave_requests: Absence Requests
+        team_leave_requests: Team Leave Requests
+        team_members: Team Members
         user: My Team
 
     actions:

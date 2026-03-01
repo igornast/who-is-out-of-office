@@ -7,6 +7,8 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\Controller\LeaveRequest\LeaveRequestCrudController;
+use App\Module\Admin\Controller\LeaveRequest\TeamLeaveRequestCrudController;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\RoleEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
@@ -81,18 +83,33 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        $teamCrudLink = MenuItem::linkToCrud('menu.items.my_team', 'fa fa-user', User::class);
-        $leaveRequestTypesCrudLink = MenuItem::linkToCrud('menu.items.leave_request_types', 'fa fa-calendar-day', LeaveRequestType::class);
-        $appSettingsLink = MenuItem::linkToRoute('menu.items.app_settings', 'fa fa-gear', 'app_settings');
+        yield MenuItem::linkToLogout('menu.items.logout', 'fa fa-right-from-bracket');
+        yield MenuItem::linkToDashboard('menu.items.dashboard', 'fa fa-home');
+        yield MenuItem::linkToCrud('menu.items.absence_requests', 'fa fa-calendar-plus', LeaveRequest::class)
+            ->setController(LeaveRequestCrudController::class);
+        yield MenuItem::linkToRoute('menu.items.calendar', 'fa fa-calendar', 'app_calendar_view');
 
-        return [
-            MenuItem::linkToLogout('menu.items.logout', 'fa fa-right-from-bracket'),
-            MenuItem::linkToDashboard('menu.items.dashboard', 'fa fa-home'),
-            ...($this->isAdmin() ? [$teamCrudLink, $leaveRequestTypesCrudLink, $appSettingsLink] : []),
-            MenuItem::linkToRoute('menu.items.profile', 'fa fa-user', 'app_user_profile'),
-            MenuItem::linkToRoute('menu.items.calendar', 'fa fa-calendar', 'app_calendar_view'),
-            MenuItem::linkToCrud('menu.items.absence_requests', 'fa fa-calendar-plus', LeaveRequest::class),
-        ];
+        if ($this->isGranted(RoleEnum::Manager->value)) {
+            yield MenuItem::section('menu.section.my_team')->setPermission(RoleEnum::Manager->value);
+            yield MenuItem::linkToCrud('menu.items.team_leave_requests', 'fa fa-calendar-check', LeaveRequest::class)
+                ->setController(TeamLeaveRequestCrudController::class)
+                ->setPermission(RoleEnum::Manager->value);
+            yield MenuItem::linkToCrud('menu.items.team_members', 'fa fa-users', User::class)
+                ->setController(TeamMembersCrudController::class)
+                ->setPermission(RoleEnum::Manager->value);
+        }
+
+        if ($this->isAdmin()) {
+            yield MenuItem::section('menu.section.organization')->setPermission(RoleEnum::Admin->value);
+            yield MenuItem::linkToCrud('menu.items.my_team', 'fa fa-user', User::class);
+            yield MenuItem::linkToCrud('menu.items.leave_request_types', 'fa fa-calendar-day', LeaveRequestType::class);
+
+            yield MenuItem::section('menu.section.settings')->setPermission(RoleEnum::Admin->value);
+            yield MenuItem::linkToRoute('menu.items.app_settings', 'fa fa-gear', 'app_settings');
+        }
+
+        yield MenuItem::section('menu.section.account');
+        yield MenuItem::linkToRoute('menu.items.profile', 'fa fa-user', 'app_user_profile');
     }
 
     /**

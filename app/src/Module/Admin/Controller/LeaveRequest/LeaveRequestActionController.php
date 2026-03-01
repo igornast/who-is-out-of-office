@@ -34,7 +34,7 @@ class LeaveRequestActionController extends AbstractController
     ) {
     }
 
-    #[Route('/app/leave-request/{id}/withdraw', name: 'app_leave_request_withdraw')]
+    #[Route('/app/leave-request/{id}/withdraw', name: 'app_leave_request_withdraw', methods: ['POST'])]
     public function withdraw(Request $request, LeaveRequest $leaveRequest): RedirectResponse
     {
         if (!$this->isCsrfTokenValid(sprintf('withdraw%s', $leaveRequest->id), $request->query->get('_token'))) {
@@ -67,7 +67,7 @@ class LeaveRequestActionController extends AbstractController
         return $this->redirectToDetail($leaveRequest);
     }
 
-    #[Route('/app/leave-request/{id}/approve', name: 'app_leave_request_approve')]
+    #[Route('/app/leave-request/{id}/approve', name: 'app_leave_request_approve', methods: ['POST'])]
     public function approve(Request $request, LeaveRequest $leaveRequest): RedirectResponse
     {
         if (!$this->isCsrfTokenValid(sprintf('approve%s', $leaveRequest->id), $request->query->get('_token'))) {
@@ -95,7 +95,7 @@ class LeaveRequestActionController extends AbstractController
         return $this->redirectToDetail($leaveRequest);
     }
 
-    #[Route('/app/leave-request/{id}/reject', name: 'app_leave_request_reject')]
+    #[Route('/app/leave-request/{id}/reject', name: 'app_leave_request_reject', methods: ['POST'])]
     public function reject(Request $request, LeaveRequest $leaveRequest): RedirectResponse
     {
         if (!$this->isCsrfTokenValid(sprintf('reject%s', $leaveRequest->id), $request->query->get('_token'))) {

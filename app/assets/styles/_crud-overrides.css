@@ -116,6 +116,25 @@ body.ea .datagrid-filters {
     box-shadow: var(--shadow-sm);
 }
 
+/* renderAsForm() actions — EA puts btn classes on both <form> and <button> */
+body.ea .content-header form.btn {
+    all: unset;
+    display: contents;
+}
+
+/* EA adds btn-secondary as default; override when a specific variant is set */
+body.ea .content-header form .btn.btn-danger {
+    background: var(--danger);
+    color: var(--text-on-primary);
+    border-color: var(--danger);
+}
+
+body.ea .content-header form .btn.btn-success {
+    background: var(--success);
+    color: var(--text-on-primary);
+    border-color: var(--success);
+}
+
 /* Detail page */
 body.ea .content-panel {
     background-color: transparent;

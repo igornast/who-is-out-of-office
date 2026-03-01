@@ -17,6 +17,8 @@ it('admin sees full sidebar with settings and organization sections', function (
 
     expect($sidebar)
         ->toContain('My Team')
+        ->toContain('Team Leave Requests')
+        ->toContain('Team Members')
         ->toContain('App Settings')
         ->toContain('Leave Types')
         ->toContain('Profile Settings')
@@ -35,7 +37,7 @@ it('admin sees awaiting approval stat card', function (): void {
     expect($content)->toContain('Awaiting Approval');
 });
 
-it('manager sees organization section but not settings section', function (): void {
+it('manager sees team section but not settings section', function (): void {
     $client = createPantherClient();
     loginUserWithLoginForm($client, 'manager@ooo.com', '123');
 
@@ -45,7 +47,9 @@ it('manager sees organization section but not settings section', function (): vo
     $sidebar = $client->getCrawler()->filter('.ooo-sidebar')->text();
 
     expect($sidebar)
-        ->toContain('My Team')
+        ->toContain('MY TEAM')
+        ->toContain('Team Leave Requests')
+        ->toContain('Team Members')
         ->toContain('Absence Requests')
         ->toContain('Calendar')
         ->toContain('Profile Settings')
@@ -77,7 +81,9 @@ it('regular user sees minimal sidebar without organization or settings', functio
         ->toContain('Absence Requests')
         ->toContain('Calendar')
         ->toContain('Profile Settings')
-        ->not->toContain('My Team')
+        ->not->toContain('MY TEAM')
+        ->not->toContain('Team Leave Requests')
+        ->not->toContain('Team Members')
         ->not->toContain('App Settings')
         ->not->toContain('Leave Types');
 });

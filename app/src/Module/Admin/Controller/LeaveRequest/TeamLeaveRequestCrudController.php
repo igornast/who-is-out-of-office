@@ -9,7 +9,6 @@ use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\AppAbstractCrudController;
 use App\Shared\Enum\LeaveRequestStatusEnum;
-use App\Shared\Enum\RoleEnum;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -28,13 +27,14 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * @extends AppAbstractCrudController<LeaveRequest>
  */
-#[AdminRoute(path: '/leave-request', name: 'app_leave_request')]
-class LeaveRequestCrudController extends AppAbstractCrudController
+#[AdminRoute(path: '/team/leave-requests', name: 'app_team_leave_requests')]
+class TeamLeaveRequestCrudController extends AppAbstractCrudController
 {
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
@@ -49,18 +49,6 @@ class LeaveRequestCrudController extends AppAbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $withdrawAction = Action::new('withdraw', 'Withdraw')
-            ->linkToUrl(
-                fn (LeaveRequest $entity) => $this->urlGenerator->generate('app_leave_request_withdraw', [
-                    'id' => $entity->id,
-                    '_token' => $this->csrfTokenManager->getToken(sprintf('withdraw%s', $entity->id))->getValue(),
-                ])
-            )
-            ->renderAsForm()
-            ->setIcon('icon-ban')
-            ->addCssClass('btn btn-outline')
-            ->displayIf($this->shouldDisplayWithdrawAction());
-
         $approveAction = Action::new('approve', 'Approve')
             ->linkToUrl(
                 fn (LeaveRequest $entity) => $this->urlGenerator->generate('app_leave_request_approve', [
@@ -71,7 +59,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             ->renderAsForm()
             ->setIcon('icon-check')
             ->addCssClass('btn btn-success')
-            ->displayIf($this->shouldDisplayApproveRejectAction());
+            ->displayIf(fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status);
 
         $rejectAction = Action::new('reject', 'Reject')
             ->linkToUrl(
@@ -83,77 +71,61 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             ->renderAsForm()
             ->setIcon('icon-x')
             ->addCssClass('btn btn-danger')
-            ->displayIf($this->shouldDisplayApproveRejectAction());
+            ->displayIf(fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status);
 
         return $actions
-            ->add(Crud::PAGE_DETAIL, $withdrawAction)
             ->add(Crud::PAGE_DETAIL, $approveAction)
             ->add(Crud::PAGE_DETAIL, $rejectAction)
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
-            ->disable(Action::NEW, Action::EDIT)
-            ->add(
-                Crud::PAGE_INDEX,
-                Action::new('new-request')
-                    ->setLabel('crud.actions.leave_requests.new')
-                    ->linkToRoute('app_dashboard_requests_new')
-                    ->addCssClass('btn btn-success')
-                    ->createAsGlobalAction()
-            )
-            ->disable(Action::DELETE, Action::EDIT);
+            ->disable(Action::NEW, Action::EDIT, Action::DELETE);
     }
 
     public function configureCrud(Crud $crud): Crud
     {
-        $crud->setPageTitle(Action::INDEX, 'crud.title.leave_requests');
-
-        if ($this->isAdmin()) {
-            return $crud
-                ->setSearchFields(['user', 'status', 'leaveType'])
-                ->setDefaultSort(['createdAt' => 'DESC']);
-        }
-
         return $crud
-            ->setSearchFields(['status', 'leaveType'])
+            ->setPageTitle(Action::INDEX, 'crud.title.team_leave_requests')
+            ->setSearchFields(['user.firstName', 'user.lastName', 'status', 'leaveType.name'])
             ->setDefaultSort(['createdAt' => 'DESC']);
     }
 
     public function configureFilters(Filters $filters): Filters
     {
-        if ($this->isAdmin()) {
-            return $filters
-                ->add(ChoiceFilter::new('status')->setChoices(LeaveRequestStatusEnum::getChoices()))
-                ->add('user')
-                ->add('startDate')
-                ->add('endDate')
-                ->add('leaveType');
-        }
-
         return $filters
             ->add(ChoiceFilter::new('status')->setChoices(LeaveRequestStatusEnum::getChoices()))
+            ->add('user')
+            ->add('startDate')
+            ->add('endDate')
             ->add('leaveType');
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
+        if (!$this->isAdminOrManager()) {
+            throw new AccessDeniedException();
+        }
+
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+        $user = $this->getUser();
 
         if ($this->isAdmin()) {
             return $qb;
         }
 
-        return $qb->andWhere('entity.user = :user')->setParameter('user', $this->getUser());
+        return $qb
+            ->join('entity.user', 'u')
+            ->andWhere('u.manager = :manager')
+            ->setParameter('manager', $user);
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
             FormField::addColumn(8),
-            FormField::addFieldset('Request absence'),
-            AssociationField::new('user', 'Person')
-                ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName))
-                ->setPermission(RoleEnum::Admin->value),
+            FormField::addFieldset('Request Details'),
+            AssociationField::new('user', 'Employee')
+                ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName)),
 
-            AssociationField::new('leaveType', 'Type of the absence')
+            AssociationField::new('leaveType', 'Type')
                 ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $requestType->name),
 
             DateField::new('startDate', 'From')
@@ -169,15 +141,5 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             BooleanField::new('isAutoApproved')->setDisabled()->hideWhenCreating()->renderAsSwitch(false),
             DateField::new('createdAt')->setDisabled()->hideWhenCreating(),
         ];
-    }
-
-    private function shouldDisplayWithdrawAction(): \Closure
-    {
-        return fn (LeaveRequest $request) => in_array($request->status, [LeaveRequestStatusEnum::Pending, LeaveRequestStatusEnum::Approved], true) && $this->getUser() === $request->user;
-    }
-
-    private function shouldDisplayApproveRejectAction(): \Closure
-    {
-        return fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status && $this->isAdminOrManager();
     }
 }

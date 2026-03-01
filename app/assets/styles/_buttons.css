@@ -21,6 +21,37 @@ body.ea .btn,
     height: 16px;
 }
 
+/* Inline SVG icon classes — replaces FontAwesome for EasyAdmin action buttons */
+i.icon-check,
+i.icon-x,
+i.icon-ban {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-color: currentColor;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+i.icon-check {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+}
+
+i.icon-x {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+}
+
+i.icon-ban {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m4.9 4.9 14.2 14.2'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m4.9 4.9 14.2 14.2'/%3E%3C/svg%3E");
+}
+
 .btn-sm {
     height: 30px;
     font-size: 12px;
@@ -103,6 +134,32 @@ body.ea .btn-danger:not(:disabled):focus,
 body.ea .btn-danger:not(:disabled):not(.disabled):focus-visible {
     background: var(--danger-hover);
     border-color: var(--danger-hover);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+/* --- Success button --- */
+body.ea .btn-success,
+.btn-success {
+    background: var(--success);
+    color: var(--text-on-primary);
+    border-color: var(--success);
+}
+
+body.ea .btn-success:not(:disabled):hover {
+    background: var(--success-hover, color-mix(in srgb, var(--success), #000 10%));
+    border-color: var(--success-hover, color-mix(in srgb, var(--success), #000 10%));
+    color: var(--text-on-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+body.ea .btn-success:not(:disabled):active,
+body.ea .btn-success:not(:disabled):focus,
+body.ea .btn-success:not(:disabled):not(.disabled):focus-visible {
+    background: var(--success-hover, color-mix(in srgb, var(--success), #000 10%));
+    border-color: var(--success-hover, color-mix(in srgb, var(--success), #000 10%));
     color: var(--text-on-primary);
     box-shadow: var(--shadow-focus);
     outline: none;

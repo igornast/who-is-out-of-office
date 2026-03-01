@@ -39,7 +39,7 @@
         </many-to-one>
 
         <many-to-one field="manager" target-entity="App\Infrastructure\Doctrine\Entity\User">
-            <join-column name="manager_id" referenced-column-name="id" nullable="true" />
+            <join-column name="manager_id" referenced-column-name="id" nullable="true" on-delete="SET NULL" />
         </many-to-one>
 
         <lifecycle-callbacks>
