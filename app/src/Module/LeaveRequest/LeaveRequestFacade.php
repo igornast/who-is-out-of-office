@@ -15,11 +15,13 @@ use App\Module\LeaveRequest\UseCase\Query\FindOnLeaveTodayQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetDailyAbsenceSummaryQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveBalancesPerTypeQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\CountAllRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserIdQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetPendingLeaveRequestsQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetRecentLeaveRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
 use App\Shared\DTO\Dashboard\LeaveBalanceDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
@@ -49,6 +51,8 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly CountAllPendingRequestsQueryHandler $countAllPendingRequestsHandler,
         private readonly GetDailyAbsenceSummaryQueryHandler $getDailyAbsenceSummaryHandler,
         private readonly GetLeaveBalancesPerTypeQueryHandler $getLeaveBalancesPerTypeHandler,
+        private readonly GetRecentLeaveRequestsQueryHandler $getRecentLeaveRequestsHandler,
+        private readonly CountAllRequestsQueryHandler $countAllRequestsHandler,
     ) {
     }
 
@@ -174,5 +178,18 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function getLeaveBalancesPerType(string $userId, \DateTimeImmutable $periodStart): array
     {
         return $this->getLeaveBalancesPerTypeHandler->handle($userId, $periodStart);
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function getRecentLeaveRequests(int $limit = 5): array
+    {
+        return $this->getRecentLeaveRequestsHandler->handle($limit);
+    }
+
+    public function countAllRequests(): int
+    {
+        return $this->countAllRequestsHandler->handle();
     }
 }

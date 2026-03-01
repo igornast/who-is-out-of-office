@@ -144,6 +144,90 @@ body.ea .content-header:has(.welcome-banner) {
     }
 }
 
+/* ============================================
+   DASHBOARD — Recent Requests Actions & Toast
+   ============================================ */
+.dashboard-recent-requests {
+    position: relative;
+}
+
+.inline-action-form {
+    display: inline;
+}
+
+.table-action-btn.approve:hover {
+    background: var(--success-subtle);
+    color: var(--success);
+}
+
+.table-action-btn.reject:hover {
+    background: var(--danger-subtle);
+    color: var(--danger);
+}
+
+.table-action-btn.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.row-flash-success {
+    animation: row-flash 1s ease;
+}
+
+@keyframes row-flash {
+    0% { background-color: var(--success-subtle); }
+    100% { background-color: transparent; }
+}
+
+.widget-toast {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.widget-toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.widget-toast--success {
+    background: var(--success);
+    color: #fff;
+}
+
+.widget-toast--error {
+    background: var(--danger);
+    color: #fff;
+}
+
+/* Mobile request actions */
+.m-request-item {
+    position: relative;
+}
+
+.m-request-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.m-request-actions {
+    display: flex;
+    gap: 4px;
+    padding: 4px 16px 12px;
+}
+
 @media (max-width: 768px) {
     .welcome-banner {
         padding: 20px;

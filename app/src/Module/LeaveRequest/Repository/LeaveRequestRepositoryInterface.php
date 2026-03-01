@@ -59,6 +59,13 @@ interface LeaveRequestRepositoryInterface
      */
     public function findUsedDaysPerTypeForUser(string $userId, \DateTimeImmutable $periodStart): array;
 
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findRecentRequests(int $limit = 5): array;
+
+    public function countAllRequests(): int;
+
     public function beginTransaction(): void;
 
     public function commit(): void;

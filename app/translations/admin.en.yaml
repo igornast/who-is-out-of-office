@@ -101,7 +101,7 @@ dashboard:
         request_leave: Request Leave
         view_calendar: View Calendar
     recent_requests:
-        title: Recent Leave Requests
+        title: Pending Requests
         view_all: View All
         col:
             employee: Employee
@@ -112,9 +112,11 @@ dashboard:
             actions: Actions
         action:
             view: View details
-        showing: 'Showing %count% requests'
+            approve: Approve request
+            reject: Reject request
+        showing: 'Showing %count% of %total% requests'
         see_all: 'See all requests'
-        empty: No upcoming absences
+        empty: No recent leave requests
     leave_balances:
         title: Leave Balances
         empty: No leave types configured

@@ -267,7 +267,7 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         /** @var int $count */
         $count = $qb->select('COUNT(lr.id)')
             ->where('lr.status = :pending')
-            ->setParameter('pending', LeaveRequestStatusEnum::Pending->value)
+            ->setParameter('pending', LeaveRequestStatusEnum::Pending)
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -304,6 +304,38 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         $resultSet = $stmt->executeQuery();
 
         return $resultSet->fetchAllAssociative();
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findRecentRequests(int $limit = 5): array
+    {
+        $qb = $this->createQueryBuilder('lr');
+
+        /** @var LeaveRequest[] $items */
+        $items = $qb->where('lr.status = :pending')
+            ->setParameter('pending', LeaveRequestStatusEnum::Pending)
+            ->orderBy('lr.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
+    }
+
+    public function countAllRequests(): int
+    {
+        $qb = $this->createQueryBuilder('lr');
+
+        /** @var int $count */
+        $count = $qb->select('COUNT(lr.id)')
+            ->where('lr.status = :pending')
+            ->setParameter('pending', LeaveRequestStatusEnum::Pending)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $count;
     }
 
     public function delete(LeaveRequestDTO $leaveRequestDTO): void

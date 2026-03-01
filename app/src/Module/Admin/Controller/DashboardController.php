@@ -62,6 +62,8 @@ class DashboardController extends AbstractDashboardController
                 [LeaveRequestStatusEnum::Pending]
             ),
             'upcoming_absences_in_team' => $this->leaveRequestFacade->getUpcomingLeaveRequests(),
+            'recent_requests' => $this->leaveRequestFacade->getRecentLeaveRequests(5),
+            'recent_requests_total' => $this->leaveRequestFacade->countAllRequests(),
             'all_pending_requests_count' => $this->leaveRequestFacade->countAllPendingRequests(),
             'on_leave_today' => $this->leaveRequestFacade->countOnLeaveToday(),
             'whos_out_today' => $this->leaveRequestFacade->findOnLeaveToday(),

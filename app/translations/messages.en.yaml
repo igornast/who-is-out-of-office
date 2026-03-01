@@ -4,3 +4,20 @@ flash:
             success:
                 new: 'Member Id added successfully.'
                 edit: 'Member Id updated successfully.'
+
+error:
+    go_back: Go Back
+    go_to_dashboard: Go to Dashboard
+    403:
+        page_title: "Access Denied - Who's OOO"
+        title: Access Denied
+        description: "You don't have permission to access this page. If you think this is a mistake, contact your administrator."
+    404:
+        page_title: "Page Not Found - Who's OOO"
+        title: Page Not Found
+        description: "The page you're looking for doesn't exist or has been moved. It may have taken a day off."
+    generic:
+        page_title: "Error - Who's OOO"
+        code: Oops
+        title: Something Went Wrong
+        description: An unexpected error occurred. Please try again later or return to the dashboard.

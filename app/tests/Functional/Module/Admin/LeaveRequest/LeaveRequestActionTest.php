@@ -166,3 +166,75 @@ it('does not render withdraw button for non-owner', function (): void {
     $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
     expect(findActionFormUrl($crawler, 'withdraw'))->toBeNull();
 });
+
+it('returns JSON success for approve with Accept header', function (): void {
+    $this->client->loginUser($this->managerUser);
+    $id = $this->pendingRequest->id;
+
+    $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
+    $approveUrl = findActionFormUrl($crawler, 'approve');
+
+    $this->client->request('POST', $approveUrl, [], [], ['HTTP_ACCEPT' => 'application/json']);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(200);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeTrue()
+        ->and($data['status'])->toBe('approved')
+        ->and($data['id'])->toBe($id->toString());
+});
+
+it('returns JSON success for reject with Accept header', function (): void {
+    $this->client->loginUser($this->admin);
+    $id = $this->pendingRequest->id;
+
+    $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
+    $rejectUrl = findActionFormUrl($crawler, 'reject');
+
+    $this->client->request('POST', $rejectUrl, [], [], ['HTTP_ACCEPT' => 'application/json']);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(200);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeTrue()
+        ->and($data['status'])->toBe('rejected')
+        ->and($data['id'])->toBe($id->toString());
+});
+
+it('returns JSON 403 for CSRF failure with Accept header', function (): void {
+    $this->client->loginUser($this->admin);
+    $id = $this->pendingRequest->id;
+
+    $this->client->request(
+        'POST',
+        sprintf('/app/leave-request/%s/approve', $id),
+        [],
+        [],
+        ['HTTP_ACCEPT' => 'application/json']
+    );
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(403);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeFalse();
+});
+
+it('returns JSON 403 for self-approval with Accept header', function (): void {
+    $this->client->loginUser($this->admin);
+    $id = $this->adminPendingRequest->id;
+
+    $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
+    $approveUrl = findActionFormUrl($crawler, 'approve');
+
+    $this->client->request('POST', $approveUrl, [], [], ['HTTP_ACCEPT' => 'application/json']);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(403);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeFalse()
+        ->and($data['message'])->toContain('cannot approve or reject your own');
+});

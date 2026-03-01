@@ -77,4 +77,11 @@ interface LeaveRequestFacadeInterface
      * @return LeaveBalanceDTO[]
      */
     public function getLeaveBalancesPerType(string $userId, \DateTimeImmutable $periodStart): array;
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function getRecentLeaveRequests(int $limit = 5): array;
+
+    public function countAllRequests(): int;
 }

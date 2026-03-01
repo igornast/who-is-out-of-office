@@ -14,6 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('styles/_tokens-light.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/_tokens-dark.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_palette-sage.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_palette-sunset.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_palette-lavender.css') }}">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -157,6 +160,9 @@
                 document.documentElement.classList.add('dark', 'ea-dark-scheme');
                 document.documentElement.dataset.bsTheme = 'dark';
             }
+            var palette = localStorage.getItem('whosooo-palette') || 'teal';
+            if (['teal','sage','sunset','lavender'].indexOf(palette) === -1) palette = 'teal';
+            if (palette !== 'teal') document.documentElement.dataset.palette = palette;
         })();
     </script>
 </head>
