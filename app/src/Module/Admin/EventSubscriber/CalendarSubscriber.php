@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Module\Admin\EventSubscriber;
 
 use App\Infrastructure\Doctrine\Entity\User;
-use App\Module\Admin\Controller\LeaveRequest\LeaveRequestCrudController;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
@@ -13,10 +12,9 @@ use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use CalendarBundle\Event\SetDataEvent;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use CalendarBundle\Entity\Event;
 
 class CalendarSubscriber implements EventSubscriberInterface
@@ -25,7 +23,7 @@ class CalendarSubscriber implements EventSubscriberInterface
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
         private readonly UserFacadeInterface $userFacade,
         private readonly HolidayFacadeInterface $holidayFacade,
-        private readonly AdminUrlGenerator $adminUrlGenerator,
+        private readonly UrlGeneratorInterface $urlGenerator,
         private readonly Security $security,
     ) {
     }
@@ -42,8 +40,12 @@ class CalendarSubscriber implements EventSubscriberInterface
         $start = \DateTimeImmutable::createFromInterface($event->getStart());
         $end = \DateTimeImmutable::createFromInterface($event->getEnd());
 
-        $this->markNonWorkingDaysForUser($event);
-        $this->addPublicHolidayEvents($event);
+        /** @var User $user */
+        $user = $this->security->getUser();
+        $currentUserDTO = UserDTO::fromEntity($user);
+
+        $this->markNonWorkingDaysForUser($event, $currentUserDTO);
+        $this->addPublicHolidayEvents($event, $currentUserDTO);
         $this->addLeaveRequestEvents($event, $start, $end);
         $this->addBirthdayEvents($event, $start);
     }
@@ -83,11 +85,9 @@ class CalendarSubscriber implements EventSubscriberInterface
                     'comment' => $dto->comment,
                     'startDate' => $dto->startDate->format('M j, Y'),
                     'endDate' => $dto->endDate->format('M j, Y'),
-                    'detailUrl' => $this->adminUrlGenerator
-                        ->setController(LeaveRequestCrudController::class)
-                        ->setAction(Action::DETAIL)
-                        ->setEntityId($dto->id->toString())
-                        ->generateUrl(),
+                    'detailUrl' => $this->urlGenerator->generate('app_dashboard_app_leave_request_detail', [
+                        'entityId' => $dto->id->toString(),
+                    ]),
                 ],
             ]);
             $event->addEvent($calendarEvent);
@@ -124,8 +124,11 @@ class CalendarSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            /** @var \DateTime $birthdayThisYear */
-            $birthdayThisYear = \DateTime::createFromFormat('Y-m-d', $start->format('Y').'-'.$birthday->format('m-d'));
+            $birthdayThisYear = \DateTime::createFromFormat('Y-m-d', sprintf('%s-%s', $start->format('Y'), $birthday->format('m-d')));
+
+            if (false === $birthdayThisYear) {
+                continue;
+            }
 
             $calendarEvent = new Event(
                 sprintf('🥳 %s %s', $userDTO->firstName, $userDTO->lastName),
@@ -151,15 +154,11 @@ class CalendarSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function markNonWorkingDaysForUser(SetDataEvent $event): void
+    private function markNonWorkingDaysForUser(SetDataEvent $event, UserDTO $currentUserDTO): void
     {
-        /** @var User $user */
-        $user = $this->security->getUser();
-        $userDTO = UserDTO::fromEntity($user);
-
         $nonWorkingDays = array_filter(
             range(1, 5),
-            fn ($day) => !in_array($day, $userDTO->workingDays)
+            fn ($day) => !in_array($day, $currentUserDTO->workingDays)
         );
 
         $start = $event->getStart();
@@ -183,21 +182,17 @@ class CalendarSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addPublicHolidayEvents(SetDataEvent $event): void
+    private function addPublicHolidayEvents(SetDataEvent $event, UserDTO $currentUserDTO): void
     {
-        /** @var User $user */
-        $user = $this->security->getUser();
-        $userDTO = UserDTO::fromEntity($user);
-
-        if (null === $userDTO->calendarCountryCode) {
+        if (null === $currentUserDTO->calendarCountryCode) {
             return;
         }
 
-        $holidayCalendarDTO = $this->holidayFacade->getHolidayCalendarForCountry($userDTO->calendarCountryCode);
+        $holidayCalendarDTO = $this->holidayFacade->getHolidayCalendarForCountry($currentUserDTO->calendarCountryCode);
 
         foreach ($holidayCalendarDTO->holidays as $holidayDTO) {
             $calendarEvent = new Event(
-                '🎌 '.$holidayDTO->description,
+                sprintf('🎌 %s', $holidayDTO->description),
                 \DateTime::createFromImmutable($holidayDTO->date),
             );
             $calendarEvent->setOptions([

@@ -178,6 +178,6 @@ class LeaveRequestCrudController extends AppAbstractCrudController
 
     private function shouldDisplayApproveRejectAction(): \Closure
     {
-        return fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status && $this->isAdminOrManager();
+        return fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status && $this->canManageRequest($request);
     }
 }

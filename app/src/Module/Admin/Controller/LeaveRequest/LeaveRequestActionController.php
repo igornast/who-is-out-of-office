@@ -71,9 +71,7 @@ class LeaveRequestActionController extends AbstractController
         $dto->status = LeaveRequestStatusEnum::Withdrawn;
         $this->leaveRequestFacade->update($dto);
 
-        if (true === $leaveRequest->leaveType->isAffectingBalance) {
-            $this->userFacade->updateUserCurrentLeaveBalance($leaveRequest->user->id->toString(), $leaveRequest->workDays);
-        }
+        $this->restoreLeaveBalanceIfNeeded($leaveRequest);
 
         if ($this->wantsJson($request)) {
             return $this->json([
@@ -185,9 +183,7 @@ class LeaveRequestActionController extends AbstractController
         $dto->approvedBy = UserDTO::fromEntity($approver);
         $this->leaveRequestFacade->update($dto);
 
-        if (true === $leaveRequest->leaveType->isAffectingBalance) {
-            $this->userFacade->updateUserCurrentLeaveBalance($leaveRequest->user->id->toString(), $leaveRequest->workDays);
-        }
+        $this->restoreLeaveBalanceIfNeeded($leaveRequest);
 
         if ($this->wantsJson($request)) {
             return $this->json([
@@ -221,6 +217,13 @@ class LeaveRequestActionController extends AbstractController
             if ($managerId !== $currentUser->id->toString()) {
                 throw $this->createAccessDeniedException();
             }
+        }
+    }
+
+    private function restoreLeaveBalanceIfNeeded(LeaveRequest $leaveRequest): void
+    {
+        if (true === $leaveRequest->leaveType->isAffectingBalance) {
+            $this->userFacade->updateUserCurrentLeaveBalance($leaveRequest->user->id->toString(), $leaveRequest->workDays);
         }
     }
 

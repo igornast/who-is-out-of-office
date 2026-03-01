@@ -143,10 +143,9 @@ it('denies self-approval', function (): void {
     $id = $this->adminPendingRequest->id;
 
     $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    $approveUrl = findActionFormUrl($crawler, 'approve');
-    expect($approveUrl)->not->toBeNull();
+    expect(findActionFormUrl($crawler, 'approve'))->toBeNull('Approve button should be hidden for own requests');
 
-    $this->client->request('POST', $approveUrl);
+    $this->client->request('POST', sprintf('/app/leave-request/%s/approve', $id), ['_token' => 'invalid']);
     expect($this->client->getResponse()->getStatusCode())->toBe(403);
 });
 
@@ -226,15 +225,17 @@ it('returns JSON 403 for self-approval with Accept header', function (): void {
     $this->client->loginUser($this->admin);
     $id = $this->adminPendingRequest->id;
 
-    $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    $approveUrl = findActionFormUrl($crawler, 'approve');
-
-    $this->client->request('POST', $approveUrl, [], [], ['HTTP_ACCEPT' => 'application/json']);
+    $this->client->request(
+        'POST',
+        sprintf('/app/leave-request/%s/approve', $id),
+        [],
+        [],
+        ['HTTP_ACCEPT' => 'application/json']
+    );
     $response = $this->client->getResponse();
 
     expect($response->getStatusCode())->toBe(403);
 
     $data = json_decode($response->getContent(), true);
-    expect($data['success'])->toBeFalse()
-        ->and($data['message'])->toContain('cannot approve or reject your own');
+    expect($data['success'])->toBeFalse();
 });

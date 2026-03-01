@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Controller;
 
+use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Shared\Enum\RoleEnum;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -35,5 +36,24 @@ abstract class AppAbstractCrudController extends AbstractCrudController
     protected function isAdminOrManager(): bool
     {
         return $this->isGranted(RoleEnum::Admin->value) || $this->isGranted(RoleEnum::Manager->value);
+    }
+
+    protected function canManageRequest(LeaveRequest $request): bool
+    {
+        $currentUser = $this->getUser();
+
+        if ($currentUser->id->toString() === $request->user->id->toString()) {
+            return false;
+        }
+
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        if ($this->isGranted(RoleEnum::Manager->value)) {
+            return $request->user->manager?->id->toString() === $currentUser->id->toString();
+        }
+
+        return false;
     }
 }

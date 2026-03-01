@@ -59,7 +59,7 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
             ->renderAsForm()
             ->setIcon('icon-check')
             ->addCssClass('btn btn-success')
-            ->displayIf(fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status);
+            ->displayIf(fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status && $this->canManageRequest($request));
 
         $rejectAction = Action::new('reject', 'Reject')
             ->linkToUrl(
@@ -71,7 +71,7 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
             ->renderAsForm()
             ->setIcon('icon-x')
             ->addCssClass('btn btn-danger')
-            ->displayIf(fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status);
+            ->displayIf(fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status && $this->canManageRequest($request));
 
         return $actions
             ->add(Crud::PAGE_DETAIL, $approveAction)
