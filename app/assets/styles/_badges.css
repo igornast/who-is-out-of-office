@@ -127,6 +127,11 @@ html.dark .badge-remote {
     opacity: 1;
 }
 
+.tag-remove:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
 .tag-list {
     display: flex;
     flex-wrap: wrap;

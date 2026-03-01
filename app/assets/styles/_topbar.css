@@ -44,6 +44,12 @@ body.ea .main-content .content-top .ooo-breadcrumb-item a:hover {
     color: var(--primary);
 }
 
+body.ea .main-content .content-top .ooo-breadcrumb-item a:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+    border-radius: var(--radius-sm);
+}
+
 body.ea .main-content .content-top .ooo-breadcrumb-sep {
     color: var(--text-muted);
     font-size: 11px;

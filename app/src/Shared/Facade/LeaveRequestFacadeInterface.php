@@ -22,6 +22,8 @@ interface LeaveRequestFacadeInterface
 
     public function update(LeaveRequestDTO $leaveRequestDTO): void;
 
+    public function updateAndRestoreBalanceIfNeeded(LeaveRequestDTO $leaveRequestDTO): void;
+
     public function save(SaveLeaveRequestCommand $command): void;
 
     /**

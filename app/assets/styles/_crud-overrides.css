@@ -36,6 +36,12 @@ body.ea .datagrid .table > thead > tr > th a:hover {
     color: var(--primary);
 }
 
+body.ea .datagrid .table > thead > tr > th a:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+    border-radius: var(--radius-sm);
+}
+
 /* Pagination */
 body.ea .list-pagination {
     padding: 12px 20px;
@@ -71,6 +77,11 @@ body.ea .list-pagination .page-link:hover {
     background-color: var(--primary-subtle);
     border-color: var(--primary);
     color: var(--primary);
+}
+
+body.ea .list-pagination .page-link:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
 }
 
 body.ea .list-pagination .page-item.active .page-link {

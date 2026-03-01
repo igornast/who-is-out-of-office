@@ -52,6 +52,27 @@ beforeEach(function (): void {
     );
     $this->em->persist($this->adminPendingRequest);
 
+    $this->otherTeamUser = $this->em->getRepository(User::class)
+        ->createQueryBuilder('u')
+        ->where('u.manager = :admin')
+        ->andWhere('u.email != :managerEmail')
+        ->setParameter('admin', $this->admin)
+        ->setParameter('managerEmail', 'manager@ooo.com')
+        ->setMaxResults(1)
+        ->getQuery()
+        ->getSingleResult();
+
+    $this->otherTeamPendingRequest = new LeaveRequest(
+        id: Uuid::uuid4(),
+        user: $this->otherTeamUser,
+        status: LeaveRequestStatusEnum::Pending,
+        leaveType: $sickLeaveType,
+        startDate: new DateTimeImmutable('+60 days'),
+        endDate: new DateTimeImmutable('+64 days'),
+        workDays: 5,
+    );
+    $this->em->persist($this->otherTeamPendingRequest);
+
     $this->em->flush();
 });
 
@@ -224,6 +245,37 @@ it('returns JSON 403 for CSRF failure with Accept header', function (): void {
 it('returns JSON 403 for self-approval with Accept header', function (): void {
     $this->client->loginUser($this->admin);
     $id = $this->adminPendingRequest->id;
+
+    $this->client->request(
+        'POST',
+        sprintf('/app/leave-request/%s/approve', $id),
+        [],
+        [],
+        ['HTTP_ACCEPT' => 'application/json']
+    );
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(403);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeFalse();
+});
+
+it('denies manager approval of request from another team', function (): void {
+    $this->client->loginUser($this->managerUser);
+    $id = $this->otherTeamPendingRequest->id;
+
+    $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
+    expect(findActionFormUrl($crawler, 'approve'))->toBeNull('Approve button should be hidden for other team requests')
+        ->and(findActionFormUrl($crawler, 'reject'))->toBeNull('Reject button should be hidden for other team requests');
+
+    $this->client->request('POST', sprintf('/app/leave-request/%s/approve', $id), ['_token' => 'invalid']);
+    expect($this->client->getResponse()->getStatusCode())->toBe(403);
+});
+
+it('returns JSON 403 when manager tries to approve other team request', function (): void {
+    $this->client->loginUser($this->managerUser);
+    $id = $this->otherTeamPendingRequest->id;
 
     $this->client->request(
         'POST',

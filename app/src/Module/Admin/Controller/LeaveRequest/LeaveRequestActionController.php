@@ -14,7 +14,6 @@ use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\RoleEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
-use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -30,7 +29,6 @@ class LeaveRequestActionController extends AbstractController
 {
     public function __construct(
         private readonly AdminUrlGenerator $adminUrlGenerator,
-        private readonly UserFacadeInterface $userFacade,
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
     ) {
     }
@@ -69,9 +67,7 @@ class LeaveRequestActionController extends AbstractController
 
         $dto = LeaveRequestDTO::fromEntity($leaveRequest);
         $dto->status = LeaveRequestStatusEnum::Withdrawn;
-        $this->leaveRequestFacade->update($dto);
-
-        $this->restoreLeaveBalanceIfNeeded($leaveRequest);
+        $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded($dto);
 
         if ($this->wantsJson($request)) {
             return $this->json([
@@ -181,9 +177,7 @@ class LeaveRequestActionController extends AbstractController
         $dto = LeaveRequestDTO::fromEntity($leaveRequest);
         $dto->status = LeaveRequestStatusEnum::Rejected;
         $dto->approvedBy = UserDTO::fromEntity($approver);
-        $this->leaveRequestFacade->update($dto);
-
-        $this->restoreLeaveBalanceIfNeeded($leaveRequest);
+        $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded($dto);
 
         if ($this->wantsJson($request)) {
             return $this->json([
@@ -217,13 +211,6 @@ class LeaveRequestActionController extends AbstractController
             if ($managerId !== $currentUser->id->toString()) {
                 throw $this->createAccessDeniedException();
             }
-        }
-    }
-
-    private function restoreLeaveBalanceIfNeeded(LeaveRequest $leaveRequest): void
-    {
-        if (true === $leaveRequest->leaveType->isAffectingBalance) {
-            $this->userFacade->updateUserCurrentLeaveBalance($leaveRequest->user->id->toString(), $leaveRequest->workDays);
         }
     }
 

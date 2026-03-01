@@ -144,6 +144,11 @@
     opacity: 0.85;
 }
 
+.fc .fc-event:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
 .fc .fc-event-title {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -430,6 +435,12 @@
 
 .cal-event-popover-link:hover {
     opacity: 0.8;
+}
+
+.cal-event-popover-link:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+    border-radius: var(--radius-sm);
 }
 
 .cal-event-popover-link i {

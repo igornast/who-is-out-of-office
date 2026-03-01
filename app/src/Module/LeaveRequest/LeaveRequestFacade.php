@@ -28,6 +28,7 @@ use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
+use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 
@@ -53,6 +54,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetLeaveBalancesPerTypeQueryHandler $getLeaveBalancesPerTypeHandler,
         private readonly GetRecentLeaveRequestsQueryHandler $getRecentLeaveRequestsHandler,
         private readonly CountAllRequestsQueryHandler $countAllRequestsHandler,
+        private readonly UserFacadeInterface $userFacade,
     ) {
     }
 
@@ -92,6 +94,18 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function update(LeaveRequestDTO $leaveRequestDTO): void
     {
         $this->updateLeaveRequestCommandHandler->handle($leaveRequestDTO);
+    }
+
+    public function updateAndRestoreBalanceIfNeeded(LeaveRequestDTO $leaveRequestDTO): void
+    {
+        $this->update($leaveRequestDTO);
+
+        if ($leaveRequestDTO->leaveType->isAffectingBalance) {
+            $this->userFacade->updateUserCurrentLeaveBalance(
+                $leaveRequestDTO->user->id,
+                $leaveRequestDTO->workDays,
+            );
+        }
     }
 
     public function save(SaveLeaveRequestCommand $command): void

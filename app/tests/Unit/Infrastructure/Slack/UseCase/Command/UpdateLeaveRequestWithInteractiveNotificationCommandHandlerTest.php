@@ -8,6 +8,7 @@ use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestDTOFixture;
+use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestTypeDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Ramsey\Uuid\Uuid;
 
@@ -93,6 +94,7 @@ it('removes leave request and returns blocked days when rejected', function () {
         'status' => LeaveRequestStatusEnum::Pending,
         'approvedBy' => null,
         'workDays' => 10,
+        'leaveType' => LeaveRequestTypeDTOFixture::create(['isAffectingBalance' => true]),
     ]);
 
     $notificationDTO = new InteractiveNotificationDTO(
@@ -146,6 +148,7 @@ it('removes leave request and returns blocked days when cancelled', function () 
         'status' => LeaveRequestStatusEnum::Pending,
         'approvedBy' => null,
         'workDays' => 7,
+        'leaveType' => LeaveRequestTypeDTOFixture::create(['isAffectingBalance' => true]),
     ]);
 
     $notificationDTO = new InteractiveNotificationDTO(

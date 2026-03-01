@@ -50,6 +50,11 @@ body.ea .card-body,
     border-color: var(--border);
 }
 
+.card-interactive:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
 .stat-card {
     background-color: var(--app-surface);
     border: 1px solid var(--border-light);
@@ -63,6 +68,12 @@ a.stat-card-link {
     text-decoration: none;
     color: inherit;
     cursor: pointer;
+}
+
+a.stat-card-link:focus-visible {
+    outline: none;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-focus);
 }
 
 .stat-card:hover {
@@ -467,6 +478,11 @@ body.ea .panel-body {
 .week-nav button:hover {
     border-color: var(--primary);
     color: var(--primary);
+}
+
+.week-nav button:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
 }
 
 .week-nav button i {
