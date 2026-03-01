@@ -74,18 +74,22 @@ class CalendarSubscriber implements EventSubscriberInterface
                 'textColor' => $style['textColor'],
                 'allDay' => true,
                 'extendedProps' => [
+                    'type' => 'leave',
                     'status' => $dto->status->value,
+                    'leaveTypeName' => $leaveTypeDTO->name,
+                    'leaveTypeIcon' => $leaveTypeDTO->icon,
+                    'employeeName' => sprintf('%s %s', $dto->user->firstName, $dto->user->lastName),
+                    'workDays' => $dto->workDays,
+                    'comment' => $dto->comment,
+                    'startDate' => $dto->startDate->format('M j, Y'),
+                    'endDate' => $dto->endDate->format('M j, Y'),
+                    'detailUrl' => $this->adminUrlGenerator
+                        ->setController(LeaveRequestCrudController::class)
+                        ->setAction(Action::DETAIL)
+                        ->setEntityId($dto->id->toString())
+                        ->generateUrl(),
                 ],
             ]);
-
-            $calendarEvent->addOption(
-                'url',
-                $this->adminUrlGenerator
-                ->setController(LeaveRequestCrudController::class)
-                ->setAction(Action::DETAIL)
-                ->setEntityId($dto->id->toString())
-                ->generateUrl()
-            );
             $event->addEvent($calendarEvent);
         }
     }
@@ -138,6 +142,8 @@ class CalendarSubscriber implements EventSubscriberInterface
                 'extendedProps' => [
                     'type' => 'birthday',
                     'userId' => $userDTO->id,
+                    'employeeName' => sprintf('%s %s', $userDTO->firstName, $userDTO->lastName),
+                    'date' => $birthdayThisYear->format('M j'),
                 ],
             ]);
 
@@ -199,6 +205,11 @@ class CalendarSubscriber implements EventSubscriberInterface
                 'borderColor' => '#f5bcbc',
                 'textColor' => '#b30000',
                 'allDay' => true,
+                'extendedProps' => [
+                    'type' => 'holiday',
+                    'description' => $holidayDTO->description,
+                    'date' => $holidayDTO->date->format('M j, Y'),
+                ],
             ]);
 
             $event->addEvent($calendarEvent);

@@ -22,6 +22,19 @@
 {% block main %}
     <div id="calendar"></div>
 
+    <div id="cal-event-popover" class="cal-event-popover" role="dialog" aria-modal="false">
+        <div class="cal-event-popover-content">
+            <div class="cal-event-popover-header">
+                <span class="cal-event-popover-title" id="cal-event-title"></span>
+                <button class="cal-event-popover-close" id="cal-event-close" type="button" aria-label="Close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="cal-event-popover-body" id="cal-event-body"></div>
+            <div class="cal-event-popover-footer" id="cal-event-footer"></div>
+        </div>
+    </div>
+
     <div id="cal-subscribe-popover" class="cal-subscribe-popover" role="dialog" aria-modal="true" aria-labelledby="cal-subscribe-title">
         <div class="cal-subscribe-popover-content">
             <div class="cal-subscribe-popover-header">
@@ -54,6 +67,17 @@
 
         const isMobile = window.innerWidth < 768;
 
+        var TRANSLATIONS = {
+            type: '{{ "calendar.popover.type"|trans(domain: "admin") }}',
+            status: '{{ "calendar.popover.status"|trans(domain: "admin") }}',
+            dates: '{{ "calendar.popover.dates"|trans(domain: "admin") }}',
+            workDays: '{{ "calendar.popover.work_days"|trans(domain: "admin") }}',
+            days: '{{ "calendar.popover.days"|trans(domain: "admin") }}',
+            comment: '{{ "calendar.popover.comment"|trans(domain: "admin") }}',
+            date: '{{ "calendar.popover.date"|trans(domain: "admin") }}',
+            viewDetails: '{{ "calendar.popover.view_details"|trans(domain: "admin") }}',
+        };
+
         const calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: isMobile ? 'listWeek' : 'dayGridMonth',
           firstDay: 1,
@@ -73,6 +97,10 @@
             if (status === 'pending') {
               info.el.classList.add('fc-pending-leave');
             }
+          },
+          eventClick: function(info) {
+            info.jsEvent.preventDefault();
+            showEventPopover(info.event, info.el);
           },
           headerToolbar: {
             left: 'prev,next today',
@@ -103,6 +131,118 @@
 
         calendar.render();
 
+        var eventPopover = document.getElementById('cal-event-popover');
+        var eventPopoverContent = eventPopover.querySelector('.cal-event-popover-content');
+        var eventTitle = document.getElementById('cal-event-title');
+        var eventBody = document.getElementById('cal-event-body');
+        var eventFooter = document.getElementById('cal-event-footer');
+        var eventClose = document.getElementById('cal-event-close');
+
+        function showEventPopover(event, el) {
+            var props = event.extendedProps;
+            var type = props.type;
+
+            if (!type) return;
+
+            if (type === 'leave') {
+                eventTitle.textContent = props.employeeName;
+                eventBody.innerHTML = buildLeaveContent(props);
+                eventFooter.innerHTML = '<a href="' + props.detailUrl + '" class="cal-event-popover-link">' +
+                    '<i data-lucide="external-link"></i> ' + TRANSLATIONS.viewDetails + '</a>';
+            } else if (type === 'birthday') {
+                eventTitle.textContent = props.employeeName;
+                eventBody.innerHTML = '<div class="cal-event-detail-row">' +
+                    '<span class="cal-event-detail-label">' + TRANSLATIONS.date + '</span>' +
+                    '<span class="cal-event-detail-value">' + props.date + '</span></div>';
+                eventFooter.innerHTML = '';
+            } else if (type === 'holiday') {
+                eventTitle.textContent = props.description;
+                eventBody.innerHTML = '<div class="cal-event-detail-row">' +
+                    '<span class="cal-event-detail-label">' + TRANSLATIONS.date + '</span>' +
+                    '<span class="cal-event-detail-value">' + props.date + '</span></div>';
+                eventFooter.innerHTML = '';
+            }
+
+            eventPopover.classList.add('active');
+            positionPopover(el);
+            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+        }
+
+        function buildLeaveContent(props) {
+            var html = '';
+            html += '<div class="cal-event-detail-row">' +
+                '<span class="cal-event-detail-label">' + TRANSLATIONS.type + '</span>' +
+                '<span class="cal-event-detail-value">' + props.leaveTypeIcon + ' ' + props.leaveTypeName + '</span></div>';
+            html += '<div class="cal-event-detail-row">' +
+                '<span class="cal-event-detail-label">' + TRANSLATIONS.status + '</span>' +
+                '<span class="cal-event-detail-value"><span class="cal-event-badge cal-event-badge-' + props.status + '">' + props.status + '</span></span></div>';
+            html += '<div class="cal-event-detail-row">' +
+                '<span class="cal-event-detail-label">' + TRANSLATIONS.dates + '</span>' +
+                '<span class="cal-event-detail-value">' + props.startDate + ' — ' + props.endDate + '</span></div>';
+            html += '<div class="cal-event-detail-row">' +
+                '<span class="cal-event-detail-label">' + TRANSLATIONS.workDays + '</span>' +
+                '<span class="cal-event-detail-value">' + props.workDays + ' ' + TRANSLATIONS.days + '</span></div>';
+            if (props.comment) {
+                html += '<div class="cal-event-detail-row cal-event-detail-row-comment">' +
+                    '<span class="cal-event-detail-label">' + TRANSLATIONS.comment + '</span>' +
+                    '<span class="cal-event-detail-value">' + escapeHtml(props.comment) + '</span></div>';
+            }
+            return html;
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(text));
+            return div.innerHTML;
+        }
+
+        function positionPopover(eventEl) {
+            var content = eventPopoverContent;
+            content.style.position = '';
+            content.style.left = '';
+            content.style.top = '';
+
+            if (window.innerWidth < 768) return;
+
+            var rect = eventEl.getBoundingClientRect();
+            content.style.position = 'fixed';
+
+            var popoverWidth = 340;
+            var popoverHeight = content.offsetHeight || 280;
+            var margin = 8;
+
+            var left = rect.right + margin;
+            if (left + popoverWidth > window.innerWidth) {
+                left = rect.left - popoverWidth - margin;
+            }
+            if (left < margin) {
+                left = margin;
+            }
+
+            var top = rect.top;
+            if (top + popoverHeight > window.innerHeight - margin) {
+                top = window.innerHeight - popoverHeight - margin;
+            }
+            if (top < margin) {
+                top = margin;
+            }
+
+            content.style.left = left + 'px';
+            content.style.top = top + 'px';
+        }
+
+        function closeEventPopover() {
+            eventPopover.classList.remove('active');
+        }
+
+        eventClose.addEventListener('click', closeEventPopover);
+
+        eventPopover.addEventListener('click', function(e) {
+            if (e.target === eventPopover) {
+                closeEventPopover();
+            }
+        });
+
         var subscribeBtn = document.getElementById('cal-subscribe-btn');
         var subscribePopover = document.getElementById('cal-subscribe-popover');
         var subscribeClose = document.getElementById('cal-subscribe-close');
@@ -130,6 +270,7 @@
         document.addEventListener('keydown', function(e) {
           if (e.key === 'Escape') {
             subscribePopover.classList.remove('active');
+            closeEventPopover();
           }
         });
 

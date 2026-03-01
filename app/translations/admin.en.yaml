@@ -144,6 +144,15 @@ calendar:
         copy_url: Copy URL
         copied: Copied!
         description: Add this URL to Google Calendar, Outlook, or Apple Calendar to sync team absences automatically.
+    popover:
+        type: Type
+        status: Status
+        dates: Dates
+        work_days: Work days
+        days: days
+        comment: Comment
+        date: Date
+        view_details: View Full Details
 
 crud:
     title:
