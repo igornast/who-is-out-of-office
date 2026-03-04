@@ -29,16 +29,20 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * @extends AppAbstractCrudController<LeaveRequest>
  */
+#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_MANAGER")'))]
 #[AdminRoute(path: '/team/leave-requests', name: 'app_team_leave_requests')]
 class TeamLeaveRequestCrudController extends AppAbstractCrudController
 {
@@ -80,11 +84,11 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
             ->addCssClass('btn btn-danger')
             ->displayIf(fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status && $this->canManageRequest($request));
 
-        $batchApproveAction = Action::new('batchApprove', 'Approve selected')
+        $batchApproveAction = Action::new('batchApprove', 'crud.team_leave_requests.batch.approve')
             ->linkToCrudAction('batchApprove')
             ->addCssClass('btn btn-success');
 
-        $batchRejectAction = Action::new('batchReject', 'Reject selected')
+        $batchRejectAction = Action::new('batchReject', 'crud.team_leave_requests.batch.reject')
             ->linkToCrudAction('batchReject')
             ->addCssClass('btn btn-danger');
 
@@ -100,7 +104,8 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setPageTitle(Action::INDEX, 'crud.title.team_leave_requests')
+            ->setPageTitle(Crud::PAGE_INDEX, 'crud.title.team_leave_requests')
+            ->setPageTitle(Crud::PAGE_DETAIL, 'crud.team_leave_requests.detail.title')
             ->setSearchFields(['user.firstName', 'user.lastName', 'status', 'leaveType.name'])
             ->setDefaultSort(['createdAt' => 'DESC']);
     }
@@ -122,16 +127,8 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
         }
 
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
-        $user = $this->getUser();
 
-        if ($this->isAdmin()) {
-            return $qb;
-        }
-
-        return $qb
-            ->join('entity.user', 'u')
-            ->andWhere('u.manager = :manager')
-            ->setParameter('manager', $user);
+        return $this->applyTeamScope($qb);
     }
 
     /**
@@ -140,33 +137,12 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
      */
     public function batchApprove(AdminContext $context, BatchActionDto $batchActionDto): Response
     {
-        if (!$this->isCsrfTokenValid('ea-batch-action-batchApprove', $batchActionDto->getCsrfToken())) {
-            return $this->redirect($this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl());
-        }
-
-        $approver = UserDTO::fromEntity($this->getUser());
-        $processed = 0;
-
-        foreach ($batchActionDto->getEntityIds() as $id) {
-            $dto = $this->leaveRequestFacade->getById($id);
-
-            if (null === $dto || LeaveRequestStatusEnum::Pending !== $dto->status) {
-                continue;
-            }
-
-            if ($dto->user->id === $approver->id) {
-                continue;
-            }
-
-            $dto->status = LeaveRequestStatusEnum::Approved;
-            $dto->approvedBy = $approver;
-            $this->leaveRequestFacade->update($dto);
-            ++$processed;
-        }
-
-        $this->addFlash('success', sprintf('%d leave request(s) approved.', $processed));
-
-        return $this->redirect($this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl());
+        return $this->processBatchAction(
+            $batchActionDto,
+            'ea-batch-action-batchApprove',
+            LeaveRequestStatusEnum::Approved,
+            restoreBalance: false,
+        );
     }
 
     /**
@@ -175,8 +151,67 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
      */
     public function batchReject(AdminContext $context, BatchActionDto $batchActionDto): Response
     {
-        if (!$this->isCsrfTokenValid('ea-batch-action-batchReject', $batchActionDto->getCsrfToken())) {
-            return $this->redirect($this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl());
+        return $this->processBatchAction(
+            $batchActionDto,
+            'ea-batch-action-batchReject',
+            LeaveRequestStatusEnum::Rejected,
+            restoreBalance: true,
+        );
+    }
+
+    public function configureFields(string $pageName): iterable
+    {
+        return [
+            FormField::addColumn(8),
+            FormField::addFieldset('crud.team_leave_requests.fieldset.request'),
+            AssociationField::new('user', 'crud.team_leave_requests.field.employee')
+                ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName)),
+
+            AssociationField::new('leaveType', 'crud.team_leave_requests.field.type')
+                ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $requestType->name),
+
+            DateField::new('startDate', 'crud.team_leave_requests.field.from')
+                ->setColumns(6),
+            DateField::new('endDate', 'crud.team_leave_requests.field.to')
+                ->setColumns(6),
+
+            TextField::new('comment', 'crud.team_leave_requests.field.comment')
+                ->onlyOnDetail(),
+
+            FormField::addColumn(4)->hideWhenCreating(),
+            FormField::addFieldset('crud.team_leave_requests.fieldset.details')->hideWhenCreating(),
+            ChoiceField::new('status', 'crud.team_leave_requests.field.status')
+                ->setChoices(LeaveRequestStatusEnum::cases())
+                ->setDisabled()
+                ->hideWhenCreating(),
+            NumberField::new('workDays', 'crud.team_leave_requests.field.work_days')
+                ->setDisabled()
+                ->hideWhenCreating(),
+            AssociationField::new('approvedBy', 'crud.team_leave_requests.field.approved_by')
+                ->formatValue(fn (?User $user): string => null === $user ? '—' : sprintf('%s %s', $user->firstName, $user->lastName))
+                ->setDisabled()
+                ->hideWhenCreating(),
+            BooleanField::new('isAutoApproved', 'crud.team_leave_requests.field.auto_approved')
+                ->setDisabled()
+                ->hideWhenCreating()
+                ->renderAsSwitch(false),
+            DateField::new('createdAt', 'crud.team_leave_requests.field.created_at')
+                ->setDisabled()
+                ->hideWhenCreating(),
+        ];
+    }
+
+    /**
+     * @param BatchActionDto<LeaveRequest> $batchActionDto
+     */
+    private function processBatchAction(
+        BatchActionDto $batchActionDto,
+        string $csrfTokenId,
+        LeaveRequestStatusEnum $newStatus,
+        bool $restoreBalance,
+    ): Response {
+        if (!$this->isCsrfTokenValid($csrfTokenId, $batchActionDto->getCsrfToken())) {
+            return $this->redirectToIndex();
         }
 
         $approver = UserDTO::fromEntity($this->getUser());
@@ -193,42 +228,43 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
                 continue;
             }
 
-            $dto->status = LeaveRequestStatusEnum::Rejected;
+            if (!$this->isAdmin() && $dto->user->managerId !== $approver->id) {
+                continue;
+            }
+
+            $dto->status = $newStatus;
             $dto->approvedBy = $approver;
-            $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded($dto);
+
+            $restoreBalance
+                ? $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded($dto)
+                : $this->leaveRequestFacade->update($dto);
+
             ++$processed;
         }
 
-        $this->addFlash('success', sprintf('%d leave request(s) rejected.', $processed));
+        $this->addFlash('success', sprintf('%d leave request(s) %s.', $processed, $newStatus->value));
 
-        return $this->redirect($this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl());
+        return $this->redirectToIndex();
     }
 
-    public function configureFields(string $pageName): iterable
+    private function redirectToIndex(): Response
     {
-        return [
-            FormField::addColumn(8),
-            FormField::addFieldset('Request Details'),
-            AssociationField::new('user', 'Employee')
-                ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName)),
+        return $this->redirect(
+            $this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl()
+        );
+    }
 
-            AssociationField::new('leaveType', 'Type')
-                ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $requestType->name),
+    private function applyTeamScope(QueryBuilder $qb): QueryBuilder
+    {
+        if ($this->isAdmin()) {
+            return $qb;
+        }
 
-            DateField::new('startDate', 'From')
-                ->setColumns(6),
-            DateField::new('endDate', 'To')
-                ->setColumns(6),
+        $user = $this->getUser();
 
-            FormField::addColumn(4)->hideWhenCreating(),
-            FormField::addFieldset('Details')->hideWhenCreating(),
-            ChoiceField::new('status')->setChoices(LeaveRequestStatusEnum::cases())->setDisabled()->hideWhenCreating(),
-            NumberField::new('workDays')->setDisabled()->hideWhenCreating(),
-            AssociationField::new('approvedBy')
-                ->formatValue(fn (?User $user): string => null === $user ? '—' : sprintf('%s %s', $user->firstName, $user->lastName))
-                ->setDisabled()->hideWhenCreating(),
-            BooleanField::new('isAutoApproved')->setDisabled()->hideWhenCreating()->renderAsSwitch(false),
-            DateField::new('createdAt')->setDisabled()->hideWhenCreating(),
-        ];
+        return $qb
+            ->join('entity.user', 'u')
+            ->andWhere('u.manager = :manager')
+            ->setParameter('manager', $user);
     }
 }

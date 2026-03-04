@@ -188,6 +188,48 @@ crud:
         leave_requests:
             new: Add Absence Request
 
+    team_leave_requests:
+        detail:
+            title: Leave Request Details
+        fieldset:
+            request: Request Details
+            details: Details
+        field:
+            employee: Employee
+            type: Type
+            from: From
+            to: To
+            comment: Comment
+            status: Status
+            work_days: Work Days
+            approved_by: Approved By
+            auto_approved: Auto Approved
+            created_at: Submitted
+        batch:
+            approve: Approve selected
+            reject: Reject selected
+
+    team_members:
+        detail:
+            title: Team Member Details
+        tab:
+            general: General
+            leave_balance: Leave Balance
+            details: Details
+        field:
+            first_name: First Name
+            last_name: Last Name
+            email: Email
+            role: Role
+            start_date: Start Date
+            manager: Manager
+            annual_allowance: Annual Allowance
+            current_balance: Current Balance
+            balance_reset_day: Balance Reset Day
+            birth_date: Birth Date
+            working_days: Working Days
+            active: Active
+
     user_profile:
         edit:
             page_title: Profile Settings

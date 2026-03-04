@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Module\Admin\Controller;
 
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\Constants\UserSettings;
 use App\Shared\Service\RoleTranslator;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -16,17 +17,22 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * @extends AppAbstractCrudController<User>
  */
+#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_MANAGER")'))]
 #[AdminRoute(path: '/team/members', name: 'app_team_members')]
 class TeamMembersCrudController extends AppAbstractCrudController
 {
@@ -43,7 +49,8 @@ class TeamMembersCrudController extends AppAbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setPageTitle(Action::INDEX, 'crud.title.team_members')
+            ->setPageTitle(Crud::PAGE_INDEX, 'crud.title.team_members')
+            ->setPageTitle(Crud::PAGE_DETAIL, 'crud.team_members.detail.title')
             ->setSearchFields(['firstName', 'lastName', 'email']);
     }
 
@@ -61,40 +68,67 @@ class TeamMembersCrudController extends AppAbstractCrudController
         }
 
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
-        $user = $this->getUser();
 
-        if ($this->isAdmin()) {
-            return $qb;
-        }
-
-        return $qb
-            ->andWhere('entity.manager = :manager')
-            ->setParameter('manager', $user);
+        return $this->applyTeamScope($qb);
     }
 
     public function configureFields(string $pageName): iterable
     {
-        yield FormField::addTab('General')->hideOnIndex();
+        yield FormField::addTab('crud.team_members.tab.general')->hideOnIndex();
         yield FormField::addColumn(3);
         yield ImageField::new('profileImageUrl', '')
             ->setBasePath('uploads/profile_images')
             ->hideOnForm();
 
         yield FormField::addColumn(9);
-        yield TextField::new('firstName');
-        yield TextField::new('lastName');
-        yield TextField::new('email');
-        yield ArrayField::new('roles')
+        yield TextField::new('firstName', 'crud.team_members.field.first_name');
+        yield TextField::new('lastName', 'crud.team_members.field.last_name');
+        yield TextField::new('email', 'crud.team_members.field.email');
+        yield ArrayField::new('roles', 'crud.team_members.field.role')
             ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
-        yield DateField::new('contractStartedAt', 'Start Date')->hideOnForm();
+        yield DateField::new('contractStartedAt', 'crud.team_members.field.start_date')
+            ->hideOnForm();
+        yield AssociationField::new('manager', 'crud.team_members.field.manager')
+            ->formatValue(fn (?User $manager): string => null === $manager ? '—' : sprintf('%s %s', $manager->firstName, $manager->lastName))
+            ->onlyOnDetail();
 
-        yield FormField::addTab('Leave Balance')->hideOnIndex();
-        yield NumberField::new('annualLeaveAllowance')->hideOnIndex()->setDisabled();
-        yield NumberField::new('currentLeaveBalance')->hideOnIndex()->setDisabled();
-        yield DateField::new('absenceBalanceResetDay')->hideOnIndex()->setDisabled();
+        yield FormField::addTab('crud.team_members.tab.leave_balance')->hideOnIndex();
+        yield NumberField::new('annualLeaveAllowance', 'crud.team_members.field.annual_allowance')
+            ->hideOnIndex()
+            ->setDisabled();
+        yield NumberField::new('currentLeaveBalance', 'crud.team_members.field.current_balance')
+            ->hideOnIndex()
+            ->setDisabled();
+        yield DateField::new('absenceBalanceResetDay', 'crud.team_members.field.balance_reset_day')
+            ->hideOnIndex()
+            ->setDisabled();
 
-        yield FormField::addTab('Details')->hideOnIndex();
-        yield DateField::new('birthDate')->hideOnIndex()->setDisabled();
-        yield BooleanField::new('isActive')->hideOnIndex()->setDisabled()->renderAsSwitch(false);
+        yield FormField::addTab('crud.team_members.tab.details')->hideOnIndex();
+        yield DateField::new('birthDate', 'crud.team_members.field.birth_date')
+            ->hideOnIndex()
+            ->setDisabled();
+        yield ChoiceField::new('workingDays', 'crud.team_members.field.working_days')
+            ->setChoices(UserSettings::WORKING_DAYS)
+            ->allowMultipleChoices()
+            ->renderExpanded()
+            ->hideOnIndex()
+            ->setDisabled();
+        yield BooleanField::new('isActive', 'crud.team_members.field.active')
+            ->hideOnIndex()
+            ->setDisabled()
+            ->renderAsSwitch(false);
+    }
+
+    private function applyTeamScope(QueryBuilder $qb): QueryBuilder
+    {
+        if ($this->isAdmin()) {
+            return $qb;
+        }
+
+        $user = $this->getUser();
+
+        return $qb
+            ->andWhere('entity.manager = :manager')
+            ->setParameter('manager', $user);
     }
 }

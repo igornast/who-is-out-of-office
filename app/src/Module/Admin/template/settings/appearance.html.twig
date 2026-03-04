@@ -2,6 +2,28 @@
 
 {% block page_title %}{{ 'settings.appearance.title'|trans(domain='admin') }}{% endblock %}
 
+{% block head_javascript %}
+    <script>
+        (function () {
+            var theme = '{{ app.user.themePreference|e('js') }}';
+            var palette = '{{ app.user.palettePreference|e('js') }}';
+
+            if (theme === 'auto') {
+                localStorage.removeItem('whosooo-theme');
+            } else {
+                localStorage.setItem('whosooo-theme', theme);
+            }
+
+            if (palette === 'teal') {
+                localStorage.removeItem('whosooo-palette');
+            } else {
+                localStorage.setItem('whosooo-palette', palette);
+            }
+        })();
+    </script>
+    {{ parent() }}
+{% endblock %}
+
 {% block content_header %}
     <div class="content-header-title">
         <h1 class="title" style="font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);">
@@ -21,7 +43,7 @@
                 {% endfor %}
             {% endfor %}
 
-            {{ form_start(form) }}
+            {{ form_start(form, {'attr': {'data-controller': 'appearance-settings'}}) }}
 
             <div class="settings-card">
                 <div class="settings-card-header">
