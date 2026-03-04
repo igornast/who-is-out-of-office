@@ -55,6 +55,7 @@ bottom_nav:
     calendar: Calendar
     request: Request
     requests: Requests
+    team_requests: Team
     profile: Profile
 
 

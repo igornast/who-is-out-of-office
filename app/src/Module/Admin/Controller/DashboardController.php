@@ -51,13 +51,14 @@ class DashboardController extends AbstractDashboardController
         /** @var User $user */
         $user = $this->getUser();
         $userId = $user->id->toString();
+        $isAdmin = $this->isAdmin();
         $isManager = $this->isGranted(RoleEnum::Manager->value);
-
+        $isAdminOrManager = $isAdmin || $isManager;
         $teamUserIds = $this->getTeamUserIds($userId, $isManager);
 
         $parameters = [
             'user' => $user,
-            'is_admin' => $this->isAdmin(),
+            'is_admin' => $isAdmin,
             'is_manager' => $isManager,
             'dashboard_stats' => $this->leaveRequestFacade->getDashboardStats($teamUserIds),
             'my_team' => $this->userFacade->getTeamMembersForUserId($userId),
@@ -68,8 +69,8 @@ class DashboardController extends AbstractDashboardController
                 [LeaveRequestStatusEnum::Pending]
             ),
             'upcoming_absences_in_team' => $this->leaveRequestFacade->getUpcomingLeaveRequests($teamUserIds),
-            'recent_requests' => $this->leaveRequestFacade->getRecentLeaveRequests(5, $teamUserIds),
-            'recent_requests_total' => $this->leaveRequestFacade->countAllRequests($teamUserIds),
+            'recent_requests' => $isAdminOrManager ? $this->leaveRequestFacade->getRecentLeaveRequests(5, $teamUserIds) : [],
+            'recent_requests_total' => $isAdminOrManager ? $this->leaveRequestFacade->countAllRequests($teamUserIds) : 0,
             'whos_out_today' => $this->leaveRequestFacade->findOnLeaveToday($teamUserIds),
             'slack_integration' => $user->slackIntegration,
             'leave_balances' => $this->leaveRequestFacade->getLeaveBalancesPerType(
