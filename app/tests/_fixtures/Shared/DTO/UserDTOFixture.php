@@ -40,6 +40,7 @@ class UserDTOFixture implements FixtureInterface
             'contractStartedAt' => \DateTimeImmutable::createFromMutable($faker->dateTimeThisDecade()),
             'absenceBalanceResetDay' => new \DateTimeImmutable(date('Y').'-01-01'),
             'managerId' => null,
+            'icalHashSalt' => null,
         ];
     }
 }

@@ -4,7 +4,9 @@
 
 {% block head_javascript %}
   {{ parent() }}
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"
+          integrity="sha384-5JIwZN3kuxX2zKsavvNmbZ3zhZZMUtu/eQiK3BbXukpSXp0Cd2ZP4OAYKx7mrPgI"
+          crossorigin="anonymous"></script>
 {% endblock %}
 
 {% block content_header %}
@@ -72,16 +74,23 @@
             <div class="cal-subscribe-popover-body">
                 <label class="cal-subscribe-url-label">{{ 'calendar.subscription.url_label'|trans(domain: 'admin') }}</label>
                 <input type="text" class="cal-subscribe-url-input" id="cal-subscribe-url" readonly value="{{ calendar_subscription_url }}">
-                <button class="btn btn-primary btn-sm" id="cal-copy-url" type="button">
-                    <i data-lucide="copy"></i>
-                    {{ 'calendar.subscription.copy_url'|trans(domain: 'admin') }}
-                </button>
+                <div class="cal-subscribe-actions">
+                    <button class="btn btn-primary btn-sm" id="cal-copy-url" type="button">
+                        <i data-lucide="copy"></i>
+                        {{ 'calendar.subscription.copy_url'|trans(domain: 'admin') }}
+                    </button>
+                </div>
                 <p class="cal-subscribe-description">
                     {{ 'calendar.subscription.description'|trans(domain: 'admin') }}
+                </p>
+                <p class="cal-subscribe-description cal-subscribe-hint">
+                    {{ 'calendar.subscription.regenerate_hint'|trans(domain: 'admin') }}
+                    <a href="{{ path('app_user_profile') }}">{{ 'calendar.subscription.profile_settings_link'|trans(domain: 'admin') }}</a>
                 </p>
             </div>
         </div>
     </div>
+
 {% endblock %}
 
 {% block body_javascript %}
@@ -330,6 +339,7 @@
             }, 2000);
           });
         }
+
       });
     </script>
 {% endblock %}

@@ -3,9 +3,9 @@
 <div class="card">
     <div class="card-header">
         <span class="card-title">{{ 'dashboard.title.my_team'|trans(domain: 'admin') }}</span>
-        <span style="font-size: 12px; color: var(--text-muted);">{{ my_team|length }} {{ 'dashboard.my_team.members'|trans(domain: 'admin') }}</span>
+        <span class="text-meta">{{ my_team|length }} {{ 'dashboard.my_team.members'|trans(domain: 'admin') }}</span>
     </div>
-    <div class="card-body" style="padding: 16px 20px;">
+    <div class="card-body card-body-padded">
         {% if my_team is not empty %}
             <div class="d-flex flex-wrap gap-2">
                 {% for userDto in my_team %}
@@ -13,7 +13,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div style="padding: 8px 0; text-align: center; color: var(--text-muted); font-size: 13px;">
+            <div class="empty-state-text">
                 {{ 'dashboard.my_team.empty'|trans(domain: 'admin') }}
             </div>
         {% endif %}

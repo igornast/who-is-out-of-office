@@ -33,6 +33,7 @@ class UserDTO
         public ?string $managerId = null,
         public string $themePreference = 'auto',
         public string $palettePreference = 'teal',
+        public ?string $icalHashSalt = null,
     ) {
     }
 
@@ -60,6 +61,7 @@ class UserDTO
             managerId: $user->manager?->id->toString(),
             themePreference: $user->themePreference,
             palettePreference: $user->palettePreference,
+            icalHashSalt: $user->icalHashSalt,
         );
     }
 
@@ -84,6 +86,7 @@ class UserDTO
             managerId: $data['manager_id'] ?? null,
             themePreference: $data['theme_preference'] ?? 'auto',
             palettePreference: $data['palette_preference'] ?? 'teal',
+            icalHashSalt: $data['ical_hash_salt'] ?? null,
         );
     }
 }

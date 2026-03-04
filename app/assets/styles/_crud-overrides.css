@@ -179,6 +179,12 @@ body.ea .flash-message {
 }
 
 /* Modal overrides */
+body.ea .modal-backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    opacity: 1;
+}
+
 body.ea .modal-content {
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);

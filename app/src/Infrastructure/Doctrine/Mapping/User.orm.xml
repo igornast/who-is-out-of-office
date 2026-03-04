@@ -25,6 +25,7 @@
         <field name="absenceBalanceResetDay" column="absence_balance_reset_day" type="date_immutable"/>
         <field name="themePreference" column="theme_preference" length="10"/>
         <field name="palettePreference" column="palette_preference" length="10"/>
+        <field name="icalHashSalt" column="ical_hash_salt" type="string" length="64" nullable="true"/>
 
         <field name="createdAt" column="created_at" type="datetime_immutable"/>
         <field name="updatedAt" column="updated_at" type="datetime_immutable"/>

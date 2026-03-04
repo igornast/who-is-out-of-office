@@ -3,14 +3,14 @@
 /* avatar */
 .avatar-img {
     border-radius: var(--radius-full);
-    height: 65px;
-    width: 65px;
+    height: 40px;
+    width: 40px;
     object-fit: cover;
 }
 
 .avatar-placeholder {
-    height: 65px;
-    width: 65px;
+    height: 40px;
+    width: 40px;
     border-radius: var(--radius-full);
     background: var(--avatar-placeholder-bg);
     color: #fff;
@@ -19,7 +19,7 @@
     justify-content: center;
     text-decoration: none;
     font-family: var(--font-body);
-    font-size: 20px;
+    font-size: 14px;
     font-weight: 600;
 }
 

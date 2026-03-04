@@ -56,4 +56,6 @@ interface UserFacadeInterface
     public function updateThemePreference(string $userId, ThemeEnum $theme, PaletteEnum $palette): void;
 
     public function changePassword(string $userId, string $plainPassword, PasswordAuthenticatedUserInterface $user): void;
+
+    public function regenerateCalendarSubscription(string $userId): void;
 }

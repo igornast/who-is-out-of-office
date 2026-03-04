@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
+use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
@@ -37,6 +38,7 @@ beforeEach(function (): void {
     $this->getDirectReportsHandler = mock(GetDirectReportsQueryHandler::class);
     $this->updateThemePreferenceHandler = mock(UpdateThemePreferenceCommandHandler::class);
     $this->changePasswordHandler = mock(ChangePasswordCommandHandler::class);
+    $this->regenerateCalendarSubscriptionHandler = mock(RegenerateCalendarSubscriptionCommandHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -52,6 +54,7 @@ beforeEach(function (): void {
         getDirectReportsHandler: $this->getDirectReportsHandler,
         updateThemePreferenceHandler: $this->updateThemePreferenceHandler,
         changePasswordHandler: $this->changePasswordHandler,
+        regenerateCalendarSubscriptionHandler: $this->regenerateCalendarSubscriptionHandler,
     );
 });
 
@@ -225,4 +228,13 @@ it('delegates changePassword to handler', function () {
         ->with('user-1', 'new-password', $user);
 
     $this->facade->changePassword('user-1', 'new-password', $user);
+});
+
+it('delegates regenerateCalendarSubscription to handler', function () {
+    $this->regenerateCalendarSubscriptionHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1');
+
+    $this->facade->regenerateCalendarSubscription('user-1');
 });

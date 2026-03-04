@@ -91,3 +91,51 @@ it('generates expected hash value for known input', function () {
 
     expect($hash)->toBe($expectedHash);
 });
+
+it('uses icalHashSalt instead of createdAt when salt is set', function () {
+    $userDTO = UserDTOFixture::create([
+        'id' => '123',
+        'createdAt' => new DateTimeImmutable('2025-01-15T10:30:00+00:00'),
+        'icalHashSalt' => 'my-random-salt',
+    ]);
+    $secret = 'test-secret';
+
+    $expectedHash = hash_hmac('sha256', '123|my-random-salt', 'test-secret');
+
+    $hash = IcalHashGenerator::generateForUser($userDTO, $secret);
+
+    expect($hash)->toBe($expectedHash);
+});
+
+it('generates different hash after salt is set compared to createdAt-based hash', function () {
+    $baseAttributes = [
+        'id' => '123',
+        'createdAt' => new DateTimeImmutable('2025-01-15T10:30:00+00:00'),
+    ];
+    $secret = 'test-secret';
+
+    $userWithoutSalt = UserDTOFixture::create($baseAttributes);
+    $userWithSalt = UserDTOFixture::create(array_merge($baseAttributes, ['icalHashSalt' => 'some-salt']));
+
+    $hashWithout = IcalHashGenerator::generateForUser($userWithoutSalt, $secret);
+    $hashWith = IcalHashGenerator::generateForUser($userWithSalt, $secret);
+
+    expect($hashWithout)->not()->toBe($hashWith);
+});
+
+it('generates different hash for different salts', function () {
+    $user1 = UserDTOFixture::create([
+        'id' => '123',
+        'icalHashSalt' => 'salt-one',
+    ]);
+    $user2 = UserDTOFixture::create([
+        'id' => '123',
+        'icalHashSalt' => 'salt-two',
+    ]);
+    $secret = 'test-secret';
+
+    $hash1 = IcalHashGenerator::generateForUser($user1, $secret);
+    $hash2 = IcalHashGenerator::generateForUser($user2, $secret);
+
+    expect($hash1)->not()->toBe($hash2);
+});

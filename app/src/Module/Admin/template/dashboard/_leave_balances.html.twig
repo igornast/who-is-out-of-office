@@ -8,7 +8,7 @@
                 {% for balance in leave_balances %}
                     <div class="balance-item">
                         <div class="balance-icon" style="background-color: {{ balance.leaveTypeBackgroundColor }}; color: {{ balance.leaveTypeTextColor }};">
-                            <span style="font-size: 16px;">{{ balance.leaveTypeIcon }}</span>
+                            <span class="balance-icon-emoji">{{ balance.leaveTypeIcon }}</span>
                         </div>
                         <div class="balance-info">
                             <div class="balance-type">{{ balance.leaveTypeName }}</div>
@@ -32,7 +32,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div style="padding: 16px 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+            <div class="card-body-padded empty-state-text">
                 {{ 'dashboard.leave_balances.empty'|trans(domain: 'admin') }}
             </div>
         {% endif %}

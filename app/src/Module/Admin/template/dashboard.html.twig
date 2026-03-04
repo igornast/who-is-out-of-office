@@ -74,7 +74,7 @@
                 </div>
             </div>
             <div class="stat-value">{{ user.currentLeaveBalance }}<span
-                        style="font-size:16px;font-weight:400;color:var(--text-muted)"> {{ 'dashboard.stats.days'|trans(domain: 'admin') }}</span>
+                        class="stat-value-unit"> {{ 'dashboard.stats.days'|trans(domain: 'admin') }}</span>
             </div>
             <div class="stat-label">{{ 'dashboard.stats.vacation_balance'|trans(domain: 'admin') }}</div>
         </div>
@@ -86,14 +86,16 @@
             {{ component('AbsenceWeekView') }}
             {% include '@AppAdmin/dashboard/_upcoming_absences.html.twig' %}
             {% if is_admin or is_manager %}
-                <div style="margin-top: 20px;">
+                <div class="mt-4">
                     {% include '@AppAdmin/dashboard/_recent_requests.html.twig' %}
                 </div>
             {% endif %}
 
-            <div style="margin-top: 20px;">
-                {% include '@AppAdmin/dashboard/_my_team.html.twig' %}
-            </div>
+            {% if my_team is not empty %}
+                <div class="mt-4">
+                    {% include '@AppAdmin/dashboard/_my_team.html.twig' %}
+                </div>
+            {% endif %}
         </div>
 
         <div class="dashboard-right-column">
@@ -105,21 +107,21 @@
                 <div class="card-header">
                     <span class="card-title">{{ 'dashboard.title.birthdays'|trans(domain: 'admin') }}</span>
                 </div>
-                <div class="card-body" style="padding: 16px 20px;">
+                <div class="card-body card-body-padded">
                     {% if users_with_birthdays is not empty %}
                         {% import "@AppAdmin/dashboard/component/_user_avatar.html.twig" as avatar %}
                         <div class="d-flex flex-wrap gap-4">
                             {% for userDto in users_with_birthdays %}
                                 <div class="text-center">
                                     {{ avatar.userDtoAvatar(userDto) }}
-                                    <div class="text-center mt-2" style="font-size: 12px; color: var(--text-muted);">
+                                    <div class="text-center mt-2 text-meta">
                                         {{ userDto.birthDate|date("m.d") }}
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div style="padding: 8px 0; text-align: center; color: var(--text-muted); font-size: 13px;">
+                        <div class="empty-state-text">
                             {{ 'dashboard.birthdays.no_upcoming'|trans(domain: 'admin') }}
                         </div>
                     {% endif %}
@@ -130,20 +132,19 @@
                 <div class="card-header">
                     <span class="card-title">{{ 'dashboard.work_anniversaries.title'|trans(domain: 'admin') }}</span>
                 </div>
-                <div class="card-body" style="padding: 16px 20px;">
+                <div class="card-body card-body-padded">
                     {% if users_with_work_anniversaries is not empty %}
                         {% import "@AppAdmin/dashboard/component/_user_avatar.html.twig" as avatar %}
                         <div class="d-flex flex-wrap gap-4">
                             {% for userDto in users_with_work_anniversaries %}
                                 <div class="text-center">
                                     {{ avatar.userDtoAvatar(userDto) }}
-                                    <div class="text-center mt-2" style="font-size: 12px; color: var(--text-muted);">
+                                    <div class="text-center mt-2 text-meta">
                                         {{ userDto.contractStartedAt|date("m.d") }}
                                         {% if userDto.contractStartedAt %}
                                             {% set years = "now"|date("Y") - userDto.contractStartedAt|date("Y") %}
                                             {% if years > 0 %}
-                                                <small class="d-block" style="color: var(--text-tertiary);">{{ years }}
-                                                    y</small>
+                                                <small class="d-block text-meta">{{ years }}y</small>
                                             {% endif %}
                                         {% endif %}
                                     </div>
@@ -151,7 +152,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div style="padding: 8px 0; text-align: center; color: var(--text-muted); font-size: 13px;">
+                        <div class="empty-state-text">
                             {{ 'dashboard.work_anniversaries.no_upcoming'|trans(domain: 'admin') }}
                         </div>
                     {% endif %}
@@ -163,8 +164,8 @@
                     <div class="card-header">
                         <span class="card-title">{{ 'dashboard.title.slack'|trans(domain: 'admin') }}</span>
                     </div>
-                    <div class="card-body" style="padding: 16px 20px;">
-                        <div style="font-size: 13px; color: var(--text-secondary);">
+                    <div class="card-body card-body-padded">
+                        <div class="text-secondary-sm">
                             Slack Member ID: {{ user.slackIntegration.slackMemberId }}
                         </div>
                     </div>

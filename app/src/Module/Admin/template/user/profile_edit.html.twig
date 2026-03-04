@@ -169,10 +169,18 @@
                         <div class="connected-service-action">
                             <div class="connected-service-url-group">
                                 <input type="text" class="connected-service-url-input" id="profile-cal-url" readonly value="{{ calendar_subscription_url }}">
-                                <button class="btn btn-outline btn-sm" id="profile-copy-cal-url" type="button">
-                                    <i data-lucide="copy"></i>
-                                    {{ 'crud.user_profile.connected_services.calendar.copy_url'|trans(domain='admin') }}
-                                </button>
+                                <div class="connected-service-url-actions">
+                                    <button class="btn btn-outline btn-sm" id="profile-copy-cal-url" type="button">
+                                        <i data-lucide="copy"></i>
+                                        {{ 'crud.user_profile.connected_services.calendar.copy_url'|trans(domain='admin') }}
+                                    </button>
+                                    <button class="btn btn-outline btn-sm" id="profile-regenerate-cal-url" type="button"
+                                            data-regenerate-url="{{ path('app_api_calendar_regenerate') }}"
+                                            data-csrf-token="{{ csrf_token('calendar_regenerate') }}">
+                                        <i data-lucide="refresh-cw"></i>
+                                        {{ 'crud.user_profile.connected_services.calendar.regenerate'|trans(domain='admin') }}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -184,6 +192,24 @@
             </div>
 
             {{ form_end(form) }}
+        </div>
+    </div>
+
+    <div class="modal fade" id="regenerateConfirmModal" tabindex="-1" aria-labelledby="regenerateConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="regenerateConfirmModalLabel">{{ 'crud.user_profile.connected_services.calendar.regenerate_confirm_title'|trans(domain: 'admin') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ 'crud.user_profile.connected_services.calendar.regenerate_confirm_body'|trans(domain: 'admin') }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'crud.user_profile.connected_services.calendar.regenerate_cancel'|trans(domain: 'admin') }}</button>
+                    <button type="button" class="btn btn-danger" id="regenerateConfirmBtn">{{ 'crud.user_profile.connected_services.calendar.regenerate_confirm_action'|trans(domain: 'admin') }}</button>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -204,6 +230,54 @@
                         copyBtn.innerHTML = originalHtml;
                         if (typeof lucide !== 'undefined') { lucide.createIcons(); }
                     }, 2000);
+                });
+            }
+
+            var regenerateBtn = document.getElementById('profile-regenerate-cal-url');
+            var regenerateModal = document.getElementById('regenerateConfirmModal');
+            var regenerateConfirmBtn = document.getElementById('regenerateConfirmBtn');
+
+            if (regenerateBtn && regenerateModal) {
+                var bsModal = new bootstrap.Modal(regenerateModal);
+
+                regenerateBtn.addEventListener('click', function() {
+                    bsModal.show();
+                });
+
+                regenerateConfirmBtn.addEventListener('click', function() {
+                    bsModal.hide();
+
+                    var url = regenerateBtn.dataset.regenerateUrl;
+                    var csrfToken = regenerateBtn.dataset.csrfToken;
+                    var originalHtml = regenerateBtn.innerHTML;
+
+                    regenerateBtn.disabled = true;
+                    regenerateBtn.innerHTML = '<i data-lucide="loader"></i> {{ "crud.user_profile.connected_services.calendar.regenerating"|trans(domain: "admin") }}';
+                    if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+
+                    var formData = new FormData();
+                    formData.append('_token', csrfToken);
+
+                    fetch(url, { method: 'POST', body: formData })
+                        .then(function(response) { return response.json(); })
+                        .then(function(data) {
+                            if (data.success) {
+                                var urlInput = document.getElementById('profile-cal-url');
+                                urlInput.value = data.url;
+                                regenerateBtn.innerHTML = '<i data-lucide="check"></i> {{ "crud.user_profile.connected_services.calendar.regenerated"|trans(domain: "admin") }}';
+                                if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+                                setTimeout(function() {
+                                    regenerateBtn.innerHTML = originalHtml;
+                                    regenerateBtn.disabled = false;
+                                    if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+                                }, 2000);
+                            }
+                        })
+                        .catch(function() {
+                            regenerateBtn.innerHTML = originalHtml;
+                            regenerateBtn.disabled = false;
+                            if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+                        });
                 });
             }
         });

@@ -9,6 +9,7 @@ use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
+use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
@@ -41,6 +42,7 @@ final class UserFacade implements UserFacadeInterface
         private readonly GetDirectReportsQueryHandler $getDirectReportsHandler,
         private readonly UpdateThemePreferenceCommandHandler $updateThemePreferenceHandler,
         private readonly ChangePasswordCommandHandler $changePasswordHandler,
+        private readonly RegenerateCalendarSubscriptionCommandHandler $regenerateCalendarSubscriptionHandler,
     ) {
     }
 
@@ -125,5 +127,10 @@ final class UserFacade implements UserFacadeInterface
     public function changePassword(string $userId, string $plainPassword, PasswordAuthenticatedUserInterface $user): void
     {
         $this->changePasswordHandler->handle($userId, $plainPassword, $user);
+    }
+
+    public function regenerateCalendarSubscription(string $userId): void
+    {
+        $this->regenerateCalendarSubscriptionHandler->handle($userId);
     }
 }

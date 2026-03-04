@@ -44,6 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public ?HolidayCalendar $holidayCalendar = null,
         public string $themePreference = 'auto',
         public string $palettePreference = 'teal',
+        public ?string $icalHashSalt = null,
         public ?self $manager = null,
         public ?Collection $leaveRequests = new ArrayCollection(),
     ) {

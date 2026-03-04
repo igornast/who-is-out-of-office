@@ -130,6 +130,8 @@ dashboard:
         new_request: New Leave Request
         team_calendar: Team Calendar
         leave_requests: Leave Requests
+        team_leave_requests: Team Leave Requests
+        app_settings: App Settings
         my_profile: My Profile
 
 leave_request:
@@ -148,7 +150,16 @@ calendar:
         url_label: Subscription URL
         copy_url: Copy URL
         copied: Copied!
+        regenerate: Regenerate
+        regenerate_confirm_title: Regenerate Subscription URL
+        regenerate_confirm_body: This will invalidate the current subscription URL. Any calendar apps using the old URL will stop syncing.
+        regenerate_confirm_action: Regenerate URL
+        regenerate_cancel: Cancel
+        regenerating: Regenerating...
+        regenerated: Regenerated!
         description: Add this URL to Google Calendar, Outlook, or Apple Calendar to sync team absences automatically.
+        regenerate_hint: Need to regenerate this URL? You can do so from your
+        profile_settings_link: Profile Settings
     filter:
         leave_type: Leave Type
         status: Status
@@ -205,6 +216,13 @@ crud:
                 description: Subscribe to team absences in your preferred calendar app.
                 copy_url: Copy URL
                 copied: Copied!
+                regenerate: Regenerate
+                regenerate_confirm_title: Regenerate Subscription URL
+                regenerate_confirm_body: This will invalidate the current subscription URL. Any calendar apps using the old URL will stop syncing.
+                regenerate_confirm_action: Regenerate URL
+                regenerate_cancel: Cancel
+                regenerating: Regenerating...
+                regenerated: Regenerated!
 
     holiday_calendar:
         index:

@@ -42,4 +42,6 @@ interface UserRepositoryInterface
     public function updateThemePreference(string $userId, string $theme, string $palette): void;
 
     public function updatePassword(string $userId, string $hashedPassword): void;
+
+    public function updateIcalHashSalt(string $userId, string $salt): void;
 }

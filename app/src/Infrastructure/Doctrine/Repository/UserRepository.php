@@ -62,6 +62,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
 
         $user->themePreference = $userDTO->themePreference;
         $user->palettePreference = $userDTO->palettePreference;
+        $user->icalHashSalt = $userDTO->icalHashSalt;
 
         if (null !== $userDTO->managerId) {
             $user->manager = $this->find($userDTO->managerId);
@@ -218,6 +219,18 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $users = $this->findBy(['manager' => $managerId, 'isActive' => true]);
 
         return array_map(fn (User $user) => UserDTO::fromEntity($user), $users);
+    }
+
+    public function updateIcalHashSalt(string $userId, string $salt): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->icalHashSalt = $salt;
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
     }
 
     public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO

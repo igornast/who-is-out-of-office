@@ -17,7 +17,7 @@
                             <th>{{ 'dashboard.recent_requests.col.dates'|trans(domain: 'admin') }}</th>
                             <th>{{ 'dashboard.recent_requests.col.duration'|trans(domain: 'admin') }}</th>
                             <th>{{ 'dashboard.recent_requests.col.status'|trans(domain: 'admin') }}</th>
-                            <th style="text-align: right;">{{ 'dashboard.recent_requests.col.actions'|trans(domain: 'admin') }}</th>
+                            <th class="text-end">{{ 'dashboard.recent_requests.col.actions'|trans(domain: 'admin') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -184,7 +184,7 @@
                 </a>
             </div>
         {% else %}
-            <div style="padding: 24px 20px;">
+            <div class="empty-state-wrapper">
                 <div class="alert alert-secondary w-100 text-center mb-0" role="alert">
                     {{ 'dashboard.recent_requests.empty'|trans(domain: 'admin') }}
                 </div>
