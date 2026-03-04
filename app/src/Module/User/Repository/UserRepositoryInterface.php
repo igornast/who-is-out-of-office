@@ -38,4 +38,8 @@ interface UserRepositoryInterface
      * @return UserDTO[]
      */
     public function findByManagerId(string $managerId): array;
+
+    public function updateThemePreference(string $userId, string $theme, string $palette): void;
+
+    public function updatePassword(string $userId, string $hashedPassword): void;
 }

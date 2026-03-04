@@ -13,8 +13,6 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -61,15 +59,6 @@ class UserProfileType extends AbstractType
                 'label' => 'Celebrate my work anniversary',
                 'required' => false,
                 'help' => 'Tick this box if you want the OOO Slackbot to send a friendly reminder to your teammates each year.',
-            ])
-
-            ->add('plainPassword', RepeatedType::class, [
-                'type' => PasswordType::class,
-                'required' => false,
-                'mapped' => false,
-                'invalid_message' => 'Passwords must match.',
-                'first_options' => ['label' => 'New Password'],
-                'second_options' => ['label' => 'Repeat Password'],
             ])
             ->add('profileImageFile', FileType::class, [
                 'label' => 'Profile Image',

@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
+use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
+use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
+use App\Shared\Enum\PaletteEnum;
+use App\Shared\Enum\ThemeEnum;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
@@ -30,6 +35,8 @@ beforeEach(function (): void {
     $this->getUsersWithWorkAnniversariesForDatesHandler = mock(GetUsersWithWorkAnniversariesForDatesQueryHandler::class);
     $this->resetAbsenceBalanceHandler = mock(ResetAbsenceBalanceCommandHandler::class);
     $this->getDirectReportsHandler = mock(GetDirectReportsQueryHandler::class);
+    $this->updateThemePreferenceHandler = mock(UpdateThemePreferenceCommandHandler::class);
+    $this->changePasswordHandler = mock(ChangePasswordCommandHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -43,6 +50,8 @@ beforeEach(function (): void {
         getUsersWithWorkAnniversariesForDatesHandler: $this->getUsersWithWorkAnniversariesForDatesHandler,
         resetAbsenceBalanceHandler: $this->resetAbsenceBalanceHandler,
         getDirectReportsHandler: $this->getDirectReportsHandler,
+        updateThemePreferenceHandler: $this->updateThemePreferenceHandler,
+        changePasswordHandler: $this->changePasswordHandler,
     );
 });
 
@@ -196,4 +205,24 @@ it('delegates getDirectReports to handler', function () {
     $result = $this->facade->getDirectReports('manager-1');
 
     expect($result)->toBe($expectedUsers);
+});
+
+it('delegates updateThemePreference to handler', function () {
+    $this->updateThemePreferenceHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', ThemeEnum::Dark, PaletteEnum::Sage);
+
+    $this->facade->updateThemePreference('user-1', ThemeEnum::Dark, PaletteEnum::Sage);
+});
+
+it('delegates changePassword to handler', function () {
+    $user = mock(PasswordAuthenticatedUserInterface::class);
+
+    $this->changePasswordHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', 'new-password', $user);
+
+    $this->facade->changePassword('user-1', 'new-password', $user);
 });

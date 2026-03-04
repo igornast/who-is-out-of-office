@@ -1,0 +1,84 @@
+{% extends '@AppAdmin/layout.html.twig' %}
+
+{% block page_title %}{{ 'settings.notifications.title'|trans(domain='admin') }}{% endblock %}
+
+{% block content_header %}
+    <div class="content-header-title">
+        <h1 class="title" style="font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);">
+            {{ 'settings.notifications.title'|trans(domain='admin') }}
+        </h1>
+    </div>
+{% endblock %}
+
+{% block main %}
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'settings.notifications.slack.title'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'settings.notifications.slack.desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="settings-status-list">
+                        <div class="settings-status-row">
+                            <div class="settings-status-label">{{ 'settings.notifications.slack.workspace'|trans(domain='admin') }}</div>
+                            <div class="settings-status-value">
+                                {% if slack_configured %}
+                                    <span class="settings-badge settings-badge-success">{{ 'settings.status.connected'|trans(domain='admin') }}</span>
+                                {% else %}
+                                    <span class="settings-badge settings-badge-muted">{{ 'settings.status.not_configured'|trans(domain='admin') }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="settings-status-row">
+                            <div class="settings-status-label">{{ 'settings.notifications.slack.signing_secret'|trans(domain='admin') }}</div>
+                            <div class="settings-status-value">
+                                {% if slack_signing_secret_set %}
+                                    <span class="settings-badge settings-badge-success">{{ 'settings.status.configured'|trans(domain='admin') }}</span>
+                                {% else %}
+                                    <span class="settings-badge settings-badge-muted">{{ 'settings.status.not_configured'|trans(domain='admin') }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card" style="margin-top: 20px;">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'settings.notifications.channels.title'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'settings.notifications.channels.desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="settings-status-list">
+                        <div class="settings-status-row">
+                            <div class="settings-status-label">{{ 'settings.notifications.channels.approval'|trans(domain='admin') }}</div>
+                            <div class="settings-status-value">
+                                {% if slack_approve_channel_set %}
+                                    <span class="settings-badge settings-badge-success">{{ 'settings.status.configured'|trans(domain='admin') }}</span>
+                                {% else %}
+                                    <span class="settings-badge settings-badge-muted">{{ 'settings.status.not_configured'|trans(domain='admin') }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="settings-status-row">
+                            <div class="settings-status-label">{{ 'settings.notifications.channels.weekly_digest'|trans(domain='admin') }}</div>
+                            <div class="settings-status-value">
+                                {% if slack_digest_channel_set %}
+                                    <span class="settings-badge settings-badge-success">{{ 'settings.status.configured'|trans(domain='admin') }}</span>
+                                {% else %}
+                                    <span class="settings-badge settings-badge-muted">{{ 'settings.status.not_configured'|trans(domain='admin') }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 16px; padding: 12px 16px; background-color: var(--primary-subtle); border-left: 3px solid var(--primary); border-radius: var(--radius-md); font-size: 13px; color: var(--text-secondary);">
+                <i data-lucide="info" style="width: 14px; height: 14px; display: inline-block; vertical-align: -2px; margin-right: 4px; color: var(--primary);"></i>
+                {{ 'settings.notifications.env_hint'|trans(domain='admin') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

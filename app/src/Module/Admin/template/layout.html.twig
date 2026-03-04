@@ -21,15 +21,18 @@
     {{ parent() }}
     <script>
         (function() {
+            var serverTheme = '{{ app.user ? app.user.themePreference : 'auto' }}';
+            var serverPalette = '{{ app.user ? app.user.palettePreference : 'teal' }}';
             var saved = localStorage.getItem('whosooo-theme');
-            var isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            var theme = saved || serverTheme || 'auto';
+            var isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
             if (isDark) {
                 document.documentElement.classList.add('dark', 'ea-dark-scheme');
                 document.documentElement.dataset.bsTheme = 'dark';
             } else {
                 document.documentElement.dataset.bsTheme = 'light';
             }
-            var palette = localStorage.getItem('whosooo-palette') || 'teal';
+            var palette = localStorage.getItem('whosooo-palette') || serverPalette || 'teal';
             if (['teal','sage','sunset','lavender'].indexOf(palette) === -1) palette = 'teal';
             document.documentElement.dataset.palette = palette;
             if (window.innerWidth > 768 && localStorage.getItem('whosooo-sidebar') === 'collapsed') {
@@ -118,6 +121,24 @@
                     <i data-lucide="list-checks"></i>
                     <span class="ooo-sidebar-label">{{ 'menu.items.leave_request_types'|trans(domain: 'admin') }}</span>
                 </a>
+                <a class="ooo-sidebar-item {{ _current_crud == 'App\\Module\\Admin\\Controller\\HolidayCalendarCrudController' ? 'active' }}"
+                   href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\HolidayCalendarCrudController').setAction('index') }}"
+                   title="{{ 'menu.items.public_holidays'|trans(domain: 'admin') }}">
+                    <i data-lucide="globe"></i>
+                    <span class="ooo-sidebar-label">{{ 'menu.items.public_holidays'|trans(domain: 'admin') }}</span>
+                </a>
+                <a class="ooo-sidebar-item {{ _current_route == 'app_settings_notifications' ? 'active' }}"
+                   href="{{ path('app_settings_notifications') }}"
+                   title="{{ 'menu.items.notifications'|trans(domain: 'admin') }}">
+                    <i data-lucide="bell"></i>
+                    <span class="ooo-sidebar-label">{{ 'menu.items.notifications'|trans(domain: 'admin') }}</span>
+                </a>
+                <a class="ooo-sidebar-item {{ _current_route == 'app_settings_integrations' ? 'active' }}"
+                   href="{{ path('app_settings_integrations') }}"
+                   title="{{ 'menu.items.integrations'|trans(domain: 'admin') }}">
+                    <i data-lucide="plug"></i>
+                    <span class="ooo-sidebar-label">{{ 'menu.items.integrations'|trans(domain: 'admin') }}</span>
+                </a>
             {% endif %}
 
             <div class="ooo-sidebar-section-label">{{ 'sidebar.section.account'|trans(domain: 'admin') }}</div>
@@ -126,6 +147,12 @@
                title="{{ 'menu.items.profile'|trans(domain: 'admin') }}">
                 <i data-lucide="user-circle"></i>
                 <span class="ooo-sidebar-label">{{ 'menu.items.profile'|trans(domain: 'admin') }}</span>
+            </a>
+            <a class="ooo-sidebar-item {{ _current_route == 'app_settings_account_security' ? 'active' }}"
+               href="{{ path('app_settings_account_security') }}"
+               title="{{ 'menu.items.account_security'|trans(domain: 'admin') }}">
+                <i data-lucide="shield"></i>
+                <span class="ooo-sidebar-label">{{ 'menu.items.account_security'|trans(domain: 'admin') }}</span>
             </a>
         </nav>
 
@@ -178,7 +205,9 @@
             <i data-lucide="plus"></i>
         </a>
         <div class="avatar-dropdown-wrapper"
-             data-controller="avatar-dropdown">
+             data-controller="avatar-dropdown"
+             data-server-theme="{{ app.user ? app.user.themePreference : 'auto' }}"
+             data-server-palette="{{ app.user ? app.user.palettePreference : 'teal' }}">
             <button class="topbar-avatar avatar-dropdown-trigger"
                     data-avatar-dropdown-target="trigger"
                     data-action="click->avatar-dropdown#toggle"

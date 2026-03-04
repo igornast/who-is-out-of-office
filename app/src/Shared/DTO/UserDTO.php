@@ -31,6 +31,8 @@ class UserDTO
         public ?\DateTimeImmutable $contractStartedAt = null,
         public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
         public ?string $managerId = null,
+        public string $themePreference = 'auto',
+        public string $palettePreference = 'teal',
     ) {
     }
 
@@ -56,6 +58,8 @@ class UserDTO
             contractStartedAt: $user->contractStartedAt,
             absenceBalanceResetDay: $user->absenceBalanceResetDay,
             managerId: $user->manager?->id->toString(),
+            themePreference: $user->themePreference,
+            palettePreference: $user->palettePreference,
         );
     }
 
@@ -78,6 +82,8 @@ class UserDTO
             contractStartedAt: isset($data['contract_started_at']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['contract_started_at']) : null,
             absenceBalanceResetDay: \DateTimeImmutable::createFromFormat('Y-m-d', $data['absence_balance_reset_day']),
             managerId: $data['manager_id'] ?? null,
+            themePreference: $data['theme_preference'] ?? 'auto',
+            palettePreference: $data['palette_preference'] ?? 'teal',
         );
     }
 }

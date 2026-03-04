@@ -42,6 +42,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public ?UserSlackIntegration $slackIntegration = null,
         public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
         public ?HolidayCalendar $holidayCalendar = null,
+        public string $themePreference = 'auto',
+        public string $palettePreference = 'teal',
         public ?self $manager = null,
         public ?Collection $leaveRequests = new ArrayCollection(),
     ) {

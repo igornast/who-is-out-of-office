@@ -100,9 +100,11 @@ body.ea .lr-form-card-body {
         display: none;
     }
 
-    /* -- Week strip: horizontal scroll, hide nav buttons -- */
-    .week-nav {
-        display: none;
+    /* -- Week strip: horizontal scroll, touch-friendly nav -- */
+    .week-nav button {
+        width: 36px;
+        height: 36px;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .week-strip {
@@ -113,6 +115,7 @@ body.ea .lr-form-card-body {
         padding: 0 20px 16px;
         margin-bottom: 0;
         border-bottom: 1px solid var(--border-light);
+        align-items: flex-start;
     }
 
     .week-header-text {

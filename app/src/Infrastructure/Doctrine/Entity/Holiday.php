@@ -7,7 +7,7 @@ namespace App\Infrastructure\Doctrine\Entity;
 use App\Infrastructure\Traits\TimestampableTrait;
 use Ramsey\Uuid\UuidInterface;
 
-class Holiday
+class Holiday implements \Stringable
 {
     use TimestampableTrait;
 
@@ -18,5 +18,10 @@ class Holiday
         public HolidayCalendar $holidayCalendar,
     ) {
         $this->initializeTimestamps();
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('%s — %s', $this->date->format('M d, Y'), $this->description);
     }
 }

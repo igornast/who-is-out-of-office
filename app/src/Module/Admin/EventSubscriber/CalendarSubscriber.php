@@ -39,6 +39,7 @@ class CalendarSubscriber implements EventSubscriberInterface
     {
         $start = \DateTimeImmutable::createFromInterface($event->getStart());
         $end = \DateTimeImmutable::createFromInterface($event->getEnd());
+        $filters = $this->parseFilters($event->getFilters());
 
         /** @var User $user */
         $user = $this->security->getUser();
@@ -46,20 +47,44 @@ class CalendarSubscriber implements EventSubscriberInterface
 
         $this->markNonWorkingDaysForUser($event, $currentUserDTO);
         $this->addPublicHolidayEvents($event, $currentUserDTO);
-        $this->addLeaveRequestEvents($event, $start, $end);
+        $this->addLeaveRequestEvents($event, $start, $end, $filters);
         $this->addBirthdayEvents($event, $start);
     }
 
-    private function addLeaveRequestEvents(SetDataEvent $event, \DateTimeImmutable $start, \DateTimeImmutable $end): void
+    /**
+     * @param mixed[] $rawFilters
+     *
+     * @return array{leaveTypeId: ?string, status: ?string}
+     */
+    private function parseFilters(array $rawFilters): array
     {
-        $statuses = [
-            LeaveRequestStatusEnum::Pending,
-            LeaveRequestStatusEnum::Approved,
+        return [
+            'leaveTypeId' => isset($rawFilters['leaveTypeId']) && '' !== $rawFilters['leaveTypeId']
+                ? (string) $rawFilters['leaveTypeId']
+                : null,
+            'status' => isset($rawFilters['status']) && '' !== $rawFilters['status']
+                ? (string) $rawFilters['status']
+                : null,
         ];
+    }
+
+    /**
+     * @param array{leaveTypeId: ?string, status: ?string} $filters
+     */
+    private function addLeaveRequestEvents(SetDataEvent $event, \DateTimeImmutable $start, \DateTimeImmutable $end, array $filters): void
+    {
+        $statuses = match ($filters['status']) {
+            'pending' => [LeaveRequestStatusEnum::Pending],
+            'approved' => [LeaveRequestStatusEnum::Approved],
+            default => [LeaveRequestStatusEnum::Pending, LeaveRequestStatusEnum::Approved],
+        };
 
         $leaveRequestDTOs = $this->leaveRequestFacade->getLeaveRequestsForDates($start, $end, $statuses);
 
         foreach ($leaveRequestDTOs as $dto) {
+            if (null !== $filters['leaveTypeId'] && $dto->leaveType->id->toString() !== $filters['leaveTypeId']) {
+                continue;
+            }
             $leaveTypeDTO = $dto->leaveType;
 
             $title = sprintf('%s %s %s', $leaveTypeDTO->icon, $dto->user->firstName, $dto->user->lastName);

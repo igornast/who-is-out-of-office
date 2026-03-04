@@ -6,14 +6,16 @@ namespace App\Module\Admin\Controller;
 
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Form\UserProfileType;
+use App\Shared\DTO\UserDTO;
+use App\Shared\Service\Ical\IcalHashGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/app/user/profile', name: 'app_user_profile')]
 class UserProfileSettingsController extends AbstractController
@@ -21,8 +23,10 @@ class UserProfileSettingsController extends AbstractController
     public function __construct(
         #[Autowire('%profile_images_base_path%')]
         private readonly string $profileImagesBasePath,
+        #[Autowire(env: 'ICAL_SECRET')]
+        private readonly string $icalSecret,
         private readonly EntityManagerInterface $em,
-        private readonly UserPasswordHasherInterface $hasher,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -34,14 +38,6 @@ class UserProfileSettingsController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $plainPassword = $form->get('plainPassword')->getData();
-            if (is_string($plainPassword)) {
-                $hashPassword = $this->hasher->hashPassword($user, $plainPassword);
-
-                $user->password = $hashPassword;
-            }
-
             $uploadedFile = $form->get('profileImageFile')->getData();
             if ($uploadedFile instanceof UploadedFile) {
                 $newFilename = uniqid().'.'.$uploadedFile->guessExtension();
@@ -58,9 +54,18 @@ class UserProfileSettingsController extends AbstractController
             return $this->redirectToRoute('app_user_profile');
         }
 
+        $userDTO = UserDTO::fromEntity($user);
+        $calendarSubscriptionUrl = $this->urlGenerator->generate('app_api_ical_endpoint', [
+            'userId' => $user->id,
+            'secret' => IcalHashGenerator::generateForUser($userDTO, $this->icalSecret),
+        ], UrlGeneratorInterface::ABSOLUTE_URL);
+
         return $this->render('@AppAdmin/user/profile_edit.html.twig', [
             'form' => $form->createView(),
             'profile_images_base_path' => $this->profileImagesBasePath,
+            'calendar_subscription_url' => $calendarSubscriptionUrl,
+            'slack_connected' => null !== $user->slackIntegration,
+            'slack_member_id' => $user->slackIntegration?->slackMemberId,
         ]);
     }
 }

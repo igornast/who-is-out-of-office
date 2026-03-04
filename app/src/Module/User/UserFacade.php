@@ -8,6 +8,8 @@ use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
+use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
+use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
@@ -18,7 +20,10 @@ use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHand
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
 use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\UserDTO;
+use App\Shared\Enum\PaletteEnum;
+use App\Shared\Enum\ThemeEnum;
 use App\Shared\Facade\UserFacadeInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 final class UserFacade implements UserFacadeInterface
 {
@@ -34,6 +39,8 @@ final class UserFacade implements UserFacadeInterface
         private readonly GetUsersWithWorkAnniversariesForDatesQueryHandler $getUsersWithWorkAnniversariesForDatesHandler,
         private readonly ResetAbsenceBalanceCommandHandler $resetAbsenceBalanceHandler,
         private readonly GetDirectReportsQueryHandler $getDirectReportsHandler,
+        private readonly UpdateThemePreferenceCommandHandler $updateThemePreferenceHandler,
+        private readonly ChangePasswordCommandHandler $changePasswordHandler,
     ) {
     }
 
@@ -108,5 +115,15 @@ final class UserFacade implements UserFacadeInterface
     public function getDirectReports(string $managerId): array
     {
         return $this->getDirectReportsHandler->handle($managerId);
+    }
+
+    public function updateThemePreference(string $userId, ThemeEnum $theme, PaletteEnum $palette): void
+    {
+        $this->updateThemePreferenceHandler->handle($userId, $theme, $palette);
+    }
+
+    public function changePassword(string $userId, string $plainPassword, PasswordAuthenticatedUserInterface $user): void
+    {
+        $this->changePasswordHandler->handle($userId, $plainPassword, $user);
     }
 }

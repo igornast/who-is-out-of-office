@@ -13,8 +13,12 @@ menu:
         profile: Profile Settings
         calendar: Calendar
         absence_requests: Absence Requests
+        public_holidays: Public Holidays
         team_leave_requests: Team Leave Requests
         team_members: Team Members
+        notifications: Notifications
+        integrations: Integrations
+        account_security: Security
     section:
         my_team: My Team
         organization: Organization
@@ -144,6 +148,13 @@ calendar:
         copy_url: Copy URL
         copied: Copied!
         description: Add this URL to Google Calendar, Outlook, or Apple Calendar to sync team absences automatically.
+    filter:
+        leave_type: Leave Type
+        status: Status
+        all_types: All Types
+        all_statuses: All Statuses
+        status_pending: Pending
+        status_approved: Approved
     popover:
         type: Type
         status: Status
@@ -178,6 +189,35 @@ crud:
             working_days: Working Days
         action:
             save_changes: Save Changes
+        connected_services:
+            title: Connected Services
+            slack:
+                title: Slack
+                connected: Connected
+                not_connected: Not connected
+                member_id: 'Member ID: %id%'
+                connect: Connect Slack
+                manage: Manage
+                description: Receive notifications about leave requests and team updates directly in Slack.
+            calendar:
+                title: Calendar Subscription
+                description: Subscribe to team absences in your preferred calendar app.
+                copy_url: Copy URL
+                copied: Copied!
+
+    holiday_calendar:
+        index:
+            title: Public Holidays
+        detail:
+            title: Holiday Calendar Details
+        field:
+            country_code: Country Code
+            country_name: Country
+            holidays_count: Holidays
+            holidays_list: Public Holidays
+            date: Date
+            name: Holiday Name
+            no_holidays: No public holidays configured
 
     absence_request_type:
         index:
@@ -213,3 +253,57 @@ crud:
             auto_approve_delay_help: Number of seconds to wait before automatically approving leave requests
         action:
             save: Save Changes
+
+settings:
+    status:
+        label: Status
+        connected: Connected
+        not_configured: Not configured
+        configured: Configured
+        active: Active
+        inactive: Inactive
+    notifications:
+        title: Notifications
+        env_hint: Notification settings are configured via environment variables. Contact your system administrator to make changes.
+        slack:
+            title: Slack Workspace
+            desc: Slack is used to send leave request notifications and weekly digests to your team.
+            workspace: Workspace Connection
+            signing_secret: Signing Secret
+        channels:
+            title: Notification Channels
+            desc: Configure which Slack channels receive automated notifications.
+            approval: Approval Notifications
+            weekly_digest: Weekly Digest
+    integrations:
+        title: Integrations
+        slack:
+            title: Slack
+            desc: Team notifications for leave requests, approvals, and weekly digests.
+        calendar:
+            title: Calendar Subscription (iCal)
+            desc: Users can subscribe to team absences in their preferred calendar app via iCal feeds.
+        date_nager:
+            title: Public Holidays API
+            desc: Automatic import of public holidays by country via the Nager.Date API.
+    account_security:
+        title: Account & Security
+        account_info:
+            title: Account Information
+            email: Email
+            role: Role
+            member_since: Member Since
+        change_password:
+            title: Change Password
+            desc: Choose a strong password with at least 8 characters.
+        field:
+            current_password: Current Password
+            new_password: New Password
+            confirm_password: Confirm New Password
+        error:
+            passwords_must_match: The password fields must match.
+            current_password_invalid: The current password is incorrect.
+        success:
+            password_changed: Your password has been updated successfully.
+        action:
+            update_password: Update Password

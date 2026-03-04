@@ -26,4 +26,14 @@ class LeaveRequestTypeRepository extends ServiceEntityRepository implements Leav
 
         return null !== $leaveRequest ? LeaveRequestTypeDTO::fromEntity($leaveRequest) : null;
     }
+
+    /**
+     * @return LeaveRequestTypeDTO[]
+     */
+    public function findAllActive(): array
+    {
+        $types = $this->findAll();
+
+        return array_map(fn (LeaveRequestType $type) => LeaveRequestTypeDTO::fromEntity($type), $types);
+    }
 }

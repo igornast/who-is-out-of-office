@@ -60,11 +60,39 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
             $user->password = $userDTO->password;
         }
 
+        $user->themePreference = $userDTO->themePreference;
+        $user->palettePreference = $userDTO->palettePreference;
+
         if (null !== $userDTO->managerId) {
             $user->manager = $this->find($userDTO->managerId);
         } else {
             $user->manager = null;
         }
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
+    public function updateThemePreference(string $userId, string $theme, string $palette): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->themePreference = $theme;
+        $user->palettePreference = $palette;
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
+    public function updatePassword(string $userId, string $hashedPassword): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->password = $hashedPassword;
 
         $em = $this->getEntityManager();
         $em->persist($user);

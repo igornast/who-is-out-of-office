@@ -86,4 +86,9 @@ interface LeaveRequestFacadeInterface
     public function getRecentLeaveRequests(int $limit = 5): array;
 
     public function countAllRequests(): int;
+
+    /**
+     * @return LeaveRequestTypeDTO[]
+     */
+    public function getAllLeaveTypes(): array;
 }

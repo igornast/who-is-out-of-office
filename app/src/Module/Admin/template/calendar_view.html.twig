@@ -20,6 +20,32 @@
 {% endblock %}
 
 {% block main %}
+    <div class="cal-filter-bar">
+        <div class="cal-filter-group">
+            <label class="cal-filter-label" for="cal-filter-type">
+                <i data-lucide="tag"></i>
+                {{ 'calendar.filter.leave_type'|trans(domain: 'admin') }}
+            </label>
+            <select class="cal-filter-select" id="cal-filter-type">
+                <option value="">{{ 'calendar.filter.all_types'|trans(domain: 'admin') }}</option>
+                {% for leaveType in leave_types %}
+                    <option value="{{ leaveType.id }}">{{ leaveType.icon }} {{ leaveType.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="cal-filter-group">
+            <label class="cal-filter-label" for="cal-filter-status">
+                <i data-lucide="filter"></i>
+                {{ 'calendar.filter.status'|trans(domain: 'admin') }}
+            </label>
+            <select class="cal-filter-select" id="cal-filter-status">
+                <option value="">{{ 'calendar.filter.all_statuses'|trans(domain: 'admin') }}</option>
+                <option value="pending">{{ 'calendar.filter.status_pending'|trans(domain: 'admin') }}</option>
+                <option value="approved">{{ 'calendar.filter.status_approved'|trans(domain: 'admin') }}</option>
+            </select>
+        </div>
+    </div>
+
     <div id="calendar"></div>
 
     <div id="cal-event-popover" class="cal-event-popover" role="dialog" aria-modal="false">
@@ -78,20 +104,30 @@
             viewDetails: '{{ "calendar.popover.view_details"|trans(domain: "admin") }}',
         };
 
+        var filterTypeEl = document.getElementById('cal-filter-type');
+        var filterStatusEl = document.getElementById('cal-filter-status');
+
+        function getFilters() {
+            return {
+                leaveTypeId: filterTypeEl.value,
+                status: filterStatusEl.value,
+            };
+        }
+
+        var eventSource = {
+            url: "{{ path('fc_load_events') }}",
+            method: 'POST',
+            extraParams: function() {
+                return { filters: JSON.stringify(getFilters()) };
+            },
+            failure: function() {},
+        };
+
         const calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: isMobile ? 'listWeek' : 'dayGridMonth',
           firstDay: 1,
           editable: false,
-          eventSources: [
-            {
-              url: "{{ path('fc_load_events') }}",
-              method: 'POST',
-              extraParams: {
-                filters: JSON.stringify({})
-              },
-              failure: () => {},
-            },
-          ],
+          eventSources: [eventSource],
           eventDidMount: function(info) {
             const status = info.event.extendedProps.status;
             if (status === 'pending') {
@@ -130,6 +166,13 @@
         });
 
         calendar.render();
+
+        filterTypeEl.addEventListener('change', function() {
+            calendar.refetchEvents();
+        });
+        filterStatusEl.addEventListener('change', function() {
+            calendar.refetchEvents();
+        });
 
         var eventPopover = document.getElementById('cal-event-popover');
         var eventPopoverContent = eventPopover.querySelector('.cal-event-popover-content');

@@ -23,6 +23,8 @@
         <field name="contractStartedAt" column="contract_started_at" type="date_immutable" nullable="true" />
         <field name="workingDays" type="json" column="working_days" />
         <field name="absenceBalanceResetDay" column="absence_balance_reset_day" type="date_immutable"/>
+        <field name="themePreference" column="theme_preference" length="10"/>
+        <field name="palettePreference" column="palette_preference" length="10"/>
 
         <field name="createdAt" column="created_at" type="datetime_immutable"/>
         <field name="updatedAt" column="updated_at" type="datetime_immutable"/>

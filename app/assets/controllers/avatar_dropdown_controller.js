@@ -15,7 +15,8 @@ export default class extends Controller {
 
     initThemeSwitcher() {
         const saved = localStorage.getItem('whosooo-theme');
-        const activeTheme = saved || 'auto';
+        const serverTheme = this.element.dataset.serverTheme || 'auto';
+        const activeTheme = saved || serverTheme;
         this.menuTarget.querySelectorAll('.avatar-dropdown-theme-option').forEach(opt => {
             const isActive = opt.dataset.theme === activeTheme;
             opt.classList.toggle('active', isActive);
@@ -118,6 +119,7 @@ export default class extends Controller {
         }
 
         this.syncSidebarToggle(theme);
+        this.persistPreferences();
     }
 
     applyTheme(theme) {
@@ -134,7 +136,8 @@ export default class extends Controller {
 
     initPalettePicker() {
         const validPalettes = ['teal', 'sage', 'sunset', 'lavender'];
-        const raw = localStorage.getItem('whosooo-palette') || 'teal';
+        const serverPalette = this.element.dataset.serverPalette || 'teal';
+        const raw = localStorage.getItem('whosooo-palette') || serverPalette;
         const saved = validPalettes.includes(raw) ? raw : 'teal';
         this.menuTarget.querySelectorAll('.avatar-dropdown-palette-swatch').forEach(swatch => {
             const isActive = swatch.dataset.palette === saved;
@@ -159,5 +162,18 @@ export default class extends Controller {
         } else {
             localStorage.setItem('whosooo-palette', palette);
         }
+
+        this.persistPreferences();
+    }
+
+    persistPreferences() {
+        const theme = localStorage.getItem('whosooo-theme') || 'auto';
+        const palette = localStorage.getItem('whosooo-palette') || 'teal';
+
+        fetch('/app/api/user/theme', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ theme, palette }),
+        }).catch(() => {});
     }
 }

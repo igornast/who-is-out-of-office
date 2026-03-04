@@ -4,8 +4,15 @@ export default class extends Controller {
     static targets = ['container', 'day', 'dot'];
 
     connect() {
+        this._onScroll = this.updateDots.bind(this);
         this.scrollToToday();
-        this.containerTarget.addEventListener('scroll', this.updateDots.bind(this), { passive: true });
+        this.containerTarget.addEventListener('scroll', this._onScroll, { passive: true });
+    }
+
+    disconnect() {
+        if (this.hasContainerTarget) {
+            this.containerTarget.removeEventListener('scroll', this._onScroll);
+        }
     }
 
     scrollToToday() {

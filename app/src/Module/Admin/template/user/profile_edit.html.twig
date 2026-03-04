@@ -132,22 +132,47 @@
 
             <div class="settings-card">
                 <div class="settings-card-header">
-                    <h3 class="settings-card-title">{{ 'crud.user_profile.section.change_password'|trans(domain='admin') }}</h3>
+                    <h3 class="settings-card-title">{{ 'crud.user_profile.connected_services.title'|trans(domain='admin') }}</h3>
                 </div>
                 <div class="settings-card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="field-text form-group mb-3">
-                                <div class="form-widget">
-                                    {{ form_row(form.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
-                                </div>
-                            </div>
+                    <div class="connected-service-row">
+                        <div class="connected-service-icon">
+                            <i data-lucide="message-square"></i>
                         </div>
-                        <div class="col-md-6">
-                            <div class="field-text form-group mb-3">
-                                <div class="form-widget">
-                                    {{ form_row(form.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
-                                </div>
+                        <div class="connected-service-info">
+                            <div class="connected-service-name">{{ 'crud.user_profile.connected_services.slack.title'|trans(domain='admin') }}</div>
+                            <div class="connected-service-desc">{{ 'crud.user_profile.connected_services.slack.description'|trans(domain='admin') }}</div>
+                        </div>
+                        <div class="connected-service-status">
+                            {% if slack_connected %}
+                                <span class="connected-service-badge connected-service-badge-success">
+                                    <i data-lucide="check-circle-2"></i>
+                                    {{ 'crud.user_profile.connected_services.slack.connected'|trans(domain='admin') }}
+                                </span>
+                                <span class="connected-service-meta">{{ 'crud.user_profile.connected_services.slack.member_id'|trans({'%id%': slack_member_id}, domain='admin') }}</span>
+                            {% else %}
+                                <span class="connected-service-badge connected-service-badge-muted">
+                                    {{ 'crud.user_profile.connected_services.slack.not_connected'|trans(domain='admin') }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="connected-service-row">
+                        <div class="connected-service-icon">
+                            <i data-lucide="calendar"></i>
+                        </div>
+                        <div class="connected-service-info">
+                            <div class="connected-service-name">{{ 'crud.user_profile.connected_services.calendar.title'|trans(domain='admin') }}</div>
+                            <div class="connected-service-desc">{{ 'crud.user_profile.connected_services.calendar.description'|trans(domain='admin') }}</div>
+                        </div>
+                        <div class="connected-service-action">
+                            <div class="connected-service-url-group">
+                                <input type="text" class="connected-service-url-input" id="profile-cal-url" readonly value="{{ calendar_subscription_url }}">
+                                <button class="btn btn-outline btn-sm" id="profile-copy-cal-url" type="button">
+                                    <i data-lucide="copy"></i>
+                                    {{ 'crud.user_profile.connected_services.calendar.copy_url'|trans(domain='admin') }}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -161,4 +186,26 @@
             {{ form_end(form) }}
         </div>
     </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var copyBtn = document.getElementById('profile-copy-cal-url');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function() {
+                    var urlInput = document.getElementById('profile-cal-url');
+                    navigator.clipboard.writeText(urlInput.value);
+                    var originalHtml = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i data-lucide="check"></i> {{ "crud.user_profile.connected_services.calendar.copied"|trans(domain: "admin") }}';
+                    if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+                    setTimeout(function() {
+                        copyBtn.innerHTML = originalHtml;
+                        if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+                    }, 2000);
+                });
+            }
+        });
+    </script>
 {% endblock %}
