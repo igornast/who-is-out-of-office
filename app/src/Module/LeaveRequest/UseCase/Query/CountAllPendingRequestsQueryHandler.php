@@ -13,8 +13,11 @@ class CountAllPendingRequestsQueryHandler
     ) {
     }
 
-    public function handle(): int
+    /**
+     * @param string[]|null $userIds
+     */
+    public function handle(?array $userIds = null): int
     {
-        return $this->repository->countAllPendingRequests();
+        return $this->repository->countAllPendingRequests($userIds);
     }
 }

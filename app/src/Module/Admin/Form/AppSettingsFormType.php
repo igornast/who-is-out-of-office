@@ -24,6 +24,21 @@ class AppSettingsFormType extends AbstractType
                 'label' => 'crud.app_settings.field.auto_approve_delay',
                 'help' => 'crud.app_settings.field.auto_approve_delay_help',
                 'required' => true,
+            ])
+            ->add('defaultAnnualAllowance', IntegerType::class, [
+                'label' => 'crud.app_settings.field.default_annual_allowance',
+                'help' => 'crud.app_settings.field.default_annual_allowance_help',
+                'required' => true,
+            ])
+            ->add('minNoticeDays', IntegerType::class, [
+                'label' => 'crud.app_settings.field.min_notice_days',
+                'help' => 'crud.app_settings.field.min_notice_days_help',
+                'required' => true,
+            ])
+            ->add('maxConsecutiveDays', IntegerType::class, [
+                'label' => 'crud.app_settings.field.max_consecutive_days',
+                'help' => 'crud.app_settings.field.max_consecutive_days_help',
+                'required' => true,
             ]);
     }
 

@@ -21,7 +21,7 @@ it('returns recent leave requests', function () {
 
     $this->repository
         ->expects('findRecentRequests')
-        ->with(5)
+        ->with(5, null)
         ->once()
         ->andReturn($expectedLeaveRequests);
 
@@ -34,7 +34,7 @@ it('returns recent leave requests', function () {
 it('returns empty array when no leave requests exist', function () {
     $this->repository
         ->expects('findRecentRequests')
-        ->with(5)
+        ->with(5, null)
         ->once()
         ->andReturn([]);
 
@@ -47,7 +47,7 @@ it('returns empty array when no leave requests exist', function () {
 it('passes custom limit to repository', function () {
     $this->repository
         ->expects('findRecentRequests')
-        ->with(10)
+        ->with(10, null)
         ->once()
         ->andReturn([]);
 

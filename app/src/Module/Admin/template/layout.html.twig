@@ -148,6 +148,12 @@
                 <i data-lucide="user-circle"></i>
                 <span class="ooo-sidebar-label">{{ 'menu.items.profile'|trans(domain: 'admin') }}</span>
             </a>
+            <a class="ooo-sidebar-item {{ _current_route == 'app_settings_appearance' ? 'active' }}"
+               href="{{ path('app_settings_appearance') }}"
+               title="{{ 'menu.items.appearance'|trans(domain: 'admin') }}">
+                <i data-lucide="palette"></i>
+                <span class="ooo-sidebar-label">{{ 'menu.items.appearance'|trans(domain: 'admin') }}</span>
+            </a>
             <a class="ooo-sidebar-item {{ _current_route == 'app_settings_account_security' ? 'active' }}"
                href="{{ path('app_settings_account_security') }}"
                title="{{ 'menu.items.account_security'|trans(domain: 'admin') }}">

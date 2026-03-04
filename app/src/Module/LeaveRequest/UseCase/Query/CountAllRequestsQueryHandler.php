@@ -13,8 +13,11 @@ class CountAllRequestsQueryHandler
     ) {
     }
 
-    public function handle(): int
+    /**
+     * @param string[]|null $userIds
+     */
+    public function handle(?array $userIds = null): int
     {
-        return $this->repository->countAllRequests();
+        return $this->repository->countAllRequests($userIds);
     }
 }

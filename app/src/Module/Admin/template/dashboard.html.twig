@@ -22,7 +22,7 @@
                         <i data-lucide="inbox"></i>
                     </div>
                 </div>
-                <div class="stat-value">{{ all_pending_requests_count }}</div>
+                <div class="stat-value">{{ dashboard_stats.pendingRequestsCount }}</div>
                 <div class="stat-label">{{ 'dashboard.stats.awaiting_approval'|trans(domain: 'admin') }}</div>
             </a>
         {% else %}
@@ -50,7 +50,7 @@
                     <i data-lucide="user-check"></i>
                 </div>
             </div>
-            <div class="stat-value">{{ on_leave_today }}</div>
+            <div class="stat-value">{{ dashboard_stats.onLeaveTodayCount }}</div>
             <div class="stat-label">{{ 'dashboard.stats.on_leave_today'|trans(domain: 'admin') }}</div>
         </a>
         <a class="stat-card stat-card-link"
@@ -64,7 +64,7 @@
                     <i data-lucide="calendar-range"></i>
                 </div>
             </div>
-            <div class="stat-value">{{ absences_this_week }}</div>
+            <div class="stat-value">{{ dashboard_stats.absencesThisWeekCount }}</div>
             <div class="stat-label">{{ 'dashboard.stats.absences_this_week'|trans(domain: 'admin') }}</div>
         </a>
         <div class="stat-card">

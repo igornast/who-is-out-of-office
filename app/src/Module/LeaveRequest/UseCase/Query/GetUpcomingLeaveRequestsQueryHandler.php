@@ -15,10 +15,12 @@ class GetUpcomingLeaveRequestsQueryHandler
     }
 
     /**
+     * @param string[]|null $userIds
+     *
      * @return LeaveRequestDTO[]
      */
-    public function handle(): array
+    public function handle(?array $userIds = null): array
     {
-        return $this->repository->findUpcomingApprovedAbsences();
+        return $this->repository->findUpcomingApprovedAbsences(userIds: $userIds);
     }
 }

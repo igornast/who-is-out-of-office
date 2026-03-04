@@ -15,10 +15,12 @@ class FindOnLeaveTodayQueryHandler
     }
 
     /**
+     * @param string[]|null $userIds
+     *
      * @return LeaveRequestDTO[]
      */
-    public function handle(): array
+    public function handle(?array $userIds = null): array
     {
-        return $this->repository->findOnLeaveToday();
+        return $this->repository->findOnLeaveToday($userIds);
     }
 }

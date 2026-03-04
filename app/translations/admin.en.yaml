@@ -19,6 +19,7 @@ menu:
         notifications: Notifications
         integrations: Integrations
         account_security: Security
+        appearance: Appearance
     section:
         my_team: My Team
         organization: Organization
@@ -247,10 +248,18 @@ crud:
         panel:
             leave_request: Leave Request Settings
             leave_request_desc: Configure automatic approval and delay settings for leave requests.
+            leave_defaults: Leave Defaults & Limits
+            leave_defaults_desc: Set company-wide defaults for leave allowance and request constraints.
         field:
             auto_approve: Auto Approve
             auto_approve_delay: Auto Approve Delay (seconds)
             auto_approve_delay_help: Number of seconds to wait before automatically approving leave requests
+            default_annual_allowance: Default Annual Allowance (days)
+            default_annual_allowance_help: Default number of annual leave days for new employees
+            min_notice_days: Minimum Notice (days)
+            min_notice_days_help: Minimum number of days in advance a leave request must be submitted (0 = no minimum)
+            max_consecutive_days: Max Consecutive Days
+            max_consecutive_days_help: Maximum number of consecutive days allowed per leave request (0 = unlimited)
         action:
             save: Save Changes
 
@@ -307,3 +316,25 @@ settings:
             password_changed: Your password has been updated successfully.
         action:
             update_password: Update Password
+    appearance:
+        title: Appearance
+        theme:
+            title: Theme
+            desc: Choose how the application looks. Select a theme that suits your preference.
+            light: Light
+            dark: Dark
+            auto: System
+        palette:
+            title: Color Palette
+            desc: Pick a color palette for the interface. This changes the accent colors across the application.
+            teal: Warm Teal
+            sage: Sage Green
+            sunset: Sunset Warm
+            lavender: Soft Lavender
+        field:
+            theme: Theme
+            palette: Color Palette
+        success:
+            saved: Appearance preferences saved successfully.
+        action:
+            save: Save Changes

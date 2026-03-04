@@ -15,10 +15,12 @@ class GetRecentLeaveRequestsQueryHandler
     }
 
     /**
+     * @param string[]|null $userIds
+     *
      * @return LeaveRequestDTO[]
      */
-    public function handle(int $limit = 5): array
+    public function handle(int $limit = 5, ?array $userIds = null): array
     {
-        return $this->repository->findRecentRequests($limit);
+        return $this->repository->findRecentRequests($limit, $userIds);
     }
 }

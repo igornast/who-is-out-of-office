@@ -17,6 +17,7 @@ use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetDailyAbsenceSummaryQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveBalancesPerTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAllRequestsQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetDashboardStatsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserIdQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
@@ -24,6 +25,7 @@ use App\Module\LeaveRequest\UseCase\Query\GetLeaveTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetPendingLeaveRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetRecentLeaveRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
+use App\Shared\DTO\Dashboard\DashboardStatsDTO;
 use App\Shared\DTO\Dashboard\LeaveBalanceDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
@@ -51,6 +53,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly CountOnLeaveTodayQueryHandler $countOnLeaveTodayHandler,
         private readonly CountAbsencesThisWeekQueryHandler $countAbsencesThisWeekHandler,
         private readonly CountAllPendingRequestsQueryHandler $countAllPendingRequestsHandler,
+        private readonly GetDashboardStatsQueryHandler $getDashboardStatsHandler,
         private readonly GetDailyAbsenceSummaryQueryHandler $getDailyAbsenceSummaryHandler,
         private readonly GetLeaveBalancesPerTypeQueryHandler $getLeaveBalancesPerTypeHandler,
         private readonly GetRecentLeaveRequestsQueryHandler $getRecentLeaveRequestsHandler,
@@ -78,9 +81,9 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     /**
      * @return LeaveRequestDTO[]
      */
-    public function getUpcomingLeaveRequests(): array
+    public function getUpcomingLeaveRequests(?array $userIds = null): array
     {
-        return $this->getUpcomingLeaveRequestsHandler->handle();
+        return $this->getUpcomingLeaveRequestsHandler->handle($userIds);
     }
 
     public function getById(string $id): ?LeaveRequestDTO
@@ -160,24 +163,29 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     /**
      * @return LeaveRequestDTO[]
      */
-    public function findOnLeaveToday(): array
+    public function findOnLeaveToday(?array $userIds = null): array
     {
-        return $this->findOnLeaveTodayHandler->handle();
+        return $this->findOnLeaveTodayHandler->handle($userIds);
     }
 
-    public function countOnLeaveToday(): int
+    public function countOnLeaveToday(?array $userIds = null): int
     {
-        return $this->countOnLeaveTodayHandler->handle();
+        return $this->countOnLeaveTodayHandler->handle($userIds);
     }
 
-    public function countAbsencesThisWeek(): int
+    public function countAbsencesThisWeek(?array $userIds = null): int
     {
-        return $this->countAbsencesThisWeekHandler->handle();
+        return $this->countAbsencesThisWeekHandler->handle($userIds);
     }
 
-    public function countAllPendingRequests(): int
+    public function countAllPendingRequests(?array $userIds = null): int
     {
-        return $this->countAllPendingRequestsHandler->handle();
+        return $this->countAllPendingRequestsHandler->handle($userIds);
+    }
+
+    public function getDashboardStats(?array $userIds = null): DashboardStatsDTO
+    {
+        return $this->getDashboardStatsHandler->handle($userIds);
     }
 
     /**
@@ -199,14 +207,14 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     /**
      * @return LeaveRequestDTO[]
      */
-    public function getRecentLeaveRequests(int $limit = 5): array
+    public function getRecentLeaveRequests(int $limit = 5, ?array $userIds = null): array
     {
-        return $this->getRecentLeaveRequestsHandler->handle($limit);
+        return $this->getRecentLeaveRequestsHandler->handle($limit, $userIds);
     }
 
-    public function countAllRequests(): int
+    public function countAllRequests(?array $userIds = null): int
     {
-        return $this->countAllRequestsHandler->handle();
+        return $this->countAllRequestsHandler->handle($userIds);
     }
 
     /**

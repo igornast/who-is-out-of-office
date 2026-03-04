@@ -15,6 +15,15 @@ class AppSettingsDTO
         #[Assert\NotNull]
         #[Assert\PositiveOrZero]
         public int $autoApproveDelay,
+        #[Assert\NotNull]
+        #[Assert\Positive]
+        public int $defaultAnnualAllowance,
+        #[Assert\NotNull]
+        #[Assert\PositiveOrZero]
+        public int $minNoticeDays,
+        #[Assert\NotNull]
+        #[Assert\PositiveOrZero]
+        public int $maxConsecutiveDays,
     ) {
     }
 
@@ -23,6 +32,9 @@ class AppSettingsDTO
         return new self(
             autoApprove: self::getNestedValue($data, AppSettingsEnum::AUTO_APPROVE),
             autoApproveDelay: self::getNestedValue($data, AppSettingsEnum::AUTO_APPROVE_DELAY),
+            defaultAnnualAllowance: self::getNestedValue($data, AppSettingsEnum::DEFAULT_ANNUAL_ALLOWANCE),
+            minNoticeDays: self::getNestedValue($data, AppSettingsEnum::MIN_NOTICE_DAYS),
+            maxConsecutiveDays: self::getNestedValue($data, AppSettingsEnum::MAX_CONSECUTIVE_DAYS),
         );
     }
 
@@ -31,6 +43,9 @@ class AppSettingsDTO
         $result = [];
         self::setNestedValue($result, AppSettingsEnum::AUTO_APPROVE, $this->autoApprove);
         self::setNestedValue($result, AppSettingsEnum::AUTO_APPROVE_DELAY, $this->autoApproveDelay);
+        self::setNestedValue($result, AppSettingsEnum::DEFAULT_ANNUAL_ALLOWANCE, $this->defaultAnnualAllowance);
+        self::setNestedValue($result, AppSettingsEnum::MIN_NOTICE_DAYS, $this->minNoticeDays);
+        self::setNestedValue($result, AppSettingsEnum::MAX_CONSECUTIVE_DAYS, $this->maxConsecutiveDays);
 
         return $result;
     }

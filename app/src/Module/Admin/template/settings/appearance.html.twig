@@ -1,0 +1,83 @@
+{% extends '@AppAdmin/layout.html.twig' %}
+
+{% block page_title %}{{ 'settings.appearance.title'|trans(domain='admin') }}{% endblock %}
+
+{% block content_header %}
+    <div class="content-header-title">
+        <h1 class="title" style="font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);">
+            {{ 'settings.appearance.title'|trans(domain='admin') }}
+        </h1>
+    </div>
+{% endblock %}
+
+{% block main %}
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }}" style="margin-bottom: 16px; border-radius: var(--radius-md); font-size: 13px;">
+                        {{ message|trans(domain='admin') }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {{ form_start(form) }}
+
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'settings.appearance.theme.title'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'settings.appearance.theme.desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="appearance-theme-options">
+                        {% for child in form.theme %}
+                            <label class="appearance-theme-card ">
+                                {{ form_widget(child, {'attr': {'class': 'visually-hidden'}}) }}
+                                <div class="appearance-theme-icon">
+                                    {% if child.vars.value == 'light' %}
+                                        <i data-lucide="sun"></i>
+                                    {% elseif child.vars.value == 'dark' %}
+                                        <i data-lucide="moon"></i>
+                                    {% else %}
+                                        <i data-lucide="monitor"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="appearance-theme-label">{{ child.vars.label|trans(domain='admin') }}</div>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'settings.appearance.palette.title'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'settings.appearance.palette.desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="appearance-palette-options">
+                        {% for child in form.palette %}
+                            {% set palette_colors = {
+                                'teal': '#3D9B8F',
+                                'sage': '#7FA030',
+                                'sunset': '#E8876F',
+                                'lavender': '#8B7AAF'
+                            } %}
+                            <label class="appearance-palette-card ">
+                                {{ form_widget(child, {'attr': {'class': 'visually-hidden'}}) }}
+                                <div class="appearance-palette-swatch" style="background-color: {{ palette_colors[child.vars.value] }};"></div>
+                                <div class="appearance-palette-label">{{ child.vars.label|trans(domain='admin') }}</div>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="settings-card-footer">
+                    {{ form_errors(form) }}
+                    <button class="btn btn-primary">{{ 'settings.appearance.action.save'|trans(domain='admin') }}</button>
+                </div>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

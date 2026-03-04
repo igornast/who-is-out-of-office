@@ -13,8 +13,11 @@ class CountAbsencesThisWeekQueryHandler
     ) {
     }
 
-    public function handle(): int
+    /**
+     * @param string[]|null $userIds
+     */
+    public function handle(?array $userIds = null): int
     {
-        return $this->repository->countAbsencesThisWeek();
+        return $this->repository->countAbsencesThisWeek($userIds);
     }
 }

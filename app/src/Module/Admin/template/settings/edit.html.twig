@@ -40,6 +40,32 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'crud.app_settings.panel.leave_defaults'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'crud.app_settings.panel.leave_defaults_desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="field-integer form-group mb-3">
+                        <div class="form-widget">
+                            {{ form_row(form.defaultAnnualAllowance, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="field-integer form-group mb-3">
+                        <div class="form-widget">
+                            {{ form_row(form.minNoticeDays, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="field-integer form-group mb-0">
+                        <div class="form-widget">
+                            {{ form_row(form.maxConsecutiveDays, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                </div>
                 <div class="settings-card-footer">
                     {{ form_errors(form) }}
                     <button class="btn btn-primary">{{ 'crud.app_settings.action.save'|trans(domain='admin') }}</button>

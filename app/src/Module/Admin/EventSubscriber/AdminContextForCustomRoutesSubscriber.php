@@ -21,6 +21,7 @@ class AdminContextForCustomRoutesSubscriber implements EventSubscriberInterface
         'app_settings_notifications',
         'app_settings_integrations',
         'app_settings_account_security',
+        'app_settings_appearance',
     ];
 
     public function __construct(

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\Facade;
 
 use App\Shared\DTO\Dashboard\DailyAbsenceSummaryDTO;
+use App\Shared\DTO\Dashboard\DashboardStatsDTO;
 use App\Shared\DTO\Dashboard\LeaveBalanceDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
@@ -53,22 +54,40 @@ interface LeaveRequestFacadeInterface
     public function getLeaveRequestsForUser(string $userId, ?array $status): array;
 
     /**
+     * @param string[]|null $userIds
+     *
      * @return LeaveRequestDTO[]
      */
-    public function getUpcomingLeaveRequests(): array;
+    public function getUpcomingLeaveRequests(?array $userIds = null): array;
 
     public function remove(LeaveRequestDTO $leaveRequestDTO): void;
 
     /**
+     * @param string[]|null $userIds
+     *
      * @return LeaveRequestDTO[]
      */
-    public function findOnLeaveToday(): array;
+    public function findOnLeaveToday(?array $userIds = null): array;
 
-    public function countOnLeaveToday(): int;
+    /**
+     * @param string[]|null $userIds
+     */
+    public function countOnLeaveToday(?array $userIds = null): int;
 
-    public function countAbsencesThisWeek(): int;
+    /**
+     * @param string[]|null $userIds
+     */
+    public function countAbsencesThisWeek(?array $userIds = null): int;
 
-    public function countAllPendingRequests(): int;
+    /**
+     * @param string[]|null $userIds
+     */
+    public function countAllPendingRequests(?array $userIds = null): int;
+
+    /**
+     * @param string[]|null $userIds
+     */
+    public function getDashboardStats(?array $userIds = null): DashboardStatsDTO;
 
     /**
      * @return DailyAbsenceSummaryDTO[]
@@ -81,11 +100,16 @@ interface LeaveRequestFacadeInterface
     public function getLeaveBalancesPerType(string $userId, \DateTimeImmutable $periodStart): array;
 
     /**
+     * @param string[]|null $userIds
+     *
      * @return LeaveRequestDTO[]
      */
-    public function getRecentLeaveRequests(int $limit = 5): array;
+    public function getRecentLeaveRequests(int $limit = 5, ?array $userIds = null): array;
 
-    public function countAllRequests(): int;
+    /**
+     * @param string[]|null $userIds
+     */
+    public function countAllRequests(?array $userIds = null): int;
 
     /**
      * @return LeaveRequestTypeDTO[]
