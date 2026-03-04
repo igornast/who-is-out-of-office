@@ -74,8 +74,9 @@ class TeamMembersCrudController extends AppAbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        yield FormField::addTab('General')->hideOnIndex();
         yield FormField::addColumn(3);
-        yield ImageField::new('profileImageUrl')
+        yield ImageField::new('profileImageUrl', '')
             ->setBasePath('uploads/profile_images')
             ->hideOnForm();
 
@@ -88,12 +89,12 @@ class TeamMembersCrudController extends AppAbstractCrudController
         yield DateField::new('contractStartedAt', 'Start Date')->hideOnForm();
 
         yield FormField::addTab('Leave Balance')->hideOnIndex();
-        yield NumberField::new('annualLeaveAllowance')->setDisabled();
-        yield NumberField::new('currentLeaveBalance')->setDisabled();
-        yield DateField::new('absenceBalanceResetDay')->setDisabled();
+        yield NumberField::new('annualLeaveAllowance')->hideOnIndex()->setDisabled();
+        yield NumberField::new('currentLeaveBalance')->hideOnIndex()->setDisabled();
+        yield DateField::new('absenceBalanceResetDay')->hideOnIndex()->setDisabled();
 
         yield FormField::addTab('Details')->hideOnIndex();
-        yield DateField::new('birthDate')->setDisabled();
-        yield BooleanField::new('isActive')->setDisabled()->renderAsSwitch(false);
+        yield DateField::new('birthDate')->hideOnIndex()->setDisabled();
+        yield BooleanField::new('isActive')->hideOnIndex()->setDisabled()->renderAsSwitch(false);
     }
 }

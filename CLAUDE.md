@@ -58,7 +58,11 @@ composer test
 composer test:phpunit:u
 
 # Run functional tests (requires test DB)
-composer test:phpunit:f
+# IMPORTANT: Always reset the test DB before running functional tests standalone!
+# Use `composer reset-test-db` first, or use `composer test` which does it automatically.
+# Running `composer test:phpunit:f` alone without a DB reset may cause stale fixture
+# data and flaky failures (e.g. date-sensitive balance assertions).
+composer reset-test-db && composer test:phpunit:f
 
 # Run architecture tests (module isolation, naming conventions, layer deps)
 composer test:arch

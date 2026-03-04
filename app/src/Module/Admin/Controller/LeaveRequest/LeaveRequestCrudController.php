@@ -165,7 +165,9 @@ class LeaveRequestCrudController extends AppAbstractCrudController
             FormField::addFieldset('Details')->hideWhenCreating(),
             ChoiceField::new('status')->setChoices(LeaveRequestStatusEnum::cases())->setDisabled()->hideWhenCreating(),
             NumberField::new('workDays')->setDisabled()->hideWhenCreating(),
-            AssociationField::new('approvedBy')->setDisabled()->hideWhenCreating(),
+            AssociationField::new('approvedBy')
+                ->formatValue(fn (?User $user): string => null === $user ? '—' : sprintf('%s %s', $user->firstName, $user->lastName))
+                ->setDisabled()->hideWhenCreating(),
             BooleanField::new('isAutoApproved')->setDisabled()->hideWhenCreating()->renderAsSwitch(false),
             DateField::new('createdAt')->setDisabled()->hideWhenCreating(),
         ];
