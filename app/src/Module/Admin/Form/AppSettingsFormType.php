@@ -39,6 +39,11 @@ class AppSettingsFormType extends AbstractType
                 'label' => 'crud.app_settings.field.max_consecutive_days',
                 'help' => 'crud.app_settings.field.max_consecutive_days_help',
                 'required' => true,
+            ])
+            ->add('skipWeekendHolidays', CheckboxType::class, [
+                'label' => 'crud.app_settings.field.skip_weekend_holidays',
+                'help' => 'crud.app_settings.field.skip_weekend_holidays_help',
+                'required' => false,
             ]);
     }
 

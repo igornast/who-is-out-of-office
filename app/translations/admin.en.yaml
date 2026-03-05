@@ -311,16 +311,20 @@ crud:
             leave_request_desc: Configure automatic approval and delay settings for leave requests.
             leave_defaults: Leave Defaults & Limits
             leave_defaults_desc: Set company-wide defaults for leave allowance and request constraints.
+            notification: Notification Settings
+            notification_desc: Configure how notifications behave for Slack digests and other channels.
         field:
             auto_approve: Auto Approve
-            auto_approve_delay: Auto Approve Delay (seconds)
-            auto_approve_delay_help: Number of seconds to wait before automatically approving leave requests
+            auto_approve_delay: Auto Approve Delay (minutes)
+            auto_approve_delay_help: Number of minutes to wait before automatically approving leave requests
             default_annual_allowance: Default Annual Allowance (days)
             default_annual_allowance_help: Default number of annual leave days for new employees
             min_notice_days: Minimum Notice (days)
             min_notice_days_help: Minimum number of days in advance a leave request must be submitted (0 = no minimum)
             max_consecutive_days: Max Consecutive Days
             max_consecutive_days_help: Maximum number of consecutive days allowed per leave request (0 = unlimited)
+            skip_weekend_holidays: Skip weekend public holidays
+            skip_weekend_holidays_help: When enabled, public holidays falling on Saturday or Sunday will not appear in Slack weekly digest notifications
         action:
             save: Save Changes
 

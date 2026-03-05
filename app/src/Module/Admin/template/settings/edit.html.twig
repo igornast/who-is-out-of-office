@@ -66,10 +66,28 @@
                         </div>
                     </div>
                 </div>
-                <div class="settings-card-footer">
-                    {{ form_errors(form) }}
-                    <button class="btn btn-primary">{{ 'crud.app_settings.action.save'|trans(domain='admin') }}</button>
+            </div>
+
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'crud.app_settings.panel.notification'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'crud.app_settings.panel.notification_desc'|trans(domain='admin') }}</p>
                 </div>
+                <div class="settings-card-body">
+                    <div class="field-checkbox form-group mb-0">
+                        <div class="checkbox-large">
+                            {{ form_widget(form.skipWeekendHolidays) }}
+                            {{ form_label(form.skipWeekendHolidays) }}
+                        </div>
+                        <div class="form-text">{{ form_help(form.skipWeekendHolidays) }}</div>
+                        {{ form_errors(form.skipWeekendHolidays) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card-footer">
+                {{ form_errors(form) }}
+                <button class="btn btn-primary">{{ 'crud.app_settings.action.save'|trans(domain='admin') }}</button>
             </div>
 
             {{ form_end(form) }}

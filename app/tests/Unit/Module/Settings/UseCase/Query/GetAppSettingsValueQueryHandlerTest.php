@@ -12,7 +12,7 @@ beforeEach(function (): void {
     file_put_contents($this->tempFile, Yaml::dump([
         'leave_request' => [
             'auto_approve' => true,
-            'auto_approve_delay' => 300,
+            'auto_approve_delay' => 5,
         ],
     ]));
 
@@ -34,18 +34,24 @@ it('returns auto approve setting value', function () {
 it('returns auto approve delay setting value', function () {
     $result = $this->handler->handle(AppSettingsEnum::AUTO_APPROVE_DELAY);
 
-    expect($result)->toBe(300);
+    expect($result)->toBe(5);
 });
 
 it('returns updated value after file change', function () {
     file_put_contents($this->tempFile, Yaml::dump([
         'leave_request' => [
             'auto_approve' => false,
-            'auto_approve_delay' => 600,
+            'auto_approve_delay' => 10,
         ],
     ]));
 
     $result = $this->handler->handle(AppSettingsEnum::AUTO_APPROVE);
 
     expect($result)->toBeFalse();
+});
+
+it('returns null for missing nested key', function () {
+    $result = $this->handler->handle(AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS);
+
+    expect($result)->toBeNull();
 });

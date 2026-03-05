@@ -24,6 +24,8 @@ class AppSettingsDTO
         #[Assert\NotNull]
         #[Assert\PositiveOrZero]
         public int $maxConsecutiveDays,
+        #[Assert\NotNull]
+        public bool $skipWeekendHolidays,
     ) {
     }
 
@@ -35,6 +37,7 @@ class AppSettingsDTO
             defaultAnnualAllowance: self::getNestedValue($data, AppSettingsEnum::DEFAULT_ANNUAL_ALLOWANCE),
             minNoticeDays: self::getNestedValue($data, AppSettingsEnum::MIN_NOTICE_DAYS),
             maxConsecutiveDays: self::getNestedValue($data, AppSettingsEnum::MAX_CONSECUTIVE_DAYS),
+            skipWeekendHolidays: self::getNestedValue($data, AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS, false),
         );
     }
 
@@ -46,14 +49,18 @@ class AppSettingsDTO
         self::setNestedValue($result, AppSettingsEnum::DEFAULT_ANNUAL_ALLOWANCE, $this->defaultAnnualAllowance);
         self::setNestedValue($result, AppSettingsEnum::MIN_NOTICE_DAYS, $this->minNoticeDays);
         self::setNestedValue($result, AppSettingsEnum::MAX_CONSECUTIVE_DAYS, $this->maxConsecutiveDays);
+        self::setNestedValue($result, AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS, $this->skipWeekendHolidays);
 
         return $result;
     }
 
-    private static function getNestedValue(array $data, AppSettingsEnum $setting): mixed
+    private static function getNestedValue(array $data, AppSettingsEnum $setting, mixed $default = null): mixed
     {
         $value = $data;
         foreach (explode('.', $setting->value) as $key) {
+            if (!is_array($value) || !array_key_exists($key, $value)) {
+                return $default;
+            }
             $value = $value[$key];
         }
 

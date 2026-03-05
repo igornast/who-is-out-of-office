@@ -37,7 +37,7 @@ class LeaveRequestAutoApproveCommand
 
         $this->logger->debug('[LEAVE-REQUEST][AUTO]: Leave request auto approve run.');
 
-        $createdBefore = new \DateTimeImmutable()->modify(sprintf('- %s seconds', $this->appSettingsFacade->autoApproveDelay()));
+        $createdBefore = new \DateTimeImmutable()->modify(sprintf('-%d seconds', $this->appSettingsFacade->autoApproveDelay() * 60));
 
         $leaveRequestDTOs = $this->leaveRequestFacade->getPendingLeaveRequests($createdBefore);
 

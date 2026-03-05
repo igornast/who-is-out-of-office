@@ -77,6 +77,21 @@ final class AppSettingsFacade implements AppSettingsFacadeInterface
         return $value;
     }
 
+    public function skipWeekendHolidays(): bool
+    {
+        $value = $this->appSettingValueHandler->handle(AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS);
+
+        if (null === $value) {
+            return false;
+        }
+
+        if (!is_bool($value)) {
+            throw new InvalidAppSettingTypeException(expected: 'bool', settingsEnum: AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS);
+        }
+
+        return $value;
+    }
+
     public function getAllSettings(): AppSettingsDTO
     {
         return $this->getAllAppSettingsQueryHandler->handle();

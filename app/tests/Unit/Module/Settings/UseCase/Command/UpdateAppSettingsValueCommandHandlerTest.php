@@ -21,10 +21,11 @@ afterEach(function (): void {
 it('writes settings to yaml file', function () {
     $settingsDTO = new AppSettingsDTO(
         autoApprove: true,
-        autoApproveDelay: 300,
+        autoApproveDelay: 5,
         defaultAnnualAllowance: 25,
         minNoticeDays: 1,
         maxConsecutiveDays: 0,
+        skipWeekendHolidays: false,
     );
 
     $this->handler->handle($settingsDTO);
@@ -32,10 +33,11 @@ it('writes settings to yaml file', function () {
     $content = Yaml::parseFile($this->tempFile);
 
     expect($content['leave_request']['auto_approve'])->toBeTrue()
-        ->and($content['leave_request']['auto_approve_delay'])->toBe(300)
+        ->and($content['leave_request']['auto_approve_delay'])->toBe(5)
         ->and($content['leave_request']['default_annual_allowance'])->toBe(25)
         ->and($content['leave_request']['min_notice_days'])->toBe(1)
-        ->and($content['leave_request']['max_consecutive_days'])->toBe(0);
+        ->and($content['leave_request']['max_consecutive_days'])->toBe(0)
+        ->and($content['notification']['skip_weekend_holidays'])->toBeFalse();
 });
 
 it('overwrites existing settings file', function () {
@@ -49,10 +51,11 @@ it('overwrites existing settings file', function () {
 
     $settingsDTO = new AppSettingsDTO(
         autoApprove: true,
-        autoApproveDelay: 600,
+        autoApproveDelay: 10,
         defaultAnnualAllowance: 30,
         minNoticeDays: 2,
         maxConsecutiveDays: 10,
+        skipWeekendHolidays: true,
     );
 
     $this->handler->handle($settingsDTO);
@@ -60,8 +63,9 @@ it('overwrites existing settings file', function () {
     $content = Yaml::parseFile($this->tempFile);
 
     expect($content['leave_request']['auto_approve'])->toBeTrue()
-        ->and($content['leave_request']['auto_approve_delay'])->toBe(600)
+        ->and($content['leave_request']['auto_approve_delay'])->toBe(10)
         ->and($content['leave_request']['default_annual_allowance'])->toBe(30)
         ->and($content['leave_request']['min_notice_days'])->toBe(2)
-        ->and($content['leave_request']['max_consecutive_days'])->toBe(10);
+        ->and($content['leave_request']['max_consecutive_days'])->toBe(10)
+        ->and($content['notification']['skip_weekend_holidays'])->toBeTrue();
 });

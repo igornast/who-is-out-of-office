@@ -18,6 +18,8 @@ interface AppSettingsFacadeInterface
 
     public function maxConsecutiveDays(): int;
 
+    public function skipWeekendHolidays(): bool;
+
     public function getAllSettings(): AppSettingsDTO;
 
     public function updateAllSettings(AppSettingsDTO $settingsDTO): void;
