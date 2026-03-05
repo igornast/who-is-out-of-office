@@ -46,12 +46,42 @@ Default admin account (development only):
 
 ## Common Commands
 
-All commands should be run from the `app/` directory or from within the PHP container.
+### Running commands with `just` (IMPORTANT)
 
-### Testing
+The project uses a `justfile` in `app/` with predefined commands. **When running commands from outside the container (e.g. from Claude Code), always use `docker exec` with `just` commands — never use `-it` flag (non-interactive context) and never run raw `composer` or `pest` commands directly.**
 
 ```bash
-# Run all tests (CS, PHPStan, Architecture, Unit, Functional)
+# Run full test suite (CS, PHPStan, Architecture, Unit, Functional)
+docker exec app_ooo_php just test
+
+# Run only unit tests
+docker exec app_ooo_php just test-unit
+
+# Run only functional tests
+docker exec app_ooo_php just test-functional
+
+# Run tests matching a filter name
+docker exec app_ooo_php just pest-filter "LeaveRequestVoter"
+
+# Run a specific test file
+docker exec app_ooo_php just pest-file tests/Unit/Path/To/YourTest.php
+
+# Fix code style
+docker exec app_ooo_php just cs
+
+# Run PHPStan
+docker exec app_ooo_php just stan
+
+# Reset test database
+docker exec app_ooo_php just db-reset-test
+```
+
+### Commands inside the container
+
+If already inside the PHP container (`docker exec -it app_ooo_php bash`), run `just` commands directly or use `composer` commands:
+
+```bash
+# Run all tests
 composer test
 
 # Run unit tests with coverage (requires 90% minimum)
@@ -60,17 +90,13 @@ composer test:phpunit:u
 # Run functional tests (requires test DB)
 # IMPORTANT: Always reset the test DB before running functional tests standalone!
 # Use `composer reset-test-db` first, or use `composer test` which does it automatically.
-# Running `composer test:phpunit:f` alone without a DB reset may cause stale fixture
-# data and flaky failures (e.g. date-sensitive balance assertions).
 composer reset-test-db && composer test:phpunit:f
 
 # Run architecture tests (module isolation, naming conventions, layer deps)
 composer test:arch
 
-# Run code style check
+# Run code style check / fix
 composer test:cs
-
-# Fix code style issues
 composer test:cs:fix
 
 # Run PHPStan (Level 8)
@@ -78,16 +104,6 @@ composer test:stan
 
 # Run CI test suite
 composer test-ci
-```
-
-### Running Individual Tests
-
-```bash
-# Run a specific test file
-./vendor/bin/pest tests/Unit/Path/To/YourTest.php
-
-# Run tests with coverage
-./vendor/bin/pest --coverage
 ```
 
 ### Database Management
