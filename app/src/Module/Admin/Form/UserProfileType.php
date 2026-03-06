@@ -7,6 +7,7 @@ namespace App\Module\Admin\Form;
 use App\Infrastructure\Doctrine\Entity\HolidayCalendar;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -37,6 +38,10 @@ class UserProfileType extends AbstractType
                 'class' => HolidayCalendar::class,
                 'choice_label' => fn (HolidayCalendar $c) => $c->countryName,
                 'placeholder' => 'Select your calendar',
+                'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('c')
+                    ->where('c.isActive = :active')
+                    ->setParameter('active', true)
+                    ->orderBy('c.countryName', 'ASC'),
             ])
 
             ->add('birthDate', DateType::class, [

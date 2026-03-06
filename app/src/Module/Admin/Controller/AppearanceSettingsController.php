@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Module\Admin\Controller;
 
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\DTO\AppearanceSettingsDTO;
 use App\Module\Admin\Form\AppearanceSettingsFormType;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
@@ -29,18 +30,19 @@ class AppearanceSettingsController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $form = $this->createForm(AppearanceSettingsFormType::class, [
-            'theme' => ThemeEnum::tryFrom($user->themePreference) ?? ThemeEnum::Auto,
-            'palette' => PaletteEnum::tryFrom($user->palettePreference) ?? PaletteEnum::Teal,
-        ]);
+        $dto = new AppearanceSettingsDTO(
+            theme: ThemeEnum::tryFrom($user->themePreference) ?? ThemeEnum::Auto,
+            palette: PaletteEnum::tryFrom($user->palettePreference) ?? PaletteEnum::Teal,
+        );
 
+        $form = $this->createForm(AppearanceSettingsFormType::class, $dto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->userFacade->updateThemePreference(
                 $user->id->toString(),
-                $form->get('theme')->getData(),
-                $form->get('palette')->getData(),
+                $dto->theme,
+                $dto->palette,
             );
 
             $this->addFlash('success', 'settings.appearance.success.saved');

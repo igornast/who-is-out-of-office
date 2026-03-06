@@ -178,13 +178,8 @@
             <div class="ooo-sidebar-user-info">
                 <div class="ooo-sidebar-user-name">{{ _user.firstName }} {{ _user.lastName }}</div>
                 <div class="ooo-sidebar-user-role">
-                    {% if is_granted('ROLE_ADMIN') %}
-                        {{ 'role.admin'|trans(domain: 'admin') }}
-                    {% elseif is_granted('ROLE_MANAGER') %}
-                        {{ 'role.manager'|trans(domain: 'admin') }}
-                    {% else %}
-                        {{ 'role.user'|trans(domain: 'admin') }}
-                    {% endif %}
+                    {% import '@AppAdmin/component/_role_badge.html.twig' as role %}
+                    {{ role.roleBadge('role-badge role-badge-sm') }}
                 </div>
             </div>
             <button class="ooo-theme-toggle"
@@ -247,13 +242,8 @@
                     <div class="avatar-dropdown-user-details">
                         <div class="avatar-dropdown-user-name">{{ _topbar_user.firstName }} {{ _topbar_user.lastName }}</div>
                         <div class="avatar-dropdown-user-email">{{ _topbar_user.email }}</div>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <span class="avatar-dropdown-role-badge role-admin">{{ 'role.admin'|trans(domain: 'admin') }}</span>
-                        {% elseif is_granted('ROLE_MANAGER') %}
-                            <span class="avatar-dropdown-role-badge role-manager">{{ 'role.manager'|trans(domain: 'admin') }}</span>
-                        {% else %}
-                            <span class="avatar-dropdown-role-badge role-employee">{{ 'role.user'|trans(domain: 'admin') }}</span>
-                        {% endif %}
+                        {% import '@AppAdmin/component/_role_badge.html.twig' as role %}
+                        {{ role.roleBadge() }}
                     </div>
                 </div>
                 <div class="avatar-dropdown-links">

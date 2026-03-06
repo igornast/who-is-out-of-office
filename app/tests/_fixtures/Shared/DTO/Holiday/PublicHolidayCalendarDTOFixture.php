@@ -25,6 +25,8 @@ class PublicHolidayCalendarDTOFixture implements FixtureInterface
             'countryCode' => $faker->countryCode(),
             'countryName' => $faker->country(),
             'holidays' => [],
+            'isActive' => true,
+            'lastSyncedYear' => (int) date('Y'),
         ];
     }
 }

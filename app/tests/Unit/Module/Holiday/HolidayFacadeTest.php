@@ -3,7 +3,12 @@
 declare(strict_types=1);
 
 use App\Module\Holiday\HolidayFacade;
+use App\Module\Holiday\UseCase\Command\DeleteCalendarCommandHandler;
+use App\Module\Holiday\UseCase\Command\SyncAllActiveCalendarsCommandHandler;
+use App\Module\Holiday\UseCase\Command\SyncCalendarCommandHandler;
+use App\Module\Holiday\UseCase\Command\ToggleCalendarActiveCommandHandler;
 use App\Module\Holiday\UseCase\Command\UpsertHolidayCalendarCommandHandler;
+use App\Module\Holiday\UseCase\Query\GetAllCalendarsQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayCalendarForCountryQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysForCountryBetweenDatesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler;
@@ -15,12 +20,22 @@ beforeEach(function (): void {
     $this->holidayCalendarHandler = mock(GetHolidayCalendarForCountryQueryHandler::class);
     $this->holidayDaysHandler = mock(GetHolidayDaysForCountryBetweenDatesQueryHandler::class);
     $this->holidayDaysGroupedByUserIdHandler = mock(GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler::class);
+    $this->getAllCalendarsHandler = mock(GetAllCalendarsQueryHandler::class);
+    $this->toggleCalendarActiveHandler = mock(ToggleCalendarActiveCommandHandler::class);
+    $this->syncCalendarHandler = mock(SyncCalendarCommandHandler::class);
+    $this->syncAllActiveCalendarsHandler = mock(SyncAllActiveCalendarsCommandHandler::class);
+    $this->deleteCalendarHandler = mock(DeleteCalendarCommandHandler::class);
 
     $this->facade = new HolidayFacade(
         upsertHandler: $this->upsertHandler,
         holidayCalendarHandler: $this->holidayCalendarHandler,
         holidayDaysHandler: $this->holidayDaysHandler,
-        holidayDaysGroupedByUserIdHandler: $this->holidayDaysGroupedByUserIdHandler
+        holidayDaysGroupedByUserIdHandler: $this->holidayDaysGroupedByUserIdHandler,
+        getAllCalendarsHandler: $this->getAllCalendarsHandler,
+        toggleCalendarActiveHandler: $this->toggleCalendarActiveHandler,
+        syncCalendarHandler: $this->syncCalendarHandler,
+        syncAllActiveCalendarsHandler: $this->syncAllActiveCalendarsHandler,
+        deleteCalendarHandler: $this->deleteCalendarHandler,
     );
 });
 
@@ -77,4 +92,58 @@ it('calls handler to get holidays grouped by user id', function () {
         ->andReturn([]);
 
     $this->facade->getHolidaysForDatesGroupedByUserId($startDate, $endDate);
+});
+
+it('calls handler to get all calendars', function () {
+    $calendar1 = PublicHolidayCalendarDTOFixture::create(['countryCode' => 'US']);
+    $calendar2 = PublicHolidayCalendarDTOFixture::create(['countryCode' => 'GB']);
+
+    $this->getAllCalendarsHandler
+        ->expects('handle')
+        ->once()
+        ->andReturn([$calendar1, $calendar2]);
+
+    $result = $this->facade->getAllCalendars();
+
+    expect($result)->toBe([$calendar1, $calendar2]);
+});
+
+it('calls handler to toggle calendar active', function () {
+    $calendarId = Uuid::uuid4()->toString();
+
+    $this->toggleCalendarActiveHandler
+        ->expects('handle')
+        ->once()
+        ->with($calendarId, false);
+
+    $this->facade->toggleCalendarActive($calendarId, false);
+});
+
+it('calls handler to sync calendar', function () {
+    $this->syncCalendarHandler
+        ->expects('handle')
+        ->once()
+        ->with('US', 'United States', 2026);
+
+    $this->facade->syncCalendar('US', 'United States', 2026);
+});
+
+it('calls handler to sync all active calendars', function () {
+    $this->syncAllActiveCalendarsHandler
+        ->expects('handle')
+        ->once()
+        ->with(2026);
+
+    $this->facade->syncAllActiveCalendars(2026);
+});
+
+it('calls handler to delete calendar', function () {
+    $calendarId = Uuid::uuid4()->toString();
+
+    $this->deleteCalendarHandler
+        ->expects('handle')
+        ->once()
+        ->with($calendarId);
+
+    $this->facade->deleteCalendar($calendarId);
 });

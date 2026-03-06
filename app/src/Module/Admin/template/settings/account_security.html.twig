@@ -34,13 +34,8 @@
                         <div class="settings-status-row">
                             <div class="settings-status-label">{{ 'settings.account_security.account_info.role'|trans(domain='admin') }}</div>
                             <div class="settings-status-value">
-                                {% if is_granted('ROLE_ADMIN') %}
-                                    <span class="settings-badge settings-badge-success">{{ 'role.admin'|trans(domain='admin') }}</span>
-                                {% elseif is_granted('ROLE_MANAGER') %}
-                                    <span class="settings-badge settings-badge-success">{{ 'role.manager'|trans(domain='admin') }}</span>
-                                {% else %}
-                                    <span class="settings-badge settings-badge-muted">{{ 'role.user'|trans(domain='admin') }}</span>
-                                {% endif %}
+                                {% import '@AppAdmin/component/_role_badge.html.twig' as role %}
+                                {{ role.roleBadge() }}
                             </div>
                         </div>
                         <div class="settings-status-row">

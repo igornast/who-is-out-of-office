@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Module\Admin\Controller;
 
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\DTO\ChangePasswordDTO;
 use App\Module\Admin\Form\ChangePasswordFormType;
 use App\Shared\Facade\UserFacadeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,20 +30,18 @@ class AccountSecurityController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $form = $this->createForm(ChangePasswordFormType::class);
+        $dto = new ChangePasswordDTO();
+        $form = $this->createForm(ChangePasswordFormType::class, $dto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $currentPassword = $form->get('currentPassword')->getData();
-
-            if (!$this->passwordHasher->isPasswordValid($user, $currentPassword)) {
+            if (!$this->passwordHasher->isPasswordValid($user, $dto->currentPassword)) {
                 $this->addFlash('danger', 'settings.account_security.error.current_password_invalid');
 
                 return $this->redirectToRoute('app_settings_account_security');
             }
 
-            $newPassword = $form->get('newPassword')->getData();
-            $this->userFacade->changePassword($user->id->toString(), $newPassword, $user);
+            $this->userFacade->changePassword($user->id->toString(), $dto->newPassword, $user);
 
             $this->addFlash('success', 'settings.account_security.success.password_changed');
 

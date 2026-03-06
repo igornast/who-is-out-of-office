@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Module\Holiday\Command;
 
-use App\Shared\DTO\Holiday\PublicHolidayCalendarDTO;
-use App\Shared\Facade\DateNagerInterface;
 use App\Shared\Facade\HolidayFacadeInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,7 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ImportPublicHolidaysCommand extends Command
 {
     public function __construct(
-        private readonly DateNagerInterface $dateNagerFacade,
         private readonly HolidayFacadeInterface $holidayFacade,
     ) {
         parent::__construct();
@@ -39,11 +36,7 @@ class ImportPublicHolidaysCommand extends Command
         $countryName = ucfirst($input->getArgument('country-name'));
         $year = (int) $input->getArgument('year');
 
-        $holidays = $this->dateNagerFacade->getHolidaysForCountry($countryCode, $year);
-
-        $holidayCalendarDTO = PublicHolidayCalendarDTO::createFromNager($countryCode, $countryName, $holidays);
-
-        $this->holidayFacade->upsertHolidayCalendar($holidayCalendarDTO);
+        $this->holidayFacade->syncCalendar($countryCode, $countryName, $year);
 
         return Command::SUCCESS;
     }

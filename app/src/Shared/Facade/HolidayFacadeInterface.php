@@ -23,4 +23,17 @@ interface HolidayFacadeInterface
      * @return array{string, UserPublicHolidaysDTO}
      */
     public function getHolidaysForDatesGroupedByUserId(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
+
+    /**
+     * @return PublicHolidayCalendarDTO[]
+     */
+    public function getAllCalendars(): array;
+
+    public function toggleCalendarActive(string $calendarId, bool $isActive): void;
+
+    public function syncCalendar(string $countryCode, string $countryName, int $year): void;
+
+    public function syncAllActiveCalendars(int $year): void;
+
+    public function deleteCalendar(string $calendarId): void;
 }

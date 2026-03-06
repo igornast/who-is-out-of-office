@@ -13,6 +13,9 @@ readonly class NagerPublicHolidayDTO
     ) {
     }
 
+    /**
+     * @param array{date: string, localName: string, name: string} $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(

@@ -114,31 +114,8 @@ body.ea .avatar-dropdown-user-email {
     margin-top: 2px;
 }
 
-body.ea .avatar-dropdown-role-badge {
-    display: inline-block;
-    font-family: var(--font-body);
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
+.avatar-dropdown-user-details .role-badge {
     margin-top: 4px;
-}
-
-body.ea .avatar-dropdown-role-badge.role-employee {
-    background: var(--success-subtle);
-    color: var(--success);
-}
-
-body.ea .avatar-dropdown-role-badge.role-manager {
-    background: var(--pending-subtle);
-    color: var(--pending);
-}
-
-body.ea .avatar-dropdown-role-badge.role-admin {
-    background: var(--danger-subtle);
-    color: var(--danger);
 }
 
 /* Section 2: Quick links */

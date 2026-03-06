@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Module\Holiday;
 
+use App\Module\Holiday\UseCase\Command\DeleteCalendarCommandHandler;
+use App\Module\Holiday\UseCase\Command\SyncAllActiveCalendarsCommandHandler;
+use App\Module\Holiday\UseCase\Command\SyncCalendarCommandHandler;
+use App\Module\Holiday\UseCase\Command\ToggleCalendarActiveCommandHandler;
 use App\Module\Holiday\UseCase\Command\UpsertHolidayCalendarCommandHandler;
+use App\Module\Holiday\UseCase\Query\GetAllCalendarsQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayCalendarForCountryQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysForCountryBetweenDatesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler;
@@ -20,6 +25,11 @@ final class HolidayFacade implements HolidayFacadeInterface
         private readonly GetHolidayCalendarForCountryQueryHandler $holidayCalendarHandler,
         private readonly GetHolidayDaysForCountryBetweenDatesQueryHandler $holidayDaysHandler,
         private readonly GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler $holidayDaysGroupedByUserIdHandler,
+        private readonly GetAllCalendarsQueryHandler $getAllCalendarsHandler,
+        private readonly ToggleCalendarActiveCommandHandler $toggleCalendarActiveHandler,
+        private readonly SyncCalendarCommandHandler $syncCalendarHandler,
+        private readonly SyncAllActiveCalendarsCommandHandler $syncAllActiveCalendarsHandler,
+        private readonly DeleteCalendarCommandHandler $deleteCalendarHandler,
     ) {
     }
 
@@ -47,5 +57,33 @@ final class HolidayFacade implements HolidayFacadeInterface
     public function getHolidaysForDatesGroupedByUserId(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
     {
         return $this->holidayDaysGroupedByUserIdHandler->handle($startDate, $endDate);
+    }
+
+    /**
+     * @return PublicHolidayCalendarDTO[]
+     */
+    public function getAllCalendars(): array
+    {
+        return $this->getAllCalendarsHandler->handle();
+    }
+
+    public function toggleCalendarActive(string $calendarId, bool $isActive): void
+    {
+        $this->toggleCalendarActiveHandler->handle($calendarId, $isActive);
+    }
+
+    public function syncCalendar(string $countryCode, string $countryName, int $year): void
+    {
+        $this->syncCalendarHandler->handle($countryCode, $countryName, $year);
+    }
+
+    public function syncAllActiveCalendars(int $year): void
+    {
+        $this->syncAllActiveCalendarsHandler->handle($year);
+    }
+
+    public function deleteCalendar(string $calendarId): void
+    {
+        $this->deleteCalendarHandler->handle($calendarId);
     }
 }

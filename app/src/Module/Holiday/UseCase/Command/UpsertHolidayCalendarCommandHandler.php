@@ -14,8 +14,8 @@ class UpsertHolidayCalendarCommandHandler
     ) {
     }
 
-    public function handle(PublicHolidayCalendarDTO $publicHolidayCalendarDTO): void
+    public function handle(PublicHolidayCalendarDTO $publicHolidayCalendarDTO, ?int $year = null): void
     {
-        $this->calendarRepository->upsertByCountryCode($publicHolidayCalendarDTO);
+        $this->calendarRepository->upsertByCountryCode($publicHolidayCalendarDTO, $year);
     }
 }

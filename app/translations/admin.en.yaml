@@ -306,9 +306,33 @@ crud:
             country_name: Country
             holidays_count: Holidays
             holidays_list: Public Holidays
+            is_active: Active
+            last_synced_year: Last Synced Year
             date: Date
             name: Holiday Name
             no_holidays: No public holidays configured
+        action:
+            toggle_active: Toggle Active
+            sync: Sync Now
+            import: Add Calendar
+            delete: Delete
+        flash:
+            activated: 'Calendar %country% has been activated.'
+            deactivated: 'Calendar %country% has been deactivated.'
+            synced: 'Holidays for %country% (%year%) synced successfully.'
+            delete_error: 'Cannot delete %country% calendar: it has assigned users.'
+    holiday_import:
+        title: Import Holiday Calendar
+        panel:
+            title: Import Public Holidays
+            desc: Select a country to import public holidays from the Nager.Date API.
+        field:
+            country: Country
+            year: Year
+        action:
+            import: Import Calendar
+        flash:
+            success: 'Public holidays for %country% (%year%) have been imported successfully.'
 
     absence_request_type:
         index:

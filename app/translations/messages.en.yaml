@@ -2,6 +2,7 @@ flash:
     crud: ~
 
 error:
+    account_not_active: Your account is not active.
     go_back: Go Back
     go_to_dashboard: Go to Dashboard
     403:

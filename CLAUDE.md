@@ -42,7 +42,7 @@ docker exec -it app_ooo_php bash
 
 Default admin account (development only):
 - Email: `admin@ooo.com`
-- Password: `admin`
+- Password: `123` (default for all users in local env)
 
 ## Common Commands
 
@@ -331,12 +331,67 @@ These tests run via `composer test:arch`. Violating these rules will fail CI.
 - PHPDoc blocks are acceptable for type hints where PHP's type system is insufficient
 - **Use sprintf for string formatting**: Prefer `sprintf()` over concatenation for better readability
 
+### Translations
+
+All user-facing strings **must** use Symfony translations — never hardcode text in templates or PHP code. Translation files are in `app/translations/`:
+- `admin.en.yaml` — Admin panel labels, dashboard, settings
+- `messages.en.yaml` — General application messages
+- `users_messaging.en.yaml` — User notification messages
+
+In Twig templates use the `|trans` filter with the appropriate domain:
+```twig
+{{ 'dashboard.section.title'|trans(domain: 'admin') }}
+```
+
 ## Configuration
 
 - **Services**: `app/config/services.yaml` - Uses autowiring by default
 - **Doctrine**: XML mappings in `src/Infrastructure/Doctrine/Mapping/`
 - **Environment**: `.env.local` for local overrides
 - **Assets**: Configured via `importmap.php` and `config/packages/asset_mapper.yaml`
+
+### PHP 8.5 Features
+
+The project runs on PHP 8.5 — use modern syntax:
+- **No parentheses around `new`**: `new DateTimeImmutable()->format('Y')` instead of `(new DateTimeImmutable())->format('Y')`
+- Use all PHP 8.5 features where they improve readability
+
+### Form Data Models (DTOs)
+
+Symfony forms **must** use a DTO as `data_class` — never extract data manually via `$form->get('field')->getData()`. Instead:
+
+1. Create a DTO in `Module/Admin/DTO/` with typed properties and validation constraints
+2. Set `data_class` in the form's `configureOptions()`
+3. Pass the DTO instance to `createForm()` and read properties directly after validation
+
+```php
+// DTO with validation
+class ExampleDTO
+{
+    public function __construct(
+        #[Assert\NotBlank]
+        public string $name = '',
+        #[Assert\Range(min: 1, max: 100)]
+        public int $count = 0,
+    ) {
+    }
+}
+
+// Controller — read from DTO, not from form
+$dto = new ExampleDTO();
+$form = $this->createForm(ExampleFormType::class, $dto);
+$form->handleRequest($request);
+
+if ($form->isSubmitted() && $form->isValid()) {
+    // $dto->name and $dto->count are populated and validated — use directly
+    $this->facade->doSomething($dto->name, $dto->count);
+}
+```
+
+**Key rules**:
+- Validation constraints belong on the DTO, not in the form type
+- DTO properties should be **non-nullable with defaults** (e.g., `string $name = ''`) — the form + `NotBlank` constraint handles validation, so no `\assert()` needed after `isValid()`
+- **Never use `\assert()` for form-validated data** — Symfony's form validation guarantees correctness
 
 ## Critical Patterns and Best Practices
 

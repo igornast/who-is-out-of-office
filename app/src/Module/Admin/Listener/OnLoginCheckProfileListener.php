@@ -9,12 +9,14 @@ use App\Module\User\Repository\InvitationRepositoryInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsEventListener(event: LoginSuccessEvent::class)]
 class OnLoginCheckProfileListener
 {
     public function __construct(
         private readonly InvitationRepositoryInterface $invitationRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -28,6 +30,6 @@ class OnLoginCheckProfileListener
             return;
         }
 
-        throw new AccessDeniedHttpException('Your account is not active.');
+        throw new AccessDeniedHttpException($this->translator->trans('error.account_not_active'));
     }
 }

@@ -24,7 +24,7 @@ use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
 use App\Module\User\UserFacade;
-use App\Shared\DTO\InvitationDTO;
+use App\Tests\_fixtures\Shared\DTO\InvitationDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 
 beforeEach(function (): void {
@@ -139,12 +139,7 @@ it('delegates acceptUserInvitation to handler', function () {
         lastName: 'Doe',
         password: 'password123',
     );
-    $invitationDTO = new InvitationDTO(
-        id: 'inv-1',
-        token: 'token-123',
-        user: UserDTOFixture::create(),
-        createdAt: new DateTimeImmutable(),
-    );
+    $invitationDTO = InvitationDTOFixture::create();
 
     $this->acceptInvitationHandler
         ->expects('handle')

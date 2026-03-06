@@ -21,6 +21,8 @@ class HolidayCalendar
         public string $countryCode,
         public string $countryName,
         public Collection $holidays = new ArrayCollection(),
+        public bool $isActive = true,
+        public ?int $lastSyncedYear = null,
     ) {
         $this->initializeTimestamps();
     }

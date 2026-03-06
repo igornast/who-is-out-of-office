@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Form;
 
+use App\Module\Admin\DTO\AppearanceSettingsDTO;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
 use Symfony\Component\Form\AbstractType;
@@ -33,6 +34,7 @@ class AppearanceSettingsFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'data_class' => AppearanceSettingsDTO::class,
             'translation_domain' => 'admin',
         ]);
     }
