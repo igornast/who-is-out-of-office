@@ -67,7 +67,7 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
                     '_token' => $this->csrfTokenManager->getToken(sprintf('approve%s', $entity->id))->getValue(),
                 ])
             )
-            ->renderAsForm()
+            ->setHtmlAttributes(['data-lr-action' => 'approve'])
             ->setIcon('icon-check')
             ->addCssClass('btn btn-success')
             ->displayIf(fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status && $this->canManageRequest($request));
@@ -79,7 +79,7 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
                     '_token' => $this->csrfTokenManager->getToken(sprintf('reject%s', $entity->id))->getValue(),
                 ])
             )
-            ->renderAsForm()
+            ->setHtmlAttributes(['data-lr-action' => 'reject'])
             ->setIcon('icon-x')
             ->addCssClass('btn btn-danger')
             ->displayIf(fn (LeaveRequest $request) => LeaveRequestStatusEnum::Pending === $request->status && $this->canManageRequest($request));

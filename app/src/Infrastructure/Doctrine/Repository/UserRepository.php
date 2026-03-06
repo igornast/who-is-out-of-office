@@ -265,7 +265,6 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $em->flush();
     }
 
-
     public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO
     {
         $em = $this->getEntityManager();

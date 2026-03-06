@@ -20,10 +20,13 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 beforeEach(function (): void {
     $this->leaveRequestFacade = mock(LeaveRequestFacadeInterface::class);
     $this->urlGenerator = mock(UrlGeneratorInterface::class);
+    $this->translator = mock(TranslatorInterface::class);
+    $this->translator->allows('trans')->andReturnUsing(fn (string $id) => $id);
 
     $this->currentUserId = Uuid::uuid4();
     $this->currentUser = new User(
@@ -55,6 +58,7 @@ beforeEach(function (): void {
     $this->controller = new LeaveRequestActionController(
         $this->urlGenerator,
         $this->leaveRequestFacade,
+        $this->translator,
     );
     $this->controller->setContainer($container);
 });

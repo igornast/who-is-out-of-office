@@ -33,6 +33,7 @@ class ChangePasswordFormType extends AbstractType
                     'translation_domain' => 'admin',
                 ],
                 'invalid_message' => 'settings.account_security.error.passwords_must_match',
+                'translation_domain' => 'admin',
                 'constraints' => [
                     new Assert\NotBlank(),
                     new Assert\Length(min: 8),

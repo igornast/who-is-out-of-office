@@ -375,6 +375,8 @@
 {% block body_javascript %}
     {{ parent() }}
 
+    {% include '@AppAdmin/component/_leave_request_confirm_modal.html.twig' %}
+
     {% set _current_route = app.request.attributes.get('_route') %}
     {% set _current_crud = app.request.attributes.get('crudControllerFqcn') ?? app.request.query.get('crudControllerFqcn') %}
     <nav class="bottom-nav" aria-label="{{ 'bottom_nav.label'|trans(domain: 'admin') }}">

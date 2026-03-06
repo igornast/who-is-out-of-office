@@ -7,21 +7,24 @@ namespace App\Module\Admin\Controller\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\DTO\NewLeaveRequestDTO;
 use App\Module\Admin\Form\NewLeaveRequestFormType;
-use App\Shared\Enum\LeaveRequestPermission;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\DTO\UserDTO;
+use App\Shared\Enum\LeaveRequestPermission;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_USER')]
 class LeaveRequestActionController extends AbstractController
@@ -29,11 +32,12 @@ class LeaveRequestActionController extends AbstractController
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
     #[Route('/app/leave-request/{id}/withdraw', name: 'app_leave_request_withdraw', methods: ['POST'])]
-    public function withdraw(Request $request, string $id): Response
+    public function withdraw(Request $request, string $id): JsonResponse
     {
         return $this->handleAction($request, $id, 'withdraw', function (LeaveRequestDTO $dto): void {
             $this->denyAccessUnlessGranted(LeaveRequestPermission::Withdraw->value, $dto);
@@ -48,7 +52,7 @@ class LeaveRequestActionController extends AbstractController
     }
 
     #[Route('/app/leave-request/{id}/approve', name: 'app_leave_request_approve', methods: ['POST'])]
-    public function approve(Request $request, string $id): Response
+    public function approve(Request $request, string $id): JsonResponse
     {
         return $this->handleAction($request, $id, 'approve', function (LeaveRequestDTO $dto): void {
             $this->denyAccessUnlessGranted(LeaveRequestPermission::Manage->value, $dto);
@@ -64,7 +68,7 @@ class LeaveRequestActionController extends AbstractController
     }
 
     #[Route('/app/leave-request/{id}/reject', name: 'app_leave_request_reject', methods: ['POST'])]
-    public function reject(Request $request, string $id): Response
+    public function reject(Request $request, string $id): JsonResponse
     {
         return $this->handleAction($request, $id, 'reject', function (LeaveRequestDTO $dto): void {
             $this->denyAccessUnlessGranted(LeaveRequestPermission::Manage->value, $dto);
@@ -82,50 +86,42 @@ class LeaveRequestActionController extends AbstractController
     /**
      * @param \Closure(LeaveRequestDTO): void $action
      */
-    private function handleAction(Request $request, string $id, string $actionName, \Closure $action): Response
+    private function handleAction(Request $request, string $id, string $actionName, \Closure $action): JsonResponse
     {
         $dto = $this->getLeaveRequestOrFail($id);
-        $isJson = 'application/json' === $request->headers->get('Accept');
 
         $token = $request->request->get('_token') ?? $request->query->get('_token');
         if (!$this->isCsrfTokenValid(sprintf('%s%s', $actionName, $dto->id), is_string($token) ? $token : null)) {
-            if ($isJson) {
-                return $this->json(['success' => false, 'message' => 'Invalid CSRF token.'], Response::HTTP_FORBIDDEN);
-            }
-
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
+            return $this->json([
+                'success' => false,
+                'message' => $this->translator->trans('leave_request.action.error.invalid_csrf', domain: 'admin'),
+            ], Response::HTTP_FORBIDDEN);
         }
 
         try {
             $action($dto);
         } catch (\DomainException $e) {
-            if ($isJson) {
-                return $this->json(['success' => false, 'message' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-
-            $this->addFlash('warning', $e->getMessage());
-
-            return $this->redirectToDetail($dto);
-        } catch (\Symfony\Component\Security\Core\Exception\AccessDeniedException $e) {
-            if ($isJson) {
-                return $this->json(['success' => false, 'message' => $e->getMessage() ?: 'Access denied.'], Response::HTTP_FORBIDDEN);
-            }
-
-            throw $e;
-        }
-
-        if ($isJson) {
+            return $this->json(['success' => false, 'message' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (AccessDeniedException) {
             return $this->json([
-                'success' => true,
-                'message' => sprintf('Leave request %s.', 'approve' === $actionName ? 'approved' : $actionName.'ed'),
-                'status' => $dto->status->value,
-                'id' => $dto->id->toString(),
-            ]);
+                'success' => false,
+                'message' => $this->translator->trans('leave_request.action.error.access_denied', domain: 'admin'),
+            ], Response::HTTP_FORBIDDEN);
         }
 
-        $this->addFlash('success', sprintf('Leave request %s.', 'approve' === $actionName ? 'approved' : $actionName.'ed'));
+        $statusKey = match ($actionName) {
+            'approve' => 'approved',
+            'reject' => 'rejected',
+            'withdraw' => 'withdrawn',
+            default => $actionName.'ed',
+        };
 
-        return $this->redirectToDetail($dto);
+        return $this->json([
+            'success' => true,
+            'message' => $this->translator->trans(sprintf('leave_request.action.success.%s', $statusKey), domain: 'admin'),
+            'status' => $dto->status->value,
+            'id' => $dto->id->toString(),
+        ]);
     }
 
     private function getLeaveRequestOrFail(string $id): LeaveRequestDTO
@@ -140,13 +136,6 @@ class LeaveRequestActionController extends AbstractController
         $user = $this->getUser();
 
         return $user;
-    }
-
-    private function redirectToDetail(LeaveRequestDTO $dto): Response
-    {
-        return $this->redirect($this->urlGenerator->generate('app_dashboard_app_leave_request_detail', [
-            'entityId' => $dto->id->toString(),
-        ]));
     }
 
     #[AdminRoute('/leave-requests/new', name: 'requests_new')] // app_dashboard_requests_new

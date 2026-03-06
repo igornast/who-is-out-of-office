@@ -136,6 +136,24 @@ dashboard:
         my_profile: My Profile
 
 leave_request:
+    action:
+        approve_confirm_title: Approve Leave Request
+        approve_confirm_body: Are you sure you want to approve this leave request?
+        approve_confirm_action: Approve
+        reject_confirm_title: Reject Leave Request
+        reject_confirm_body: Are you sure you want to reject this leave request?
+        reject_confirm_action: Reject
+        withdraw_confirm_title: Withdraw Leave Request
+        withdraw_confirm_body: Are you sure you want to withdraw this leave request?
+        withdraw_confirm_action: Withdraw
+        cancel: Cancel
+        success:
+            approved: Leave request approved.
+            rejected: Leave request rejected.
+            withdrawn: Leave request withdrawn.
+        error:
+            invalid_csrf: Invalid CSRF token.
+            access_denied: Access denied.
     new:
         page_title: New Absence Request
         heading: Create New Absence Request

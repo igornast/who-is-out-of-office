@@ -1,4 +1,4 @@
-<div class="card dashboard-recent-requests" data-controller="recent-requests">
+<div class="card dashboard-recent-requests">
     <div class="card-header">
         <span class="card-title">{{ 'dashboard.recent_requests.title'|trans(domain: 'admin') }}</span>
         <a class="btn btn-outline btn-sm"
@@ -23,7 +23,7 @@
                     <tbody>
                         {% for leaveRequestDto in recent_requests %}
                             {% set userDto = leaveRequestDto.user %}
-                            <tr data-recent-requests-target="row">
+                            <tr data-lr-row>
                                 <td>
                                     <div class="employee-cell">
                                         <div class="employee-avatar avatar-color-{{ (userDto.firstName ~ userDto.lastName)|length % 6 }}">
@@ -71,32 +71,22 @@
                                             <i data-lucide="eye"></i>
                                         </a>
                                         {% if is_admin or is_manager %}
-                                            <form class="inline-action-form"
-                                                  action="{{ path('app_leave_request_approve', {id: leaveRequestDto.id}) }}"
-                                                  method="post"
-                                                  data-action="submit->recent-requests#submitAction">
-                                                <input type="hidden" name="_token"
-                                                       value="{{ csrf_token('approve' ~ leaveRequestDto.id) }}"
-                                                       data-controller="csrf-protection">
-                                                <button type="submit"
-                                                        class="table-action-btn approve"
-                                                        title="{{ 'dashboard.recent_requests.action.approve'|trans(domain: 'admin') }}">
-                                                    <i data-lucide="check"></i>
-                                                </button>
-                                            </form>
-                                            <form class="inline-action-form"
-                                                  action="{{ path('app_leave_request_reject', {id: leaveRequestDto.id}) }}"
-                                                  method="post"
-                                                  data-action="submit->recent-requests#submitAction">
-                                                <input type="hidden" name="_token"
-                                                       value="{{ csrf_token('reject' ~ leaveRequestDto.id) }}"
-                                                       data-controller="csrf-protection">
-                                                <button type="submit"
-                                                        class="table-action-btn reject"
-                                                        title="{{ 'dashboard.recent_requests.action.reject'|trans(domain: 'admin') }}">
-                                                    <i data-lucide="x"></i>
-                                                </button>
-                                            </form>
+                                            <button class="table-action-btn approve"
+                                                    data-lr-action="approve"
+                                                    data-lr-url="{{ path('app_leave_request_approve', {id: leaveRequestDto.id}) }}"
+                                                    data-lr-token="{{ csrf_token('approve' ~ leaveRequestDto.id) }}"
+                                                    data-lr-reload="false"
+                                                    title="{{ 'dashboard.recent_requests.action.approve'|trans(domain: 'admin') }}">
+                                                <i data-lucide="check"></i>
+                                            </button>
+                                            <button class="table-action-btn reject"
+                                                    data-lr-action="reject"
+                                                    data-lr-url="{{ path('app_leave_request_reject', {id: leaveRequestDto.id}) }}"
+                                                    data-lr-token="{{ csrf_token('reject' ~ leaveRequestDto.id) }}"
+                                                    data-lr-reload="false"
+                                                    title="{{ 'dashboard.recent_requests.action.reject'|trans(domain: 'admin') }}">
+                                                <i data-lucide="x"></i>
+                                            </button>
                                         {% endif %}
                                     </div>
                                 </td>
@@ -108,7 +98,7 @@
             <div class="m-request-list">
                 {% for leaveRequestDto in recent_requests %}
                     {% set userDto = leaveRequestDto.user %}
-                    <div class="m-request-item" data-recent-requests-target="row">
+                    <div class="m-request-item" data-lr-row>
                         <a class="m-request-link"
                            href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('detail').setEntityId(leaveRequestDto.id) }}">
                             <div class="m-request-top">
@@ -145,30 +135,22 @@
                         </a>
                         {% if is_admin or is_manager %}
                             <div class="m-request-actions">
-                                <form class="inline-action-form"
-                                      action="{{ path('app_leave_request_approve', {id: leaveRequestDto.id}) }}"
-                                      method="post"
-                                      data-action="submit->recent-requests#submitAction">
-                                    <input type="hidden" name="_token"
-                                           value="{{ csrf_token('approve' ~ leaveRequestDto.id) }}"
-                                           data-controller="csrf-protection">
-                                    <button type="submit" class="table-action-btn approve"
-                                            title="{{ 'dashboard.recent_requests.action.approve'|trans(domain: 'admin') }}">
-                                        <i data-lucide="check"></i>
-                                    </button>
-                                </form>
-                                <form class="inline-action-form"
-                                      action="{{ path('app_leave_request_reject', {id: leaveRequestDto.id}) }}"
-                                      method="post"
-                                      data-action="submit->recent-requests#submitAction">
-                                    <input type="hidden" name="_token"
-                                           value="{{ csrf_token('reject' ~ leaveRequestDto.id) }}"
-                                           data-controller="csrf-protection">
-                                    <button type="submit" class="table-action-btn reject"
-                                            title="{{ 'dashboard.recent_requests.action.reject'|trans(domain: 'admin') }}">
-                                        <i data-lucide="x"></i>
-                                    </button>
-                                </form>
+                                <button class="table-action-btn approve"
+                                        data-lr-action="approve"
+                                        data-lr-url="{{ path('app_leave_request_approve', {id: leaveRequestDto.id}) }}"
+                                        data-lr-token="{{ csrf_token('approve' ~ leaveRequestDto.id) }}"
+                                        data-lr-reload="false"
+                                        title="{{ 'dashboard.recent_requests.action.approve'|trans(domain: 'admin') }}">
+                                    <i data-lucide="check"></i>
+                                </button>
+                                <button class="table-action-btn reject"
+                                        data-lr-action="reject"
+                                        data-lr-url="{{ path('app_leave_request_reject', {id: leaveRequestDto.id}) }}"
+                                        data-lr-token="{{ csrf_token('reject' ~ leaveRequestDto.id) }}"
+                                        data-lr-reload="false"
+                                        title="{{ 'dashboard.recent_requests.action.reject'|trans(domain: 'admin') }}">
+                                    <i data-lucide="x"></i>
+                                </button>
                             </div>
                         {% endif %}
                     </div>
@@ -191,5 +173,5 @@
             </div>
         {% endif %}
     </div>
-    <div class="widget-toast" data-recent-requests-target="toast"></div>
+
 </div>

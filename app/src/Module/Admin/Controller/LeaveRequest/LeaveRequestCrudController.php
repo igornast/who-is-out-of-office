@@ -56,7 +56,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
                     '_token' => $this->csrfTokenManager->getToken(sprintf('withdraw%s', $entity->id))->getValue(),
                 ])
             )
-            ->renderAsForm()
+            ->setHtmlAttributes(['data-lr-action' => 'withdraw'])
             ->setIcon('icon-ban')
             ->addCssClass('btn btn-outline')
             ->displayIf($this->shouldDisplayWithdrawAction());
@@ -68,7 +68,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
                     '_token' => $this->csrfTokenManager->getToken(sprintf('approve%s', $entity->id))->getValue(),
                 ])
             )
-            ->renderAsForm()
+            ->setHtmlAttributes(['data-lr-action' => 'approve'])
             ->setIcon('icon-check')
             ->addCssClass('btn btn-success')
             ->displayIf($this->shouldDisplayApproveRejectAction());
@@ -80,7 +80,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
                     '_token' => $this->csrfTokenManager->getToken(sprintf('reject%s', $entity->id))->getValue(),
                 ])
             )
-            ->renderAsForm()
+            ->setHtmlAttributes(['data-lr-action' => 'reject'])
             ->setIcon('icon-x')
             ->addCssClass('btn btn-danger')
             ->displayIf($this->shouldDisplayApproveRejectAction());

@@ -81,11 +81,11 @@ function leaveRequestDetailUrl(string $entityId): string
     return sprintf('/app/dashboard/leave-request/%s', $entityId);
 }
 
-function findActionFormUrl(Crawler $crawler, string $action): ?string
+function findActionUrl(Crawler $crawler, string $action): ?string
 {
-    $form = $crawler->filter(sprintf('form[action*="/%s"]', $action));
+    $link = $crawler->filter(sprintf('a[data-lr-action="%s"]', $action));
 
-    return $form->count() > 0 ? $form->attr('action') : null;
+    return $link->count() > 0 ? $link->attr('href') : null;
 }
 
 it('returns 405 for GET requests to action routes', function (): void {
@@ -102,12 +102,18 @@ it('returns 405 for GET requests to action routes', function (): void {
     expect($this->client->getResponse()->getStatusCode())->toBe(405);
 });
 
-it('rejects POST without CSRF token', function (): void {
+it('returns JSON 403 for missing CSRF token', function (): void {
     $this->client->loginUser($this->admin);
     $id = $this->pendingRequest->id;
 
     $this->client->request('POST', sprintf('/app/leave-request/%s/approve', $id));
-    expect($this->client->getResponse()->getStatusCode())->toBe(403);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(403);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeFalse()
+        ->and($data['message'])->not->toBeEmpty();
 });
 
 it('allows manager to approve direct report pending request', function (): void {
@@ -115,11 +121,18 @@ it('allows manager to approve direct report pending request', function (): void 
     $id = $this->pendingRequest->id;
 
     $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    $approveUrl = findActionFormUrl($crawler, 'approve');
+    $approveUrl = findActionUrl($crawler, 'approve');
     expect($approveUrl)->not->toBeNull();
 
     $this->client->request('POST', $approveUrl);
-    expect($this->client->getResponse()->getStatusCode())->toBe(302);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(200);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeTrue()
+        ->and($data['status'])->toBe('approved')
+        ->and($data['message'])->toBe('Leave request approved.');
 
     $this->em->clear();
     $updated = $this->em->find(LeaveRequest::class, $id);
@@ -132,11 +145,18 @@ it('allows admin to reject a pending request', function (): void {
     $id = $this->pendingRequest->id;
 
     $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    $rejectUrl = findActionFormUrl($crawler, 'reject');
+    $rejectUrl = findActionUrl($crawler, 'reject');
     expect($rejectUrl)->not->toBeNull();
 
     $this->client->request('POST', $rejectUrl);
-    expect($this->client->getResponse()->getStatusCode())->toBe(302);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(200);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeTrue()
+        ->and($data['status'])->toBe('rejected')
+        ->and($data['message'])->toBe('Leave request rejected.');
 
     $this->em->clear();
     $updated = $this->em->find(LeaveRequest::class, $id);
@@ -148,26 +168,38 @@ it('allows user to withdraw own approved request', function (): void {
     $id = $this->approvedRequest->id;
 
     $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    $withdrawUrl = findActionFormUrl($crawler, 'withdraw');
+    $withdrawUrl = findActionUrl($crawler, 'withdraw');
     expect($withdrawUrl)->not->toBeNull();
 
     $this->client->request('POST', $withdrawUrl);
-    expect($this->client->getResponse()->getStatusCode())->toBe(302);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(200);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeTrue()
+        ->and($data['status'])->toBe('withdrawn')
+        ->and($data['message'])->toBe('Leave request withdrawn.');
 
     $this->em->clear();
     $updated = $this->em->find(LeaveRequest::class, $id);
     expect($updated->status)->toBe(LeaveRequestStatusEnum::Withdrawn);
 });
 
-it('denies self-approval', function (): void {
+it('returns JSON 403 for self-approval', function (): void {
     $this->client->loginUser($this->admin);
     $id = $this->adminPendingRequest->id;
 
     $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    expect(findActionFormUrl($crawler, 'approve'))->toBeNull('Approve button should be hidden for own requests');
+    expect(findActionUrl($crawler, 'approve'))->toBeNull('Approve button should be hidden for own requests');
 
     $this->client->request('POST', sprintf('/app/leave-request/%s/approve', $id), ['_token' => 'invalid']);
-    expect($this->client->getResponse()->getStatusCode())->toBe(403);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(403);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeFalse();
 });
 
 it('does not render approve button for regular user', function (): void {
@@ -175,8 +207,8 @@ it('does not render approve button for regular user', function (): void {
     $id = $this->pendingRequest->id;
 
     $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    expect(findActionFormUrl($crawler, 'approve'))->toBeNull()
-        ->and(findActionFormUrl($crawler, 'reject'))->toBeNull();
+    expect(findActionUrl($crawler, 'approve'))->toBeNull()
+        ->and(findActionUrl($crawler, 'reject'))->toBeNull();
 });
 
 it('does not render withdraw button for non-owner', function (): void {
@@ -184,17 +216,56 @@ it('does not render withdraw button for non-owner', function (): void {
     $id = $this->approvedRequest->id;
 
     $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    expect(findActionFormUrl($crawler, 'withdraw'))->toBeNull();
+    expect(findActionUrl($crawler, 'withdraw'))->toBeNull();
 });
 
-it('returns JSON success for approve with Accept header', function (): void {
+it('returns JSON 403 for invalid CSRF token', function (): void {
+    $this->client->loginUser($this->admin);
+    $id = $this->pendingRequest->id;
+
+    $this->client->request('POST', sprintf('/app/leave-request/%s/approve', $id), ['_token' => 'invalid']);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(403);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeFalse()
+        ->and($data['message'])->not->toBeEmpty();
+});
+
+it('returns JSON 403 when manager tries to approve other team request', function (): void {
+    $this->client->loginUser($this->managerUser);
+    $id = $this->otherTeamPendingRequest->id;
+
+    $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
+    expect(findActionUrl($crawler, 'approve'))->toBeNull('Approve button should be hidden for other team requests')
+        ->and(findActionUrl($crawler, 'reject'))->toBeNull('Reject button should be hidden for other team requests');
+
+    $this->client->request('POST', sprintf('/app/leave-request/%s/approve', $id), ['_token' => 'invalid']);
+    $response = $this->client->getResponse();
+
+    expect($response->getStatusCode())->toBe(403);
+
+    $data = json_decode($response->getContent(), true);
+    expect($data['success'])->toBeFalse();
+});
+
+it('accepts CSRF token in POST body', function (): void {
     $this->client->loginUser($this->managerUser);
     $id = $this->pendingRequest->id;
 
     $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    $approveUrl = findActionFormUrl($crawler, 'approve');
+    $approveUrl = findActionUrl($crawler, 'approve');
+    expect($approveUrl)->not->toBeNull();
 
-    $this->client->request('POST', $approveUrl, [], [], ['HTTP_ACCEPT' => 'application/json']);
+    parse_str(parse_url($approveUrl, PHP_URL_QUERY) ?? '', $query);
+    $token = $query['_token'] ?? '';
+
+    $this->client->request(
+        'POST',
+        sprintf('/app/leave-request/%s/approve', $id),
+        ['_token' => $token],
+    );
     $response = $this->client->getResponse();
 
     expect($response->getStatusCode())->toBe(200);
@@ -202,92 +273,5 @@ it('returns JSON success for approve with Accept header', function (): void {
     $data = json_decode($response->getContent(), true);
     expect($data['success'])->toBeTrue()
         ->and($data['status'])->toBe('approved')
-        ->and($data['id'])->toBe($id->toString());
-});
-
-it('returns JSON success for reject with Accept header', function (): void {
-    $this->client->loginUser($this->admin);
-    $id = $this->pendingRequest->id;
-
-    $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    $rejectUrl = findActionFormUrl($crawler, 'reject');
-
-    $this->client->request('POST', $rejectUrl, [], [], ['HTTP_ACCEPT' => 'application/json']);
-    $response = $this->client->getResponse();
-
-    expect($response->getStatusCode())->toBe(200);
-
-    $data = json_decode($response->getContent(), true);
-    expect($data['success'])->toBeTrue()
-        ->and($data['status'])->toBe('rejected')
-        ->and($data['id'])->toBe($id->toString());
-});
-
-it('returns JSON 403 for CSRF failure with Accept header', function (): void {
-    $this->client->loginUser($this->admin);
-    $id = $this->pendingRequest->id;
-
-    $this->client->request(
-        'POST',
-        sprintf('/app/leave-request/%s/approve', $id),
-        [],
-        [],
-        ['HTTP_ACCEPT' => 'application/json']
-    );
-    $response = $this->client->getResponse();
-
-    expect($response->getStatusCode())->toBe(403);
-
-    $data = json_decode($response->getContent(), true);
-    expect($data['success'])->toBeFalse();
-});
-
-it('returns JSON 403 for self-approval with Accept header', function (): void {
-    $this->client->loginUser($this->admin);
-    $id = $this->adminPendingRequest->id;
-
-    $this->client->request(
-        'POST',
-        sprintf('/app/leave-request/%s/approve', $id),
-        [],
-        [],
-        ['HTTP_ACCEPT' => 'application/json']
-    );
-    $response = $this->client->getResponse();
-
-    expect($response->getStatusCode())->toBe(403);
-
-    $data = json_decode($response->getContent(), true);
-    expect($data['success'])->toBeFalse();
-});
-
-it('denies manager approval of request from another team', function (): void {
-    $this->client->loginUser($this->managerUser);
-    $id = $this->otherTeamPendingRequest->id;
-
-    $crawler = $this->client->request('GET', leaveRequestDetailUrl($id->toString()));
-    expect(findActionFormUrl($crawler, 'approve'))->toBeNull('Approve button should be hidden for other team requests')
-        ->and(findActionFormUrl($crawler, 'reject'))->toBeNull('Reject button should be hidden for other team requests');
-
-    $this->client->request('POST', sprintf('/app/leave-request/%s/approve', $id), ['_token' => 'invalid']);
-    expect($this->client->getResponse()->getStatusCode())->toBe(403);
-});
-
-it('returns JSON 403 when manager tries to approve other team request', function (): void {
-    $this->client->loginUser($this->managerUser);
-    $id = $this->otherTeamPendingRequest->id;
-
-    $this->client->request(
-        'POST',
-        sprintf('/app/leave-request/%s/approve', $id),
-        [],
-        [],
-        ['HTTP_ACCEPT' => 'application/json']
-    );
-    $response = $this->client->getResponse();
-
-    expect($response->getStatusCode())->toBe(403);
-
-    $data = json_decode($response->getContent(), true);
-    expect($data['success'])->toBeFalse();
+        ->and($data['message'])->toBe('Leave request approved.');
 });
