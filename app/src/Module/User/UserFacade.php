@@ -9,7 +9,10 @@ use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
+use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
+use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
+use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
@@ -43,6 +46,9 @@ final class UserFacade implements UserFacadeInterface
         private readonly UpdateThemePreferenceCommandHandler $updateThemePreferenceHandler,
         private readonly ChangePasswordCommandHandler $changePasswordHandler,
         private readonly RegenerateCalendarSubscriptionCommandHandler $regenerateCalendarSubscriptionHandler,
+        private readonly UpdateSlackMemberIdCommandHandler $updateSlackMemberIdHandler,
+        private readonly DisconnectSlackCommandHandler $disconnectSlackHandler,
+        private readonly RemoveProfileImageCommandHandler $removeProfileImageHandler,
     ) {
     }
 
@@ -132,5 +138,20 @@ final class UserFacade implements UserFacadeInterface
     public function regenerateCalendarSubscription(string $userId): void
     {
         $this->regenerateCalendarSubscriptionHandler->handle($userId);
+    }
+
+    public function updateSlackMemberId(string $userId, string $slackMemberId): void
+    {
+        $this->updateSlackMemberIdHandler->handle($userId, $slackMemberId);
+    }
+
+    public function disconnectSlack(string $userId): void
+    {
+        $this->disconnectSlackHandler->handle($userId);
+    }
+
+    public function deleteOldProfileImage(?string $currentProfileImageUrl): void
+    {
+        $this->removeProfileImageHandler->handle($currentProfileImageUrl);
     }
 }

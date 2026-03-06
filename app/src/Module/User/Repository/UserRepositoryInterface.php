@@ -44,4 +44,9 @@ interface UserRepositoryInterface
     public function updatePassword(string $userId, string $hashedPassword): void;
 
     public function updateIcalHashSalt(string $userId, string $salt): void;
+
+    public function updateSlackMemberId(string $userId, string $slackMemberId): void;
+
+    public function removeSlackIntegration(string $userId): void;
+
 }

@@ -241,6 +241,9 @@ crud:
             change_password: Change Password
         field:
             profile_image: Profile Image
+            profile_image_help: 'JPEG, PNG or WebP. Max 2 MB.'
+            profile_image_change: 'Change photo'
+            profile_image_remove: Remove
             working_days: Working Days
         action:
             save_changes: Save Changes
@@ -254,6 +257,14 @@ crud:
                 connect: Connect Slack
                 manage: Manage
                 description: Receive notifications about leave requests and team updates directly in Slack.
+                configure: Configure
+                modal_title: Configure Slack Integration
+                modal_field_label: Slack Member ID
+                modal_field_help: 'Open your Slack profile, click the three dots menu (...), and select "Copy member ID".'
+                modal_save: Save
+                modal_saving: Saving...
+                modal_disconnect: Disconnect
+                modal_cancel: Cancel
             calendar:
                 title: Calendar Subscription
                 description: Subscribe to team absences in your preferred calendar app.
@@ -292,15 +303,6 @@ crud:
             title: The leave type details
         action:
             new: Add a new type
-
-    slack_integration:
-        new:
-            title: Connect Slack
-        edit:
-            title: Slack Integration
-        field:
-            slack_member_id: Slack Member ID
-            slack_member_id_help: 'Open Slack, click on your profile picture, select "Profile", then click the three-dot menu (⋯) and choose "Copy member ID".'
 
     app_settings:
         source_filename: The app settings source file

@@ -20,29 +20,47 @@
                     <h3 class="settings-card-title">{{ 'crud.user_profile.section.profile_info'|trans(domain='admin') }}</h3>
                 </div>
                 <div class="settings-card-body">
-                    <div class="form-group row mb-3">
-                        {% if app.user.profileImageUrl %}
-                            {% set img = app.user.profileImageUrl %}
-                            {% if img starts with 'http://' or img starts with 'https://' %}
-                                {% set src = img %}
+                    <div class="profile-avatar-upload" id="profile-image-container">
+                        <div class="profile-avatar-zone" id="profile-avatar-zone">
+                            {% if app.user.profileImageUrl %}
+                                {% set img = app.user.profileImageUrl %}
+                                {% if img starts with 'http://' or img starts with 'https://' %}
+                                    {% set src = img %}
+                                {% else %}
+                                    {% set src = asset(profile_images_base_path ~ '/' ~ img) %}
+                                {% endif %}
+                                <img src="{{ src }}"
+                                     alt="{{ 'crud.user_profile.field.profile_image'|trans(domain='admin') }}"
+                                     id="profile-image-preview"
+                                     class="profile-avatar-img">
+                                <div class="profile-avatar-placeholder" id="profile-image-placeholder" style="display: none;">
+                                    <i data-lucide="user"></i>
+                                </div>
                             {% else %}
-                                {% set src = asset(profile_images_base_path ~ '/' ~ img) %}
+                                <div class="profile-avatar-placeholder" id="profile-image-placeholder">
+                                    <i data-lucide="user"></i>
+                                </div>
+                                <img src="" alt="" id="profile-image-preview" class="profile-avatar-img" style="display: none;">
                             {% endif %}
-                            <div class="col-md-4 mb-3">
-                                <div class="text-center">
-                                    <img src="{{ src }}"
-                                         alt="{{ 'crud.user_profile.field.profile_image'|trans(domain='admin') }}"
-                                         style="max-width: 140px; border-radius: var(--radius-lg); border: 2px solid var(--border-light); box-shadow: var(--shadow-sm);">
-                                </div>
-                            </div>
-                        {% endif %}
-                        <div class="{{ app.user.profileImageUrl ? 'col-md-8' : 'col-12' }}">
-                            <div class="field-file">
-                                <div class="form-widget">
-                                    {{ form_row(form.profileImageFile, {'attr': {'class': 'form-control'}}) }}
-                                </div>
+                            <div class="profile-avatar-overlay" id="profile-avatar-overlay">
+                                <i data-lucide="camera"></i>
                             </div>
                         </div>
+                        <div class="profile-avatar-actions">
+                            <button type="button" class="profile-avatar-change-btn" id="profile-image-change-btn">
+                                <i data-lucide="upload"></i>
+                                {{ 'crud.user_profile.field.profile_image_change'|trans(domain='admin') }}
+                            </button>
+                            <button type="button" class="profile-avatar-remove-btn" id="profile-image-remove-btn"{% if not app.user.profileImageUrl %} style="display: none;"{% endif %}>
+                                <i data-lucide="trash-2"></i>
+                                {{ 'crud.user_profile.field.profile_image_remove'|trans(domain='admin') }}
+                            </button>
+                        </div>
+                        <div class="profile-avatar-hint">
+                            {{ 'crud.user_profile.field.profile_image_help'|trans(domain='admin') }}
+                        </div>
+                        {{ form_widget(form.profileImageFile, {'attr': {'class': 'profile-avatar-file-input', 'accept': 'image/jpeg,image/png,image/webp'}}) }}
+                        {{ form_widget(form.removeProfileImage) }}
                     </div>
 
                     <div class="row">
@@ -135,7 +153,7 @@
                     <h3 class="settings-card-title">{{ 'crud.user_profile.connected_services.title'|trans(domain='admin') }}</h3>
                 </div>
                 <div class="settings-card-body">
-                    <div class="connected-service-row">
+                    <div class="connected-service-row" id="slack">
                         <div class="connected-service-icon">
                             <i data-lucide="message-square"></i>
                         </div>
@@ -143,7 +161,7 @@
                             <div class="connected-service-name">{{ 'crud.user_profile.connected_services.slack.title'|trans(domain='admin') }}</div>
                             <div class="connected-service-desc">{{ 'crud.user_profile.connected_services.slack.description'|trans(domain='admin') }}</div>
                         </div>
-                        <div class="connected-service-status">
+                        <div class="connected-service-status" id="slack-status">
                             {% if slack_connected %}
                                 <span class="connected-service-badge connected-service-badge-success">
                                     <i data-lucide="check-circle-2"></i>
@@ -155,6 +173,17 @@
                                     {{ 'crud.user_profile.connected_services.slack.not_connected'|trans(domain='admin') }}
                                 </span>
                             {% endif %}
+                        </div>
+                        <div class="connected-service-action">
+                            <button class="btn btn-outline btn-sm" id="slack-configure-btn" type="button"
+                                    data-update-url="{{ path('app_api_slack_update') }}"
+                                    data-disconnect-url="{{ path('app_api_slack_disconnect') }}"
+                                    data-csrf-update="{{ csrf_token('slack_update') }}"
+                                    data-csrf-disconnect="{{ csrf_token('slack_disconnect') }}"
+                                    data-member-id="{{ slack_member_id ?? '' }}">
+                                <i data-lucide="settings"></i>
+                                {{ 'crud.user_profile.connected_services.slack.configure'|trans(domain='admin') }}
+                            </button>
                         </div>
                     </div>
 
@@ -195,6 +224,29 @@
         </div>
     </div>
 
+    <div class="modal fade" id="slackConfigModal" tabindex="-1" aria-labelledby="slackConfigModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="slackConfigModalLabel">{{ 'crud.user_profile.connected_services.slack.modal_title'|trans(domain: 'admin') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="slack-member-id-input" class="form-label">{{ 'crud.user_profile.connected_services.slack.modal_field_label'|trans(domain: 'admin') }}</label>
+                        <input type="text" class="form-control" id="slack-member-id-input" placeholder="U0123456789">
+                        <div class="form-text">{{ 'crud.user_profile.connected_services.slack.modal_field_help'|trans(domain: 'admin') }}</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger me-auto" id="slackDisconnectBtn" style="display: none;">{{ 'crud.user_profile.connected_services.slack.modal_disconnect'|trans(domain: 'admin') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'crud.user_profile.connected_services.slack.modal_cancel'|trans(domain: 'admin') }}</button>
+                    <button type="button" class="btn btn-primary" id="slackSaveBtn">{{ 'crud.user_profile.connected_services.slack.modal_save'|trans(domain: 'admin') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="regenerateConfirmModal" tabindex="-1" aria-labelledby="regenerateConfirmModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -218,6 +270,50 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            var imageInput = document.getElementById('{{ form.profileImageFile.vars.id }}');
+            var imagePreview = document.getElementById('profile-image-preview');
+            var imagePlaceholder = document.getElementById('profile-image-placeholder');
+            var removeBtn = document.getElementById('profile-image-remove-btn');
+            var removeFlag = document.getElementById('{{ form.removeProfileImage.vars.id }}');
+            var changeBtn = document.getElementById('profile-image-change-btn');
+            var avatarZone = document.getElementById('profile-avatar-zone');
+
+            if (changeBtn && imageInput) {
+                changeBtn.addEventListener('click', function() { imageInput.click(); });
+            }
+            if (avatarZone && imageInput) {
+                avatarZone.addEventListener('click', function() { imageInput.click(); });
+            }
+
+            if (imageInput) {
+                imageInput.addEventListener('change', function() {
+                    var file = this.files[0];
+                    if (!file) return;
+
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = '';
+                        if (imagePlaceholder) imagePlaceholder.style.display = 'none';
+                        if (removeFlag) removeFlag.value = '';
+                        if (removeBtn) removeBtn.style.display = '';
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            if (removeBtn && removeFlag) {
+                removeBtn.addEventListener('click', function() {
+                    removeFlag.value = '1';
+                    imagePreview.style.display = 'none';
+                    removeBtn.style.display = 'none';
+                    if (imageInput) imageInput.value = '';
+                    if (imagePlaceholder) {
+                        imagePlaceholder.style.display = '';
+                    }
+                });
+            }
+
             var copyBtn = document.getElementById('profile-copy-cal-url');
             if (copyBtn) {
                 copyBtn.addEventListener('click', function() {
@@ -230,6 +326,81 @@
                         copyBtn.innerHTML = originalHtml;
                         if (typeof lucide !== 'undefined') { lucide.createIcons(); }
                     }, 2000);
+                });
+            }
+
+            var slackConfigureBtn = document.getElementById('slack-configure-btn');
+            var slackModal = document.getElementById('slackConfigModal');
+            var slackMemberIdInput = document.getElementById('slack-member-id-input');
+            var slackSaveBtn = document.getElementById('slackSaveBtn');
+            var slackDisconnectBtn = document.getElementById('slackDisconnectBtn');
+            var slackStatus = document.getElementById('slack-status');
+
+            if (slackConfigureBtn && slackModal) {
+                var bsSlackModal = new bootstrap.Modal(slackModal);
+
+                slackConfigureBtn.addEventListener('click', function() {
+                    var memberId = slackConfigureBtn.dataset.memberId;
+                    slackMemberIdInput.value = memberId;
+                    slackDisconnectBtn.style.display = memberId ? '' : 'none';
+                    bsSlackModal.show();
+                });
+
+                slackSaveBtn.addEventListener('click', function() {
+                    var memberId = slackMemberIdInput.value.trim();
+                    if (!memberId) return;
+
+                    var url = slackConfigureBtn.dataset.updateUrl;
+                    var csrfToken = slackConfigureBtn.dataset.csrfUpdate;
+
+                    slackSaveBtn.disabled = true;
+                    slackSaveBtn.textContent = '{{ "crud.user_profile.connected_services.slack.modal_saving"|trans(domain: "admin") }}';
+
+                    var formData = new FormData();
+                    formData.append('_token', csrfToken);
+                    formData.append('slack_member_id', memberId);
+
+                    fetch(url, { method: 'POST', body: formData })
+                        .then(function(response) { return response.json(); })
+                        .then(function(data) {
+                            if (data.success) {
+                                slackConfigureBtn.dataset.memberId = data.memberId;
+                                slackStatus.innerHTML = '<span class="connected-service-badge connected-service-badge-success"><i data-lucide="check-circle-2"></i> {{ "crud.user_profile.connected_services.slack.connected"|trans(domain: "admin") }}</span>' +
+                                    '<span class="connected-service-meta">{{ "crud.user_profile.connected_services.slack.member_id"|trans(domain: "admin") }}'.replace('%id%', data.memberId) + '</span>';
+                                if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+                                bsSlackModal.hide();
+                            }
+                            slackSaveBtn.disabled = false;
+                            slackSaveBtn.textContent = '{{ "crud.user_profile.connected_services.slack.modal_save"|trans(domain: "admin") }}';
+                        })
+                        .catch(function() {
+                            slackSaveBtn.disabled = false;
+                            slackSaveBtn.textContent = '{{ "crud.user_profile.connected_services.slack.modal_save"|trans(domain: "admin") }}';
+                        });
+                });
+
+                slackDisconnectBtn.addEventListener('click', function() {
+                    var url = slackConfigureBtn.dataset.disconnectUrl;
+                    var csrfToken = slackConfigureBtn.dataset.csrfDisconnect;
+
+                    slackDisconnectBtn.disabled = true;
+
+                    var formData = new FormData();
+                    formData.append('_token', csrfToken);
+
+                    fetch(url, { method: 'POST', body: formData })
+                        .then(function(response) { return response.json(); })
+                        .then(function(data) {
+                            if (data.success) {
+                                slackConfigureBtn.dataset.memberId = '';
+                                slackStatus.innerHTML = '<span class="connected-service-badge connected-service-badge-muted">{{ "crud.user_profile.connected_services.slack.not_connected"|trans(domain: "admin") }}</span>';
+                                bsSlackModal.hide();
+                            }
+                            slackDisconnectBtn.disabled = false;
+                        })
+                        .catch(function() {
+                            slackDisconnectBtn.disabled = false;
+                        });
                 });
             }
 

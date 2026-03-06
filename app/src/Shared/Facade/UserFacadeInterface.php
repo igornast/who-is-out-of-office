@@ -58,4 +58,10 @@ interface UserFacadeInterface
     public function changePassword(string $userId, string $plainPassword, PasswordAuthenticatedUserInterface $user): void;
 
     public function regenerateCalendarSubscription(string $userId): void;
+
+    public function updateSlackMemberId(string $userId, string $slackMemberId): void;
+
+    public function disconnectSlack(string $userId): void;
+
+    public function deleteOldProfileImage(?string $currentProfileImageUrl): void;
 }

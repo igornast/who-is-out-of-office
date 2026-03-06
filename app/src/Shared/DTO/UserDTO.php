@@ -73,7 +73,7 @@ class UserDTO
             lastName: $data['last_name'],
             email: $data['email'],
             roles: json_decode($data['roles'], true, flags: JSON_THROW_ON_ERROR),
-            workingDays: json_decode($data['working_days'], false, flags: JSON_THROW_ON_ERROR),
+            workingDays: json_decode($data['working_days'], true, flags: JSON_THROW_ON_ERROR),
             annualLeaveAllowance: $data['annual_leave_allowance'],
             currentLeaveBalance: $data['current_leave_balance'],
             isActive: (bool) $data['is_active'],

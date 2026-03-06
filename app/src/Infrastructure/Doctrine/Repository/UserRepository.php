@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Doctrine\Repository;
 
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Infrastructure\Doctrine\Entity\UserSlackIntegration;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Shared\DTO\UserDTO;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -232,6 +233,38 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $em->persist($user);
         $em->flush();
     }
+
+    public function updateSlackMemberId(string $userId, string $slackMemberId): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        if (null === $user->slackIntegration) {
+            $user->slackIntegration = new UserSlackIntegration(user: $user, slackMemberId: $slackMemberId);
+        } else {
+            $user->slackIntegration->slackMemberId = $slackMemberId;
+        }
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
+    public function removeSlackIntegration(string $userId): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        if (null === $user->slackIntegration) {
+            return;
+        }
+
+        $em = $this->getEntityManager();
+        $em->remove($user->slackIntegration);
+        $user->slackIntegration = null;
+        $em->flush();
+    }
+
 
     public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO
     {

@@ -5,9 +5,12 @@ declare(strict_types=1);
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
+use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
+use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
+use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
@@ -39,6 +42,9 @@ beforeEach(function (): void {
     $this->updateThemePreferenceHandler = mock(UpdateThemePreferenceCommandHandler::class);
     $this->changePasswordHandler = mock(ChangePasswordCommandHandler::class);
     $this->regenerateCalendarSubscriptionHandler = mock(RegenerateCalendarSubscriptionCommandHandler::class);
+    $this->updateSlackMemberIdHandler = mock(UpdateSlackMemberIdCommandHandler::class);
+    $this->disconnectSlackHandler = mock(DisconnectSlackCommandHandler::class);
+    $this->removeProfileImageHandler = mock(RemoveProfileImageCommandHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -55,6 +61,9 @@ beforeEach(function (): void {
         updateThemePreferenceHandler: $this->updateThemePreferenceHandler,
         changePasswordHandler: $this->changePasswordHandler,
         regenerateCalendarSubscriptionHandler: $this->regenerateCalendarSubscriptionHandler,
+        updateSlackMemberIdHandler: $this->updateSlackMemberIdHandler,
+        disconnectSlackHandler: $this->disconnectSlackHandler,
+        removeProfileImageHandler: $this->removeProfileImageHandler,
     );
 });
 
@@ -237,4 +246,31 @@ it('delegates regenerateCalendarSubscription to handler', function () {
         ->with('user-1');
 
     $this->facade->regenerateCalendarSubscription('user-1');
+});
+
+it('delegates updateSlackMemberId to handler', function () {
+    $this->updateSlackMemberIdHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', 'U12345ABC');
+
+    $this->facade->updateSlackMemberId('user-1', 'U12345ABC');
+});
+
+it('delegates disconnectSlack to handler', function () {
+    $this->disconnectSlackHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1');
+
+    $this->facade->disconnectSlack('user-1');
+});
+
+it('delegates deleteOldProfileImage to handler', function () {
+    $this->removeProfileImageHandler
+        ->expects('handle')
+        ->once()
+        ->with('old-avatar.jpg');
+
+    $this->facade->deleteOldProfileImage('old-avatar.jpg');
 });

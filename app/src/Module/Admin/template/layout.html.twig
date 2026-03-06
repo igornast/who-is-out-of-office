@@ -273,14 +273,14 @@
                     {% endif %}
                     {% if _topbar_user.slackIntegration is not null %}
                         <a class="avatar-dropdown-status"
-                           href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\SlackIntegrationCrudController').setAction('edit').setEntityId(_topbar_user.id) }}"
+                           href="{{ path('app_user_profile') }}#slack"
                            role="menuitem">
                             <span class="avatar-dropdown-status-dot connected"></span>
                             {{ 'dropdown.slack_connected'|trans(domain: 'admin') }}
                         </a>
                     {% else %}
                         <a class="avatar-dropdown-status"
-                           href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\SlackIntegrationCrudController').setAction('new') }}"
+                           href="{{ path('app_user_profile') }}#slack"
                            role="menuitem">
                             <span class="avatar-dropdown-status-dot disconnected"></span>
                             {{ 'dropdown.slack_not_configured'|trans(domain: 'admin') }}

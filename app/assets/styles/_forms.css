@@ -234,6 +234,133 @@ body.ea .is-invalid:focus {
     border-left: 3px solid var(--danger);
 }
 
+/* Profile avatar upload */
+.profile-avatar-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0 20px;
+}
+
+.profile-avatar-zone {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--radius-full);
+}
+
+.profile-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--app-surface-sunken);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-full);
+    color: var(--text-muted);
+}
+
+.profile-avatar-placeholder i {
+    width: 40px;
+    height: 40px;
+}
+
+.profile-avatar-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: var(--radius-full);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    color: #fff;
+}
+
+.profile-avatar-overlay i {
+    width: 28px;
+    height: 28px;
+}
+
+.profile-avatar-zone:hover .profile-avatar-overlay {
+    opacity: 1;
+}
+
+.profile-avatar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-avatar-change-btn,
+.profile-avatar-remove-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid var(--border);
+    background: var(--app-surface);
+}
+
+.profile-avatar-change-btn i,
+.profile-avatar-remove-btn i {
+    width: 15px;
+    height: 15px;
+}
+
+.profile-avatar-change-btn {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.profile-avatar-change-btn:hover {
+    background: var(--primary-subtle);
+}
+
+.profile-avatar-remove-btn {
+    color: var(--danger);
+    border-color: var(--border);
+}
+
+.profile-avatar-remove-btn:hover {
+    border-color: var(--danger);
+    background: var(--danger-subtle);
+}
+
+.profile-avatar-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.profile-avatar-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+}
+
 @media (max-width: 768px) {
     .form-row {
         grid-template-columns: 1fr;

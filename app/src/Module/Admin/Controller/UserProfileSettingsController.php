@@ -7,6 +7,7 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Form\UserProfileType;
 use App\Shared\DTO\UserDTO;
+use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\Ical\IcalHashGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,10 +26,13 @@ class UserProfileSettingsController extends AbstractController
     public function __construct(
         #[Autowire('%profile_images_base_path%')]
         private readonly string $profileImagesBasePath,
+        #[Autowire('%kernel.project_dir%/public/%profile_images_base_path%')]
+        private readonly string $uploadDirectory,
         #[Autowire(env: 'ICAL_SECRET')]
         private readonly string $icalSecret,
         private readonly EntityManagerInterface $em,
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly UserFacadeInterface $userFacade,
     ) {
     }
 
@@ -40,11 +44,19 @@ class UserProfileSettingsController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $removeRequested = '1' === $form->get('removeProfileImage')->getData();
             $uploadedFile = $form->get('profileImageFile')->getData();
-            if ($uploadedFile instanceof UploadedFile) {
-                $newFilename = uniqid().'.'.$uploadedFile->guessExtension();
-                $uploadedFile->move('uploads/profile_images', $newFilename);
 
+            if ($removeRequested && null === $uploadedFile) {
+                $this->userFacade->deleteOldProfileImage($user->profileImageUrl);
+                $user->profileImageUrl = null;
+            }
+
+            if ($uploadedFile instanceof UploadedFile) {
+                $this->userFacade->deleteOldProfileImage($user->profileImageUrl);
+
+                $newFilename = sprintf('%s.%s', bin2hex(random_bytes(16)), $uploadedFile->guessExtension());
+                $uploadedFile->move($this->uploadDirectory, $newFilename);
                 $user->profileImageUrl = $newFilename;
             }
 
