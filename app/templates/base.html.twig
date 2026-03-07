@@ -2,16 +2,35 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Who is ooo{% endblock %}</title>
         <link rel="shortcut icon" href="{{ asset('image/icons/icon_pride.png') }}">
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('image/icons/apple-touch-icon.png') }}">
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('image/icons/favicon-32x32.png') }}">
         <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('image/icons/favicon-16x16.png') }}">
 
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
         <link rel="stylesheet" href="{{ asset('styles/bootstrap.min.css') }}">
 
         {% block stylesheets %}
         {% endblock %}
+
+        <script>
+            (function() {
+                var saved = localStorage.getItem('whosooo-theme');
+                var isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (isDark) {
+                    document.documentElement.classList.add('dark', 'ea-dark-scheme');
+                    document.documentElement.dataset.bsTheme = 'dark';
+                }
+                var palette = localStorage.getItem('whosooo-palette') || 'teal';
+                if (['teal','sage','sunset','lavender'].indexOf(palette) === -1) palette = 'teal';
+                if (palette !== 'teal') document.documentElement.dataset.palette = palette;
+            })();
+        </script>
 
         {% block javascripts %}
         {% endblock %}

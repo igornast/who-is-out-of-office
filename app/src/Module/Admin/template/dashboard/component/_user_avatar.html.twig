@@ -1,5 +1,5 @@
 {% macro userDtoAvatar(userDto) %}
-    <div class="pe-3 align-content-center mb-2"
+    <div class="align-content-center"
          title="{{ userDto.firstName }} {{ userDto.lastName }}">
         {% if userDto.profileImageUrl %}
             {% set img = userDto.profileImageUrl %}
@@ -13,12 +13,12 @@
             <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}"
                class="p-0 align-content-center">
                 <img src="{{ src }}" class="avatar-img"
-                     style="width:65px;"
                      alt="{{ userDto.firstName }} {{ userDto.lastName }} avatar"/>
             </a>
         {% else %}
+            {% set _color_idx = (userDto.firstName ~ userDto.lastName)|length % 6 %}
             <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}"
-               class="btn btn-primary btn-lg fs-3 avatar-placeholder">
+               class="avatar-placeholder avatar-color-{{ _color_idx }}">
                 <span class="avatar-placeholder-text">{{ userDto.firstName[:1] }}{{ userDto.lastName[:1] }}</span>
             </a>
         {% endif %}

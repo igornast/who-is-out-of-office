@@ -75,6 +75,9 @@ public function someMethod(): void
     $newSettings = new AppSettingsDTO(
         autoApprove: false,
         autoApproveDelay: 3600,
+        defaultAnnualAllowance: 25,
+        minNoticeDays: 1,
+        maxConsecutiveDays: 0,
     );
     $this->appSettingsFacade->updateAllSettings($newSettings);
 }

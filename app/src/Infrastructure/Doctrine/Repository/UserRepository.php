@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Doctrine\Repository;
 
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Infrastructure\Doctrine\Entity\UserSlackIntegration;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Shared\DTO\UserDTO;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -59,6 +60,41 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         if (null !== $userDTO->password) {
             $user->password = $userDTO->password;
         }
+
+        $user->themePreference = $userDTO->themePreference;
+        $user->palettePreference = $userDTO->palettePreference;
+        $user->icalHashSalt = $userDTO->icalHashSalt;
+
+        if (null !== $userDTO->managerId) {
+            $user->manager = $this->find($userDTO->managerId);
+        } else {
+            $user->manager = null;
+        }
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
+    public function updateThemePreference(string $userId, string $theme, string $palette): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->themePreference = $theme;
+        $user->palettePreference = $palette;
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
+    public function updatePassword(string $userId, string $hashedPassword): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->password = $hashedPassword;
 
         $em = $this->getEntityManager();
         $em->persist($user);
@@ -174,6 +210,59 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         }
 
         return $userDTOs;
+    }
+
+    /**
+     * @return UserDTO[]
+     */
+    public function findByManagerId(string $managerId): array
+    {
+        $users = $this->findBy(['manager' => $managerId, 'isActive' => true]);
+
+        return array_map(fn (User $user) => UserDTO::fromEntity($user), $users);
+    }
+
+    public function updateIcalHashSalt(string $userId, string $salt): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->icalHashSalt = $salt;
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
+    public function updateSlackMemberId(string $userId, string $slackMemberId): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        if (null === $user->slackIntegration) {
+            $user->slackIntegration = new UserSlackIntegration(user: $user, slackMemberId: $slackMemberId);
+        } else {
+            $user->slackIntegration->slackMemberId = $slackMemberId;
+        }
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
+    public function removeSlackIntegration(string $userId): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        if (null === $user->slackIntegration) {
+            return;
+        }
+
+        $em = $this->getEntityManager();
+        $em->remove($user->slackIntegration);
+        $user->slackIntegration = null;
+        $em->flush();
     }
 
     public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO

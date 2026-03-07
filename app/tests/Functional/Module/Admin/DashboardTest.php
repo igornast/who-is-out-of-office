@@ -20,7 +20,9 @@ it('redirects unauthenticated users to login', function (): void {
     $client->request('GET', '/app/dashboard');
 
     $content = $client->getCrawler()->text();
-    expect($content)->toContain('Who is ooo login');
+    expect($content)
+        ->toContain("Who's OOO")
+        ->toContain('Sign in');
 });
 
 it('displays error message for invalid credentials', function (): void {
@@ -35,10 +37,10 @@ it('displays user information on dashboard', function (): void {
     $client = createPantherClient();
     loginUserWithLoginForm($client, 'admin@ooo.com', '123');
 
-    $client->waitForVisibility('#main-menu');
+    $client->waitForVisibility('.ooo-sidebar');
 
     $content = $client->getCrawler()->text();
-    expect($content)->toContain('Hans Müller (admin@ooo.com)');
+    expect($content)->toContain('Hans Müller');
 });
 
 it('admin can access menu items', function (): void {
@@ -55,7 +57,7 @@ it('admin can access menu items', function (): void {
         ->toContain('Profile Settings')
         ->toContain('Calendar')
         ->toContain('Absence Requests')
-        ->toContain('Requests to approve');
+        ->toContain('Awaiting Approval');
 });
 
 it('displays upcoming absences in team', function (): void {

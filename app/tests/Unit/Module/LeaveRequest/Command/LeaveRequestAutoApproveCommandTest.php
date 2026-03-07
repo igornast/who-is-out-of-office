@@ -48,7 +48,8 @@ it('returns success without processing when auto approve is disabled', function 
 });
 
 it('returns success when auto approve is enabled but no pending requests', function () {
-    $autoApproveDelay = 300;
+    $autoApproveDelay = 5;
+    $expectedCreatedBefore = new DateTimeImmutable()->modify(sprintf('-%d seconds', $autoApproveDelay * 60));
 
     $this->appSettingsFacade
         ->expects('isAutoApprove')
@@ -68,6 +69,7 @@ it('returns success when auto approve is enabled but no pending requests', funct
     $this->leaveRequestFacade
         ->expects('getPendingLeaveRequests')
         ->once()
+        ->withArgs(fn (DateTimeImmutable $createdBefore) => abs($createdBefore->getTimestamp() - $expectedCreatedBefore->getTimestamp()) < 2)
         ->andReturn([]);
 
     $this->logger
@@ -89,7 +91,7 @@ it('returns success when auto approve is enabled but no pending requests', funct
 });
 
 it('approves pending leave requests and dispatches messages', function () {
-    $autoApproveDelay = 300;
+    $autoApproveDelay = 5;
 
     $leaveRequest1 = LeaveRequestDTOFixture::create([
         'id' => Uuid::fromString('111e2222-e33b-44d5-a666-777777777777'),
@@ -146,7 +148,7 @@ it('approves pending leave requests and dispatches messages', function () {
 });
 
 it('approves single pending leave request with correct message id', function () {
-    $autoApproveDelay = 600;
+    $autoApproveDelay = 10;
     $leaveRequestId = Uuid::fromString('333e4444-e55b-66d7-a888-999999999999');
 
     $leaveRequest = LeaveRequestDTOFixture::create([

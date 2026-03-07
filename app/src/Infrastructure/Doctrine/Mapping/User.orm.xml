@@ -23,6 +23,9 @@
         <field name="contractStartedAt" column="contract_started_at" type="date_immutable" nullable="true" />
         <field name="workingDays" type="json" column="working_days" />
         <field name="absenceBalanceResetDay" column="absence_balance_reset_day" type="date_immutable"/>
+        <field name="themePreference" column="theme_preference" length="10"/>
+        <field name="palettePreference" column="palette_preference" length="10"/>
+        <field name="icalHashSalt" column="ical_hash_salt" type="string" length="64" nullable="true"/>
 
         <field name="createdAt" column="created_at" type="datetime_immutable"/>
         <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
@@ -36,6 +39,10 @@
 
         <many-to-one field="holidayCalendar" target-entity="App\Infrastructure\Doctrine\Entity\HolidayCalendar">
             <join-column name="holiday_calendar_id" referenced-column-name="id" nullable="true" />
+        </many-to-one>
+
+        <many-to-one field="manager" target-entity="App\Infrastructure\Doctrine\Entity\User">
+            <join-column name="manager_id" referenced-column-name="id" nullable="true" on-delete="SET NULL" />
         </many-to-one>
 
         <lifecycle-callbacks>

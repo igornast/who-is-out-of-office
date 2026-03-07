@@ -7,17 +7,18 @@ namespace App\Module\Admin\Form;
 use App\Infrastructure\Doctrine\Entity\HolidayCalendar;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
 
 class UserProfileType extends AbstractType
 {
@@ -37,6 +38,10 @@ class UserProfileType extends AbstractType
                 'class' => HolidayCalendar::class,
                 'choice_label' => fn (HolidayCalendar $c) => $c->countryName,
                 'placeholder' => 'Select your calendar',
+                'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('c')
+                    ->where('c.isActive = :active')
+                    ->setParameter('active', true)
+                    ->orderBy('c.countryName', 'ASC'),
             ])
 
             ->add('birthDate', DateType::class, [
@@ -62,17 +67,18 @@ class UserProfileType extends AbstractType
                 'required' => false,
                 'help' => 'Tick this box if you want the OOO Slackbot to send a friendly reminder to your teammates each year.',
             ])
-
-            ->add('plainPassword', RepeatedType::class, [
-                'type' => PasswordType::class,
-                'required' => false,
-                'mapped' => false,
-                'invalid_message' => 'Passwords must match.',
-                'first_options' => ['label' => 'New Password'],
-                'second_options' => ['label' => 'Repeat Password'],
-            ])
             ->add('profileImageFile', FileType::class, [
-                'label' => 'Profile Image',
+                'label' => false,
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new Image(
+                        maxSize: '2M',
+                        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+                    ),
+                ],
+            ])
+            ->add('removeProfileImage', HiddenType::class, [
                 'mapped' => false,
                 'required' => false,
             ]);

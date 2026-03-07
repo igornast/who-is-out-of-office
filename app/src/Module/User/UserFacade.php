@@ -8,6 +8,13 @@ use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
+use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
+use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
+use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
+use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
+use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
+use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
+use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
@@ -17,7 +24,10 @@ use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHand
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
 use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\UserDTO;
+use App\Shared\Enum\PaletteEnum;
+use App\Shared\Enum\ThemeEnum;
 use App\Shared\Facade\UserFacadeInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 final class UserFacade implements UserFacadeInterface
 {
@@ -32,6 +42,13 @@ final class UserFacade implements UserFacadeInterface
         private readonly GetUsersWithIncomingWorkAnniversariesQueryHandler $getUsersWithIncomingWorkAnniversariesHandler,
         private readonly GetUsersWithWorkAnniversariesForDatesQueryHandler $getUsersWithWorkAnniversariesForDatesHandler,
         private readonly ResetAbsenceBalanceCommandHandler $resetAbsenceBalanceHandler,
+        private readonly GetDirectReportsQueryHandler $getDirectReportsHandler,
+        private readonly UpdateThemePreferenceCommandHandler $updateThemePreferenceHandler,
+        private readonly ChangePasswordCommandHandler $changePasswordHandler,
+        private readonly RegenerateCalendarSubscriptionCommandHandler $regenerateCalendarSubscriptionHandler,
+        private readonly UpdateSlackMemberIdCommandHandler $updateSlackMemberIdHandler,
+        private readonly DisconnectSlackCommandHandler $disconnectSlackHandler,
+        private readonly RemoveProfileImageCommandHandler $removeProfileImageHandler,
     ) {
     }
 
@@ -98,5 +115,43 @@ final class UserFacade implements UserFacadeInterface
     public function resetAbsenceBalance(): void
     {
         $this->resetAbsenceBalanceHandler->handle();
+    }
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getDirectReports(string $managerId): array
+    {
+        return $this->getDirectReportsHandler->handle($managerId);
+    }
+
+    public function updateThemePreference(string $userId, ThemeEnum $theme, PaletteEnum $palette): void
+    {
+        $this->updateThemePreferenceHandler->handle($userId, $theme, $palette);
+    }
+
+    public function changePassword(string $userId, string $plainPassword, PasswordAuthenticatedUserInterface $user): void
+    {
+        $this->changePasswordHandler->handle($userId, $plainPassword, $user);
+    }
+
+    public function regenerateCalendarSubscription(string $userId): void
+    {
+        $this->regenerateCalendarSubscriptionHandler->handle($userId);
+    }
+
+    public function updateSlackMemberId(string $userId, string $slackMemberId): void
+    {
+        $this->updateSlackMemberIdHandler->handle($userId, $slackMemberId);
+    }
+
+    public function disconnectSlack(string $userId): void
+    {
+        $this->disconnectSlackHandler->handle($userId);
+    }
+
+    public function deleteOldProfileImage(?string $currentProfileImageUrl): void
+    {
+        $this->removeProfileImageHandler->handle($currentProfileImageUrl);
     }
 }

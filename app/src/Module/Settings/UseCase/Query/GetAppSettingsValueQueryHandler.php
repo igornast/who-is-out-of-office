@@ -22,6 +22,9 @@ class GetAppSettingsValueQueryHandler
 
         $settingsValue = $content;
         foreach (explode('.', $settingsEnum->value) as $key) {
+            if (!is_array($settingsValue) || !array_key_exists($key, $settingsValue)) {
+                return null;
+            }
             $settingsValue = &$settingsValue[$key];
         }
 

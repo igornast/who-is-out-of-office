@@ -1,0 +1,460 @@
+/* ============================================
+   RESPONSIVE — Breakpoints & Mobile Layout
+   ============================================ */
+
+/* ---- Bottom Navigation Bar ---- */
+.bottom-nav {
+    display: none;
+}
+
+/* ---- Mobile request card list (hidden by default, shown on mobile) ---- */
+.m-request-list {
+    display: none;
+}
+
+/* ---- Leave Request form base styles (body.ea for specificity over EA reset) ---- */
+body.ea .lr-form-card-body {
+    padding: 32px;
+}
+
+.lr-form-actions {
+    border-top: 1px solid var(--border-light);
+    padding-top: 20px;
+}
+
+/* ===========================================
+   Small Desktop: 1024–1199px
+   Stats 2x2 (already handled at 1200px in _cards.css)
+   Dashboard single column (already handled at 1200px in _dashboard.css)
+   =========================================== */
+
+/* ===========================================
+   Tablet: 768–1023px
+   Sidebar overlay (already handled in _sidebar.css)
+   Single column, stats 2x2
+   =========================================== */
+
+/* ===========================================
+   Mobile: < 768px
+   =========================================== */
+@media (max-width: 767px) {
+
+    /* -- Stats grid: 2x2 instead of 1-column -- */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 14px;
+    }
+
+    .stat-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .stat-icon i {
+        width: 15px;
+        height: 15px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .stat-trend {
+        display: none;
+    }
+
+    /* -- Welcome banner compact -- */
+    .welcome-banner {
+        padding: 20px;
+    }
+
+    .welcome-text h2 {
+        font-size: 20px;
+    }
+
+    .welcome-text p {
+        font-size: 12px;
+    }
+
+    .welcome-banner::after {
+        width: 140px;
+        height: 140px;
+        right: -30px;
+        top: -30px;
+    }
+
+    .welcome-banner::before {
+        width: 100px;
+        height: 100px;
+    }
+
+    .welcome-actions .btn-outline-primary {
+        display: none;
+    }
+
+    /* -- Week strip: horizontal scroll, touch-friendly nav -- */
+    .week-nav button {
+        width: 36px;
+        height: 36px;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .week-strip {
+        padding: 20px 0 16px;
+    }
+
+    .week-header {
+        padding: 0 20px 16px;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--border-light);
+        align-items: flex-start;
+    }
+
+    .week-header-text {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .week-title {
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .week-subtitle {
+        font-size: 14px;
+    }
+
+    .week-days {
+        display: flex;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        padding: 0 16px 4px;
+        scroll-snap-type: x mandatory;
+    }
+
+    .week-days::-webkit-scrollbar {
+        display: none;
+    }
+
+    .week-day {
+        flex: 0 0 calc(50% - 4px);
+        min-width: 0;
+        padding: 16px 12px 20px;
+        border-radius: var(--radius-lg);
+        scroll-snap-align: start;
+    }
+
+    .week-day-name {
+        font-size: 12px;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    .week-day-num {
+        font-family: var(--font-display);
+        font-size: 32px;
+        font-weight: 700;
+        margin: 6px 0;
+    }
+
+    .week-day-count {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .week-day-count.has-leaves {
+        color: var(--cta);
+    }
+
+    .week-day.today .week-day-count.has-leaves {
+        color: var(--primary-active);
+    }
+
+    .mini-avatar {
+        width: 28px;
+        height: 28px;
+        margin-left: -6px;
+        font-size: 10px;
+        border-width: 2px;
+    }
+
+    .mini-avatar:first-child {
+        margin-left: 0;
+    }
+
+    .week-day-avatars {
+        margin-top: 12px;
+    }
+
+    /* Scroll indicator dots */
+    .week-strip-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        padding: 12px 0 0;
+    }
+
+    .week-strip-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background: var(--border);
+        transition: all 0.2s ease;
+    }
+
+    .week-strip-dot.active {
+        width: 18px;
+        background: var(--primary);
+    }
+
+    /* -- Who's out today: minor size tweaks -- */
+    .whos-out-avatar {
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
+    }
+
+    .whos-out-name {
+        font-size: 13px;
+    }
+
+    .whos-out-detail {
+        font-size: 11px;
+    }
+
+    /* -- Recent requests: card list on mobile, hide table -- */
+    .dashboard-recent-requests .table-wrapper {
+        display: none;
+    }
+
+    .m-request-list {
+        display: block;
+    }
+
+    .m-request-item {
+        display: flex;
+        flex-direction: column;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border-light);
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+    }
+
+    .m-request-item:hover {
+        background: var(--app-bg-alt);
+    }
+
+    .m-request-item:last-child {
+        border-bottom: none;
+    }
+
+    .m-request-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .m-request-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text-on-primary);
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .m-request-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .m-request-name {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-primary);
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .m-request-bottom {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-left: 36px;
+        margin-top: 4px;
+        font-size: 11px;
+        color: var(--text-muted);
+        flex-wrap: wrap;
+    }
+
+    .m-request-type-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .m-request-sep {
+        color: var(--border);
+    }
+
+    /* -- Quick links: hidden on mobile -- */
+    .quick-links-card {
+        display: none;
+    }
+
+    /* -- Bottom navigation bar -- */
+    .bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--app-surface);
+        border-top: 1px solid var(--border-light);
+        padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 12px));
+        z-index: 100;
+        box-shadow: 0 -2px 8px rgba(42, 63, 79, 0.06);
+    }
+
+    .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-family: var(--font-body);
+        font-size: 10px;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: var(--radius-md);
+        transition: color 0.15s ease;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        min-width: 44px;
+        min-height: 44px;
+        justify-content: center;
+    }
+
+    .bottom-nav-item i {
+        width: 20px;
+        height: 20px;
+    }
+
+    .bottom-nav-item.active {
+        color: var(--primary);
+    }
+
+    .bottom-nav-item.cta {
+        color: var(--cta);
+    }
+
+    .bottom-nav-item:active {
+        opacity: 0.7;
+    }
+
+    /* Content padding to account for bottom nav */
+    body.ea .main-content .content-wrapper {
+        padding-bottom: calc(72px + env(safe-area-inset-bottom, 12px));
+    }
+
+    /* -- Dashboard grid spacing -- */
+    .dashboard-grid {
+        gap: 16px;
+    }
+
+    .dashboard-left-column,
+    .dashboard-right-column {
+        gap: 16px;
+    }
+
+    .dashboard-left-column > *,
+    .dashboard-right-column > * {
+        margin-bottom: 0;
+    }
+
+    /* -- Leave Request form: compact padding + sticky submit -- */
+    body.ea .lr-form-card-body {
+        padding: 16px;
+    }
+
+    .lr-form-actions {
+        position: sticky;
+        bottom: 0;
+        flex-direction: column;
+        background: var(--app-surface);
+        border-top: 1px solid var(--border-light);
+        margin: 16px -16px -16px;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+        z-index: 10;
+    }
+
+    body.ea .lr-form-actions .btn {
+        width: 100%;
+    }
+
+    /* -- Profile & Settings: full-width buttons (body.ea for specificity) -- */
+    body.ea .settings-card-footer {
+        flex-direction: column;
+    }
+
+    body.ea .settings-card-footer .btn {
+        width: 100%;
+    }
+
+    /* Profile image: center on mobile */
+    .settings-card-body .form-group.row .text-center img {
+        max-width: 100px !important;
+    }
+
+    .settings-card-body .field-file .form-control {
+        width: 100%;
+    }
+
+    /* -- Full-width centered columns: remove excess horizontal margin on row -- */
+    .row.justify-content-center {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+/* Dark mode overrides for bottom nav */
+html.dark .bottom-nav {
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Scroll indicator dots — hidden on desktop */
+.week-strip-dots {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bottom-nav-item,
+    .week-strip-dot {
+        transition: none;
+    }
+}

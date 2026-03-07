@@ -1,0 +1,9 @@
+{% macro roleBadge(baseClass = 'role-badge') %}
+    {% if is_granted('ROLE_ADMIN') %}
+        <span class="{{ baseClass }} role-admin">{{ 'role.admin'|trans(domain: 'admin') }}</span>
+    {% elseif is_granted('ROLE_MANAGER') %}
+        <span class="{{ baseClass }} role-manager">{{ 'role.manager'|trans(domain: 'admin') }}</span>
+    {% else %}
+        <span class="{{ baseClass }} role-employee">{{ 'role.user'|trans(domain: 'admin') }}</span>
+    {% endif %}
+{% endmacro %}

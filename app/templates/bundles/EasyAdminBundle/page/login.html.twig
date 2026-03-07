@@ -4,6 +4,65 @@
     <link rel="shortcut icon" href="{{ asset('image/icons/icon_pride.png') }}">
 {% endblock %}
 
+{% block head_stylesheets %}
+    {{ parent() }}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body.ea-login {
+            font-family: var(--font-body);
+            background-color: var(--app-bg);
+        }
+        .ea-login .wrapper {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--sidebar-bg) 100%);
+        }
+        .ea-login .login-form {
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            background-color: var(--app-surface);
+        }
+        .ea-login .login-form h1 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .ea-login .login-form .form-control {
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--app-surface-sunken);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            transition: all 0.15s ease;
+        }
+        .ea-login .login-form .form-control:focus {
+            border-color: var(--border-focus);
+            box-shadow: var(--shadow-focus);
+        }
+        .ea-login .login-form .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        .ea-login .login-form .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        .ea-login .login-form .btn-primary:focus {
+            box-shadow: var(--shadow-focus);
+        }
+        .ea-login .login-form label {
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+    </style>
+{% endblock %}
+
 {% block body_javascript %}
     {{ parent() }}
     {% block importmap %}{{ importmap('app') }}{% endblock %}

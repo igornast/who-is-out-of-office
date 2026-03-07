@@ -1,0 +1,206 @@
+{% set _username_label = username_label is defined ? username_label|trans : 'login_page.username'|trans({}, 'EasyAdminBundle') %}
+{% set _password_label = password_label is defined ? password_label|trans : 'login_page.password'|trans({}, 'EasyAdminBundle') %}
+{% set _sign_in_label = sign_in_label is defined ? sign_in_label|trans : 'login_page.sign_in'|trans({}, 'EasyAdminBundle') %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{{ page_title|default('Sign In') }}</title>
+    <link rel="shortcut icon" href="{{ asset('image/icons/icon_pride.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('styles/_tokens-light.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_tokens-dark.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_palette-sage.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_palette-sunset.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_palette-lavender.css') }}">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--app-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.25s ease;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo h1 {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .login-logo h1 span {
+            color: var(--primary);
+        }
+
+        .login-card {
+            background: var(--app-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .login-card h2 {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--app-surface-sunken);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--border-focus);
+            box-shadow: var(--shadow-focus);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .btn-sign-in {
+            width: 100%;
+            height: 42px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--cta-text);
+            background: var(--cta);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            margin-top: 4px;
+        }
+
+        .btn-sign-in:hover {
+            background: var(--cta-hover);
+        }
+
+        .btn-sign-in:focus-visible {
+            outline: none;
+            box-shadow: var(--shadow-focus);
+        }
+
+        .alert-error {
+            background: var(--danger-subtle);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        html.dark body { background: var(--app-bg); }
+        html.dark .login-card {
+            background: var(--app-surface);
+            border-color: var(--border-light);
+        }
+        html.dark .form-control {
+            background: var(--app-surface-sunken);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+    </style>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('whosooo-theme');
+            var isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark', 'ea-dark-scheme');
+                document.documentElement.dataset.bsTheme = 'dark';
+            }
+            var palette = localStorage.getItem('whosooo-palette') || 'teal';
+            if (['teal','sage','sunset','lavender'].indexOf(palette) === -1) palette = 'teal';
+            if (palette !== 'teal') document.documentElement.dataset.palette = palette;
+        })();
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <h1>Who's <span>OOO</span></h1>
+        </div>
+
+        <div class="login-card">
+            <h2>{{ _sign_in_label }}</h2>
+
+            {% if error|default(false) %}
+                <div class="alert-error">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{{ action|default('') }}">
+                {% if csrf_token_intention|default(false) %}
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token(csrf_token_intention) }}">
+                {% endif %}
+                <input type="hidden" name="{{ target_path_parameter|default('_target_path') }}" value="{{ target_path|default('/') }}">
+
+                <div class="form-group">
+                    <label class="form-label" for="username">{{ _username_label }}</label>
+                    <input type="text" id="username" name="{{ username_parameter|default('_username') }}" class="form-control" value="{{ last_username|default('') }}" required autofocus autocomplete="username" placeholder="you@company.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">{{ _password_label }}</label>
+                    <input type="password" id="password" name="{{ password_parameter|default('_password') }}" class="form-control" required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn-sign-in">{{ _sign_in_label }}</button>
+            </form>
+        </div>
+    </div>
+    {{ importmap('app') }}
+</body>
+</html>

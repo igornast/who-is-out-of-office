@@ -10,6 +10,10 @@ class IcalHashGenerator
 {
     public static function generateForUser(UserDTO $userDTO, string $secret): string
     {
-        return hash_hmac('sha256', $userDTO->id.'|'.$userDTO->createdAt->format('c'), $secret);
+        $payload = null !== $userDTO->icalHashSalt
+            ? $userDTO->id.'|'.$userDTO->icalHashSalt
+            : $userDTO->id.'|'.$userDTO->createdAt->format('c');
+
+        return hash_hmac('sha256', $payload, $secret);
     }
 }

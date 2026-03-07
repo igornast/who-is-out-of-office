@@ -1,0 +1,326 @@
+body.ea .btn,
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 16px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.btn i {
+    width: 16px;
+    height: 16px;
+}
+
+/* Inline SVG icon classes — replaces FontAwesome for EasyAdmin action buttons */
+i.icon-check,
+i.icon-x,
+i.icon-ban {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-color: currentColor;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+i.icon-check {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+}
+
+i.icon-x {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+}
+
+i.icon-ban {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m4.9 4.9 14.2 14.2'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m4.9 4.9 14.2 14.2'/%3E%3C/svg%3E");
+}
+
+.btn-sm {
+    height: 30px;
+    font-size: 12px;
+    padding: 0 12px;
+}
+
+.btn-lg {
+    height: 44px;
+    font-size: 14px;
+    padding: 0 20px;
+}
+
+/* --- Primary button --- */
+body.ea .btn-primary,
+.btn-primary {
+    background: var(--primary);
+    color: var(--text-on-primary);
+    border-color: var(--primary);
+}
+
+body.ea .btn-primary:not(:disabled):hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: var(--text-on-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+body.ea .btn-primary:not(:disabled):active,
+body.ea .btn-primary:not(:disabled):focus,
+body.ea .btn-primary:not(:disabled):not(.disabled):focus-visible {
+    background: var(--primary-active);
+    border-color: var(--primary-active);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+/* --- CTA button --- */
+body.ea .btn-cta,
+.btn-cta {
+    background: var(--cta);
+    color: var(--cta-text);
+}
+
+body.ea .btn-cta:not(:disabled):hover {
+    background: var(--cta-hover);
+    color: var(--cta-text);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+body.ea .btn-cta:not(:disabled):active,
+body.ea .btn-cta:not(:disabled):focus,
+body.ea .btn-cta:not(:disabled):not(.disabled):focus-visible {
+    background: var(--cta-hover);
+    color: var(--cta-text);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+/* --- Danger button --- */
+body.ea .btn-danger,
+.btn-danger {
+    background: var(--danger);
+    color: var(--text-on-primary);
+    border-color: var(--danger);
+}
+
+body.ea .btn-danger:not(:disabled):hover {
+    background: var(--danger-hover);
+    border-color: var(--danger-hover);
+    color: var(--text-on-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+body.ea .btn-danger:not(:disabled):active,
+body.ea .btn-danger:not(:disabled):focus,
+body.ea .btn-danger:not(:disabled):not(.disabled):focus-visible {
+    background: var(--danger-hover);
+    border-color: var(--danger-hover);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+/* --- Success button --- */
+body.ea .btn-success,
+.btn-success {
+    background: var(--success);
+    color: var(--text-on-primary);
+    border-color: var(--success);
+}
+
+body.ea .btn-success:not(:disabled):hover {
+    background: var(--success-hover, color-mix(in srgb, var(--success), #000 10%));
+    border-color: var(--success-hover, color-mix(in srgb, var(--success), #000 10%));
+    color: var(--text-on-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+body.ea .btn-success:not(:disabled):active,
+body.ea .btn-success:not(:disabled):focus,
+body.ea .btn-success:not(:disabled):not(.disabled):focus-visible {
+    background: var(--success-hover, color-mix(in srgb, var(--success), #000 10%));
+    border-color: var(--success-hover, color-mix(in srgb, var(--success), #000 10%));
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+/* --- Outline Primary button --- */
+body.ea .btn-outline-primary,
+.btn-outline,
+.btn-outline-primary {
+    background: transparent;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+}
+
+body.ea .btn-outline-primary:not(:disabled):hover {
+    background: var(--primary-subtle);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+body.ea .btn-outline-primary:not(:disabled):active,
+body.ea .btn-outline-primary:not(:disabled):focus,
+body.ea .btn-outline-primary:not(:disabled):not(.disabled):focus-visible {
+    background: var(--primary-subtle);
+    color: var(--primary);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+/* --- Outline White button --- */
+.btn-outline-white {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-on-primary);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-outline-white:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* --- Ghost button --- */
+.btn-ghost {
+    background: transparent;
+    color: var(--text-tertiary);
+}
+
+.btn-ghost:hover {
+    background: var(--primary-subtle);
+    color: var(--primary);
+}
+
+/* --- Danger Ghost button --- */
+.btn-danger-ghost {
+    background: transparent;
+    color: var(--danger);
+}
+
+.btn-danger-ghost:hover {
+    background: var(--danger-subtle);
+}
+
+/* --- Secondary button --- */
+body.ea .btn-secondary,
+.btn-secondary {
+    background: var(--app-bg-alt);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+body.ea .btn-secondary:not(:disabled):hover {
+    background: var(--border-light);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+
+body.ea .btn-secondary:not(:disabled):active,
+body.ea .btn-secondary:not(:disabled):focus,
+body.ea .btn-secondary:not(:disabled):not(.disabled):focus-visible {
+    background: var(--border-light);
+    border-color: var(--border);
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+/* --- Action buttons --- */
+.action-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.action-btn i {
+    width: 15px;
+    height: 15px;
+}
+
+.action-btn:hover {
+    background: var(--primary-subtle);
+    color: var(--primary);
+}
+
+.action-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+.action-btn.approve:hover {
+    background: var(--success-subtle);
+    color: var(--success);
+}
+
+.action-btn.reject:hover {
+    background: var(--danger-subtle);
+    color: var(--danger);
+}
+
+.action-btns {
+    display: flex;
+    gap: 4px;
+}
+
+/* --- Quick Add button --- */
+body.ea .btn-quick-add,
+.btn-quick-add {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--cta);
+    color: var(--cta-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-quick-add:hover {
+    background: var(--cta-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.ea .btn,
+    .btn,
+    .action-btn,
+    .btn-quick-add {
+        transition: none;
+    }
+
+    body.ea .btn-primary:not(:disabled):hover,
+    body.ea .btn-cta:not(:disabled):hover,
+    body.ea .btn-danger:not(:disabled):hover {
+        transform: none;
+    }
+}

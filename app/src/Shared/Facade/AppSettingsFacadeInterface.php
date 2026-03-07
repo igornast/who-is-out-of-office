@@ -12,6 +12,14 @@ interface AppSettingsFacadeInterface
 
     public function autoApproveDelay(): int;
 
+    public function defaultAnnualAllowance(): int;
+
+    public function minNoticeDays(): int;
+
+    public function maxConsecutiveDays(): int;
+
+    public function skipWeekendHolidays(): bool;
+
     public function getAllSettings(): AppSettingsDTO;
 
     public function updateAllSettings(AppSettingsDTO $settingsDTO): void;

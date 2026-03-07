@@ -20,6 +20,8 @@ readonly class PublicHolidayCalendarDTO
         public string $countryCode,
         public string $countryName,
         public array $holidays,
+        public bool $isActive = true,
+        public ?int $lastSyncedYear = null,
     ) {
     }
 
@@ -28,11 +30,15 @@ readonly class PublicHolidayCalendarDTO
      */
     public static function createFromNager(string $countryCode, string $countryName, array $holidays): self
     {
+        $firstHolidayYear = [] !== $holidays ? (int) $holidays[0]->date->format('Y') : null;
+
         return new self(
             id: Uuid::uuid4(),
             countryCode: $countryCode,
             countryName: $countryName,
             holidays: array_map(fn (NagerPublicHolidayDTO $holiday) => PublicHolidayDTO::fromNager($holiday, $countryCode), $holidays),
+            isActive: true,
+            lastSyncedYear: $firstHolidayYear,
         );
     }
 
@@ -46,6 +52,8 @@ readonly class PublicHolidayCalendarDTO
                 fn (Holiday $holiday) => PublicHolidayDTO::fromEntity($holiday),
                 $holidayCalendar->holidays->toArray()
             ),
+            isActive: $holidayCalendar->isActive,
+            lastSyncedYear: $holidayCalendar->lastSyncedYear,
         );
     }
 }

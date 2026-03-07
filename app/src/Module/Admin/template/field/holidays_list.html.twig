@@ -1,0 +1,20 @@
+{% if field.value is not empty %}
+    <table class="table table-sm table-borderless mb-0">
+        <thead>
+            <tr>
+                <th class="text-body-secondary" style="width: 140px">{{ 'crud.holiday_calendar.field.date'|trans(domain='admin') }}</th>
+                <th class="text-body-secondary">{{ 'crud.holiday_calendar.field.name'|trans(domain='admin') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for holiday in field.value %}
+                <tr>
+                    <td>{{ holiday.date|date('M d, Y') }}</td>
+                    <td>{{ holiday.description }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <span class="text-body-secondary">{{ 'crud.holiday_calendar.field.no_holidays'|trans(domain='admin') }}</span>
+{% endif %}

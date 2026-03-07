@@ -36,6 +36,7 @@ class LeaveRequestDTOFixture implements FixtureInterface
             'user' => UserDTOFixture::create(),
             'approvedBy' => $faker->randomElement([null, UserDTOFixture::create(['roles' => [RoleEnum::Manager->value]])]),
             'comment' => $faker->sentence(),
+            'createdAt' => new \DateTimeImmutable(),
         ];
     }
 }

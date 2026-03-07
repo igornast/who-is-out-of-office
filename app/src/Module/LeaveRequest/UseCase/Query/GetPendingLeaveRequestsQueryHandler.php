@@ -7,7 +7,7 @@ namespace App\Module\LeaveRequest\UseCase\Query;
 use App\Infrastructure\Doctrine\Repository\LeaveRequestRepository;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 
-final class GetPendingLeaveRequestsQueryHandler
+class GetPendingLeaveRequestsQueryHandler
 {
     public function __construct(
         private readonly LeaveRequestRepository $leaveRequestRepository,

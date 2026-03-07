@@ -8,6 +8,7 @@ use App\Infrastructure\Slack\Service\UsersEventsProvider;
 use App\Shared\DTO\Holiday\UserPublicHolidaysDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\UserDTO;
+use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\Messaging\EmojisProvider;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -25,6 +26,7 @@ class WeeklyDigestNotificationCommandHandler
         private readonly ChatterInterface $chatter,
         private readonly UserFacadeInterface $userFacade,
         private readonly UsersEventsProvider $usersEventsProvider,
+        private readonly AppSettingsFacadeInterface $appSettingsFacade,
     ) {
     }
 
@@ -37,6 +39,10 @@ class WeeklyDigestNotificationCommandHandler
 
         /** @var array{string, LeaveRequestDTO[]|UserPublicHolidaysDTO[]} $mergedEvents */
         $mergedEvents = $this->usersEventsProvider->provideMergedAbsencesPerUser($monday, $sunday);
+
+        if ($this->appSettingsFacade->skipWeekendHolidays()) {
+            $mergedEvents = $this->filterWeekendHolidaysFromEvents($mergedEvents);
+        }
 
         $birthdayUsers = $this->userFacade->getUsersWithBirthdaysForDates($monday, $sunday);
         $anniversaryUsers = $this->userFacade->getUsersWithWorkAnniversariesForDates($monday, $sunday);
@@ -256,5 +262,42 @@ class WeeklyDigestNotificationCommandHandler
         ]);
 
         $this->chatter->send(new ChatMessage(self::SUBJECT_MESSAGE)->options($options));
+    }
+
+    /**
+     * @param array{string, array{int, LeaveRequestDTO|UserPublicHolidaysDTO}}|void[] $events
+     *
+     * @return array{string, array{int, LeaveRequestDTO|UserPublicHolidaysDTO}}|void[]
+     */
+    private function filterWeekendHolidaysFromEvents(array $events): array
+    {
+        $holidayEntries = [];
+
+        foreach ($events as $userId => $userEvents) {
+            foreach ($userEvents as $event) {
+                if ($event instanceof UserPublicHolidaysDTO) {
+                    $holidayEntries[$userId] = $event;
+                }
+            }
+        }
+
+        $filteredHolidays = $this->usersEventsProvider->filterWeekendHolidays($holidayEntries);
+
+        foreach ($events as $userId => $userEvents) {
+            $events[$userId] = array_values(array_filter(
+                $userEvents,
+                fn (LeaveRequestDTO|UserPublicHolidaysDTO $event) => !$event instanceof UserPublicHolidaysDTO,
+            ));
+
+            if (isset($filteredHolidays[$userId])) {
+                $events[$userId][] = $filteredHolidays[$userId];
+            }
+
+            if ([] === $events[$userId]) {
+                unset($events[$userId]);
+            }
+        }
+
+        return $events;
     }
 }

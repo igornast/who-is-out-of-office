@@ -1,0 +1,177 @@
+<div class="card dashboard-recent-requests">
+    <div class="card-header">
+        <span class="card-title">{{ 'dashboard.recent_requests.title'|trans(domain: 'admin') }}</span>
+        <a class="btn btn-outline btn-sm"
+           href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('index') }}">
+            {{ 'dashboard.recent_requests.view_all'|trans(domain: 'admin') }}
+        </a>
+    </div>
+    <div class="card-body">
+        {% if recent_requests is not empty %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>{{ 'dashboard.recent_requests.col.employee'|trans(domain: 'admin') }}</th>
+                            <th>{{ 'dashboard.recent_requests.col.type'|trans(domain: 'admin') }}</th>
+                            <th>{{ 'dashboard.recent_requests.col.dates'|trans(domain: 'admin') }}</th>
+                            <th>{{ 'dashboard.recent_requests.col.duration'|trans(domain: 'admin') }}</th>
+                            <th>{{ 'dashboard.recent_requests.col.status'|trans(domain: 'admin') }}</th>
+                            <th class="text-end">{{ 'dashboard.recent_requests.col.actions'|trans(domain: 'admin') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leaveRequestDto in recent_requests %}
+                            {% set userDto = leaveRequestDto.user %}
+                            <tr data-lr-row>
+                                <td>
+                                    <div class="employee-cell">
+                                        <div class="employee-avatar avatar-color-{{ (userDto.firstName ~ userDto.lastName)|length % 6 }}">
+                                            {% if userDto.profileImageUrl %}
+                                                {% if userDto.profileImageUrl starts with 'http://' or userDto.profileImageUrl starts with 'https://' %}
+                                                    <img src="{{ userDto.profileImageUrl }}" alt="">
+                                                {% else %}
+                                                    <img src="{{ asset(profile_images_base_path ~ '/' ~ userDto.profileImageUrl) }}" alt="">
+                                                {% endif %}
+                                            {% else %}
+                                                {{ userDto.firstName|first }}{{ userDto.lastName|first }}
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="employee-name">{{ userDto.firstName }} {{ userDto.lastName }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="leave-type">
+                                        <span class="leave-dot" style="background-color: {{ leaveRequestDto.leaveType.backgroundColor }}"></span>
+                                        {{ leaveRequestDto.leaveType.name }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if leaveRequestDto.startDate|date('Y-m-d') == leaveRequestDto.endDate|date('Y-m-d') %}
+                                        {{ leaveRequestDto.startDate|date("M d") }}
+                                    {% else %}
+                                        {{ leaveRequestDto.startDate|date("M d") }} – {{ leaveRequestDto.endDate|date("M d") }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ leaveRequestDto.workDays }} {{ leaveRequestDto.workDays == 1 ? 'day' : 'days' }}
+                                </td>
+                                <td>
+                                    <span class="status-badge status-{{ leaveRequestDto.status.value }}">
+                                        {{ leaveRequestDto.status.value|capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a class="table-action-btn"
+                                           href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('detail').setEntityId(leaveRequestDto.id) }}"
+                                           title="{{ 'dashboard.recent_requests.action.view'|trans(domain: 'admin') }}">
+                                            <i data-lucide="eye"></i>
+                                        </a>
+                                        {% if is_admin or is_manager %}
+                                            <button class="table-action-btn approve"
+                                                    data-lr-action="approve"
+                                                    data-lr-url="{{ path('app_leave_request_approve', {id: leaveRequestDto.id}) }}"
+                                                    data-lr-token="{{ csrf_token('approve' ~ leaveRequestDto.id) }}"
+                                                    data-lr-reload="false"
+                                                    title="{{ 'dashboard.recent_requests.action.approve'|trans(domain: 'admin') }}">
+                                                <i data-lucide="check"></i>
+                                            </button>
+                                            <button class="table-action-btn reject"
+                                                    data-lr-action="reject"
+                                                    data-lr-url="{{ path('app_leave_request_reject', {id: leaveRequestDto.id}) }}"
+                                                    data-lr-token="{{ csrf_token('reject' ~ leaveRequestDto.id) }}"
+                                                    data-lr-reload="false"
+                                                    title="{{ 'dashboard.recent_requests.action.reject'|trans(domain: 'admin') }}">
+                                                <i data-lucide="x"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="m-request-list">
+                {% for leaveRequestDto in recent_requests %}
+                    {% set userDto = leaveRequestDto.user %}
+                    <div class="m-request-item" data-lr-row>
+                        <a class="m-request-link"
+                           href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('detail').setEntityId(leaveRequestDto.id) }}">
+                            <div class="m-request-top">
+                                <div class="m-request-avatar avatar-color-{{ (userDto.firstName ~ userDto.lastName)|length % 6 }}">
+                                    {% if userDto.profileImageUrl %}
+                                        {% if userDto.profileImageUrl starts with 'http://' or userDto.profileImageUrl starts with 'https://' %}
+                                            <img src="{{ userDto.profileImageUrl }}" alt="">
+                                        {% else %}
+                                            <img src="{{ asset(profile_images_base_path ~ '/' ~ userDto.profileImageUrl) }}" alt="">
+                                        {% endif %}
+                                    {% else %}
+                                        {{ userDto.firstName|first }}{{ userDto.lastName|first }}
+                                    {% endif %}
+                                </div>
+                                <span class="m-request-name">{{ userDto.firstName }} {{ userDto.lastName }}</span>
+                                <span class="status-badge status-{{ leaveRequestDto.status.value }}">
+                                    {{ leaveRequestDto.status.value|capitalize }}
+                                </span>
+                            </div>
+                            <div class="m-request-bottom">
+                                <span class="m-request-type-dot" style="background-color: {{ leaveRequestDto.leaveType.backgroundColor }}"></span>
+                                <span>{{ leaveRequestDto.leaveType.name }}</span>
+                                <span class="m-request-sep">&middot;</span>
+                                <span>
+                                    {% if leaveRequestDto.startDate|date('Y-m-d') == leaveRequestDto.endDate|date('Y-m-d') %}
+                                        {{ leaveRequestDto.startDate|date("M d") }}
+                                    {% else %}
+                                        {{ leaveRequestDto.startDate|date("M d") }} – {{ leaveRequestDto.endDate|date("M d") }}
+                                    {% endif %}
+                                </span>
+                                <span class="m-request-sep">&middot;</span>
+                                <span>{{ leaveRequestDto.workDays }}d</span>
+                            </div>
+                        </a>
+                        {% if is_admin or is_manager %}
+                            <div class="m-request-actions">
+                                <button class="table-action-btn approve"
+                                        data-lr-action="approve"
+                                        data-lr-url="{{ path('app_leave_request_approve', {id: leaveRequestDto.id}) }}"
+                                        data-lr-token="{{ csrf_token('approve' ~ leaveRequestDto.id) }}"
+                                        data-lr-reload="false"
+                                        title="{{ 'dashboard.recent_requests.action.approve'|trans(domain: 'admin') }}">
+                                    <i data-lucide="check"></i>
+                                </button>
+                                <button class="table-action-btn reject"
+                                        data-lr-action="reject"
+                                        data-lr-url="{{ path('app_leave_request_reject', {id: leaveRequestDto.id}) }}"
+                                        data-lr-token="{{ csrf_token('reject' ~ leaveRequestDto.id) }}"
+                                        data-lr-reload="false"
+                                        title="{{ 'dashboard.recent_requests.action.reject'|trans(domain: 'admin') }}">
+                                    <i data-lucide="x"></i>
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="table-footer">
+                <span class="table-footer-text">
+                    {{ 'dashboard.recent_requests.showing'|trans({'%count%': recent_requests|length, '%total%': recent_requests_total}, domain: 'admin') }}
+                </span>
+                <a class="btn btn-ghost btn-sm"
+                   href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController').setAction('index') }}">
+                    {{ 'dashboard.recent_requests.see_all'|trans(domain: 'admin') }}
+                </a>
+            </div>
+        {% else %}
+            <div class="empty-state-wrapper">
+                <div class="alert alert-secondary w-100 text-center mb-0" role="alert">
+                    {{ 'dashboard.recent_requests.empty'|trans(domain: 'admin') }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+</div>

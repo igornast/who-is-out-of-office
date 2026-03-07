@@ -1,25 +1,34 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Access Denied - Who is ooo{% endblock %}
+{% block title %}{{ 'error.403.page_title'|trans }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/error.css') }}">
 {% endblock %}
 
 {% block body %}
-    <div class="error-fullscreen gradient-pink">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6">
-                    <div class="glass-card">
-                        <div class="error-code-large">403</div>
-                        <div class="error-title">Access Denied</div>
-                        <p class="error-description">
-                            Sorry, you don't have permission to access this resource.
-                        </p>
-                        <button onclick="window.history.back()" class="btn-glass btn-pink">Go Back</button>
-                    </div>
-                </div>
+    <div class="error-page">
+        <div class="error-card">
+            <div class="error-icon error-icon--danger">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+            </div>
+            <div class="error-code">403</div>
+            <div class="error-title">{{ 'error.403.title'|trans }}</div>
+            <p class="error-description">
+                {{ 'error.403.description'|trans }}
+            </p>
+            <div class="error-actions">
+                <button onclick="window.history.back()" class="error-btn error-btn--ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    {{ 'error.go_back'|trans }}
+                </button>
+                {% if app.user %}
+                    <a href="/app/dashboard" class="error-btn error-btn--primary">
+                        {{ 'error.go_to_dashboard'|trans }}
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>

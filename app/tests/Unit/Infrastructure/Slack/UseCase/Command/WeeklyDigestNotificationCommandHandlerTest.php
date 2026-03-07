@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Infrastructure\Slack\Service\UsersEventsProvider;
 use App\Infrastructure\Slack\UseCase\Command\WeeklyDigestNotificationCommandHandler;
+use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Tests\_fixtures\Shared\DTO\Holiday\PublicHolidayDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\Holiday\UserPublicHolidaysDTOFixture;
@@ -19,12 +20,18 @@ beforeEach(function (): void {
     $this->chatter = mock(ChatterInterface::class);
     $this->userFacade = mock(UserFacadeInterface::class);
     $this->usersEventsProvider = mock(UsersEventsProvider::class);
+    $this->appSettingsFacade = mock(AppSettingsFacadeInterface::class);
+
+    $this->appSettingsFacade
+        ->allows('skipWeekendHolidays')
+        ->andReturn(false);
 
     $this->handler = new WeeklyDigestNotificationCommandHandler(
         dailyDigestChannelId: $this->dailyDigestChannelId,
         chatter: $this->chatter,
         userFacade: $this->userFacade,
-        usersEventsProvider: $this->usersEventsProvider
+        usersEventsProvider: $this->usersEventsProvider,
+        appSettingsFacade: $this->appSettingsFacade,
     );
 });
 

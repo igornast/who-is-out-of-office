@@ -1,0 +1,66 @@
+{% set max_visible = 5 %}
+{% set total_count = whos_out_today|length %}
+{% set visible_items = whos_out_today|slice(0, max_visible) %}
+{% set lr_crud = 'App\\Module\\Admin\\Controller\\LeaveRequest\\LeaveRequestCrudController' %}
+{% set today_filter = "now"|date("Y-m-d") ~ 'T00:00' %}
+
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">{{ 'dashboard.whos_out_today.title'|trans(domain: 'admin') }}</span>
+        {% if total_count > 0 %}
+            <span class="card-header-badge">{{ 'dashboard.whos_out_today.count'|trans({'%count%': total_count}, domain: 'admin') }}</span>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if visible_items is not empty %}
+            <div class="whos-out-list">
+                {% for leaveRequestDto in visible_items %}
+                    {% set userDto = leaveRequestDto.user %}
+                    <div class="whos-out-item">
+                        <div class="whos-out-avatar" style="background-color: {{ leaveRequestDto.leaveType.backgroundColor }}">
+                            {% if userDto.profileImageUrl %}
+                                {% if userDto.profileImageUrl starts with 'http://' or userDto.profileImageUrl starts with 'https://' %}
+                                    <img src="{{ userDto.profileImageUrl }}" alt="">
+                                {% else %}
+                                    <img src="{{ asset(profile_images_base_path ~ '/' ~ userDto.profileImageUrl) }}" alt="">
+                                {% endif %}
+                            {% else %}
+                                {{ userDto.firstName|first }}{{ userDto.lastName|first }}
+                            {% endif %}
+                        </div>
+                        <div class="whos-out-info">
+                            <div class="whos-out-name">
+                                <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}" class="link-unstyled">
+                                    {{ userDto.firstName }} {{ userDto.lastName }}
+                                </a>
+                            </div>
+                            <div class="whos-out-detail">
+                                <span class="whos-out-badge" style="background-color: {{ leaveRequestDto.leaveType.backgroundColor }}; color: {{ leaveRequestDto.leaveType.textColor }};">
+                                    {{ leaveRequestDto.leaveType.name }}
+                                </span>
+                                {{ 'dashboard.whos_out_today.returns'|trans({'%date%': leaveRequestDto.endDate|date("M d")}, domain: 'admin') }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if total_count > max_visible %}
+                <div class="table-footer">
+                    <span class="table-footer-text">
+                        {{ 'dashboard.whos_out_today.showing'|trans({'%visible%': max_visible, '%total%': total_count}, domain: 'admin') }}
+                    </span>
+                    <a class="btn btn-ghost btn-sm"
+                       href="{{ path('app_calendar_view') }}">
+                        {{ 'dashboard.whos_out_today.see_all'|trans(domain: 'admin') }}
+                    </a>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state-wrapper">
+                <div class="empty-state-text">
+                    {{ 'dashboard.whos_out_today.empty'|trans(domain: 'admin') }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>

@@ -17,4 +17,5 @@ return [
     Symfony\UX\StimulusBundle\StimulusBundle::class => ['all' => true],
     Sentry\SentryBundle\SentryBundle::class => ['prod' => true],
     Symfony\UX\LiveComponent\LiveComponentBundle::class => ['all' => true],
+    Sensiolabs\MinifyBundle\SensiolabsMinifyBundle::class => ['all' => true],
 ];

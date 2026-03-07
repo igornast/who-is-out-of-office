@@ -11,6 +11,7 @@ use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -96,26 +97,27 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
     /**
      * @return LeaveRequestDTO[]
      */
-    public function findUpcomingApprovedAbsences(int $limit = 4): array
+    public function findUpcomingApprovedAbsences(int $limit = 4, ?array $userIds = null): array
     {
         $now = new \DateTimeImmutable()->setTime(0, 0, 0);
         $endInterval = $now->modify('+30 days');
 
         $qb = $this->createQueryBuilder('lr');
 
-        /** @var LeaveRequest[] $items */
-        $items = $qb->andWhere('lr.status = :approved')
+        $qb->andWhere('lr.status = :approved')
             ->andWhere('lr.startDate BETWEEN :now AND :endInterval')
             ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
             ->setParameter('now', $now)
             ->setParameter('endInterval', $endInterval)
             ->orderBy('lr.startDate', 'ASC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+
+        $this->applyUserIdsFilter($qb, $userIds);
+
+        /** @var LeaveRequest[] $items */
+        $items = $qb->getQuery()->getResult();
 
         return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
-
     }
 
     private function getUserOrNull(string $userId): ?User
@@ -198,6 +200,158 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
     }
 
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findOnLeaveToday(?array $userIds = null): array
+    {
+        $today = new \DateTimeImmutable('today');
+
+        $qb = $this->createQueryBuilder('lr');
+
+        $qb->where('lr.status = :approved')
+            ->andWhere('lr.startDate <= :today')
+            ->andWhere('lr.endDate >= :today')
+            ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
+            ->setParameter('today', $today)
+            ->orderBy('lr.endDate', 'ASC');
+
+        $this->applyUserIdsFilter($qb, $userIds);
+
+        /** @var LeaveRequest[] $items */
+        $items = $qb->getQuery()->getResult();
+
+        return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
+    }
+
+    public function countOnLeaveToday(?array $userIds = null): int
+    {
+        $today = new \DateTimeImmutable('today');
+
+        $qb = $this->createQueryBuilder('lr');
+
+        $qb->select('COUNT(DISTINCT IDENTITY(lr.user))')
+            ->where('lr.status = :approved')
+            ->andWhere('lr.startDate <= :today')
+            ->andWhere('lr.endDate >= :today')
+            ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
+            ->setParameter('today', $today);
+
+        $this->applyUserIdsFilter($qb, $userIds);
+
+        /** @var int $count */
+        $count = $qb->getQuery()->getSingleScalarResult();
+
+        return $count;
+    }
+
+    public function countAbsencesThisWeek(?array $userIds = null): int
+    {
+        $monday = new \DateTimeImmutable('monday this week');
+        $sunday = new \DateTimeImmutable('sunday this week');
+
+        $qb = $this->createQueryBuilder('lr');
+
+        $qb->select('COUNT(DISTINCT IDENTITY(lr.user))')
+            ->where('lr.status = :approved')
+            ->andWhere('lr.startDate <= :sunday')
+            ->andWhere('lr.endDate >= :monday')
+            ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
+            ->setParameter('sunday', $sunday)
+            ->setParameter('monday', $monday);
+
+        $this->applyUserIdsFilter($qb, $userIds);
+
+        /** @var int $count */
+        $count = $qb->getQuery()->getSingleScalarResult();
+
+        return $count;
+    }
+
+    public function countAllPendingRequests(?array $userIds = null): int
+    {
+        $qb = $this->createQueryBuilder('lr');
+
+        $qb->select('COUNT(lr.id)')
+            ->where('lr.status = :pending')
+            ->setParameter('pending', LeaveRequestStatusEnum::Pending);
+
+        $this->applyUserIdsFilter($qb, $userIds);
+
+        /** @var int $count */
+        $count = $qb->getQuery()->getSingleScalarResult();
+
+        return $count;
+    }
+
+    public function findUsedDaysPerTypeForUser(string $userId, \DateTimeImmutable $periodStart): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT
+                lt.name AS leave_type_name,
+                lt.icon AS leave_type_icon,
+                lt.background_color,
+                lt.border_color,
+                lt.text_color,
+                lt.is_affecting_balance,
+                COALESCE(SUM(lr.work_days), 0) AS used_days
+            FROM leave_request_type lt
+            LEFT JOIN leave_request lr
+                ON lr.leave_type = lt.id
+                AND lr.user_id = :userId
+                AND lr.status = :approved
+                AND lr.start_date >= :periodStart
+            GROUP BY lt.id
+            ORDER BY lt.is_affecting_balance DESC, lt.name ASC
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('userId', $userId);
+        $stmt->bindValue('approved', LeaveRequestStatusEnum::Approved->value);
+        $stmt->bindValue('periodStart', $periodStart->format('Y-m-d'));
+        $resultSet = $stmt->executeQuery();
+
+        return $resultSet->fetchAllAssociative();
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findRecentRequests(int $limit = 5, ?array $userIds = null): array
+    {
+        $qb = $this->createQueryBuilder('lr');
+
+        $qb->where('lr.status = :pending')
+            ->setParameter('pending', LeaveRequestStatusEnum::Pending)
+            ->orderBy('lr.createdAt', 'DESC')
+            ->setMaxResults($limit);
+
+        $this->applyUserIdsFilter($qb, $userIds);
+
+        /** @var LeaveRequest[] $items */
+        $items = $qb->getQuery()->getResult();
+
+        return array_map(fn (LeaveRequest $leaveRequest) => LeaveRequestDTO::fromEntity($leaveRequest), $items);
+    }
+
+    public function countAllRequests(?array $userIds = null): int
+    {
+        $qb = $this->createQueryBuilder('lr');
+
+        $qb->select('COUNT(lr.id)')
+            ->where('lr.status = :pending')
+            ->setParameter('pending', LeaveRequestStatusEnum::Pending);
+
+        $this->applyUserIdsFilter($qb, $userIds);
+
+        /** @var int $count */
+        $count = $qb->getQuery()->getSingleScalarResult();
+
+        return $count;
+    }
+
     public function delete(LeaveRequestDTO $leaveRequestDTO): void
     {
         $qb = $this->createQueryBuilder('lr');
@@ -221,6 +375,17 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
     public function rollback(): void
     {
         $this->getEntityManager()->rollback();
+    }
+
+    /**
+     * @param string[]|null $userIds
+     */
+    private function applyUserIdsFilter(QueryBuilder $qb, ?array $userIds): void
+    {
+        if (null !== $userIds) {
+            $qb->andWhere('IDENTITY(lr.user) IN (:userIds)')
+                ->setParameter('userIds', $userIds);
+        }
     }
 
     private function getLeaveRequestType(LeaveRequestDTO $leaveRequestDTO): ?LeaveRequestType

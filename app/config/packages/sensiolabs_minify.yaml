@@ -1,0 +1,11 @@
+sensiolabs_minify:
+    asset_mapper:
+        ignore_paths:
+            - '*.min.js'
+            - '*.min.css'
+    minify:
+        download_binary: true
+
+when@test:
+    sensiolabs_minify:
+        asset_mapper: false

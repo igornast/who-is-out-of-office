@@ -11,6 +11,8 @@
 
         <field name="countryCode" column="country_code" length="4"/>
         <field name="countryName" column="country_name" length="100"/>
+        <field name="isActive" column="is_active" type="boolean"/>
+        <field name="lastSyncedYear" column="last_synced_year" type="integer" nullable="true"/>
 
         <one-to-many
                 field="holidays"

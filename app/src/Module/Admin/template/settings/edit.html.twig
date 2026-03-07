@@ -4,32 +4,29 @@
 
 {% block content_header %}
     <div class="content-header-title">
-        <h1 class="title">{{ 'crud.app_settings.edit.title'|trans(domain='admin') }}</h1>
-    </div>
-
-    <div class="page-actions">
-        <div class="global-actions">
-        </div>
+        <h1 class="title" style="font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);">
+            {{ 'crud.app_settings.edit.title'|trans(domain='admin') }}
+        </h1>
     </div>
 {% endblock %}
 
 {% block main %}
-    <div class="col-lg-10 col-xl-11">
-
-        <div class="row mb-3">
-            <div class="alert alert-info mt-2" role="alert">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div style="margin-bottom: 16px; padding: 12px 16px; background-color: var(--primary-subtle); border-left: 3px solid var(--primary); border-radius: var(--radius-md); font-size: 13px; color: var(--text-secondary);">
+                <i data-lucide="info" style="width: 14px; height: 14px; display: inline-block; vertical-align: -2px; margin-right: 4px; color: var(--primary);"></i>
                 {{ 'crud.app_settings.source_filename'|trans(domain='admin') ~ ": " ~ app_settings_filename }}
             </div>
-        </div>
 
-        <div class="row justify-content-center">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    {{ form_start(form) }}
+            {{ form_start(form) }}
 
-                    <h5>{{ 'crud.app_settings.panel.leave_request'|trans(domain='admin') }}</h5>
-
-                    <div class="field-checkbox form-group mt-3">
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'crud.app_settings.panel.leave_request'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'crud.app_settings.panel.leave_request_desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="field-checkbox form-group mb-3">
                         <div class="checkbox-large">
                             {{ form_widget(form.autoApprove) }}
                             {{ form_label(form.autoApprove) }}
@@ -37,19 +34,63 @@
                         {{ form_errors(form.autoApprove) }}
                     </div>
 
-                    <div class="field-integer form-group">
+                    <div class="field-integer form-group mb-0">
                         <div class="form-widget">
                             {{ form_row(form.autoApproveDelay, {'attr': {'class': 'form-control'}}) }}
                         </div>
                     </div>
-
-                    {{ form_errors(form) }}
-
-                    <button class="btn btn-primary">Save Changes</button>
-
-                    {{ form_end(form) }}
                 </div>
             </div>
+
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'crud.app_settings.panel.leave_defaults'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'crud.app_settings.panel.leave_defaults_desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="field-integer form-group mb-3">
+                        <div class="form-widget">
+                            {{ form_row(form.defaultAnnualAllowance, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="field-integer form-group mb-3">
+                        <div class="form-widget">
+                            {{ form_row(form.minNoticeDays, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="field-integer form-group mb-0">
+                        <div class="form-widget">
+                            {{ form_row(form.maxConsecutiveDays, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'crud.app_settings.panel.notification'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'crud.app_settings.panel.notification_desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="field-checkbox form-group mb-0">
+                        <div class="checkbox-large">
+                            {{ form_widget(form.skipWeekendHolidays) }}
+                            {{ form_label(form.skipWeekendHolidays) }}
+                        </div>
+                        <div class="form-text">{{ form_help(form.skipWeekendHolidays) }}</div>
+                        {{ form_errors(form.skipWeekendHolidays) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card-footer">
+                {{ form_errors(form) }}
+                <button class="btn btn-primary">{{ 'crud.app_settings.action.save'|trans(domain='admin') }}</button>
+            </div>
+
+            {{ form_end(form) }}
         </div>
     </div>
 {% endblock %}

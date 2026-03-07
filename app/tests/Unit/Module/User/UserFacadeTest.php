@@ -4,8 +4,18 @@ declare(strict_types=1);
 
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
+use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
+use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
+use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
+use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
+use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
+use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
+use App\Shared\Enum\PaletteEnum;
+use App\Shared\Enum\ThemeEnum;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
@@ -14,7 +24,7 @@ use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
 use App\Module\User\UserFacade;
-use App\Shared\DTO\InvitationDTO;
+use App\Tests\_fixtures\Shared\DTO\InvitationDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 
 beforeEach(function (): void {
@@ -28,6 +38,13 @@ beforeEach(function (): void {
     $this->getUsersWithIncomingWorkAnniversariesHandler = mock(GetUsersWithIncomingWorkAnniversariesQueryHandler::class);
     $this->getUsersWithWorkAnniversariesForDatesHandler = mock(GetUsersWithWorkAnniversariesForDatesQueryHandler::class);
     $this->resetAbsenceBalanceHandler = mock(ResetAbsenceBalanceCommandHandler::class);
+    $this->getDirectReportsHandler = mock(GetDirectReportsQueryHandler::class);
+    $this->updateThemePreferenceHandler = mock(UpdateThemePreferenceCommandHandler::class);
+    $this->changePasswordHandler = mock(ChangePasswordCommandHandler::class);
+    $this->regenerateCalendarSubscriptionHandler = mock(RegenerateCalendarSubscriptionCommandHandler::class);
+    $this->updateSlackMemberIdHandler = mock(UpdateSlackMemberIdCommandHandler::class);
+    $this->disconnectSlackHandler = mock(DisconnectSlackCommandHandler::class);
+    $this->removeProfileImageHandler = mock(RemoveProfileImageCommandHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -40,6 +57,13 @@ beforeEach(function (): void {
         getUsersWithIncomingWorkAnniversariesHandler: $this->getUsersWithIncomingWorkAnniversariesHandler,
         getUsersWithWorkAnniversariesForDatesHandler: $this->getUsersWithWorkAnniversariesForDatesHandler,
         resetAbsenceBalanceHandler: $this->resetAbsenceBalanceHandler,
+        getDirectReportsHandler: $this->getDirectReportsHandler,
+        updateThemePreferenceHandler: $this->updateThemePreferenceHandler,
+        changePasswordHandler: $this->changePasswordHandler,
+        regenerateCalendarSubscriptionHandler: $this->regenerateCalendarSubscriptionHandler,
+        updateSlackMemberIdHandler: $this->updateSlackMemberIdHandler,
+        disconnectSlackHandler: $this->disconnectSlackHandler,
+        removeProfileImageHandler: $this->removeProfileImageHandler,
     );
 });
 
@@ -115,12 +139,7 @@ it('delegates acceptUserInvitation to handler', function () {
         lastName: 'Doe',
         password: 'password123',
     );
-    $invitationDTO = new InvitationDTO(
-        id: 'inv-1',
-        token: 'token-123',
-        user: UserDTOFixture::create(),
-        createdAt: new DateTimeImmutable(),
-    );
+    $invitationDTO = InvitationDTOFixture::create();
 
     $this->acceptInvitationHandler
         ->expects('handle')
@@ -179,4 +198,74 @@ it('delegates resetAbsenceBalance to handler', function () {
         ->once();
 
     $this->facade->resetAbsenceBalance();
+});
+
+it('delegates getDirectReports to handler', function () {
+    $expectedUsers = [UserDTOFixture::create()];
+
+    $this->getDirectReportsHandler
+        ->expects('handle')
+        ->once()
+        ->with('manager-1')
+        ->andReturn($expectedUsers);
+
+    $result = $this->facade->getDirectReports('manager-1');
+
+    expect($result)->toBe($expectedUsers);
+});
+
+it('delegates updateThemePreference to handler', function () {
+    $this->updateThemePreferenceHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', ThemeEnum::Dark, PaletteEnum::Sage);
+
+    $this->facade->updateThemePreference('user-1', ThemeEnum::Dark, PaletteEnum::Sage);
+});
+
+it('delegates changePassword to handler', function () {
+    $user = mock(PasswordAuthenticatedUserInterface::class);
+
+    $this->changePasswordHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', 'new-password', $user);
+
+    $this->facade->changePassword('user-1', 'new-password', $user);
+});
+
+it('delegates regenerateCalendarSubscription to handler', function () {
+    $this->regenerateCalendarSubscriptionHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1');
+
+    $this->facade->regenerateCalendarSubscription('user-1');
+});
+
+it('delegates updateSlackMemberId to handler', function () {
+    $this->updateSlackMemberIdHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', 'U12345ABC');
+
+    $this->facade->updateSlackMemberId('user-1', 'U12345ABC');
+});
+
+it('delegates disconnectSlack to handler', function () {
+    $this->disconnectSlackHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1');
+
+    $this->facade->disconnectSlack('user-1');
+});
+
+it('delegates deleteOldProfileImage to handler', function () {
+    $this->removeProfileImageHandler
+        ->expects('handle')
+        ->once()
+        ->with('old-avatar.jpg');
+
+    $this->facade->deleteOldProfileImage('old-avatar.jpg');
 });

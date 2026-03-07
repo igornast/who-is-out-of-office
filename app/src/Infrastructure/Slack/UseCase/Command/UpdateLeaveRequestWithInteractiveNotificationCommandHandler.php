@@ -50,12 +50,13 @@ class UpdateLeaveRequestWithInteractiveNotificationCommandHandler
 
     private function handleRemoveAndReturnBlockedDays(LeaveRequestDTO $leaveRequestDTO): void
     {
-        $userDTO = $leaveRequestDTO->user;
+        if ($leaveRequestDTO->leaveType->isAffectingBalance) {
+            $this->userFacade->updateUserCurrentLeaveBalance(
+                $leaveRequestDTO->user->id,
+                $leaveRequestDTO->workDays,
+            );
+        }
 
-        $this->userFacade->updateUserCurrentLeaveBalance(
-            $userDTO->id,
-            $leaveRequestDTO->workDays,
-        );
         $this->leaveRequestFacade->remove($leaveRequestDTO);
     }
 

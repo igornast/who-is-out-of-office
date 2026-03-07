@@ -30,6 +30,10 @@ class UserDTO
         public ?\DateTimeImmutable $birthDate = null,
         public ?\DateTimeImmutable $contractStartedAt = null,
         public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
+        public ?string $managerId = null,
+        public string $themePreference = 'auto',
+        public string $palettePreference = 'teal',
+        public ?string $icalHashSalt = null,
     ) {
     }
 
@@ -54,6 +58,10 @@ class UserDTO
             birthDate: $user->birthDate,
             contractStartedAt: $user->contractStartedAt,
             absenceBalanceResetDay: $user->absenceBalanceResetDay,
+            managerId: $user->manager?->id->toString(),
+            themePreference: $user->themePreference,
+            palettePreference: $user->palettePreference,
+            icalHashSalt: $user->icalHashSalt,
         );
     }
 
@@ -65,7 +73,7 @@ class UserDTO
             lastName: $data['last_name'],
             email: $data['email'],
             roles: json_decode($data['roles'], true, flags: JSON_THROW_ON_ERROR),
-            workingDays: json_decode($data['working_days'], false, flags: JSON_THROW_ON_ERROR),
+            workingDays: json_decode($data['working_days'], true, flags: JSON_THROW_ON_ERROR),
             annualLeaveAllowance: $data['annual_leave_allowance'],
             currentLeaveBalance: $data['current_leave_balance'],
             isActive: (bool) $data['is_active'],
@@ -75,6 +83,10 @@ class UserDTO
             birthDate: isset($data['birth_date']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['birth_date']) : null,
             contractStartedAt: isset($data['contract_started_at']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['contract_started_at']) : null,
             absenceBalanceResetDay: \DateTimeImmutable::createFromFormat('Y-m-d', $data['absence_balance_reset_day']),
+            managerId: $data['manager_id'] ?? null,
+            themePreference: $data['theme_preference'] ?? 'auto',
+            palettePreference: $data['palette_preference'] ?? 'teal',
+            icalHashSalt: $data['ical_hash_salt'] ?? null,
         );
     }
 }

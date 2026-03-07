@@ -33,4 +33,19 @@ interface UserRepositoryInterface
      * @return UserDTO[]
      */
     public function findUsersWithBalanceResetToday(): array;
+
+    /**
+     * @return UserDTO[]
+     */
+    public function findByManagerId(string $managerId): array;
+
+    public function updateThemePreference(string $userId, string $theme, string $palette): void;
+
+    public function updatePassword(string $userId, string $hashedPassword): void;
+
+    public function updateIcalHashSalt(string $userId, string $salt): void;
+
+    public function updateSlackMemberId(string $userId, string $slackMemberId): void;
+
+    public function removeSlackIntegration(string $userId): void;
 }

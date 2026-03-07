@@ -1,0 +1,32 @@
+<div class="modal fade" id="lr-confirm-modal" tabindex="-1"
+     aria-labelledby="lr-confirm-modal-label" aria-hidden="true"
+     data-controller="leave-request-action"
+     data-approve-title="{{ 'leave_request.action.approve_confirm_title'|trans(domain: 'admin') }}"
+     data-approve-body="{{ 'leave_request.action.approve_confirm_body'|trans(domain: 'admin') }}"
+     data-approve-action="{{ 'leave_request.action.approve_confirm_action'|trans(domain: 'admin') }}"
+     data-reject-title="{{ 'leave_request.action.reject_confirm_title'|trans(domain: 'admin') }}"
+     data-reject-body="{{ 'leave_request.action.reject_confirm_body'|trans(domain: 'admin') }}"
+     data-reject-action="{{ 'leave_request.action.reject_confirm_action'|trans(domain: 'admin') }}"
+     data-withdraw-title="{{ 'leave_request.action.withdraw_confirm_title'|trans(domain: 'admin') }}"
+     data-withdraw-body="{{ 'leave_request.action.withdraw_confirm_body'|trans(domain: 'admin') }}"
+     data-withdraw-action="{{ 'leave_request.action.withdraw_confirm_action'|trans(domain: 'admin') }}">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lr-confirm-modal-label" data-modal="title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="{{ 'leave_request.action.cancel'|trans(domain: 'admin') }}"></button>
+            </div>
+            <div class="modal-body" data-modal="body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {{ 'leave_request.action.cancel'|trans(domain: 'admin') }}
+                </button>
+                <button type="button" class="btn btn-success" data-modal="confirm"
+                        data-action="click->leave-request-action#confirm">
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="widget-toast" data-leave-request-action-target="toast"></div>
+</div>

@@ -41,7 +41,7 @@ it('upserts holiday calendar', function () {
     $this->calendarRepository
         ->expects('upsertByCountryCode')
         ->once()
-        ->with($calendarDTO);
+        ->with($calendarDTO, null);
 
     $this->handler->handle($calendarDTO);
 });
@@ -57,9 +57,24 @@ it('upserts holiday calendar with empty holidays', function () {
     $this->calendarRepository
         ->expects('upsertByCountryCode')
         ->once()
-        ->with($calendarDTO);
+        ->with($calendarDTO, null);
 
     $this->handler->handle($calendarDTO);
+});
+
+it('upserts holiday calendar with year parameter', function () {
+    $calendarDTO = PublicHolidayCalendarDTOFixture::create([
+        'id' => Uuid::uuid4(),
+        'countryCode' => 'DE',
+        'countryName' => 'Germany',
+    ]);
+
+    $this->calendarRepository
+        ->expects('upsertByCountryCode')
+        ->once()
+        ->with($calendarDTO, 2026);
+
+    $this->handler->handle($calendarDTO, 2026);
 });
 
 it('upserts holiday calendar for different countries', function () {
@@ -80,7 +95,7 @@ it('upserts holiday calendar for different countries', function () {
     $this->calendarRepository
         ->expects('upsertByCountryCode')
         ->once()
-        ->with($calendarDTO);
+        ->with($calendarDTO, null);
 
     $this->handler->handle($calendarDTO);
 });

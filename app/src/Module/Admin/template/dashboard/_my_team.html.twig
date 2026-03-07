@@ -1,22 +1,21 @@
 {% import "@AppAdmin/dashboard/component/_user_avatar.html.twig" as avatar %}
 
-
-<div class="panel panel-primary">
-    <div class="panel-heading border-bottom mb-4 d-flex align-items-center pb-3">
-        <div class="me-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
-                 class="bi bi-people-fill"
-                 viewBox="0 0 16 16">
-                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
-            </svg>
-        </div>
-        <h6 class="panel-title text-body-emphasis mb-0">{{ 'dashboard.title.my_team'|trans(domain: 'admin') }}</h6>
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">{{ 'dashboard.title.my_team'|trans(domain: 'admin') }}</span>
+        <span class="text-meta">{{ my_team|length }} {{ 'dashboard.my_team.members'|trans(domain: 'admin') }}</span>
     </div>
-    <div class="panel-body">
-        <div class="d-flex flex-wrap">
-            {% for userDto in my_team %}
-                {{ avatar.userDtoAvatar(userDto) }}
-            {% endfor %}
-        </div>
+    <div class="card-body card-body-padded">
+        {% if my_team is not empty %}
+            <div class="d-flex flex-wrap gap-2">
+                {% for userDto in my_team %}
+                    {{ avatar.userDtoAvatar(userDto) }}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state-text">
+                {{ 'dashboard.my_team.empty'|trans(domain: 'admin') }}
+            </div>
+        {% endif %}
     </div>
 </div>

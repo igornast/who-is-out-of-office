@@ -1,0 +1,66 @@
+body.ea .main-content {
+    background: var(--app-bg);
+    transition: background-color 0.25s ease;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Flash messages — fixed toast above all navigation */
+body.ea #flash-messages {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1100;
+    max-width: 420px;
+    width: calc(100% - 32px);
+}
+
+body.ea #flash-messages .alert {
+    box-shadow: var(--shadow-lg);
+}
+
+body.ea .main-content .content-wrapper {
+    padding: 24px;
+    background: var(--app-bg);
+    width: 100%;
+}
+
+body.ea .main-content .content {
+    min-width: 0;
+}
+
+body.ea .main-content .content-header .title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+body.ea .main-content .content-header {
+    margin-bottom: 20px;
+}
+
+
+body.ea .main-content .content-body {
+    color: var(--text-secondary);
+}
+
+body.ea .main-content .content-body:has(.datagrid) {
+    overflow-x: auto;
+    display: grid;
+}
+
+@media (max-width: 768px) {
+    body.ea .main-content .content-wrapper {
+        padding: 16px;
+    }
+
+    body.ea .main-content .content-header .title {
+        font-size: 18px;
+    }
+
+    body.ea .main-content .content-top {
+        padding: 0 16px;
+    }
+}

@@ -1,3 +1,8 @@
 leave_request:
     auto_approve: false
-    auto_approve_delay: 6900
+    auto_approve_delay: 115
+    default_annual_allowance: 25
+    min_notice_days: 1
+    max_consecutive_days: 0
+notification:
+    skip_weekend_holidays: false

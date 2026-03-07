@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Slack\Service;
 
+use App\Shared\DTO\Holiday\PublicHolidayDTO;
 use App\Shared\DTO\Holiday\UserPublicHolidaysDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
@@ -43,5 +44,30 @@ class UsersEventsProvider
             });
 
         return $events->toArray();
+    }
+
+    /**
+     * @param array<string, UserPublicHolidaysDTO> $mapUserIdToHolidays
+     *
+     * @return array<string, UserPublicHolidaysDTO>
+     */
+    public function filterWeekendHolidays(array $mapUserIdToHolidays): array
+    {
+        $filtered = [];
+
+        foreach ($mapUserIdToHolidays as $userId => $dto) {
+            $weekdayHolidays = array_values(array_filter(
+                $dto->holidays,
+                fn (PublicHolidayDTO $holiday) => (int) $holiday->date->format('N') < 6,
+            ));
+
+            if ([] === $weekdayHolidays) {
+                continue;
+            }
+
+            $filtered[$userId] = new UserPublicHolidaysDTO($dto->user, $weekdayHolidays);
+        }
+
+        return $filtered;
     }
 }

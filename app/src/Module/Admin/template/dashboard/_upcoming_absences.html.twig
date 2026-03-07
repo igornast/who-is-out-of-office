@@ -1,29 +1,45 @@
-<div class="panel panel-primary mt-4">
-    <div class="panel-heading align-items-center pb-3">
-        <strong class="panel-title text-body-secondary mb-0">{{ 'dashboard.title.upcoming_absences'|trans(domain: 'admin') }}</strong>
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">{{ 'dashboard.title.upcoming_absences'|trans(domain: 'admin') }}</span>
     </div>
-    <div class="panel-body">
-        <ul class="nav">
-            {% for leaveRequestDto in upcoming_absences_in_team %}
-                {% set userDto = leaveRequestDto.user %}
-                <li class="nav-item w-100">
-                    <div class="me-2 align-content-center mb-2"
-                         title="{{ userDto.firstName }} {{ userDto.lastName }}">
-                        <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}">
-                            {{ userDto.firstName }} {{ userDto.lastName }}
-                        </a>
-
-                        <span class="text-body-secondary"> - {{  leaveRequestDto.leaveType.name }} </span>
-                        <p class="text-body-secondary">
-                            {{ leaveRequestDto.startDate|date("Y.m.d") }} - {{ leaveRequestDto.endDate|date("Y.m.d") }}
-                        </p>
+    <div class="card-body">
+        {% if upcoming_absences_in_team is not empty %}
+            <div class="whos-out-list">
+                {% for leaveRequestDto in upcoming_absences_in_team %}
+                    {% set userDto = leaveRequestDto.user %}
+                    <div class="whos-out-item">
+                        <div class="whos-out-avatar" style="background-color: {{ leaveRequestDto.leaveType.backgroundColor }}">
+                            {% if userDto.profileImageUrl %}
+                                {% if userDto.profileImageUrl starts with 'http://' or userDto.profileImageUrl starts with 'https://' %}
+                                    <img src="{{ userDto.profileImageUrl }}" alt="">
+                                {% else %}
+                                    <img src="{{ asset(profile_images_base_path ~ '/' ~ userDto.profileImageUrl) }}" alt="">
+                                {% endif %}
+                            {% else %}
+                                {{ userDto.firstName|first }}{{ userDto.lastName|first }}
+                            {% endif %}
+                        </div>
+                        <div class="whos-out-info">
+                            <div class="whos-out-name">
+                                <a href="{{ url('app_dashboard_app_users_detail', {'entityId': userDto.id}) }}" class="link-unstyled">
+                                    {{ userDto.firstName }} {{ userDto.lastName }}
+                                </a>
+                            </div>
+                            <div class="whos-out-detail">
+                                <span class="whos-out-badge" style="background-color: {{ leaveRequestDto.leaveType.backgroundColor }}; color: {{ leaveRequestDto.leaveType.textColor }};">
+                                    {{ leaveRequestDto.leaveType.name }}
+                                </span>
+                                {{ leaveRequestDto.startDate|date("M d") }} – {{ leaveRequestDto.endDate|date("M d") }}
+                            </div>
+                        </div>
                     </div>
-                </li>
-            {% endfor %}
-        </ul>
-        {% if upcoming_absences_in_team is empty %}
-            <div class="alert alert-secondary text-center" role="alert">
-                <span class="text-secondary text-lowercase">No upcoming absences</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state-wrapper">
+                <div class="empty-state-text">
+                    {{ 'dashboard.upcoming_absences.empty'|trans(domain: 'admin') }}
+                </div>
             </div>
         {% endif %}
     </div>

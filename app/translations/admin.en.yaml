@@ -13,6 +13,50 @@ menu:
         profile: Profile Settings
         calendar: Calendar
         absence_requests: Absence Requests
+        public_holidays: Public Holidays
+        team_leave_requests: Team Leave Requests
+        team_members: Team Members
+        notifications: Notifications
+        integrations: Integrations
+        account_security: Security
+        appearance: Appearance
+    section:
+        my_team: My Team
+        organization: Organization
+        settings: Settings
+        account: Account
+
+sidebar:
+    section:
+        my_leave: My Leave
+        my_team: My Team
+        organization: Organization
+        settings: Settings
+        account: Account
+    theme_toggle: Toggle dark mode
+    collapse: Toggle sidebar
+    menu: Open menu
+
+dropdown:
+    my_profile: My Profile
+    appearance: Appearance
+    slack_connected: Slack connected
+    slack_not_configured: Slack not configured
+    theme: Theme
+    theme_light: Light
+    theme_dark: Dark
+    theme_auto: Auto
+    sign_out: Sign Out
+    palette: Color palette
+
+bottom_nav:
+    label: Main navigation
+    home: Home
+    calendar: Calendar
+    request: Request
+    requests: Requests
+    team_requests: Team
+    profile: Profile
 
 
 
@@ -21,7 +65,7 @@ dashboard:
         my_team: My Team
         employee: Employee
         absences: Absences
-        upcoming_absences: UPCOMING ABSENCES
+        upcoming_absences: Upcoming Absences
         slack: Slack Notifications
         birthdays: Time to celebrate
     birthdays:
@@ -29,15 +73,181 @@ dashboard:
     work_anniversaries:
         title: Work Anniversaries
         no_upcoming: No upcoming work anniversaries
+    my_team:
+        members: members
+        empty: No team members
+    whos_out_today:
+        title: Who's Out Today
+        count: '%count% people'
+        empty: No one is out today
+        returns: 'Returns %date%'
+        showing: 'Showing %visible% of %total%'
+        see_all: 'View calendar'
+    week_strip:
+        title: This Week
+        out: out
+        prev: Previous week
+        next: Next week
+    upcoming_absences:
+        empty: No upcoming absences
+    stats:
+        pending_requests: Pending Requests
+        awaiting_approval: Awaiting Approval
+        on_leave_today: On Leave Today
+        team_members: Team Members
+        absences_this_week: Absences This Week
+        vacation_balance: My Vacation Balance
+        days: days
+    welcome:
+        greeting: 'Good morning, %name%'
+        greeting_morning: Good morning
+        greeting_afternoon: Good afternoon
+        greeting_evening: Good evening
+        balance: 'You have %days% vacation days remaining this year'
+        request_leave: Request Leave
+        view_calendar: View Calendar
+    recent_requests:
+        title: Pending Requests
+        view_all: View All
+        col:
+            employee: Employee
+            type: Type
+            dates: Dates
+            duration: Duration
+            status: Status
+            actions: Actions
+        action:
+            view: View details
+            approve: Approve request
+            reject: Reject request
+        showing: 'Showing %count% of %total% requests'
+        see_all: 'See all requests'
+        empty: No recent leave requests
+    leave_balances:
+        title: Leave Balances
+        empty: No leave types configured
+    quick_links:
+        title: Quick Links
+        new_request: New Leave Request
+        team_calendar: Team Calendar
+        leave_requests: Leave Requests
+        team_leave_requests: Team Leave Requests
+        app_settings: App Settings
+        my_profile: My Profile
+
+leave_request:
+    action:
+        approve_confirm_title: Approve Leave Request
+        approve_confirm_body: Are you sure you want to approve this leave request?
+        approve_confirm_action: Approve
+        reject_confirm_title: Reject Leave Request
+        reject_confirm_body: Are you sure you want to reject this leave request?
+        reject_confirm_action: Reject
+        withdraw_confirm_title: Withdraw Leave Request
+        withdraw_confirm_body: Are you sure you want to withdraw this leave request?
+        withdraw_confirm_action: Withdraw
+        cancel: Cancel
+        success:
+            approved: Leave request approved.
+            rejected: Leave request rejected.
+            withdrawn: Leave request withdrawn.
+        error:
+            invalid_csrf: Invalid CSRF token.
+            access_denied: Access denied.
+    new:
+        page_title: New Absence Request
+        heading: Create New Absence Request
+        cancel: Cancel
+        submit: Submit Request
+        loading: Loading...
+
+calendar:
+    page_title: Team Calendar
+    subscribe: Subscribe
+    subscription:
+        title: Calendar Subscription
+        url_label: Subscription URL
+        copy_url: Copy URL
+        copied: Copied!
+        regenerate: Regenerate
+        regenerate_confirm_title: Regenerate Subscription URL
+        regenerate_confirm_body: This will invalidate the current subscription URL. Any calendar apps using the old URL will stop syncing.
+        regenerate_confirm_action: Regenerate URL
+        regenerate_cancel: Cancel
+        regenerating: Regenerating...
+        regenerated: Regenerated!
+        description: Add this URL to Google Calendar, Outlook, or Apple Calendar to sync team absences automatically.
+        regenerate_hint: Need to regenerate this URL? You can do so from your
+        profile_settings_link: Profile Settings
+    filter:
+        leave_type: Leave Type
+        status: Status
+        all_types: All Types
+        all_statuses: All Statuses
+        status_pending: Pending
+        status_approved: Approved
+    popover:
+        type: Type
+        status: Status
+        dates: Dates
+        work_days: Work days
+        days: days
+        comment: Comment
+        date: Date
+        view_details: View Full Details
 
 crud:
     title:
         leave_requests: Absence Requests
+        team_leave_requests: Team Leave Requests
+        team_members: Team Members
         user: My Team
 
     actions:
         leave_requests:
             new: Add Absence Request
+
+    team_leave_requests:
+        detail:
+            title: Leave Request Details
+        fieldset:
+            request: Request Details
+            details: Details
+        field:
+            employee: Employee
+            type: Type
+            from: From
+            to: To
+            comment: Comment
+            status: Status
+            work_days: Work Days
+            approved_by: Approved By
+            auto_approved: Auto Approved
+            created_at: Submitted
+        batch:
+            approve: Approve selected
+            reject: Reject selected
+
+    team_members:
+        detail:
+            title: Team Member Details
+        tab:
+            general: General
+            leave_balance: Leave Balance
+            details: Details
+        field:
+            first_name: First Name
+            last_name: Last Name
+            email: Email
+            role: Role
+            start_date: Start Date
+            manager: Manager
+            annual_allowance: Annual Allowance
+            current_balance: Current Balance
+            balance_reset_day: Balance Reset Day
+            birth_date: Birth Date
+            working_days: Working Days
+            active: Active
 
     user_profile:
         edit:
@@ -49,9 +259,80 @@ crud:
             change_password: Change Password
         field:
             profile_image: Profile Image
+            profile_image_help: 'JPEG, PNG or WebP. Max 2 MB.'
+            profile_image_change: 'Change photo'
+            profile_image_remove: Remove
             working_days: Working Days
         action:
             save_changes: Save Changes
+        connected_services:
+            title: Connected Services
+            slack:
+                title: Slack
+                connected: Connected
+                not_connected: Not connected
+                member_id: 'Member ID: %id%'
+                connect: Connect Slack
+                manage: Manage
+                description: Receive notifications about leave requests and team updates directly in Slack.
+                configure: Configure
+                modal_title: Configure Slack Integration
+                modal_field_label: Slack Member ID
+                modal_field_help: 'Open your Slack profile, click the three dots menu (...), and select "Copy member ID".'
+                modal_save: Save
+                modal_saving: Saving...
+                modal_disconnect: Disconnect
+                modal_cancel: Cancel
+            calendar:
+                title: Calendar Subscription
+                description: Subscribe to team absences in your preferred calendar app.
+                copy_url: Copy URL
+                copied: Copied!
+                regenerate: Regenerate
+                regenerate_confirm_title: Regenerate Subscription URL
+                regenerate_confirm_body: This will invalidate the current subscription URL. Any calendar apps using the old URL will stop syncing.
+                regenerate_confirm_action: Regenerate URL
+                regenerate_cancel: Cancel
+                regenerating: Regenerating...
+                regenerated: Regenerated!
+
+    holiday_calendar:
+        index:
+            title: Public Holidays
+        detail:
+            title: Holiday Calendar Details
+        field:
+            country_code: Country Code
+            country_name: Country
+            holidays_count: Holidays
+            holidays_list: Public Holidays
+            is_active: Active
+            last_synced_year: Last Synced Year
+            date: Date
+            name: Holiday Name
+            no_holidays: No public holidays configured
+        action:
+            toggle_active: Toggle Active
+            sync: Sync Now
+            import: Add Calendar
+            delete: Delete
+        flash:
+            activated: 'Calendar %country% has been activated.'
+            deactivated: 'Calendar %country% has been deactivated.'
+            synced: 'Holidays for %country% (%year%) synced successfully.'
+            delete_error: 'Cannot delete %country% calendar: it has assigned users.'
+    holiday_import:
+        title: Import Holiday Calendar
+        panel:
+            title: Import Public Holidays
+            desc: Select a country to import public holidays from the Nager.Date API.
+        field:
+            country: Country
+            year: Year
+        action:
+            import: Import Calendar
+        flash:
+            success: 'Public holidays for %country% (%year%) have been imported successfully.'
 
     absence_request_type:
         index:
@@ -71,7 +352,98 @@ crud:
             title: Application Settings
         panel:
             leave_request: Leave Request Settings
+            leave_request_desc: Configure automatic approval and delay settings for leave requests.
+            leave_defaults: Leave Defaults & Limits
+            leave_defaults_desc: Set company-wide defaults for leave allowance and request constraints.
+            notification: Notification Settings
+            notification_desc: Configure how notifications behave for Slack digests and other channels.
         field:
             auto_approve: Auto Approve
-            auto_approve_delay: Auto Approve Delay (seconds)
-            auto_approve_delay_help: Number of seconds to wait before automatically approving leave requests
+            auto_approve_delay: Auto Approve Delay (minutes)
+            auto_approve_delay_help: Number of minutes to wait before automatically approving leave requests
+            default_annual_allowance: Default Annual Allowance (days)
+            default_annual_allowance_help: Default number of annual leave days for new employees
+            min_notice_days: Minimum Notice (days)
+            min_notice_days_help: Minimum number of days in advance a leave request must be submitted (0 = no minimum)
+            max_consecutive_days: Max Consecutive Days
+            max_consecutive_days_help: Maximum number of consecutive days allowed per leave request (0 = unlimited)
+            skip_weekend_holidays: Skip weekend public holidays
+            skip_weekend_holidays_help: When enabled, public holidays falling on Saturday or Sunday will not appear in Slack weekly digest notifications
+        action:
+            save: Save Changes
+
+settings:
+    status:
+        label: Status
+        connected: Connected
+        not_configured: Not configured
+        configured: Configured
+        active: Active
+        inactive: Inactive
+    notifications:
+        title: Notifications
+        env_hint: Notification settings are configured via environment variables. Contact your system administrator to make changes.
+        slack:
+            title: Slack Workspace
+            desc: Slack is used to send leave request notifications and weekly digests to your team.
+            workspace: Workspace Connection
+            signing_secret: Signing Secret
+        channels:
+            title: Notification Channels
+            desc: Configure which Slack channels receive automated notifications.
+            approval: Approval Notifications
+            weekly_digest: Weekly Digest
+    integrations:
+        title: Integrations
+        slack:
+            title: Slack
+            desc: Team notifications for leave requests, approvals, and weekly digests.
+        calendar:
+            title: Calendar Subscription (iCal)
+            desc: Users can subscribe to team absences in their preferred calendar app via iCal feeds.
+        date_nager:
+            title: Public Holidays API
+            desc: Automatic import of public holidays by country via the Nager.Date API.
+    account_security:
+        title: Account & Security
+        account_info:
+            title: Account Information
+            email: Email
+            role: Role
+            member_since: Member Since
+        change_password:
+            title: Change Password
+            desc: Choose a strong password with at least 8 characters.
+        field:
+            current_password: Current Password
+            new_password: New Password
+            confirm_password: Confirm New Password
+        error:
+            passwords_must_match: The password fields must match.
+            current_password_invalid: The current password is incorrect.
+        success:
+            password_changed: Your password has been updated successfully.
+        action:
+            update_password: Update Password
+    appearance:
+        title: Appearance
+        theme:
+            title: Theme
+            desc: Choose how the application looks. Select a theme that suits your preference.
+            light: Light
+            dark: Dark
+            auto: System
+        palette:
+            title: Color Palette
+            desc: Pick a color palette for the interface. This changes the accent colors across the application.
+            teal: Warm Teal
+            sage: Sage Green
+            sunset: Sunset Warm
+            lavender: Soft Lavender
+        field:
+            theme: Theme
+            palette: Color Palette
+        success:
+            saved: Appearance preferences saved successfully.
+        action:
+            save: Save Changes

@@ -8,17 +8,30 @@ use App\Module\LeaveRequest\UseCase\Command\RemoveLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\SaveLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Query\CalculateWorkDaysQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\CountAbsencesThisWeekQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetAllLeaveTypesQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\CountAllPendingRequestsQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\CountOnLeaveTodayQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\FindOnLeaveTodayQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetDailyAbsenceSummaryQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetLeaveBalancesPerTypeQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\CountAllRequestsQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetDashboardStatsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesGroupedByUserIdQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForDatesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetPendingLeaveRequestsQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetRecentLeaveRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
+use App\Shared\DTO\Dashboard\DashboardStatsDTO;
+use App\Shared\DTO\Dashboard\LeaveBalanceDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
+use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 
@@ -36,6 +49,17 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetLeaveRequestsForDatesGroupedByUserIdQueryHandler $getLeaveRequestForDatesGroupedByUserIdHandler,
         private readonly RemoveLeaveRequestCommandHandler $removeRequestHandler,
         private readonly GetPendingLeaveRequestsQueryHandler $getPendingLeaveRequestsHandler,
+        private readonly FindOnLeaveTodayQueryHandler $findOnLeaveTodayHandler,
+        private readonly CountOnLeaveTodayQueryHandler $countOnLeaveTodayHandler,
+        private readonly CountAbsencesThisWeekQueryHandler $countAbsencesThisWeekHandler,
+        private readonly CountAllPendingRequestsQueryHandler $countAllPendingRequestsHandler,
+        private readonly GetDashboardStatsQueryHandler $getDashboardStatsHandler,
+        private readonly GetDailyAbsenceSummaryQueryHandler $getDailyAbsenceSummaryHandler,
+        private readonly GetLeaveBalancesPerTypeQueryHandler $getLeaveBalancesPerTypeHandler,
+        private readonly GetRecentLeaveRequestsQueryHandler $getRecentLeaveRequestsHandler,
+        private readonly CountAllRequestsQueryHandler $countAllRequestsHandler,
+        private readonly UserFacadeInterface $userFacade,
+        private readonly GetAllLeaveTypesQueryHandler $getAllLeaveTypesHandler,
     ) {
     }
 
@@ -57,9 +81,9 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     /**
      * @return LeaveRequestDTO[]
      */
-    public function getUpcomingLeaveRequests(): array
+    public function getUpcomingLeaveRequests(?array $userIds = null): array
     {
-        return $this->getUpcomingLeaveRequestsHandler->handle();
+        return $this->getUpcomingLeaveRequestsHandler->handle($userIds);
     }
 
     public function getById(string $id): ?LeaveRequestDTO
@@ -75,6 +99,18 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function update(LeaveRequestDTO $leaveRequestDTO): void
     {
         $this->updateLeaveRequestCommandHandler->handle($leaveRequestDTO);
+    }
+
+    public function updateAndRestoreBalanceIfNeeded(LeaveRequestDTO $leaveRequestDTO): void
+    {
+        $this->update($leaveRequestDTO);
+
+        if ($leaveRequestDTO->leaveType->isAffectingBalance) {
+            $this->userFacade->updateUserCurrentLeaveBalance(
+                $leaveRequestDTO->user->id,
+                $leaveRequestDTO->workDays,
+            );
+        }
     }
 
     public function save(SaveLeaveRequestCommand $command): void
@@ -122,5 +158,70 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function remove(LeaveRequestDTO $leaveRequestDTO): void
     {
         $this->removeRequestHandler->handle($leaveRequestDTO);
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findOnLeaveToday(?array $userIds = null): array
+    {
+        return $this->findOnLeaveTodayHandler->handle($userIds);
+    }
+
+    public function countOnLeaveToday(?array $userIds = null): int
+    {
+        return $this->countOnLeaveTodayHandler->handle($userIds);
+    }
+
+    public function countAbsencesThisWeek(?array $userIds = null): int
+    {
+        return $this->countAbsencesThisWeekHandler->handle($userIds);
+    }
+
+    public function countAllPendingRequests(?array $userIds = null): int
+    {
+        return $this->countAllPendingRequestsHandler->handle($userIds);
+    }
+
+    public function getDashboardStats(?array $userIds = null): DashboardStatsDTO
+    {
+        return $this->getDashboardStatsHandler->handle($userIds);
+    }
+
+    /**
+     * @return \App\Shared\DTO\Dashboard\DailyAbsenceSummaryDTO[]
+     */
+    public function getDailyAbsenceSummary(?\DateTimeImmutable $weekStart = null): array
+    {
+        return $this->getDailyAbsenceSummaryHandler->handle($weekStart);
+    }
+
+    /**
+     * @return LeaveBalanceDTO[]
+     */
+    public function getLeaveBalancesPerType(string $userId, \DateTimeImmutable $periodStart): array
+    {
+        return $this->getLeaveBalancesPerTypeHandler->handle($userId, $periodStart);
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function getRecentLeaveRequests(int $limit = 5, ?array $userIds = null): array
+    {
+        return $this->getRecentLeaveRequestsHandler->handle($limit, $userIds);
+    }
+
+    public function countAllRequests(?array $userIds = null): int
+    {
+        return $this->countAllRequestsHandler->handle($userIds);
+    }
+
+    /**
+     * @return LeaveRequestTypeDTO[]
+     */
+    public function getAllLeaveTypes(): array
+    {
+        return $this->getAllLeaveTypesHandler->handle();
     }
 }

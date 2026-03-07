@@ -1,0 +1,254 @@
+/* ============================================
+   DASHBOARD — Welcome Banner
+   ============================================ */
+body.ea .content-header:has(.welcome-banner) {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+}
+
+.welcome-banner {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: var(--radius-xl);
+    padding: 28px 32px;
+    color: var(--text-on-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.welcome-banner::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.welcome-banner::before {
+    content: '';
+    position: absolute;
+    right: 60px;
+    bottom: -40px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.welcome-text h2 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text-on-primary);
+}
+
+.welcome-text p {
+    font-size: 14px;
+    opacity: 0.85;
+    font-weight: 300;
+}
+
+.welcome-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-illustration {
+    position: relative;
+    z-index: 1;
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   DASHBOARD — Recent Requests Table
+   ============================================ */
+.dashboard-recent-requests .table-wrapper {
+    overflow-x: auto;
+}
+
+.dashboard-recent-requests table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.dashboard-recent-requests thead th {
+    padding: 10px 20px;
+    text-align: left;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    background-color: var(--app-bg-alt);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.dashboard-recent-requests tbody td {
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+}
+
+.dashboard-recent-requests tbody tr {
+    transition: background-color 0.1s ease;
+}
+
+.dashboard-recent-requests tbody tr:hover {
+    background-color: var(--app-bg-alt);
+}
+
+.dashboard-recent-requests tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ============================================
+   DASHBOARD — Layout Grid
+   ============================================ */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    min-width: 0;
+}
+
+.dashboard-left-column {
+    min-width: 0;
+}
+
+.dashboard-right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   DASHBOARD — Recent Requests Actions & Toast
+   ============================================ */
+.dashboard-recent-requests {
+    position: relative;
+}
+
+.inline-action-form {
+    display: inline;
+}
+
+.table-action-btn.approve:hover {
+    background: var(--success-subtle);
+    color: var(--success);
+}
+
+.table-action-btn.reject:hover {
+    background: var(--danger-subtle);
+    color: var(--danger);
+}
+
+.table-action-btn.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.row-flash-success {
+    animation: row-flash 1s ease;
+}
+
+@keyframes row-flash {
+    0% { background-color: var(--success-subtle); }
+    100% { background-color: transparent; }
+}
+
+.widget-toast {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.widget-toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.widget-toast--success {
+    background: var(--success);
+    color: #fff;
+}
+
+.widget-toast--error {
+    background: var(--danger);
+    color: #fff;
+}
+
+/* Mobile request actions */
+.m-request-item {
+    position: relative;
+}
+
+.m-request-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.m-request-actions {
+    display: flex;
+    gap: 4px;
+    padding: 4px 16px 12px;
+}
+
+@media (max-width: 768px) {
+    .welcome-banner {
+        padding: 20px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .welcome-text h2 {
+        font-size: 20px;
+    }
+
+    .welcome-illustration {
+        display: none;
+    }
+
+    .welcome-actions {
+        flex-wrap: wrap;
+    }
+
+    .dashboard-recent-requests thead th,
+    .dashboard-recent-requests tbody td {
+        padding: 10px 12px;
+    }
+}

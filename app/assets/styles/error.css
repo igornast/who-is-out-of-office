@@ -1,149 +1,167 @@
-/* Reusable error page components */
+@import './_tokens-light.css';
+@import './_tokens-dark.css';
+@import './_palette-sage.css';
+@import './_palette-sunset.css';
+@import './_palette-lavender.css';
 
-/* Full viewport container with gradient background */
-.error-fullscreen {
+:root {
+    --font-display: 'Crimson Pro', Georgia, serif;
+    --font-body: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.error-page {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--app-bg);
+    font-family: var(--font-body);
+    padding: 24px;
+    transition: background-color 0.2s ease;
 }
 
-/* Gradient backgrounds - can be combined with error-fullscreen */
-.gradient-purple {
-    background: linear-gradient(135deg, var(--bs-indigo) 0%, var(--bs-purple) 100%);
-}
-
-.gradient-pink {
-    background: linear-gradient(135deg, #f093fb 0%, var(--bs-pink) 100%);
-}
-
-.gradient-blue {
-    background: linear-gradient(135deg, var(--bs-cyan) 0%, var(--bs-blue) 100%);
-}
-
-/* Glassmorphism card effect */
-.glass-card {
+.error-card {
     text-align: center;
-    color: var(--bs-white);
-    padding: 40px;
-    background: rgba(var(--bs-white-rgb), 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: var(--bs-border-radius-lg);
-    box-shadow: var(--bs-box-shadow-lg);
+    max-width: 480px;
+    width: 100%;
+    padding: 48px 40px;
+    background: var(--app-surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-light);
 }
 
-/* Error code styling */
-.error-code-large {
-    font-size: 150px;
-    font-weight: bold;
-    line-height: 1;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(var(--bs-black-rgb), 0.3);
+.error-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
 }
 
-.error-code-animated {
-    animation: float 3s ease-in-out infinite;
+.error-icon svg {
+    width: 28px;
+    height: 28px;
 }
 
-/* Error text styling */
-.error-title {
-    font-size: 36px;
-    font-weight: 600;
-    margin-bottom: 15px;
+.error-icon--danger {
+    background: var(--danger-subtle);
+    color: var(--danger);
 }
 
-.error-description {
-    font-size: 18px;
-    opacity: 0.9;
-    margin-bottom: 30px;
+.error-icon--primary {
+    background: var(--primary-subtle);
+    color: var(--primary);
 }
 
-/* Button styling */
-.btn-glass {
-    background: var(--bs-white);
-    padding: 12px 40px;
-    border-radius: var(--bs-border-radius-pill);
-    text-decoration: none;
-    font-weight: 600;
-    display: inline-block;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px 0 rgba(var(--bs-white-rgb), 0.3);
-    border: none;
-    cursor: pointer;
-}
-
-.btn-glass:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px 0 rgba(var(--bs-white-rgb), 0.4);
-    text-decoration: none;
-}
-
-/* Color variants for buttons */
-.btn-purple {
-    color: var(--bs-indigo);
-}
-
-.btn-purple:hover {
-    color: var(--bs-indigo);
-}
-
-.btn-pink {
-    color: var(--bs-pink);
-}
-
-.btn-pink:hover {
-    color: var(--bs-pink);
-}
-
-.btn-blue {
-    color: var(--bs-blue);
-}
-
-.btn-blue:hover {
-    color: var(--bs-blue);
-}
-
-/* Animations */
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-}
-
-/* Legacy simple error page styles */
-body {
-    background-color: var(--bs-gray-100);
-}
-
-.error-container {
-    text-align: center;
-    padding: 100px 0;
+.error-icon--warning {
+    background: var(--pending-subtle);
+    color: var(--pending);
 }
 
 .error-code {
-    font-size: 100px;
-    color: var(--bs-primary);
-    margin-bottom: 20px;
+    font-family: var(--font-display);
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+    color: var(--text-primary);
 }
 
-.error-message {
-    font-size: 24px;
-    margin-bottom: 30px;
-    color: var(--bs-gray-800);
+.error-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
 }
 
-.btn-custom {
-    background-color: var(--bs-primary);
-    color: var(--bs-white);
-    border-radius: var(--bs-border-radius-pill);
-    padding: 10px 30px;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
+.error-description {
+    font-size: 14px;
+    color: var(--text-tertiary);
+    margin-bottom: 32px;
+    line-height: 1.6;
+    font-weight: 400;
 }
 
-.btn-custom:hover {
-    background-color: var(--bs-link-hover-color);
-    transform: translateY(-2px);
-    color: var(--bs-white);
+.error-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-btn {
+    padding: 10px 24px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 13px;
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.error-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+.error-btn--primary {
+    background: var(--primary);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.error-btn--primary:hover {
+    background: var(--primary-hover);
+    color: var(--text-on-primary);
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.error-btn--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.error-btn--ghost:hover {
+    background: var(--app-bg-alt);
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.error-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+@media (max-width: 480px) {
+    .error-card {
+        padding: 36px 24px;
+    }
+
+    .error-code {
+        font-size: 56px;
+    }
+
+    .error-title {
+        font-size: 18px;
+    }
+
+    .error-actions {
+        flex-direction: column;
+    }
+
+    .error-btn {
+        justify-content: center;
+    }
 }

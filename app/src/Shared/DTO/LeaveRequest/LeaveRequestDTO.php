@@ -22,6 +22,7 @@ class LeaveRequestDTO
         public ?bool $isAutoApproved = false,
         public ?string $comment = null,
         public ?UserDTO $approvedBy = null,
+        public ?\DateTimeImmutable $createdAt = null,
     ) {
     }
 
@@ -44,6 +45,7 @@ class LeaveRequestDTO
             isAutoApproved: $leaveRequest->isAutoApproved,
             comment: $leaveRequest->comment,
             approvedBy: $approver,
+            createdAt: $leaveRequest->getCreatedAt(),
         );
     }
 }

@@ -1,0 +1,36 @@
+<div class="welcome-banner">
+    <div class="welcome-text">
+        <h2 data-controller="greeting"
+            data-greeting-name-value="{{ user.firstName }}"
+            data-greeting-morning-value="{{ 'dashboard.welcome.greeting_morning'|trans(domain: 'admin') }}"
+            data-greeting-afternoon-value="{{ 'dashboard.welcome.greeting_afternoon'|trans(domain: 'admin') }}"
+            data-greeting-evening-value="{{ 'dashboard.welcome.greeting_evening'|trans(domain: 'admin') }}"
+        >{{ 'dashboard.welcome.greeting'|trans({'%name%': user.firstName}, domain: 'admin') }}</h2>
+        <p>{{ 'dashboard.welcome.balance'|trans({'%days%': user.currentLeaveBalance}, domain: 'admin') }}</p>
+        <div class="welcome-actions">
+            <a class="btn btn-cta"
+               href="{{ url('app_dashboard_requests_new') }}">
+                <i data-lucide="plus"></i>
+                {{ 'dashboard.welcome.request_leave'|trans(domain: 'admin') }}
+            </a>
+            <a class="btn btn-outline-white" href="{{ path('app_calendar_view') }}">
+                <i data-lucide="calendar-days"></i>
+                {{ 'dashboard.welcome.view_calendar'|trans(domain: 'admin') }}
+            </a>
+        </div>
+    </div>
+    <div class="welcome-illustration">
+        <svg width="140" height="120" viewBox="0 0 140 120" fill="none">
+            <circle cx="70" cy="85" r="30" fill="rgba(255,255,255,0.08)"/>
+            <path d="M70 95 L70 55" stroke="rgba(255,255,255,0.25)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M70 55 Q55 35 40 40" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M70 55 Q85 35 100 40" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M70 55 Q60 30 55 25" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M70 55 Q80 30 85 25" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M70 58 Q70 45 60 35" stroke="rgba(255,255,255,0.15)" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <ellipse cx="70" cy="98" rx="25" ry="4" fill="rgba(255,255,255,0.06)"/>
+            <circle cx="110" cy="25" r="10" fill="rgba(245,213,168,0.25)"/>
+            <circle cx="110" cy="25" r="6" fill="rgba(245,213,168,0.15)"/>
+        </svg>
+    </div>
+</div>
