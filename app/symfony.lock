@@ -121,18 +121,6 @@
             "config/packages/ramsey_uuid_doctrine.yaml"
         ]
     },
-    "sensiolabs/minify-bundle": {
-        "version": "1.2",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "0.9",
-            "ref": "b762016c180efbeff79b7a0eb95db7ec74c8e9d6"
-        },
-        "files": [
-            "config/packages/sensiolabs_minify.yaml"
-        ]
-    },
     "sentry/sentry-symfony": {
         "version": "5.0",
         "recipe": {
