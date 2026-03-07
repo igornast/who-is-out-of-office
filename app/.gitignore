@@ -27,3 +27,7 @@
 /tests/_output/
 
 /app_setting.local.yaml
+
+###> sensiolabs/minify-bundle ###
+/var/minify/
+###< sensiolabs/minify-bundle ###
