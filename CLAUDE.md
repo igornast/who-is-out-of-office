@@ -186,7 +186,7 @@ Each module exposes a `Facade` that provides a high-level API. Facades implement
 - `LeaveRequestFacade` → `LeaveRequestFacadeInterface`
 - `UserFacade` → `UserFacadeInterface`
 - `HolidayFacade` → `HolidayFacadeInterface`
-- `AppSettingsFacade` → `AppSettingsFacadeInterface`
+- `SettingsFacade` → `SettingsFacadeInterface`
 - `SlackFacade` → `SlackFacadeInterface`
 - `DateNagerFacade` → `DateNagerInterface`
 
@@ -238,6 +238,7 @@ The application uses Symfony events for cross-cutting concerns:
 - Dashboard with team overview, birthdays, pending requests
 - CRUD controllers for Users, Leave Requests, Leave Types
 - User profile settings and calendar views
+- See [`Module/Admin/README.md`](app/src/Module/Admin/README.md) for controllers, DTOs, forms, event subscribers, and architecture details
 
 #### LeaveRequest Module
 - Core leave request business logic
@@ -252,8 +253,9 @@ The application uses Symfony events for cross-cutting concerns:
 - Profile customization (working days, birthday, Slack integration)
 
 #### Settings Module
-- Application-wide settings management (e.g., absence balance reset day)
-- Key-value store pattern via `AppSettingsFacade`
+- YAML-based application settings (leave request rules, notification preferences)
+- Type-safe access via `SettingsFacade` with enum keys and validated DTOs
+- See [`Module/Settings/README.md`](app/src/Module/Settings/README.md) for available settings, adding new ones, and architecture details
 
 #### Holiday Module
 - Public holiday calendar management
@@ -321,6 +323,27 @@ These tests run via `composer test:arch`. Violating these rules will fail CI.
 - **PHPStan**: Static analysis at level 8
 - DTOs and DataFixtures are excluded from PHPStan checks (see `phpstan.neon`)
 - All commands should run successfully before committing
+
+### Constructor Parameter Order
+
+Order constructor parameters: **mandatory before optional**, and within each group **primitives before objects**:
+
+```php
+public function __construct(
+    public string $name,              // 1. mandatory primitives
+    public int $count,
+    public SomeService $service,      // 2. mandatory objects
+    public string $label = '',        // 3. optional primitives
+    public bool $active = false,
+    public ?string $note = null,
+    public ?\DateTimeImmutable $date = null,  // 4. optional objects
+    public ?SomeEntity $entity = null,
+)
+```
+
+### Service Extraction
+
+- **Deduplicate cross-controller logic into a service** — when multiple controllers repeat the same multi-step operation, extract it into a dedicated service with a single-call API. Inject the service instead of duplicating dependencies (e.g., env vars, URL generators) across controllers.
 
 ### Code Documentation Standards
 
@@ -392,6 +415,8 @@ if ($form->isSubmitted() && $form->isValid()) {
 - Validation constraints belong on the DTO, not in the form type
 - DTO properties should be **non-nullable with defaults** (e.g., `string $name = ''`) — the form + `NotBlank` constraint handles validation, so no `\assert()` needed after `isValid()`
 - **Never use `\assert()` for form-validated data** — Symfony's form validation guarantees correctness
+- **All form fields must be mapped** — never use `'mapped' => false`. Add the property to the DTO instead (e.g., `?UploadedFile $profileImageFile = null`)
+- **No magic strings** — when a string literal carries domain meaning (e.g., a flag value), extract it to a `public const` on the DTO. In Twig JS, reference it via `{{ constant('App\\Module\\Admin\\DTO\\ExampleDTO::CONST_NAME') }}` instead of duplicating the value
 
 ## Critical Patterns and Best Practices
 

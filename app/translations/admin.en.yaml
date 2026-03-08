@@ -258,11 +258,23 @@ crud:
             employee_of_record: Employee Of Record
             change_password: Change Password
         field:
+            first_name: First Name
+            last_name: Last Name
+            working_days: Working Days
+            holiday_calendar: Holiday Calendar
+            holiday_calendar_placeholder: Select your calendar
+            birth_date: Birth Date
+            birth_date_help: If you enter a birthdate, our OOO Slackbot will automatically send a friendly reminder to your teammates before your birthday. This helps everyone celebrate together.
+            contract_started_at: Contract Start Date
+            contract_started_at_help: Your contract start date is set by HR.
+            absence_balance_reset_day: Next Absence Balance Reset
+            absence_balance_reset_day_help: The next date when your absence balance will be reset. This is set by HR.
+            has_celebrate_work_anniversary: Celebrate my work anniversary
+            has_celebrate_work_anniversary_help: Tick this box if you want the OOO Slackbot to send a friendly reminder to your teammates each year.
             profile_image: Profile Image
             profile_image_help: 'JPEG, PNG or WebP. Max 2 MB.'
             profile_image_change: 'Change photo'
             profile_image_remove: Remove
-            working_days: Working Days
         action:
             save_changes: Save Changes
         connected_services:

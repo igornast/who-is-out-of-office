@@ -10,6 +10,8 @@ services:
         resource: '../src/'
         exclude:
             - '../src/Infrastructure/Doctrine/Entity'
+            - '../src/Module/**/DTO'
+            - '../src/Module/**/Constants'
             - '../src/Kernel.php'
 
     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
