@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Module\Admin\Controller;
 
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\DTO\UserProfileDTO;
 use App\Module\Admin\Form\UserProfileType;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Facade\UserFacadeInterface;
-use App\Shared\Service\Ical\IcalHashGenerator;
+use App\Shared\Service\Ical\IcalSubscriptionUrlGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -16,7 +17,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
@@ -28,11 +28,9 @@ class UserProfileSettingsController extends AbstractController
         private readonly string $profileImagesBasePath,
         #[Autowire('%kernel.project_dir%/public/%profile_images_base_path%')]
         private readonly string $uploadDirectory,
-        #[Autowire(env: 'ICAL_SECRET')]
-        private readonly string $icalSecret,
         private readonly EntityManagerInterface $em,
-        private readonly UrlGeneratorInterface $urlGenerator,
         private readonly UserFacadeInterface $userFacade,
+        private readonly IcalSubscriptionUrlGenerator $icalSubscriptionUrlGenerator,
     ) {
     }
 
@@ -40,25 +38,30 @@ class UserProfileSettingsController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $form = $this->createForm(UserProfileType::class, $user);
+        $dto = UserProfileDTO::fromUser($user);
+        $form = $this->createForm(UserProfileType::class, $dto);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $removeRequested = '1' === $form->get('removeProfileImage')->getData();
-            $uploadedFile = $form->get('profileImageFile')->getData();
-
-            if ($removeRequested && null === $uploadedFile) {
+            if ($dto->isRemoveProfileImageRequested()) {
                 $this->userFacade->deleteOldProfileImage($user->profileImageUrl);
                 $user->profileImageUrl = null;
             }
 
-            if ($uploadedFile instanceof UploadedFile) {
+            if ($dto->profileImageFile instanceof UploadedFile) {
                 $this->userFacade->deleteOldProfileImage($user->profileImageUrl);
 
-                $newFilename = sprintf('%s.%s', bin2hex(random_bytes(16)), $uploadedFile->guessExtension());
-                $uploadedFile->move($this->uploadDirectory, $newFilename);
+                $newFilename = sprintf('%s.%s', bin2hex(random_bytes(16)), $dto->profileImageFile->guessExtension());
+                $dto->profileImageFile->move($this->uploadDirectory, $newFilename);
                 $user->profileImageUrl = $newFilename;
             }
+
+            $user->firstName = $dto->firstName;
+            $user->lastName = $dto->lastName;
+            $user->workingDays = $dto->workingDays;
+            $user->holidayCalendar = $dto->holidayCalendar;
+            $user->birthDate = $dto->birthDate;
+            $user->hasCelebrateWorkAnniversary = $dto->hasCelebrateWorkAnniversary;
 
             $this->em->persist($user);
             $this->em->flush();
@@ -68,16 +71,10 @@ class UserProfileSettingsController extends AbstractController
             return $this->redirectToRoute('app_user_profile');
         }
 
-        $userDTO = UserDTO::fromEntity($user);
-        $calendarSubscriptionUrl = $this->urlGenerator->generate('app_api_ical_endpoint', [
-            'userId' => $user->id,
-            'secret' => IcalHashGenerator::generateForUser($userDTO, $this->icalSecret),
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
-
         return $this->render('@AppAdmin/user/profile_edit.html.twig', [
             'form' => $form->createView(),
             'profile_images_base_path' => $this->profileImagesBasePath,
-            'calendar_subscription_url' => $calendarSubscriptionUrl,
+            'calendar_subscription_url' => $this->icalSubscriptionUrlGenerator->generateForUser(UserDTO::fromEntity($user)),
             'slack_connected' => null !== $user->slackIntegration,
             'slack_member_id' => $user->slackIntegration?->slackMemberId,
         ]);

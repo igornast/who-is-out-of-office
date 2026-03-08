@@ -28,9 +28,10 @@ describe('Global State', function () {
 describe('Dependency Injection', function () {
     arch('facades should have constructor', function (string $module) {
         $facadeClass = sprintf('App\Module\%s\%sFacade', $module, $module);
-        if (class_exists($facadeClass)) {
-            expect($facadeClass)->toHaveConstructor();
+        if (!class_exists($facadeClass)) {
+            $this->markTestSkipped(sprintf('Module %s has no facade', $module));
         }
+        expect($facadeClass)->toHaveConstructor();
     })->with(modules());
 });
 
@@ -88,8 +89,9 @@ describe('Code Organization', function () {
 
     arch('facades should be final', function (string $module) {
         $facadeClass = sprintf('App\Module\%s\%sFacade', $module, $module);
-        if (class_exists($facadeClass)) {
-            expect($facadeClass)->toBeFinal();
+        if (!class_exists($facadeClass)) {
+            $this->markTestSkipped(sprintf('Module %s has no facade', $module));
         }
+        expect($facadeClass)->toBeFinal();
     })->with(modules());
 });

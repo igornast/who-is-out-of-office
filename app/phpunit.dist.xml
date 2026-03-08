@@ -37,7 +37,10 @@
             <directory suffix=".php">src/Shared/DTO</directory>
             <directory suffix=".php">src/Shared/Enum</directory>
             <directory suffix=".php">src/Infrastructure/Doctrine/Entity</directory>
+            <directory suffix=".php">src/Infrastructure/Doctrine/Repository</directory>
             <directory suffix=".php">src/DataFixtures</directory>
+            <directory suffix=".php">src/Module/Admin/Controller</directory>
+            <directory suffix=".php">src/Module/Admin/DTO</directory>
             <file>src/Kernel.php</file>
         </exclude>
     </source>

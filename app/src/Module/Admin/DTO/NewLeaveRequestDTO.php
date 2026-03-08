@@ -11,11 +11,11 @@ class NewLeaveRequestDTO
 {
     public function __construct(
         #[Assert\NotBlank]
-        public ?LeaveRequestType $leaveType = null,
-        #[Assert\NotBlank]
         public ?\DateTimeImmutable $startDate = null,
         #[Assert\NotBlank]
         public ?\DateTimeImmutable $endDate = null,
+        #[Assert\NotBlank]
+        public ?LeaveRequestType $leaveType = null,
     ) {
     }
 

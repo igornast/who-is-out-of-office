@@ -18,14 +18,14 @@ Settings/
 │   └── Query/
 │       ├── GetAllAppSettingsQueryHandler.php
 │       └── GetAppSettingsValueQueryHandler.php
-├── AppSettingsFacade.php         # Facade implementation
+├── SettingsFacade.php         # Facade implementation
 └── README.md                      # This file
 ```
 
 **Shared components:**
 - `Shared/Enum/AppSettingsEnum.php` - Setting key definitions
 - `Shared/DTO/Settings/AppSettingsDTO.php` - Data transfer object
-- `Shared/Facade/AppSettingsFacadeInterface.php` - Facade interface
+- `Shared/Facade/SettingsFacadeInterface.php` - Facade interface
 
 **Admin UI:**
 - `Module/Admin/Controller/AppSettingsController.php` - Settings controller
@@ -39,7 +39,16 @@ Settings/
 | Setting | Type | Description | Default |
 |---------|------|-------------|---------|
 | `auto_approve` | boolean | Enable/disable automatic approval of leave requests | `false` |
-| `auto_approve_delay` | integer | Delay in seconds before automatically approving leave requests | `6900` |
+| `auto_approve_delay` | integer | Delay in seconds before automatically approving leave requests | `115` |
+| `default_annual_allowance` | integer | Default number of annual leave days for new users | `25` |
+| `min_notice_days` | integer | Minimum number of days notice required for leave requests (0 = no minimum) | `1` |
+| `max_consecutive_days` | integer | Maximum consecutive days allowed per leave request (0 = unlimited) | `0` |
+
+### Notification Settings
+
+| Setting | Type | Description | Default |
+|---------|------|-------------|---------|
+| `skip_weekend_holidays` | boolean | Skip public holidays that fall on weekends in notifications | `false` |
 
 ## Managing Settings
 
@@ -53,13 +62,13 @@ Administrators can manage settings through the UI:
 
 ### Via Code
 
-Access settings through the `AppSettingsFacadeInterface`:
+Access settings through the `SettingsFacadeInterface`:
 
 ```php
-use App\Shared\Facade\AppSettingsFacadeInterface;
+use App\Shared\Facade\SettingsFacadeInterface;
 
 public function __construct(
-    private readonly AppSettingsFacadeInterface $appSettingsFacade,
+    private readonly SettingsFacadeInterface $appSettingsFacade,
 ) {}
 
 public function someMethod(): void
@@ -67,6 +76,10 @@ public function someMethod(): void
     // Get individual settings
     $autoApprove = $this->appSettingsFacade->isAutoApprove();
     $delay = $this->appSettingsFacade->autoApproveDelay();
+    $allowance = $this->appSettingsFacade->defaultAnnualAllowance();
+    $noticeDays = $this->appSettingsFacade->minNoticeDays();
+    $maxDays = $this->appSettingsFacade->maxConsecutiveDays();
+    $skipWeekendHolidays = $this->appSettingsFacade->skipWeekendHolidays();
 
     // Get all settings as DTO
     $settings = $this->appSettingsFacade->getAllSettings();
@@ -78,6 +91,7 @@ public function someMethod(): void
         defaultAnnualAllowance: 25,
         minNoticeDays: 1,
         maxConsecutiveDays: 0,
+        skipWeekendHolidays: false,
     );
     $this->appSettingsFacade->updateAllSettings($newSettings);
 }
@@ -111,13 +125,17 @@ enum AppSettingsEnum: string
 {
     case AUTO_APPROVE = 'leave_request.auto_approve';
     case AUTO_APPROVE_DELAY = 'leave_request.auto_approve_delay';
+    case DEFAULT_ANNUAL_ALLOWANCE = 'leave_request.default_annual_allowance';
+    case MIN_NOTICE_DAYS = 'leave_request.min_notice_days';
+    case MAX_CONSECUTIVE_DAYS = 'leave_request.max_consecutive_days';
+    case SKIP_WEEKEND_HOLIDAYS = 'notification.skip_weekend_holidays';
     case YOUR_NEW_SETTING = 'section_name.setting_name'; // Add here
 }
 ```
 
 The enum value uses dot notation for nested YAML structure:
-- `section_name.setting_name` → `section_name: { setting_name: value }`
-- `a.b.c` → `a: { b: { c: value } }`
+- `section_name.setting_name` -> `section_name: { setting_name: value }`
+- `a.b.c` -> `a: { b: { c: value } }`
 
 ### 2. Update the DTO
 
@@ -132,6 +150,17 @@ public function __construct(
     #[Assert\NotNull]
     #[Assert\PositiveOrZero]
     public int $autoApproveDelay,
+    #[Assert\NotNull]
+    #[Assert\Positive]
+    public int $defaultAnnualAllowance,
+    #[Assert\NotNull]
+    #[Assert\PositiveOrZero]
+    public int $minNoticeDays,
+    #[Assert\NotNull]
+    #[Assert\PositiveOrZero]
+    public int $maxConsecutiveDays,
+    #[Assert\NotNull]
+    public bool $skipWeekendHolidays,
     public string $yourNewSetting, // Add property with validation
 ) {}
 ```
@@ -144,6 +173,10 @@ public static function fromArray(array $data): self
     return new self(
         autoApprove: self::getNestedValue($data, AppSettingsEnum::AUTO_APPROVE),
         autoApproveDelay: self::getNestedValue($data, AppSettingsEnum::AUTO_APPROVE_DELAY),
+        defaultAnnualAllowance: self::getNestedValue($data, AppSettingsEnum::DEFAULT_ANNUAL_ALLOWANCE),
+        minNoticeDays: self::getNestedValue($data, AppSettingsEnum::MIN_NOTICE_DAYS),
+        maxConsecutiveDays: self::getNestedValue($data, AppSettingsEnum::MAX_CONSECUTIVE_DAYS),
+        skipWeekendHolidays: self::getNestedValue($data, AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS, false),
         yourNewSetting: self::getNestedValue($data, AppSettingsEnum::YOUR_NEW_SETTING), // Add here
     );
 }
@@ -157,6 +190,10 @@ public function toArray(): array
     $result = [];
     self::setNestedValue($result, AppSettingsEnum::AUTO_APPROVE, $this->autoApprove);
     self::setNestedValue($result, AppSettingsEnum::AUTO_APPROVE_DELAY, $this->autoApproveDelay);
+    self::setNestedValue($result, AppSettingsEnum::DEFAULT_ANNUAL_ALLOWANCE, $this->defaultAnnualAllowance);
+    self::setNestedValue($result, AppSettingsEnum::MIN_NOTICE_DAYS, $this->minNoticeDays);
+    self::setNestedValue($result, AppSettingsEnum::MAX_CONSECUTIVE_DAYS, $this->maxConsecutiveDays);
+    self::setNestedValue($result, AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS, $this->skipWeekendHolidays);
     self::setNestedValue($result, AppSettingsEnum::YOUR_NEW_SETTING, $this->yourNewSetting); // Add here
 
     return $result;
@@ -168,19 +205,23 @@ public function toArray(): array
 If you want a dedicated method for your setting, add it to the interface and implementation:
 
 ```php
-// app/src/Shared/Facade/AppSettingsFacadeInterface.php
+// app/src/Shared/Facade/SettingsFacadeInterface.php
 
-interface AppSettingsFacadeInterface
+interface SettingsFacadeInterface
 {
     public function isAutoApprove(): bool;
     public function autoApproveDelay(): int;
+    public function defaultAnnualAllowance(): int;
+    public function minNoticeDays(): int;
+    public function maxConsecutiveDays(): int;
+    public function skipWeekendHolidays(): bool;
     public function yourNewSetting(): string; // Add here
     // ...
 }
 ```
 
 ```php
-// app/src/Module/Settings/AppSettingsFacade.php
+// app/src/Module/Settings/SettingsFacade.php
 
 public function yourNewSetting(): string
 {
@@ -206,6 +247,10 @@ public function buildForm(FormBuilderInterface $builder, array $options): void
     $builder
         ->add('autoApprove', CheckboxType::class, [...])
         ->add('autoApproveDelay', IntegerType::class, [...])
+        ->add('defaultAnnualAllowance', IntegerType::class, [...])
+        ->add('minNoticeDays', IntegerType::class, [...])
+        ->add('maxConsecutiveDays', IntegerType::class, [...])
+        ->add('skipWeekendHolidays', CheckboxType::class, [...])
         ->add('yourNewSetting', TextType::class, [
             'label' => 'crud.app_settings.field.your_new_setting',
             'help' => 'crud.app_settings.field.your_new_setting_help',
@@ -253,7 +298,13 @@ Add the default value to the settings file:
 
 leave_request:
     auto_approve: false
-    auto_approve_delay: 6900
+    auto_approve_delay: 115
+    default_annual_allowance: 25
+    min_notice_days: 1
+    max_consecutive_days: 0
+
+notification:
+    skip_weekend_holidays: false
 
 section_name:
     setting_name: default_value

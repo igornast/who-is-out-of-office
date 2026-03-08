@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Module\Settings\AppSettingsFacade;
+use App\Module\Settings\SettingsFacade;
 use App\Module\Settings\Exception\InvalidAppSettingTypeException;
 use App\Module\Settings\UseCase\Command\UpdateAppSettingsValueCommandHandler;
 use App\Module\Settings\UseCase\Query\GetAllAppSettingsQueryHandler;
@@ -15,7 +15,7 @@ beforeEach(function (): void {
     $this->getAllAppSettingsQueryHandler = mock(GetAllAppSettingsQueryHandler::class);
     $this->updateAppSettingsValueCommandHandler = mock(UpdateAppSettingsValueCommandHandler::class);
 
-    $this->facade = new AppSettingsFacade(
+    $this->facade = new SettingsFacade(
         appSettingValueHandler: $this->appSettingValueHandler,
         getAllAppSettingsQueryHandler: $this->getAllAppSettingsQueryHandler,
         updateAppSettingsValueCommandHandler: $this->updateAppSettingsValueCommandHandler,

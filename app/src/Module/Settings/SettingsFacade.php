@@ -12,7 +12,7 @@ use App\Shared\DTO\Settings\AppSettingsDTO;
 use App\Shared\Enum\AppSettingsEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 
-final class AppSettingsFacade implements AppSettingsFacadeInterface
+final class SettingsFacade implements AppSettingsFacadeInterface
 {
     public function __construct(
         private readonly GetAppSettingsValueQueryHandler $appSettingValueHandler,
