@@ -5,15 +5,19 @@ declare(strict_types=1);
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
+use App\Module\User\UseCase\Command\CleanupExpiredPasswordResetTokensCommandHandler;
+use App\Module\User\UseCase\Command\CreatePasswordResetTokenCommandHandler;
 use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
-use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
-use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
+use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
+use App\Module\User\UseCase\Command\ResetPasswordCommandHandler;
+use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
+use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
@@ -45,6 +49,10 @@ beforeEach(function (): void {
     $this->updateSlackMemberIdHandler = mock(UpdateSlackMemberIdCommandHandler::class);
     $this->disconnectSlackHandler = mock(DisconnectSlackCommandHandler::class);
     $this->removeProfileImageHandler = mock(RemoveProfileImageCommandHandler::class);
+    $this->createPasswordResetTokenHandler = mock(CreatePasswordResetTokenCommandHandler::class);
+    $this->resetPasswordHandler = mock(ResetPasswordCommandHandler::class);
+    $this->cleanupExpiredPasswordResetTokensHandler = mock(CleanupExpiredPasswordResetTokensCommandHandler::class);
+    $this->getPasswordResetTokenHandler = mock(GetPasswordResetTokenQueryHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -64,6 +72,10 @@ beforeEach(function (): void {
         updateSlackMemberIdHandler: $this->updateSlackMemberIdHandler,
         disconnectSlackHandler: $this->disconnectSlackHandler,
         removeProfileImageHandler: $this->removeProfileImageHandler,
+        createPasswordResetTokenHandler: $this->createPasswordResetTokenHandler,
+        resetPasswordHandler: $this->resetPasswordHandler,
+        cleanupExpiredPasswordResetTokensHandler: $this->cleanupExpiredPasswordResetTokensHandler,
+        getPasswordResetTokenHandler: $this->getPasswordResetTokenHandler,
     );
 });
 
@@ -268,4 +280,51 @@ it('delegates deleteOldProfileImage to handler', function () {
         ->with('old-avatar.jpg');
 
     $this->facade->deleteOldProfileImage('old-avatar.jpg');
+});
+
+it('delegates createPasswordResetToken to handler', function () {
+    $this->createPasswordResetTokenHandler
+        ->expects('handle')
+        ->once()
+        ->with('user@ooo.com')
+        ->andReturn('reset-token');
+
+    $result = $this->facade->createPasswordResetToken('user@ooo.com');
+
+    expect($result)->toBe('reset-token');
+});
+
+it('delegates resetPassword to handler', function () {
+    $this->resetPasswordHandler
+        ->expects('handle')
+        ->once()
+        ->with('token-abc', 'new-password')
+        ->andReturn(true);
+
+    $result = $this->facade->resetPassword('token-abc', 'new-password');
+
+    expect($result)->toBeTrue();
+});
+
+it('delegates cleanupExpiredPasswordResetTokens to handler', function () {
+    $this->cleanupExpiredPasswordResetTokensHandler
+        ->expects('handle')
+        ->once()
+        ->andReturn(3);
+
+    $result = $this->facade->cleanupExpiredPasswordResetTokens();
+
+    expect($result)->toBe(3);
+});
+
+it('delegates getPasswordResetToken to handler', function () {
+    $this->getPasswordResetTokenHandler
+        ->expects('handle')
+        ->once()
+        ->with('token-xyz')
+        ->andReturn(null);
+
+    $result = $this->facade->getPasswordResetToken('token-xyz');
+
+    expect($result)->toBeNull();
 });

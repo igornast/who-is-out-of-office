@@ -27,6 +27,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * @extends AppAbstractCrudController<User>
@@ -37,6 +39,8 @@ class UserCrudController extends AppAbstractCrudController
     public function __construct(
         private readonly RoleTranslator $roleTranslator,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly CsrfTokenManagerInterface $csrfTokenManager,
     ) {
     }
 
@@ -65,11 +69,25 @@ class UserCrudController extends AppAbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        $resetPasswordAction = Action::new('resetPassword', 'crud.user.action.reset_password')
+            ->linkToUrl(
+                fn (User $entity) => $this->urlGenerator->generate('app_user_reset_password', [
+                    'id' => $entity->id,
+                    '_token' => $this->csrfTokenManager->getToken(sprintf('resetPassword%s', $entity->id))->getValue(),
+                ])
+            )
+            ->setHtmlAttributes(['data-lr-action' => 'resetPassword'])
+            ->setIcon('icon-key-round')
+            ->addCssClass('btn btn-outline')
+            ->displayIf(fn (User $entity) => $this->isAdmin() && $entity->id->toString() !== $this->getUser()->id->toString());
+
         return $actions
             ->setPermission(Action::NEW, RoleEnum::Admin->value)
             ->setPermission(Action::DELETE, RoleEnum::Admin->value)
             ->setPermission(Action::EDIT, new Expression(sprintf('"%s" in role_names or "%s" in role_names', RoleEnum::Admin->value, RoleEnum::Manager->value)))
-            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_DETAIL, $resetPasswordAction)
+            ->add(Crud::PAGE_EDIT, $resetPasswordAction);
     }
 
     public function configureFields(string $pageName): iterable

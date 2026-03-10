@@ -14,6 +14,15 @@ email:
         date_range: "Date Range"
         status: "Status"
         default_leave_type: "Time Off"
+    password_reset:
+        subject: Reset your password
+        preheader: Click the link below to reset your password
+        title: Reset Your Password
+        body: We received a request to reset your password. Click the button below to choose a new one.
+        button: Reset Password
+        link_fallback: "If the button above doesn't work, copy and paste this link into your browser:"
+        expiry_note: This link will expire in 1 hour.
+        footer: "If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged."
     invitation:
         subject: "You're invited to Who's OOO"
         preheader: "%inviter_name% invited you to join Who's OOO"
@@ -67,6 +76,30 @@ email:
             status: "Withdrawn"
             withdrawn_by_label: "Withdrawn By"
             button: "View Dashboard"
+
+login:
+    forgot_password: Forgot your password?
+
+password_reset:
+    request:
+        page_title: "Forgot Password - Who's OOO"
+        heading: Forgot Password?
+        description: Enter your email address and we'll send you a link to reset your password.
+        email_label: Email Address
+        submit: Send Reset Link
+        success: If an account with that email exists, we've sent a password reset link.
+        back_to_login: Back to sign in
+    new_password: New Password
+    confirm_password: Confirm New Password
+    reset:
+        page_title: "Reset Password - Who's OOO"
+        heading: Reset Password
+        description: Enter your new password below.
+        submit: Reset Password
+        success: Your password has been reset successfully. Please sign in.
+        error: This reset link is invalid or has expired. Please request a new one.
+    error:
+        passwords_must_match: The password fields must match.
 
 invitation:
     page_title: "Complete Your Account - Who's OOO"

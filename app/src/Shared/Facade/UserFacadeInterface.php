@@ -64,4 +64,12 @@ interface UserFacadeInterface
     public function disconnectSlack(string $userId): void;
 
     public function deleteOldProfileImage(?string $currentProfileImageUrl): void;
+
+    public function createPasswordResetToken(string $email): ?string;
+
+    public function resetPassword(string $token, string $plainPassword): bool;
+
+    public function cleanupExpiredPasswordResetTokens(): int;
+
+    public function getPasswordResetToken(string $token): ?\App\Shared\DTO\PasswordResetTokenDTO;
 }

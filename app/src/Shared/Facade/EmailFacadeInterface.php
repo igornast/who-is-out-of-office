@@ -18,4 +18,6 @@ interface EmailFacadeInterface
     public function sendLeaveRequestRejectedEmail(LeaveRequestDTO $leaveRequestDTO): void;
 
     public function sendLeaveRequestWithdrawnEmail(LeaveRequestDTO $leaveRequestDTO): void;
+
+    public function sendPasswordResetEmail(string $email, string $token): void;
 }

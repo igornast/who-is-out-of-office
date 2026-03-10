@@ -4,6 +4,7 @@ const ACTION_CONFIG = {
     approve: { confirmClass: 'btn-success' },
     reject: { confirmClass: 'btn-danger' },
     withdraw: { confirmClass: 'btn-danger' },
+    resetPassword: { confirmClass: 'btn-primary' },
 };
 
 export default class extends Controller {
