@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\Exception\ExceptionInterface as MessengerExceptionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -37,8 +38,8 @@ class UserActionController extends AbstractController
             throw new NotFoundHttpException(sprintf('User "%s" not found.', $id));
         }
 
-        $token = $request->request->get('_token') ?? $request->query->get('_token');
-        if (!$this->isCsrfTokenValid(sprintf('resetPassword%s', $id), is_string($token) ? $token : null)) {
+        $token = $request->request->getString('_token');
+        if (!$this->isCsrfTokenValid(sprintf('resetPassword%s', $id), $token)) {
             return $this->json([
                 'success' => false,
                 'message' => $this->translator->trans('user.action.error.invalid_csrf', domain: 'admin'),
@@ -63,8 +64,8 @@ class UserActionController extends AbstractController
 
         try {
             $this->emailFacade->sendPasswordResetEmail($userDTO->email, $resetToken);
-        } catch (\Throwable $e) {
-            $this->logger->error(sprintf('Failed to send admin-triggered password reset email to %s: %s', $userDTO->email, $e->getMessage()));
+        } catch (MessengerExceptionInterface $e) {
+            $this->logger->error(sprintf('Failed to send admin-triggered password reset email for user %s: %s', $id, $e->getMessage()));
 
             return $this->json([
                 'success' => false,

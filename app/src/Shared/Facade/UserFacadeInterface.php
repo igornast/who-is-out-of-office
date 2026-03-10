@@ -6,6 +6,7 @@ namespace App\Shared\Facade;
 
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Shared\DTO\InvitationDTO;
+use App\Shared\DTO\PasswordResetTokenDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
@@ -71,5 +72,5 @@ interface UserFacadeInterface
 
     public function cleanupExpiredPasswordResetTokens(): int;
 
-    public function getPasswordResetToken(string $token): ?\App\Shared\DTO\PasswordResetTokenDTO;
+    public function getPasswordResetToken(string $token): ?PasswordResetTokenDTO;
 }

@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Exception\ExceptionInterface as MessengerExceptionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -28,19 +29,17 @@ class PasswordResetRequestController extends AbstractController
 
     public function __invoke(Request $request): Response
     {
-        $form = $this->createForm(PasswordResetRequestType::class, new PasswordResetRequestDTO());
+        $dto = new PasswordResetRequestDTO();
+        $form = $this->createForm(PasswordResetRequestType::class, $dto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var PasswordResetRequestDTO $dto */
-            $dto = $form->getData();
-
             $token = $this->userFacade->createPasswordResetToken($dto->email);
 
             if (null !== $token) {
                 try {
                     $this->emailFacade->sendPasswordResetEmail($dto->email, $token);
-                } catch (\Throwable $e) {
+                } catch (MessengerExceptionInterface $e) {
                     $this->logger->error(sprintf('Failed to send password reset email: %s', $e->getMessage()));
                 }
             }

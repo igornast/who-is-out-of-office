@@ -16,9 +16,4 @@ class PasswordResetToken
         public \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
     ) {
     }
-
-    public function isExpired(): bool
-    {
-        return $this->expiresAt < new \DateTimeImmutable();
-    }
 }

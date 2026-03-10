@@ -8,6 +8,7 @@ use App\Module\User\DTO\PasswordHashUserDTO;
 use App\Module\User\Repository\PasswordResetTokenRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Shared\DTO\PasswordResetTokenDTO;
+use Psr\Clock\ClockInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class ResetPasswordCommandHandler
@@ -16,6 +17,7 @@ class ResetPasswordCommandHandler
         private readonly PasswordResetTokenRepositoryInterface $tokenRepository,
         private readonly UserRepositoryInterface $userRepository,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -27,7 +29,7 @@ class ResetPasswordCommandHandler
             return false;
         }
 
-        if ($tokenDTO->isExpired()) {
+        if ($tokenDTO->expiresAt < $this->clock->now()) {
             $this->tokenRepository->removeByToken($token);
 
             return false;

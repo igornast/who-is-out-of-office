@@ -24,7 +24,15 @@ class PasswordResetTokenRepository extends ServiceEntityRepository implements Pa
 
     public function findOneByToken(string $token): ?PasswordResetTokenDTO
     {
-        $entity = $this->findOneBy(['token' => $token]);
+        $hashedToken = hash('sha256', $token);
+
+        $entity = $this->createQueryBuilder('prt')
+            ->join('prt.user', 'u')
+            ->addSelect('u')
+            ->where('prt.token = :token')
+            ->setParameter('token', $hashedToken)
+            ->getQuery()
+            ->getOneOrNullResult();
 
         return $entity instanceof PasswordResetToken ? PasswordResetTokenDTO::fromEntity($entity) : null;
     }
@@ -37,7 +45,7 @@ class PasswordResetTokenRepository extends ServiceEntityRepository implements Pa
 
         $entity = new PasswordResetToken(
             id: Uuid::uuid4(),
-            token: $token,
+            token: hash('sha256', $token),
             user: $user,
             expiresAt: $expiresAt,
         );
@@ -58,7 +66,8 @@ class PasswordResetTokenRepository extends ServiceEntityRepository implements Pa
 
     public function removeByToken(string $token): void
     {
-        $entity = $this->findOneBy(['token' => $token]);
+        $hashedToken = hash('sha256', $token);
+        $entity = $this->findOneBy(['token' => $hashedToken]);
 
         if (!$entity instanceof PasswordResetToken) {
             return;

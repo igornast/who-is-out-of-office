@@ -17,11 +17,6 @@ class PasswordResetTokenDTO
     ) {
     }
 
-    public function isExpired(): bool
-    {
-        return $this->expiresAt < new \DateTimeImmutable();
-    }
-
     public static function fromEntity(PasswordResetToken $entity): self
     {
         return new self(

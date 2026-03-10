@@ -7,12 +7,14 @@ namespace App\Module\User\UseCase\Command;
 use App\Module\User\Repository\PasswordResetTokenRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Shared\DTO\UserDTO;
+use Psr\Clock\ClockInterface;
 
 class CreatePasswordResetTokenCommandHandler
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository,
         private readonly PasswordResetTokenRepositoryInterface $tokenRepository,
+        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -27,7 +29,7 @@ class CreatePasswordResetTokenCommandHandler
         $this->tokenRepository->removeByUserId($userDTO->id);
 
         $token = bin2hex(random_bytes(32));
-        $expiresAt = new \DateTimeImmutable('+1 hour');
+        $expiresAt = $this->clock->now()->modify('+1 hour');
 
         $this->tokenRepository->save($token, $userDTO->id, $expiresAt);
 

@@ -136,7 +136,10 @@ describe('resetPassword', function (): void {
 
         $this->userFacade->expects('getUser')->with($userId)->andReturn($userDTO);
         $this->userFacade->expects('createPasswordResetToken')->with('test@ooo.com')->andReturn('reset-token-abc');
-        $this->emailFacade->expects('sendPasswordResetEmail')->andThrow(new RuntimeException('SMTP down'));
+        $this->emailFacade->expects('sendPasswordResetEmail')->andThrow(new Symfony\Component\Messenger\Exception\HandlerFailedException(
+            new Symfony\Component\Messenger\Envelope(new App\Infrastructure\Email\Message\SendPasswordResetEmailMessage('test@ooo.com', 'reset-token-abc')),
+            [new RuntimeException('SMTP down')],
+        ));
         $this->logger->expects('error')->once();
 
         $response = $this->controller->resetPassword(resetPasswordRequest(), $userId);

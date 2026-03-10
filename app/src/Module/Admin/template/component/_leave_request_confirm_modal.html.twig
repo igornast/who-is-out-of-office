@@ -1,6 +1,6 @@
-<div class="modal fade" id="lr-confirm-modal" tabindex="-1"
-     aria-labelledby="lr-confirm-modal-label" aria-hidden="true"
-     data-controller="leave-request-action"
+<div class="modal fade" id="action-confirm-modal" tabindex="-1"
+     aria-labelledby="action-confirm-modal-label" aria-hidden="true"
+     data-controller="action-confirm"
      data-approve-title="{{ 'leave_request.action.approve_confirm_title'|trans(domain: 'admin') }}"
      data-approve-body="{{ 'leave_request.action.approve_confirm_body'|trans(domain: 'admin') }}"
      data-approve-action="{{ 'leave_request.action.approve_confirm_action'|trans(domain: 'admin') }}"
@@ -16,7 +16,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="lr-confirm-modal-label" data-modal="title"></h5>
+                <h5 class="modal-title" id="action-confirm-modal-label" data-modal="title"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="{{ 'leave_request.action.cancel'|trans(domain: 'admin') }}"></button>
             </div>
@@ -26,10 +26,10 @@
                     {{ 'leave_request.action.cancel'|trans(domain: 'admin') }}
                 </button>
                 <button type="button" class="btn btn-success" data-modal="confirm"
-                        data-action="click->leave-request-action#confirm">
+                        data-action="click->action-confirm#confirm">
                 </button>
             </div>
         </div>
     </div>
-    <div class="widget-toast" data-leave-request-action-target="toast"></div>
+    <div class="widget-toast" data-action-confirm-target="toast"></div>
 </div>

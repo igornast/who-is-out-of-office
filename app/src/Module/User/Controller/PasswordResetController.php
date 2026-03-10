@@ -14,13 +14,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Psr\Clock\ClockInterface;
 
-#[Route('/password-reset/{token}', name: 'app_password_reset', methods: ['GET', 'POST'])]
+#[Route('/password-reset/{token}', name: 'app_password_reset', methods: ['GET', 'POST'], requirements: ['token' => '[a-f0-9]{64}'])]
 class PasswordResetController extends AbstractController
 {
     public function __construct(
         private readonly UserFacadeInterface $userFacade,
         private readonly TranslatorInterface $translator,
+        private readonly ClockInterface $clock,
     ) {
     }
 
@@ -28,17 +30,15 @@ class PasswordResetController extends AbstractController
     {
         $tokenDTO = $this->userFacade->getPasswordResetToken($token);
 
-        if (!$tokenDTO instanceof PasswordResetTokenDTO || $tokenDTO->isExpired()) {
+        if (!$tokenDTO instanceof PasswordResetTokenDTO || $tokenDTO->expiresAt < $this->clock->now()) {
             throw new NotFoundHttpException();
         }
 
-        $form = $this->createForm(PasswordResetType::class, new PasswordResetDTO());
+        $dto = new PasswordResetDTO();
+        $form = $this->createForm(PasswordResetType::class, $dto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var PasswordResetDTO $dto */
-            $dto = $form->getData();
-
             $success = $this->userFacade->resetPassword($token, $dto->password);
 
             if ($success) {

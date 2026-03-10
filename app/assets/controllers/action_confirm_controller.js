@@ -63,16 +63,22 @@ export default class extends Controller {
         this._setLoading(btn, row, true);
 
         const headers = { 'Accept': 'application/json' };
+        const formData = new FormData();
         let fetchUrl = url;
-        let body = null;
 
         if (token) {
-            const formData = new FormData();
             formData.append('_token', token);
-            body = formData;
         }
 
-        fetch(fetchUrl, { method: 'POST', body, headers })
+        const parsedUrl = new URL(url, window.location.origin);
+        const urlToken = parsedUrl.searchParams.get('_token');
+        if (urlToken) {
+            formData.append('_token', urlToken);
+            parsedUrl.searchParams.delete('_token');
+            fetchUrl = parsedUrl.toString();
+        }
+
+        fetch(fetchUrl, { method: 'POST', body: formData, headers })
             .then(response => response.json().then(data => ({ ok: response.ok, data })))
             .then(({ ok, data }) => {
                 if (ok && data.success) {

@@ -6,14 +6,17 @@ use App\Module\User\Repository\PasswordResetTokenRepositoryInterface;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Module\User\UseCase\Command\CreatePasswordResetTokenCommandHandler;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
+use Symfony\Component\Clock\MockClock;
 
 beforeEach(function (): void {
     $this->userRepository = mock(UserRepositoryInterface::class);
     $this->tokenRepository = mock(PasswordResetTokenRepositoryInterface::class);
+    $this->clock = new MockClock(new DateTimeImmutable('2026-03-10 12:00:00'));
 
     $this->handler = new CreatePasswordResetTokenCommandHandler(
         $this->userRepository,
         $this->tokenRepository,
+        $this->clock,
     );
 });
 
@@ -61,19 +64,14 @@ describe('CreatePasswordResetTokenCommandHandler', function (): void {
 
     it('saves token with 1-hour expiry', function (): void {
         $userDTO = UserDTOFixture::create(['email' => 'test@ooo.com', 'isActive' => true]);
+        $expectedExpiry = new DateTimeImmutable('2026-03-10 13:00:00');
 
         $this->userRepository->expects('findOneByEmail')->andReturn($userDTO);
         $this->tokenRepository->expects('removeByUserId');
         $this->tokenRepository->expects('save')
-            ->withArgs(function (string $token, string $userId, DateTimeImmutable $expiresAt) use ($userDTO): bool {
-                $now = new DateTimeImmutable();
-                $diff = $expiresAt->getTimestamp() - $now->getTimestamp();
-
-                return 64 === strlen($token)
+            ->withArgs(fn (string $token, string $userId, DateTimeImmutable $expiresAt): bool => 64 === strlen($token)
                     && $userId === $userDTO->id
-                    && $diff >= 3500
-                    && $diff <= 3600;
-            })
+                    && $expiresAt->getTimestamp() === $expectedExpiry->getTimestamp())
             ->once();
 
         $this->handler->handle('test@ooo.com');
