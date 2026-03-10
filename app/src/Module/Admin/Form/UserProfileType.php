@@ -71,6 +71,11 @@ class UserProfileType extends AbstractType
                 'required' => false,
                 'help' => 'crud.user_profile.field.has_celebrate_work_anniversary_help',
             ])
+            ->add('isEmailNotificationsEnabled', CheckboxType::class, [
+                'label' => 'crud.user_profile.field.is_email_notifications_enabled',
+                'required' => false,
+                'help' => 'crud.user_profile.field.is_email_notifications_enabled_help',
+            ])
             ->add('profileImageFile', FileType::class, [
                 'label' => false,
                 'required' => false,

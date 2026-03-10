@@ -1,23 +1,34 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}{{ 'invitation.page_title'|trans }}{% endblock %}
 
-{% form_theme form '@EasyAdmin/symfony-form-themes/bootstrap_5_layout.html.twig' %}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/invitation.css') }}">
+{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <h1 class="mb-4">Complete Your Account</h1>
+    <div class="invitation-page">
+        <div class="invitation-card">
+            <h1>{{ 'invitation.title'|trans }}</h1>
+            <p class="invitation-subtitle">{{ 'invitation.subtitle'|trans }}</p>
 
-                {{ form_start(form) }}
+            {{ form_start(form) }}
                 {{ form_row(form.firstName) }}
                 {{ form_row(form.lastName) }}
                 {{ form_row(form.birthdate) }}
-                {{ form_row(form.password) }}
+                {{ form_row(form.password.first) }}
+                {{ form_row(form.password.second) }}
 
-                <button class="btn btn-primary w-100">Submit</button>
-                {{ form_end(form) }}
-            </div>
+                <button type="submit" class="btn btn-primary w-100 mt-2">
+                    {{ 'invitation.submit'|trans }}
+                </button>
+            {{ form_end(form) }}
         </div>
     </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
 {% endblock %}

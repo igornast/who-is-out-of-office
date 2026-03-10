@@ -12,6 +12,7 @@ use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestPermission;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Facade\EmailFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -33,6 +34,7 @@ class LeaveRequestActionController extends AbstractController
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
         private readonly TranslatorInterface $translator,
+        private readonly EmailFacadeInterface $emailFacade,
     ) {
     }
 
@@ -48,6 +50,7 @@ class LeaveRequestActionController extends AbstractController
 
             $dto->status = LeaveRequestStatusEnum::Withdrawn;
             $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded($dto);
+            $this->emailFacade->sendLeaveRequestWithdrawnEmail($dto);
         });
     }
 
@@ -64,6 +67,7 @@ class LeaveRequestActionController extends AbstractController
             $dto->status = LeaveRequestStatusEnum::Approved;
             $dto->approvedBy = UserDTO::fromEntity($this->getCurrentUser());
             $this->leaveRequestFacade->update($dto);
+            $this->emailFacade->sendLeaveRequestApprovedEmail($dto);
         });
     }
 
@@ -80,6 +84,7 @@ class LeaveRequestActionController extends AbstractController
             $dto->status = LeaveRequestStatusEnum::Rejected;
             $dto->approvedBy = UserDTO::fromEntity($this->getCurrentUser());
             $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded($dto);
+            $this->emailFacade->sendLeaveRequestRejectedEmail($dto);
         });
     }
 

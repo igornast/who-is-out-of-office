@@ -31,6 +31,7 @@ class UserDTOFixture implements FixtureInterface
             'currentLeaveBalance' => 24,
             'isActive' => true,
             'hasCelebrateWorkAnniversary' => $faker->boolean(),
+            'isEmailNotificationsEnabled' => true,
             'createdAt' => \DateTimeImmutable::createFromMutable($faker->dateTime()),
             'password' => $faker->password(),
             'profileImageUrl' => null,

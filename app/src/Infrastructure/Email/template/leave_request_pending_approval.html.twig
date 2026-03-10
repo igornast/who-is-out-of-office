@@ -1,0 +1,139 @@
+{% extends '@AppEmail/base.html.twig' %}
+
+{% block subject %}{{ 'email.leave_request.pending_approval.subject'|trans({'%name%': employee_name}) }}{% endblock %}
+
+{% block preheader %}{{ 'email.leave_request.pending_approval.preheader'|trans({'%name%': employee_name, '%date%': start_date|date('F j')}) }}{% endblock %}
+
+{% block content %}
+
+    {# Greeting #}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 20px; font-weight: bold; color: #1A2E2E; margin-bottom: 8px;">
+                {{ 'email.leave_request.pending_approval.heading'|trans }}
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #6B8080; line-height: 1.6; padding-bottom: 24px;">
+                {{ 'email.leave_request.pending_approval.intro'|trans }}
+            </td>
+        </tr>
+    </table>
+
+    {# Employee details section #}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0; padding: 20px 24px; background-color: #F5F8F7; border-radius: 4px;">
+        <tr>
+            <td>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px;">
+                                        {{ 'email.leave_request.pending_approval.employee_label'|trans }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #1A2E2E; font-weight: bold; padding-bottom: 20px;">
+                                        {{ employee_name }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; text-align: right; vertical-align: top;">
+                            <div style="display: inline-block; width: 48px; height: 48px; background-color: #3D9B8F; border-radius: 50%; line-height: 48px; text-align: center; font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 18px; font-weight: bold; color: #FFFFFF;">
+                                {{ employee_initials|default('?') }}
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    {# Leave details card #}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0;">
+        <tr>
+            <td style="background-color: #F5F8F7; border-left: 4px solid #3D9B8F; padding: 20px 24px; border-radius: 4px;">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    {# Leave type and duration #}
+                    <tr>
+                        <td style="width: 50%; padding-right: 12px; padding-bottom: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px;">{{ 'email.common.leave_type'|trans }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #1A2E2E; font-weight: bold;">{{ leave_type|default('email.common.default_leave_type'|trans) }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; padding-bottom: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px;">{{ 'email.common.duration'|trans }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #1A2E2E; font-weight: bold;">{{ 'email.common.duration_value'|trans({'%count%': duration|default('0')}) }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {# Date range #}
+                    <tr>
+                        <td colspan="2" style="padding-bottom: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px;">{{ 'email.common.date_range'|trans }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #1A2E2E; font-weight: bold;">
+                                        {{ start_date|date('M j, Y') }} — {{ end_date|date('M j, Y') }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {# Reason if provided #}
+                    {% if reason %}
+                    <tr>
+                        <td colspan="2">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px;">{{ 'email.leave_request.pending_approval.reason_label'|trans }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #1A2E2E; line-height: 1.5;">{{ reason }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    {# Call to action message #}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #6B8080; line-height: 1.6; padding-bottom: 24px;">
+                {{ 'email.leave_request.pending_approval.action'|trans }}
+            </td>
+        </tr>
+    </table>
+
+    {# Review button #}
+    <table cellpadding="0" cellspacing="0" border="0" style="margin: 24px auto;">
+        <tr>
+            <td align="center" style="background-color: #E8876F; border-radius: 8px;">
+                <a href="{{ request_url }}" target="_blank" style="display: inline-block; padding: 14px 32px; font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; font-weight: 600; color: #FFFFFF; text-decoration: none;">
+                    {{ 'email.leave_request.pending_approval.button'|trans }}
+                </a>
+            </td>
+        </tr>
+    </table>
+
+{% endblock %}

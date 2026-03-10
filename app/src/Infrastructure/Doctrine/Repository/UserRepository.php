@@ -54,6 +54,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->annualLeaveAllowance = $userDTO->annualLeaveAllowance;
         $user->currentLeaveBalance = $userDTO->currentLeaveBalance;
         $user->isActive = $userDTO->isActive;
+        $user->isEmailNotificationsEnabled = $userDTO->isEmailNotificationsEnabled;
         $user->birthDate = $userDTO->birthDate;
         $user->absenceBalanceResetDay = $userDTO->absenceBalanceResetDay;
 

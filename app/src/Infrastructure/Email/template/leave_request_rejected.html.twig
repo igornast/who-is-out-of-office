@@ -1,0 +1,119 @@
+{% extends '@AppEmail/base.html.twig' %}
+
+{% block subject %}{{ 'email.leave_request.rejected.subject'|trans }}{% endblock %}
+
+{% block preheader %}{{ 'email.leave_request.rejected.preheader'|trans }}{% endblock %}
+
+{% block content %}
+
+    {# Greeting #}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 20px; font-weight: bold; color: #1A2E2E; margin-bottom: 8px;">
+                {{ 'email.leave_request.rejected.heading'|trans }}
+            </td>
+        </tr>
+        <tr>
+            <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #6B8080; line-height: 1.6; padding-bottom: 24px;">
+                {{ 'email.leave_request.rejected.greeting'|trans({'%name%': employee_name|default('there')}) }}<br>
+                {{ 'email.leave_request.rejected.body'|trans({'%rejected_by%': rejected_by|default('email.leave_request.rejected.default_rejected_by'|trans)}) }}
+            </td>
+        </tr>
+    </table>
+
+    {# Leave details card with rejected status #}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0;">
+        <tr>
+            <td style="background-color: #FDEAEA; border-left: 4px solid #D4555E; padding: 20px 24px; border-radius: 4px;">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    {# Status badge #}
+                    <tr>
+                        <td colspan="2" style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 8px;">
+                            {{ 'email.common.status'|trans }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding-bottom: 20px;">
+                            <span style="display: inline-block; padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; background-color: #FDEAEA; color: #D4555E;">{{ 'email.leave_request.rejected.status'|trans }}</span>
+                        </td>
+                    </tr>
+
+                    {# Leave type and duration #}
+                    <tr>
+                        <td style="width: 50%; padding-right: 12px; padding-bottom: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px;">{{ 'email.common.leave_type'|trans }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #1A2E2E; font-weight: bold;">{{ leave_type|default('email.common.default_leave_type'|trans) }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 50%; padding-bottom: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px;">{{ 'email.common.duration'|trans }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #1A2E2E; font-weight: bold;">{{ 'email.common.duration_value'|trans({'%count%': duration|default('0')}) }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {# Date range #}
+                    <tr>
+                        <td colspan="2" style="padding-bottom: 20px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px;">{{ 'email.common.date_range'|trans }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #1A2E2E; font-weight: bold;">
+                                        {{ start_date|date('M j, Y') }} — {{ end_date|date('M j, Y') }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {# Declined by #}
+                    <tr>
+                        <td colspan="2">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px;">{{ 'email.leave_request.rejected.declined_by_label'|trans }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; color: #1A2E2E; font-weight: bold;">{{ rejected_by|default('email.leave_request.rejected.default_rejected_by'|trans) }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    {# Info message #}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #6B8080; line-height: 1.6; padding-bottom: 24px;">
+                {{ 'email.leave_request.rejected.info'|trans({'%rejected_by%': rejected_by|default('email.leave_request.rejected.default_rejected_by'|trans)}) }}
+            </td>
+        </tr>
+    </table>
+
+    {# Dashboard button #}
+    <table cellpadding="0" cellspacing="0" border="0" style="margin: 24px auto;">
+        <tr>
+            <td align="center" style="background-color: #3D9B8F; border-radius: 8px;">
+                <a href="{{ dashboard_url }}" target="_blank" style="display: inline-block; padding: 14px 32px; font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; font-weight: 600; color: #FFFFFF; text-decoration: none;">
+                    {{ 'email.leave_request.rejected.button'|trans }}
+                </a>
+            </td>
+        </tr>
+    </table>
+
+{% endblock %}

@@ -35,6 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public int $currentLeaveBalance = 24,
         public bool $isActive = false,
         public bool $hasCelebrateWorkAnniversary = false,
+        public bool $isEmailNotificationsEnabled = true,
         public ?string $plainPassword = null,
         public ?string $profileImageUrl = null,
         public ?\DateTimeImmutable $birthDate = null,

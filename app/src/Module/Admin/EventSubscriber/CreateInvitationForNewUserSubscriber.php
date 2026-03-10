@@ -6,6 +6,8 @@ namespace App\Module\Admin\EventSubscriber;
 
 use App\Infrastructure\Doctrine\Entity\Invitation;
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Shared\DTO\InvitationDTO;
+use App\Shared\Facade\EmailFacadeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityPersistedEvent;
 use Ramsey\Uuid\Uuid;
@@ -13,8 +15,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CreateInvitationForNewUserSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly EntityManagerInterface $em)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly EmailFacadeInterface $emailFacade,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -43,5 +47,7 @@ class CreateInvitationForNewUserSubscriber implements EventSubscriberInterface
 
         $this->em->persist($invitation);
         $this->em->flush();
+
+        $this->emailFacade->sendInvitationEmail(InvitationDTO::fromEntity($invitation));
     }
 }

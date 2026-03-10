@@ -18,6 +18,7 @@
         <field name="currentLeaveBalance" column="current_leave_balance"  type="integer"/>
         <field name="isActive" column="is_active" type="boolean" />
         <field name="hasCelebrateWorkAnniversary" column="celebrate_work_anniversary" type="boolean" />
+        <field name="isEmailNotificationsEnabled" column="is_email_notifications_enabled" type="boolean"/>
         <field name="profileImageUrl" column="profile_image_url" length="255" nullable="true" />
         <field name="birthDate" column="birth_date" type="date_immutable" nullable="true" />
         <field name="contractStartedAt" column="contract_started_at" type="date_immutable" nullable="true" />

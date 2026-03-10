@@ -24,6 +24,7 @@ class UserProfileDTO
         #[Assert\NotBlank]
         public array $workingDays = [],
         public bool $hasCelebrateWorkAnniversary = false,
+        public bool $isEmailNotificationsEnabled = true,
         public ?string $removeProfileImage = null,
         public ?\DateTimeImmutable $birthDate = null,
         public ?\DateTimeImmutable $contractStartedAt = null,
@@ -41,6 +42,7 @@ class UserProfileDTO
             lastName: $user->lastName,
             workingDays: $user->workingDays,
             hasCelebrateWorkAnniversary: $user->hasCelebrateWorkAnniversary,
+            isEmailNotificationsEnabled: $user->isEmailNotificationsEnabled,
             birthDate: $user->birthDate,
             contractStartedAt: $user->contractStartedAt,
             absenceBalanceResetDay: $user->absenceBalanceResetDay,

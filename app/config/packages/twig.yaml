@@ -3,6 +3,7 @@ twig:
     paths:
         'src/Module/Admin/template': 'AppAdmin'
         'src/Module/User/template': 'AppUser'
+        'src/Infrastructure/Email/template': 'AppEmail'
     globals:
         profile_images_base_path: '%profile_images_base_path%'
     form_themes:

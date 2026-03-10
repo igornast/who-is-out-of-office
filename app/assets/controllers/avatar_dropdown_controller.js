@@ -128,6 +128,7 @@ export default class extends Controller {
         html.classList.toggle('dark', isDark);
         html.classList.toggle('ea-dark-scheme', isDark);
         html.dataset.bsTheme = isDark ? 'dark' : 'light';
+        html.style.colorScheme = isDark ? 'dark' : 'light';
     }
 
     syncSidebarToggle(mode) {

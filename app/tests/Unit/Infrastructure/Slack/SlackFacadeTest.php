@@ -69,7 +69,9 @@ it('handles interactive notification and notifies user when not auto approved', 
         ->once()
         ->with($leaveRequestDTO);
 
-    $this->facade->handleInteractiveNotification($interactiveDTO);
+    $result = $this->facade->handleInteractiveNotification($interactiveDTO);
+
+    expect($result)->toBe($leaveRequestDTO);
 });
 
 it('handles interactive notification and skips user notification when auto approved', function () {
@@ -97,7 +99,9 @@ it('handles interactive notification and skips user notification when auto appro
     $this->notifyUserLeaveRequestStatusChanged
         ->shouldNotReceive('handle');
 
-    $this->facade->handleInteractiveNotification($interactiveDTO);
+    $result = $this->facade->handleInteractiveNotification($interactiveDTO);
+
+    expect($result)->toBe($leaveRequestDTO);
 });
 
 it('delegates notifyUserOnLeaveRequestChange to handler', function () {
