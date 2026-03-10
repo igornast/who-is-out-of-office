@@ -10,7 +10,7 @@ class PasswordResetDTO
 {
     public function __construct(
         #[Assert\NotBlank]
-        #[Assert\Length(min: 12)]
+        #[Assert\Length(min: 8)]
         public string $password = '',
     ) {
     }
