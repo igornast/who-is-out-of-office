@@ -77,6 +77,23 @@ email:
             withdrawn_by_label: "Withdrawn By"
             button: "View Dashboard"
 
+welcome:
+    page_title: "Who's OOO — Open Source Leave Management"
+    tagline: "Open source leave management for teams that value simplicity."
+    cta_signin: "Sign in to your account"
+    cta_dashboard: "Go to Dashboard"
+    cta_github: "View on GitHub"
+    feature_calendar: "Team calendar"
+    feature_approvals: "One-click approvals"
+    feature_integrations: "Slack & iCal"
+    feature_dark_mode: "Dark mode"
+    feature_mobile: "Mobile ready"
+    feature_selfhosted: "Self-hosted"
+    footer_website: "Project website"
+    footer_github: "GitHub"
+    footer_docs: "Documentation"
+    footer_version: "Who's OOO — Open source leave management"
+
 login:
     forgot_password: Forgot your password?
 
