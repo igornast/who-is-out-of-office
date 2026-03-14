@@ -78,24 +78,13 @@
         /* ── Logo mark ── */
         .logo-mark {
             display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 72px;
-            height: 72px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-active));
-            border-radius: var(--radius-xl);
             margin-bottom: 28px;
-            box-shadow: 0 4px 20px rgba(61, 155, 143, 0.25);
         }
 
-        .logo-mark svg {
-            width: 38px;
-            height: 38px;
-            fill: none;
-            stroke: white;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+        .logo-mark img {
+            width: 96px;
+            height: 96px;
+            object-fit: contain;
         }
 
         /* ── Typography ── */
@@ -292,9 +281,9 @@
                 margin-bottom: 24px;
             }
 
-            .logo-mark svg {
-                width: 32px;
-                height: 32px;
+            .logo-mark img {
+                width: 76px;
+                height: 76px;
             }
 
             .app-name {
@@ -352,15 +341,7 @@
         <div class="hero-content">
 
             <div class="logo-mark">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 21V11"/>
-                    <path d="M14 3c-1.5 2-1.5 4-1 6"/>
-                    <path d="M10 3c1.5 2 1.5 4 1 6"/>
-                    <path d="M6 5c2 .5 3.5 2 4 4"/>
-                    <path d="M18 5c-2 .5-3.5 2-4 4"/>
-                    <path d="M3 7c2.5 0 4.5 1.5 5.5 3"/>
-                    <path d="M21 7c-2.5 0-4.5 1.5-5.5 3"/>
-                </svg>
+                <img src="{{ asset('image/icons/icon_pride.png') }}" alt="Who's OOO">
             </div>
 
             <h1 class="app-name">Who's <span>OOO</span></h1>
