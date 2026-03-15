@@ -42,7 +42,7 @@ class DashboardController extends AbstractDashboardController
         return Dashboard::new()
             ->setTitle('Who\'s OOO')
             ->renderContentMaximized()
-            ->setDefaultColorScheme('auto')
+            ->disableDarkMode()
             ->setTranslationDomain('admin');
     }
 
