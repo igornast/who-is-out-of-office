@@ -8,6 +8,8 @@ framework:
 
         routing:
             'App\Module\LeaveRequest\Message\LeaveRequestAutoApprovedMessage': async
+            'App\Infrastructure\Email\Message\SendLeaveRequestEmailMessage': async
+            'App\Infrastructure\Email\Message\SendInvitationEmailMessage': async
 
 when@test:
     framework:

@@ -100,6 +100,50 @@ App\Infrastructure\Doctrine\Entity\User:
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
             manager: '@user_1'
 
+    invited_user:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Invited'
+            lastName: 'User'
+            email: 'invited@ooo.com'
+            password: 'not-set'
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 24
+            isActive: false
+            hasCelebrateWorkAnniversary: false
+            holidayCalendar: '@holiday_calendar_fr'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
+
+    invited_user_2:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Invited'
+            lastName: 'User Two'
+            email: 'invited2@ooo.com'
+            password: 'not-set'
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 24
+            isActive: false
+            hasCelebrateWorkAnniversary: false
+            holidayCalendar: '@holiday_calendar_fr'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
+
+App\Infrastructure\Doctrine\Entity\Invitation:
+    invitation_1:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            token: 'test-invitation-token-abc123'
+            user: '@invited_user'
+    invitation_2:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            token: 'test-invitation-token-validation'
+            user: '@invited_user_2'
+
 App\Infrastructure\Doctrine\Entity\LeaveRequestType:
     leave_request_type_1:
         __construct:

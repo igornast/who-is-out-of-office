@@ -159,6 +159,9 @@
             if (isDark) {
                 document.documentElement.classList.add('dark', 'ea-dark-scheme');
                 document.documentElement.dataset.bsTheme = 'dark';
+                document.documentElement.style.colorScheme = 'dark';
+            } else {
+                document.documentElement.style.colorScheme = 'light';
             }
             var palette = localStorage.getItem('whosooo-palette') || 'teal';
             if (['teal','sage','sunset','lavender'].indexOf(palette) === -1) palette = 'teal';
@@ -199,6 +202,12 @@
 
                 <button type="submit" class="btn-sign-in">{{ _sign_in_label }}</button>
             </form>
+
+            <div style="text-align: center; margin-top: 16px;">
+                <a href="{{ path('app_password_reset_request') }}" style="font-family: var(--font-body); font-size: 13px; color: var(--text-tertiary); text-decoration: none;">
+                    {{ 'login.forgot_password'|trans }}
+                </a>
+            </div>
         </div>
     </div>
     {{ importmap('app') }}

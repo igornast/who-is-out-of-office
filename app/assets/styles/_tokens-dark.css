@@ -1,4 +1,6 @@
 html.dark {
+    color-scheme: dark;
+
     --app-bg: #1A2424;
     --app-bg-alt: #1E2C2C;
     --app-surface: #243434;

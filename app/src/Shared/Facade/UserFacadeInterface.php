@@ -6,6 +6,7 @@ namespace App\Shared\Facade;
 
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Shared\DTO\InvitationDTO;
+use App\Shared\DTO\PasswordResetTokenDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
@@ -64,4 +65,12 @@ interface UserFacadeInterface
     public function disconnectSlack(string $userId): void;
 
     public function deleteOldProfileImage(?string $currentProfileImageUrl): void;
+
+    public function createPasswordResetToken(string $email): ?string;
+
+    public function resetPassword(string $token, string $plainPassword): bool;
+
+    public function cleanupExpiredPasswordResetTokens(): int;
+
+    public function getPasswordResetToken(string $token): ?PasswordResetTokenDTO;
 }

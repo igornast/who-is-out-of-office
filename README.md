@@ -32,10 +32,16 @@ Settings are stored in `app/src/Module/Settings/Config/app_setting.yaml` and can
 
 ## 📅 Public Holiday Import
 
-You can import a set of public holidays for a specific country and year using the following Symfony command:
+Public holidays can be imported via the admin UI:
+
+1. Log in with an admin account
+2. Navigate to **Public Holidays** in the Settings sidebar section
+3. Click **Add Calendar**, select a country and year, then import
+
+Alternatively, use the CLI command:
 
 ```shell
-php app/bin/console app:holiday:import NG Nigeria 2025
+php app/bin/console app:holiday:import DE Germany 2025
 ```
 
 ## 🗂️ Frontend & Assets

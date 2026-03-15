@@ -43,5 +43,13 @@ services:
             - mysql:/var/lib/mysql:delegated
             - ./docker/mysql/init-grants.sql:/docker-entrypoint-initdb.d/init-grants.sql
 
+    mailer:
+        image: axllent/mailpit
+        ports:
+            - "1025"
+            - "8025"
+        environment:
+            MP_SMTP_AUTH_ACCEPT_ANY: 1
+            MP_SMTP_AUTH_ALLOW_INSECURE: 1
 volumes:
     mysql:

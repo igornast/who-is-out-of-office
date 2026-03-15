@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Controller;
 
-use App\Infrastructure\Doctrine\Entity\Invitation;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
 use App\Shared\Enum\RoleEnum;
@@ -29,17 +28,19 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * @extends AppAbstractCrudController<User>
  */
-#[AdminRoute(path: '/my-team', name: 'app_users')]
+#[AdminRoute(path: '/my-organization', name: 'app_users')]
 class UserCrudController extends AppAbstractCrudController
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
         private readonly RoleTranslator $roleTranslator,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly CsrfTokenManagerInterface $csrfTokenManager,
     ) {
     }
 
@@ -68,11 +69,25 @@ class UserCrudController extends AppAbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        $resetPasswordAction = Action::new('resetPassword', 'crud.user.action.reset_password')
+            ->linkToUrl(
+                fn (User $entity) => $this->urlGenerator->generate('app_user_reset_password', [
+                    'id' => $entity->id,
+                    '_token' => $this->csrfTokenManager->getToken(sprintf('resetPassword%s', $entity->id))->getValue(),
+                ])
+            )
+            ->setHtmlAttributes(['data-lr-action' => 'resetPassword'])
+            ->setIcon('icon-key-round')
+            ->addCssClass('btn btn-outline')
+            ->displayIf(fn (User $entity) => $this->isAdmin() && $entity->id->toString() !== $this->getUser()->id->toString());
+
         return $actions
             ->setPermission(Action::NEW, RoleEnum::Admin->value)
             ->setPermission(Action::DELETE, RoleEnum::Admin->value)
             ->setPermission(Action::EDIT, new Expression(sprintf('"%s" in role_names or "%s" in role_names', RoleEnum::Admin->value, RoleEnum::Manager->value)))
-            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_DETAIL, $resetPasswordAction)
+            ->add(Crud::PAGE_EDIT, $resetPasswordAction);
     }
 
     public function configureFields(string $pageName): iterable
@@ -94,6 +109,9 @@ class UserCrudController extends AppAbstractCrudController
         yield TextField::new('firstName')->hideWhenCreating();
         yield TextField::new('lastName')->hideWhenCreating();
         yield DateField::new('birthDate')->hideWhenCreating();
+        yield BooleanField::new('isActive', 'Status')
+            ->renderAsSwitch(false)
+            ->onlyOnIndex();
 
         if ($this->isAdminOrManager()) {
             yield FormField::addTab('Employee of record');
@@ -134,13 +152,6 @@ class UserCrudController extends AppAbstractCrudController
                 ->hideOnDetail()
                 ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
 
-            yield TextField::new('invitationCopy', 'Status')
-                ->setVirtual(true)
-                ->setValue('')
-                ->formatValue(fn ($value, $user) => $this->generateInvitationButton($user))
-                ->onlyOnIndex()
-                ->renderAsHtml();
-
             yield TextField::new('plainPassword')
                 ->onlyWhenUpdating()->setRequired(false);
         }
@@ -172,44 +183,5 @@ class UserCrudController extends AppAbstractCrudController
         }
 
         parent::updateEntity($entityManager, $entityInstance);
-    }
-
-    private function generateInvitationButton(User $user): string
-    {
-
-        $invitation = $this->em
-            ->getRepository(Invitation::class)
-            ->findOneBy(['user' => $user]);
-
-        if (!$invitation) {
-            return 'Active';
-        }
-
-        $invitationUrl = $this->generateUrl(
-            route: 'app_user_invitation',
-            parameters: ['token' => $invitation->token],
-            referenceType: UrlGeneratorInterface::ABSOLUTE_URL
-        );
-
-        $buttonId = 'copy-invite-'.$user->id;
-
-        return <<<HTML
-            <button 
-                id="{$buttonId}" 
-                class="btn btn-sm btn-outline-secondary" 
-                data-invitation-url="{$invitationUrl}"
-                onclick="copyInvitationLink(this)"
-            >
-                Copy Invitation Link
-            </button>
-        <script>
-            function copyInvitationLink(button) {
-                navigator.clipboard.writeText(button.dataset.invitationUrl);
-                button.innerText = 'Copied!';
-                setTimeout(() => button.innerText = 'Copy Invite', 2000);
-            }
-        </script>
-
-        HTML;
     }
 }

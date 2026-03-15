@@ -11,10 +11,14 @@ use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
 use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
+use App\Module\User\UseCase\Command\CleanupExpiredPasswordResetTokensCommandHandler;
+use App\Module\User\UseCase\Command\CreatePasswordResetTokenCommandHandler;
 use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
+use App\Module\User\UseCase\Command\ResetPasswordCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
+use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
@@ -23,6 +27,7 @@ use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
 use App\Shared\DTO\InvitationDTO;
+use App\Shared\DTO\PasswordResetTokenDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
@@ -49,6 +54,10 @@ final class UserFacade implements UserFacadeInterface
         private readonly UpdateSlackMemberIdCommandHandler $updateSlackMemberIdHandler,
         private readonly DisconnectSlackCommandHandler $disconnectSlackHandler,
         private readonly RemoveProfileImageCommandHandler $removeProfileImageHandler,
+        private readonly CreatePasswordResetTokenCommandHandler $createPasswordResetTokenHandler,
+        private readonly ResetPasswordCommandHandler $resetPasswordHandler,
+        private readonly CleanupExpiredPasswordResetTokensCommandHandler $cleanupExpiredPasswordResetTokensHandler,
+        private readonly GetPasswordResetTokenQueryHandler $getPasswordResetTokenHandler,
     ) {
     }
 
@@ -153,5 +162,25 @@ final class UserFacade implements UserFacadeInterface
     public function deleteOldProfileImage(?string $currentProfileImageUrl): void
     {
         $this->removeProfileImageHandler->handle($currentProfileImageUrl);
+    }
+
+    public function createPasswordResetToken(string $email): ?string
+    {
+        return $this->createPasswordResetTokenHandler->handle($email);
+    }
+
+    public function resetPassword(string $token, string $plainPassword): bool
+    {
+        return $this->resetPasswordHandler->handle($token, $plainPassword);
+    }
+
+    public function cleanupExpiredPasswordResetTokens(): int
+    {
+        return $this->cleanupExpiredPasswordResetTokensHandler->handle();
+    }
+
+    public function getPasswordResetToken(string $token): ?PasswordResetTokenDTO
+    {
+        return $this->getPasswordResetTokenHandler->handle($token);
     }
 }

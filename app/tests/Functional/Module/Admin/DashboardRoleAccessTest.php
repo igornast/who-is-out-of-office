@@ -16,7 +16,7 @@ it('admin sees full sidebar with settings and organization sections', function (
     $sidebar = $client->getCrawler()->filter('.ooo-sidebar')->text();
 
     expect($sidebar)
-        ->toContain('My Team')
+        ->toContain('My Organization')
         ->toContain('Team Leave Requests')
         ->toContain('Team Members')
         ->toContain('App Settings')

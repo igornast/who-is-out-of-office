@@ -11,7 +11,7 @@ interface SlackFacadeInterface
 {
     public function notifyOnNewLeaveRequest(LeaveRequestDTO $leaveRequestDTO): void;
 
-    public function handleInteractiveNotification(InteractiveNotificationDTO $interactiveNotificationDTO): void;
+    public function handleInteractiveNotification(InteractiveNotificationDTO $interactiveNotificationDTO): LeaveRequestDTO;
 
     public function notifyUserOnLeaveRequestChange(LeaveRequestDTO $leaveRequestDTO): void;
 

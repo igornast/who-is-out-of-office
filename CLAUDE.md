@@ -160,6 +160,7 @@ app/src/
 ├── Infrastructure/        # External integrations and persistence
 │   ├── DataNager/        # Public holiday API integration
 │   ├── Doctrine/         # Entities, Repositories, XML Mappings
+│   ├── Email/            # Email notifications (async via Messenger)
 │   ├── Ical/             # iCalendar export functionality
 │   ├── Slack/            # Slack notification and webhook handling
 │   └── Traits/           # Reusable traits (e.g., TimestampableTrait)
@@ -188,6 +189,7 @@ Each module exposes a `Facade` that provides a high-level API. Facades implement
 - `HolidayFacade` → `HolidayFacadeInterface`
 - `SettingsFacade` → `SettingsFacadeInterface`
 - `SlackFacade` → `SlackFacadeInterface`
+- `EmailFacade` → `EmailFacadeInterface`
 - `DateNagerFacade` → `DateNagerInterface`
 
 Controllers and services interact with modules exclusively through these facades.
@@ -263,6 +265,22 @@ The application uses Symfony events for cross-cutting concerns:
 - Country-specific holiday calendars
 
 ### Infrastructure Layer
+
+#### Email Integration
+- Async email delivery via Symfony Messenger (messages routed to `async` transport)
+- Leave request notifications: pending approval, approved, rejected, withdrawn
+- User invitation emails with token-based activation links
+- Respects user's `isEmailNotificationsEnabled` preference (except invitations)
+- Facade dispatches messages; message handlers delegate to command handlers that build and send `TemplatedEmail`
+- Templates use `@AppEmail` Twig namespace (`src/Infrastructure/Email/template/`)
+- See [`Infrastructure/Email/README.md`](app/src/Infrastructure/Email/README.md) for architecture diagrams and full details
+
+Environment variables required:
+```
+MAILER_DSN=
+EMAIL_FROM_ADDRESS=
+EMAIL_FROM_NAME=
+```
 
 #### Slack Integration
 - **Approval workflow**: Managers can approve/reject leave requests via Slack buttons

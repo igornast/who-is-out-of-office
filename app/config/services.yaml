@@ -1,5 +1,7 @@
 parameters:
     profile_images_base_path: 'uploads/profile_images'
+    email_from_address: '%env(EMAIL_FROM_ADDRESS)%'
+    email_from_name: '%env(EMAIL_FROM_NAME)%'
 
 services:
     _defaults:
@@ -18,3 +20,9 @@ services:
         arguments:
             - '%env(DATABASE_URL)%'
             - { db_table: 'user_session' }
+
+    App\Infrastructure\Email\UseCase\Command\:
+        resource: '../src/Infrastructure/Email/UseCase/Command/'
+        arguments:
+            $emailFromAddress: '%email_from_address%'
+            $emailFromName: '%email_from_name%'

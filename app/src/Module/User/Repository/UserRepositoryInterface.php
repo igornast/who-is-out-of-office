@@ -15,6 +15,8 @@ interface UserRepositoryInterface
 
     public function findOneById(string $id): ?UserDTO;
 
+    public function findOneByEmail(string $email): ?UserDTO;
+
     public function update(UserDTO $userDTO): void;
 
     /**

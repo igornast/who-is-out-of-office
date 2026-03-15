@@ -7,7 +7,7 @@ menu:
     items:
         logout: Logout
         dashboard: Dashboard
-        my_team: My Team
+        my_team: My Organization
         leave_request_types: Leave Types
         app_settings: App Settings
         profile: Profile Settings
@@ -196,12 +196,29 @@ calendar:
         date: Date
         view_details: View Full Details
 
+user:
+    action:
+        reset_password_confirm_title: Reset Password
+        reset_password_confirm_body: Are you sure you want to reset the password for this user? They will receive an email with a link to set a new password.
+        reset_password_confirm_action: Reset Password
+        success:
+            reset_password: Password reset link has been sent to the user.
+        error:
+            invalid_csrf: Invalid CSRF token.
+            user_inactive: Cannot reset password for an inactive user.
+            reset_failed: Failed to initiate password reset. Please try again.
+            email_failed: Password reset was initiated but the email could not be sent. Please try again.
+
 crud:
     title:
         leave_requests: Absence Requests
         team_leave_requests: Team Leave Requests
         team_members: Team Members
-        user: My Team
+        user: My Organization
+
+    user:
+        action:
+            reset_password: Reset Password
 
     actions:
         leave_requests:
@@ -256,6 +273,7 @@ crud:
         section:
             profile_info: Profile Info
             employee_of_record: Employee Of Record
+            notifications: Notifications
             change_password: Change Password
         field:
             first_name: First Name
@@ -271,6 +289,8 @@ crud:
             absence_balance_reset_day_help: The next date when your absence balance will be reset. This is set by HR.
             has_celebrate_work_anniversary: Celebrate my work anniversary
             has_celebrate_work_anniversary_help: Tick this box if you want the OOO Slackbot to send a friendly reminder to your teammates each year.
+            is_email_notifications_enabled: Receive email notifications
+            is_email_notifications_enabled_help: When enabled, you will receive email notifications for leave request updates.
             profile_image: Profile Image
             profile_image_help: 'JPEG, PNG or WebP. Max 2 MB.'
             profile_image_change: 'Change photo'

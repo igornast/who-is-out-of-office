@@ -1,4 +1,6 @@
 :root {
+    color-scheme: light;
+
     --app-bg: #FAFCFB;
     --app-bg-alt: #EDF6F4;
     --app-surface: #FFFFFF;

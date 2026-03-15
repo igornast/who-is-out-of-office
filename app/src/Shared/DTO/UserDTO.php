@@ -27,6 +27,7 @@ class UserDTO
         public ?string $slackMemberId = null,
         public ?string $calendarCountryCode = null,
         public ?bool $hasCelebrateWorkAnniversary = false,
+        public bool $isEmailNotificationsEnabled = true,
         public ?\DateTimeImmutable $birthDate = null,
         public ?\DateTimeImmutable $contractStartedAt = null,
         public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
@@ -35,6 +36,11 @@ class UserDTO
         public string $palettePreference = 'teal',
         public ?string $icalHashSalt = null,
     ) {
+    }
+
+    public function getFullName(): string
+    {
+        return sprintf('%s %s', $this->firstName, $this->lastName);
     }
 
     public static function fromEntity(User $user): UserDTO
@@ -55,6 +61,7 @@ class UserDTO
             slackMemberId: $user->slackIntegration?->slackMemberId,
             calendarCountryCode: $user->holidayCalendar->countryCode ?? null,
             hasCelebrateWorkAnniversary: $user->hasCelebrateWorkAnniversary,
+            isEmailNotificationsEnabled: $user->isEmailNotificationsEnabled,
             birthDate: $user->birthDate,
             contractStartedAt: $user->contractStartedAt,
             absenceBalanceResetDay: $user->absenceBalanceResetDay,
@@ -80,6 +87,7 @@ class UserDTO
             createdAt: \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['created_at']),
             profileImageUrl: $data['profile_image_url'],
             hasCelebrateWorkAnniversary: (bool) ($data['celebrate_work_anniversary'] ?? false),
+            isEmailNotificationsEnabled: (bool) ($data['is_email_notifications_enabled'] ?? true),
             birthDate: isset($data['birth_date']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['birth_date']) : null,
             contractStartedAt: isset($data['contract_started_at']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['contract_started_at']) : null,
             absenceBalanceResetDay: \DateTimeImmutable::createFromFormat('Y-m-d', $data['absence_balance_reset_day']),

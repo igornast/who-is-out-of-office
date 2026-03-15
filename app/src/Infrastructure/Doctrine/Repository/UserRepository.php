@@ -42,6 +42,17 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return UserDTO::fromEntity($user);
     }
 
+    public function findOneByEmail(string $email): ?UserDTO
+    {
+        $user = $this->findOneBy(['email' => $email]);
+
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        return UserDTO::fromEntity($user);
+    }
+
     public function update(UserDTO $userDTO): void
     {
         /** @var User $user */
@@ -54,6 +65,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->annualLeaveAllowance = $userDTO->annualLeaveAllowance;
         $user->currentLeaveBalance = $userDTO->currentLeaveBalance;
         $user->isActive = $userDTO->isActive;
+        $user->isEmailNotificationsEnabled = $userDTO->isEmailNotificationsEnabled;
         $user->birthDate = $userDTO->birthDate;
         $user->absenceBalanceResetDay = $userDTO->absenceBalanceResetDay;
 

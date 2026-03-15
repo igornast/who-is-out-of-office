@@ -18,19 +18,23 @@ class UserInvitationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
+            ->add('firstName', TextType::class, [
+                'label' => 'invitation.field.first_name',
+            ])
+            ->add('lastName', TextType::class, [
+                'label' => 'invitation.field.last_name',
+            ])
             ->add('birthdate', DateType::class, [
                 'widget' => 'single_text',
-                'label' => 'Date of Birth',
-                'required' => true,
+                'label' => 'invitation.field.birth_date',
+                'required' => false,
+                'help' => 'invitation.field.birth_date_help',
             ])
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'Passwords must match.',
-                'first_options' => ['label' => 'Password'],
-                'second_options' => ['label' => 'Repeat Password'],
-                'mapped' => true,
+                'first_options' => ['label' => 'invitation.field.password'],
+                'second_options' => ['label' => 'invitation.field.password_repeat'],
             ]);
     }
 
@@ -38,6 +42,7 @@ class UserInvitationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => UserInvitationRequestDTO::class,
+            'translation_domain' => 'messages',
         ]);
     }
 }

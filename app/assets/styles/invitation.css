@@ -1,0 +1,120 @@
+@import './_tokens-light.css';
+@import './_tokens-dark.css';
+@import './_palette-sage.css';
+@import './_palette-sunset.css';
+@import './_palette-lavender.css';
+
+:root {
+    --font-display: 'Crimson Pro', Georgia, serif;
+    --font-body: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.invitation-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--sidebar-bg) 100%);
+    font-family: var(--font-body);
+    padding: 24px;
+}
+
+.invitation-card {
+    max-width: 440px;
+    width: 100%;
+    padding: 40px 36px;
+    background: var(--app-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.invitation-card h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 26px;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+}
+
+.invitation-card .invitation-subtitle {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    margin-bottom: 28px;
+}
+
+.invitation-card label {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.invitation-card .form-control {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--app-surface-sunken);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 8px 12px;
+    transition: all 0.15s ease;
+}
+
+.invitation-card .form-control:focus {
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-focus);
+}
+
+.invitation-card .form-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.invitation-card .btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 10px;
+    transition: all 0.15s ease;
+}
+
+.invitation-card .btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.invitation-card .btn-primary:focus {
+    box-shadow: var(--shadow-focus);
+}
+
+.invitation-card .invalid-feedback {
+    font-size: 12px;
+}
+
+@media (max-width: 576px) {
+    .invitation-page {
+        background: var(--app-surface);
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    .invitation-card {
+        max-width: none;
+        min-height: 100vh;
+        padding: 48px 24px 32px;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .invitation-card h1 {
+        font-size: 22px;
+    }
+
+    .invitation-card .invitation-subtitle {
+        margin-bottom: 24px;
+    }
+}

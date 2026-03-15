@@ -6,6 +6,8 @@ namespace App\Infrastructure\Slack\Controller;
 
 use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
 use App\Infrastructure\Slack\Service\RequestVerifier;
+use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Facade\EmailFacadeInterface;
 use App\Shared\Facade\SlackFacadeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +21,7 @@ class PostInteractiveRequestController extends AbstractController
     public function __construct(
         private readonly RequestVerifier $requestVerifier,
         private readonly SlackFacadeInterface $slackFacade,
+        private readonly EmailFacadeInterface $emailFacade,
     ) {
     }
 
@@ -32,9 +35,18 @@ class PostInteractiveRequestController extends AbstractController
 
         $notificationDTO = InteractiveNotificationDTO::fromArray($data);
 
-        $this->slackFacade->handleInteractiveNotification($notificationDTO);
+        $leaveRequestDTO = $this->slackFacade->handleInteractiveNotification($notificationDTO);
+
+        if ($leaveRequestDTO->isAutoApproved) {
+            return new JsonResponse(null);
+        }
+
+        match ($leaveRequestDTO->status) {
+            LeaveRequestStatusEnum::Approved => $this->emailFacade->sendLeaveRequestApprovedEmail($leaveRequestDTO),
+            LeaveRequestStatusEnum::Rejected => $this->emailFacade->sendLeaveRequestRejectedEmail($leaveRequestDTO),
+            default => null,
+        };
 
         return new JsonResponse(null);
-
     }
 }

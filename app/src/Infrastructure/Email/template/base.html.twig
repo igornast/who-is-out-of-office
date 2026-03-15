@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block subject %}{{ 'email.base.title'|trans }}{% endblock %}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap');
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .mobile-center {
+                text-align: center !important;
+            }
+            .mobile-full-width {
+                width: 100% !important;
+            }
+            .mobile-padding {
+                padding: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #FAFCFB; font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1A2E2E;">
+
+    {# Preheader text (hidden from display, shown in email client preview) #}
+    <div style="display: none; max-height: 0; overflow: hidden;">
+        {% block preheader %}{{ 'email.base.preheader'|trans }}{% endblock %}
+        {# Filler content to push preview text #}
+        <span style="display: none;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span>
+    </div>
+
+    {# 4px teal top accent bar #}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; background-color: #3D9B8F; height: 4px;">
+        <tr>
+            <td style="height: 4px; width: 100%;"></td>
+        </tr>
+    </table>
+
+    {# Main container #}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; background-color: #FAFCFB;">
+        <tr>
+            <td align="center" style="padding: 32px 16px;">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" class="container" style="max-width: 600px; background-color: #FFFFFF; border-radius: 8px; box-shadow: 0 1px 3px rgba(26, 46, 46, 0.1);">
+
+                    {# Header with logo #}
+                    <tr>
+                        <td style="padding: 32px 24px; border-bottom: 1px solid #E8EFEC;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 24px; font-weight: bold; color: #1A2E2E; letter-spacing: -0.5px;">
+                                        Who's <span style="color: #3D9B8F;">OOO</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    {# Content block #}
+                    <tr>
+                        <td style="padding: 32px 24px;">
+                            {% block content %}{% endblock %}
+                        </td>
+                    </tr>
+
+                    {# Footer #}
+                    <tr>
+                        <td style="padding: 24px; border-top: 1px solid #E8EFEC; background-color: #F5F8F7;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="font-family: 'Sora', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #8A9E9E; line-height: 1.6;">
+                                        <p style="margin: 0 0 12px 0;">
+                                            {% if company_name is defined and company_name %}
+                                                <strong>{{ company_name }}</strong><br>
+                                            {% endif %}
+                                            {{ 'email.base.powered_by'|trans }}
+                                        </p>
+                                        <p style="margin: 12px 0 0 0; color: #8A9E9E; font-size: 11px;">
+                                            &copy; {{ 'now'|date('Y') }} {{ 'email.base.rights'|trans }}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

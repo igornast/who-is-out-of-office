@@ -29,8 +29,10 @@
             if (isDark) {
                 document.documentElement.classList.add('dark', 'ea-dark-scheme');
                 document.documentElement.dataset.bsTheme = 'dark';
+                document.documentElement.style.colorScheme = 'dark';
             } else {
                 document.documentElement.dataset.bsTheme = 'light';
+                document.documentElement.style.colorScheme = 'light';
             }
             var palette = localStorage.getItem('whosooo-palette') || serverPalette || 'teal';
             if (['teal','sage','sunset','lavender'].indexOf(palette) === -1) palette = 'teal';
