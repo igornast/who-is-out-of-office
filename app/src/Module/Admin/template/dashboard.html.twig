@@ -115,7 +115,7 @@
                                 <div class="text-center">
                                     {{ avatar.userDtoAvatar(userDto) }}
                                     <div class="text-center mt-2 text-meta">
-                                        {{ userDto.birthDate|date("m.d") }}
+                                        {{ userDto.birthDate|date("d.m") }}
                                     </div>
                                 </div>
                             {% endfor %}
@@ -140,7 +140,7 @@
                                 <div class="text-center">
                                     {{ avatar.userDtoAvatar(userDto) }}
                                     <div class="text-center mt-2 text-meta">
-                                        {{ userDto.contractStartedAt|date("m.d") }}
+                                        {{ userDto.contractStartedAt|date("d.m") }}
                                         {% if userDto.contractStartedAt %}
                                             {% set years = "now"|date("Y") - userDto.contractStartedAt|date("Y") %}
                                             {% if years > 0 %}
