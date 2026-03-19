@@ -4,6 +4,7 @@
             <tr>
                 <th class="text-body-secondary" style="width: 140px">{{ 'crud.holiday_calendar.field.date'|trans(domain='admin') }}</th>
                 <th class="text-body-secondary">{{ 'crud.holiday_calendar.field.name'|trans(domain='admin') }}</th>
+                <th class="text-body-secondary">{{ 'crud.holiday_calendar.field.scope'|trans(domain='admin') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -11,6 +12,22 @@
                 <tr>
                     <td>{{ holiday.date|date('M d, Y') }}</td>
                     <td>{{ holiday.description }}</td>
+                    <td>
+                        {% if holiday.isGlobal %}
+                            <span class="badge bg-success">{{ 'crud.holiday_calendar.badge.global'|trans(domain='admin') }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ 'crud.holiday_calendar.badge.regional'|trans(domain='admin') }}</span>
+                            {% if holiday.counties is not empty %}
+                                <small class="text-body-secondary ms-1">
+                                    {%- for code in holiday.counties -%}
+                                        {%- set key = 'subdivision.' ~ code -%}
+                                        {%- set name = key|trans(domain='admin') -%}
+                                        {{ name == key ? code : name }}{{ not loop.last ? ', ' }}
+                                    {%- endfor -%}
+                                </small>
+                            {% endif %}
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

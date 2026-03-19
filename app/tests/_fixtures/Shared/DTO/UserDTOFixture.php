@@ -37,6 +37,7 @@ class UserDTOFixture implements FixtureInterface
             'profileImageUrl' => null,
             'slackMemberId' => null,
             'calendarCountryCode' => $faker->countryCode(),
+            'subdivisionCode' => null,
             'birthDate' => \DateTimeImmutable::createFromMutable($faker->dateTimeThisDecade()),
             'contractStartedAt' => \DateTimeImmutable::createFromMutable($faker->dateTimeThisDecade()),
             'absenceBalanceResetDay' => new \DateTimeImmutable(date('Y').'-01-01'),

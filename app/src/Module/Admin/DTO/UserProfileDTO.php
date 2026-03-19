@@ -30,6 +30,7 @@ class UserProfileDTO
         public ?\DateTimeImmutable $contractStartedAt = null,
         public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
         public ?HolidayCalendar $holidayCalendar = null,
+        public ?string $subdivisionCode = null,
         #[Assert\Image(maxSize: '2M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'])]
         public ?UploadedFile $profileImageFile = null,
     ) {
@@ -47,6 +48,7 @@ class UserProfileDTO
             contractStartedAt: $user->contractStartedAt,
             absenceBalanceResetDay: $user->absenceBalanceResetDay,
             holidayCalendar: $user->holidayCalendar,
+            subdivisionCode: $user->subdivisionCode,
         );
     }
 

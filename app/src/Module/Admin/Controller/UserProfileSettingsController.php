@@ -8,6 +8,7 @@ use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\DTO\UserProfileDTO;
 use App\Module\Admin\Form\UserProfileType;
 use App\Shared\DTO\UserDTO;
+use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\Ical\IcalSubscriptionUrlGenerator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_USER')]
 #[Route('/app/user/profile', name: 'app_user_profile')]
@@ -30,7 +32,9 @@ class UserProfileSettingsController extends AbstractController
         private readonly string $uploadDirectory,
         private readonly EntityManagerInterface $em,
         private readonly UserFacadeInterface $userFacade,
+        private readonly HolidayFacadeInterface $holidayFacade,
         private readonly IcalSubscriptionUrlGenerator $icalSubscriptionUrlGenerator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -60,6 +64,7 @@ class UserProfileSettingsController extends AbstractController
             $user->lastName = $dto->lastName;
             $user->workingDays = $dto->workingDays;
             $user->holidayCalendar = $dto->holidayCalendar;
+            $user->subdivisionCode = $dto->subdivisionCode;
             $user->birthDate = $dto->birthDate;
             $user->hasCelebrateWorkAnniversary = $dto->hasCelebrateWorkAnniversary;
             $user->isEmailNotificationsEnabled = $dto->isEmailNotificationsEnabled;
@@ -67,7 +72,7 @@ class UserProfileSettingsController extends AbstractController
             $this->em->persist($user);
             $this->em->flush();
 
-            $this->addFlash('success', 'Profile updated successfully!');
+            $this->addFlash('success', $this->translator->trans('crud.user_profile.flash.updated', domain: 'admin'));
 
             return $this->redirectToRoute('app_user_profile');
         }
@@ -78,6 +83,7 @@ class UserProfileSettingsController extends AbstractController
             'calendar_subscription_url' => $this->icalSubscriptionUrlGenerator->generateForUser(UserDTO::fromEntity($user)),
             'slack_connected' => null !== $user->slackIntegration,
             'slack_member_id' => $user->slackIntegration?->slackMemberId,
+            'subdivisions_by_calendar' => $this->holidayFacade->getSubdivisionsGroupedByCalendar(),
         ]);
     }
 }

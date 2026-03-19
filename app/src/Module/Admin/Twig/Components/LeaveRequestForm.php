@@ -33,6 +33,11 @@ class LeaveRequestForm extends AbstractController
     #[LiveProp(writable: true)]
     public ?LeaveRequestType $leaveType = null;
 
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
+
     protected function instantiateForm(): FormInterface
     {
         return $this->createForm(NewLeaveRequestFormType::class, null);
@@ -44,7 +49,6 @@ class LeaveRequestForm extends AbstractController
         User $user,
         LeaveRequestFacadeInterface $leaveRequestFacade,
         AppSettingsFacadeInterface $appSettingsFacade,
-        TranslatorInterface $translator,
     ): void {
         $this->isSubmitDisabled = true;
         $this->infoBox = '';
@@ -82,7 +86,7 @@ class LeaveRequestForm extends AbstractController
             $earliestAllowed = $today->modify(sprintf('+%d days', $minNoticeDays));
 
             if ($startDate < $earliestAllowed) {
-                $this->infoBox = $this->generateMinNoticeBox($minNoticeDays, $translator);
+                $this->infoBox = $this->generateMinNoticeBox($minNoticeDays);
 
                 return;
             }
@@ -92,14 +96,15 @@ class LeaveRequestForm extends AbstractController
             startDate: $startDate,
             endDate: $endDate,
             userWorkingDays: $user->workingDays,
-            holidayCalendarCountryCode: $user->holidayCalendar?->countryCode
+            holidayCalendarCountryCode: $user->holidayCalendar?->countryCode,
+            subdivisionCode: $user->subdivisionCode,
         );
 
         $workdaysNumber = $leaveRequestFacade->calculateWorkDays($query);
 
         $maxConsecutiveDays = $appSettingsFacade->maxConsecutiveDays();
         if ($maxConsecutiveDays > 0 && $workdaysNumber > $maxConsecutiveDays) {
-            $this->infoBox = $this->generateMaxConsecutiveDaysBox($maxConsecutiveDays, $translator);
+            $this->infoBox = $this->generateMaxConsecutiveDaysBox($maxConsecutiveDays);
 
             return;
         }
@@ -107,12 +112,12 @@ class LeaveRequestForm extends AbstractController
         $remainingBalance = $user->currentLeaveBalance - $workdaysNumber;
 
         if ($remainingBalance < 0) {
-            $this->infoBox = $this->generateNoBalanceBox($user->currentLeaveBalance, $translator);
+            $this->infoBox = $this->generateNoBalanceBox($user->currentLeaveBalance);
 
             return;
         }
 
-        $this->infoBox = $this->generateInfoBox($workdaysNumber, $remainingBalance, $translator);
+        $this->infoBox = $this->generateInfoBox($workdaysNumber, $remainingBalance);
         $this->isSubmitDisabled = false;
     }
 
@@ -124,12 +129,9 @@ class LeaveRequestForm extends AbstractController
         return explode(' to ', $rageString.' to ');
     }
 
-    private function generateInfoBox(
-        int $workdaysNumber,
-        int $remainingBalance,
-        TranslatorInterface $translator,
-    ): string {
-        $message = $translator->trans(
+    private function generateInfoBox(int $workdaysNumber, int $remainingBalance): string
+    {
+        $message = $this->translator->trans(
             'leave_request.new.info_box',
             ['%workdays%' => $workdaysNumber, '%remaining%' => $remainingBalance],
             'admin',
@@ -138,9 +140,9 @@ class LeaveRequestForm extends AbstractController
         return sprintf('<div class="alert alert-info mt-3" id="infoBox">%s</div>', $message);
     }
 
-    private function generateMinNoticeBox(int $minNoticeDays, TranslatorInterface $translator): string
+    private function generateMinNoticeBox(int $minNoticeDays): string
     {
-        $message = $translator->trans(
+        $message = $this->translator->trans(
             'leave_request.new.min_notice_box',
             ['%days%' => $minNoticeDays],
             'admin',
@@ -149,9 +151,9 @@ class LeaveRequestForm extends AbstractController
         return sprintf('<div class="alert alert-warning mt-3" id="minNoticeBox">%s</div>', $message);
     }
 
-    private function generateMaxConsecutiveDaysBox(int $maxConsecutiveDays, TranslatorInterface $translator): string
+    private function generateMaxConsecutiveDaysBox(int $maxConsecutiveDays): string
     {
-        $message = $translator->trans(
+        $message = $this->translator->trans(
             'leave_request.new.max_consecutive_box',
             ['%days%' => $maxConsecutiveDays],
             'admin',
@@ -160,9 +162,9 @@ class LeaveRequestForm extends AbstractController
         return sprintf('<div class="alert alert-warning mt-3" id="maxConsecutiveBox">%s</div>', $message);
     }
 
-    private function generateNoBalanceBox(int $remainingBalance, TranslatorInterface $translator): string
+    private function generateNoBalanceBox(int $remainingBalance): string
     {
-        $message = $translator->trans(
+        $message = $this->translator->trans(
             'leave_request.new.no_balance_box',
             ['%remaining%' => $remainingBalance],
             'admin',

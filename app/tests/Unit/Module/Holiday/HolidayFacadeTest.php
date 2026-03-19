@@ -12,6 +12,7 @@ use App\Module\Holiday\UseCase\Query\GetAllCalendarsQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayCalendarForCountryQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysForCountryBetweenDatesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler;
+use App\Module\Holiday\UseCase\Query\GetSubdivisionsGroupedByCalendarQueryHandler;
 use App\Tests\_fixtures\Shared\DTO\Holiday\PublicHolidayCalendarDTOFixture;
 use Ramsey\Uuid\Uuid;
 
@@ -25,6 +26,7 @@ beforeEach(function (): void {
     $this->syncCalendarHandler = mock(SyncCalendarCommandHandler::class);
     $this->syncAllActiveCalendarsHandler = mock(SyncAllActiveCalendarsCommandHandler::class);
     $this->deleteCalendarHandler = mock(DeleteCalendarCommandHandler::class);
+    $this->subdivisionsHandler = mock(GetSubdivisionsGroupedByCalendarQueryHandler::class);
 
     $this->facade = new HolidayFacade(
         upsertHandler: $this->upsertHandler,
@@ -36,6 +38,7 @@ beforeEach(function (): void {
         syncCalendarHandler: $this->syncCalendarHandler,
         syncAllActiveCalendarsHandler: $this->syncAllActiveCalendarsHandler,
         deleteCalendarHandler: $this->deleteCalendarHandler,
+        subdivisionsHandler: $this->subdivisionsHandler,
     );
 });
 
@@ -75,10 +78,25 @@ it('calls handler to get holiday days for country between dates', function () {
     $this->holidayDaysHandler
         ->expects('handle')
         ->once()
-        ->with($startDate, $endDate, $countryCode)
+        ->with($startDate, $endDate, $countryCode, null)
         ->andReturn([]);
 
     $this->facade->getHolidayDaysForCountryBetweenDates($startDate, $endDate, $countryCode);
+});
+
+it('calls handler to get holiday days with subdivision code', function () {
+    $startDate = new DateTimeImmutable('2025-01-01');
+    $endDate = new DateTimeImmutable('2025-12-31');
+    $countryCode = 'DE';
+    $subdivisionCode = 'DE-BY';
+
+    $this->holidayDaysHandler
+        ->expects('handle')
+        ->once()
+        ->with($startDate, $endDate, $countryCode, $subdivisionCode)
+        ->andReturn([]);
+
+    $this->facade->getHolidayDaysForCountryBetweenDates($startDate, $endDate, $countryCode, $subdivisionCode);
 });
 
 it('calls handler to get holidays grouped by user id', function () {
@@ -146,4 +164,20 @@ it('calls handler to delete calendar', function () {
         ->with($calendarId);
 
     $this->facade->deleteCalendar($calendarId);
+});
+
+it('calls handler to get subdivisions grouped by calendar', function () {
+    $expected = [
+        'cal-de' => ['DE-BW', 'DE-BY'],
+        'cal-ch' => ['CH-AG'],
+    ];
+
+    $this->subdivisionsHandler
+        ->expects('handle')
+        ->once()
+        ->andReturn($expected);
+
+    $result = $this->facade->getSubdivisionsGroupedByCalendar();
+
+    expect($result)->toBe($expected);
 });

@@ -48,7 +48,7 @@ Default admin account (development only):
 
 ### Running commands with `just` (IMPORTANT)
 
-The project uses a `justfile` in `app/` with predefined commands. **When running commands from outside the container (e.g. from Claude Code), always use `docker exec` with `just` commands — never use `-it` flag (non-interactive context) and never run raw `composer` or `pest` commands directly.**
+The project uses a `justfile` in `app/` with predefined commands. **When running commands from outside the container (e.g. from Claude Code), always use `docker exec` with `just` commands — never use `-it` flag (non-interactive context) and never run raw `php vendor/bin/pest`, `bash -c` wrappers, or `composer` commands directly.** Note: pest output may be silently swallowed when run via `docker exec`; the exit code (0 = pass, non-0 = fail) is the reliable signal.
 
 ```bash
 # Run full test suite (CS, PHPStan, Architecture, Unit, Functional)
@@ -262,7 +262,10 @@ The application uses Symfony events for cross-cutting concerns:
 #### Holiday Module
 - Public holiday calendar management
 - Integration with Date Nager API for importing holidays
-- Country-specific holiday calendars
+- Country-specific holiday calendars with regional subdivision support
+- Holidays store `isGlobal` flag and `counties` (JSON array of subdivision codes like `DE-BY`)
+- Users can set a `subdivisionCode` to filter holidays to their region
+- Workday calculation respects subdivision: global holidays always apply, regional only when matching
 
 ### Infrastructure Layer
 
@@ -341,6 +344,10 @@ These tests run via `composer test:arch`. Violating these rules will fail CI.
 - **PHPStan**: Static analysis at level 8
 - DTOs and DataFixtures are excluded from PHPStan checks (see `phpstan.neon`)
 - All commands should run successfully before committing
+
+### No `final` on Classes
+
+Do **not** use `final` on project classes — mocking in tests is more important than sealing inheritance. Use interfaces where contract enforcement is needed instead.
 
 ### Constructor Parameter Order
 

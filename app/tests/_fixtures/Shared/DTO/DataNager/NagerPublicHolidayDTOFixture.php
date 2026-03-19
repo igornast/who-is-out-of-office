@@ -23,6 +23,8 @@ class NagerPublicHolidayDTOFixture implements FixtureInterface
             'date' => \DateTimeImmutable::createFromMutable($faker->dateTimeThisYear()),
             'localName' => $faker->word(),
             'name' => $faker->word(),
+            'global' => true,
+            'counties' => null,
         ];
     }
 }

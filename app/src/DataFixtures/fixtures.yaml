@@ -41,6 +41,7 @@ App\Infrastructure\Doctrine\Entity\User:
             hasCelebrateWorkAnniversary: true
             profileImageUrl: <randomElement($profileImages)>
             holidayCalendar: '@holiday_calendar_de'
+            subdivisionCode: 'DE-BY'
             birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
@@ -255,9 +256,26 @@ App\Infrastructure\Doctrine\Entity\Holiday:
             holidayCalendar: '@holiday_calendar_fr'
             description: <word()>
             date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+5 days", "+20 days")->format("Y-m-d H:i:s")))>'
-    holiday_{4..6}:
+    holiday_4:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             holidayCalendar: '@holiday_calendar_de'
-            description: <word()>
-            date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeThisMonth()->format("Y-m-d H:i:s")))>'
+            description: 'Tag der Deutschen Einheit'
+            date: '<(new \DateTimeImmutable(date("Y") . "-10-03"))>'
+            isGlobal: true
+    holiday_5:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            holidayCalendar: '@holiday_calendar_de'
+            description: 'Heilige Drei Könige'
+            date: '<(new \DateTimeImmutable(date("Y") . "-01-06"))>'
+            isGlobal: false
+            counties: ['DE-BW', 'DE-BY', 'DE-ST']
+    holiday_6:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            holidayCalendar: '@holiday_calendar_de'
+            description: 'Mariä Himmelfahrt'
+            date: '<(new \DateTimeImmutable(date("Y") . "-08-15"))>'
+            isGlobal: false
+            counties: ['DE-SL']

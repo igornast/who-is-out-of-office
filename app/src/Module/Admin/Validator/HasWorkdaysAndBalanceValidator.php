@@ -83,7 +83,8 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
             startDate: $value['start'],
             endDate: $value['end'],
             userWorkingDays: $user->workingDays,
-            holidayCalendarCountryCode:  $user->holidayCalendar?->countryCode
+            holidayCalendarCountryCode: $user->holidayCalendar?->countryCode,
+            subdivisionCode: $user->subdivisionCode,
         );
 
         $workdays = $this->leaveRequestFacade->calculateWorkDays($query);

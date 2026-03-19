@@ -14,6 +14,7 @@ final readonly class CalculateWorkdaysQuery
         public \DateTimeImmutable $endDate,
         public array $userWorkingDays,
         public ?string $holidayCalendarCountryCode,
+        public ?string $subdivisionCode = null,
     ) {
     }
 }

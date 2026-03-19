@@ -62,7 +62,7 @@ beforeEach(function (): void {
     $container->allows('get')->with('security.token_storage')->andReturn($tokenStorage);
     $container->allows('get')->with('security.authorization_checker')->andReturn($authChecker);
 
-    $this->component = new LeaveRequestForm();
+    $this->component = new LeaveRequestForm(translator: $this->translator);
     $this->component->setContainer($container);
     $this->component->leaveType = $this->balanceLeaveType;
 });
@@ -76,7 +76,7 @@ it('shows warning and disables submit when start date violates minNoticeDays', f
         'dateRange' => sprintf('%s to %s', $startDate->format('Y-m-d'), $startDate->modify('+2 days')->format('Y-m-d')),
     ];
 
-    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade, $this->translator);
+    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade);
 
     expect($this->component->isSubmitDisabled)->toBeTrue()
         ->and($this->component->infoBox)->toContain('min_notice_box');
@@ -94,7 +94,7 @@ it('shows warning and disables submit when workdays exceed maxConsecutiveDays', 
 
     $this->leaveRequestFacade->allows('calculateWorkDays')->andReturn(10);
 
-    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade, $this->translator);
+    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade);
 
     expect($this->component->isSubmitDisabled)->toBeTrue()
         ->and($this->component->infoBox)->toContain('max_consecutive_box');
@@ -112,7 +112,7 @@ it('allows submit when within minNoticeDays and maxConsecutiveDays limits', func
 
     $this->leaveRequestFacade->allows('calculateWorkDays')->andReturn(3);
 
-    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade, $this->translator);
+    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade);
 
     expect($this->component->isSubmitDisabled)->toBeFalse();
 });

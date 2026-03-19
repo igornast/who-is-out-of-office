@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\UserProfileSettingsController;
+use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\Ical\IcalSubscriptionUrlGenerator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 beforeEach(function (): void {
     $this->em = mock(EntityManagerInterface::class);
@@ -27,6 +29,10 @@ beforeEach(function (): void {
     $this->userFacade->allows('deleteOldProfileImage');
     $this->icalUrlGenerator = mock(IcalSubscriptionUrlGenerator::class);
     $this->icalUrlGenerator->allows('generateForUser')->andReturn('https://example.com/cal.ics');
+    $this->translator = mock(TranslatorInterface::class);
+    $this->translator->allows('trans')->andReturnUsing(fn (string $id) => $id);
+    $this->holidayFacade = mock(HolidayFacadeInterface::class);
+    $this->holidayFacade->allows('getSubdivisionsGroupedByCalendar')->andReturn([]);
 
     $this->user = new User(
         id: Uuid::uuid4(),
@@ -83,7 +89,9 @@ beforeEach(function (): void {
         uploadDirectory: '/tmp/uploads',
         em: $this->em,
         userFacade: $this->userFacade,
+        holidayFacade: $this->holidayFacade,
         icalSubscriptionUrlGenerator: $this->icalUrlGenerator,
+        translator: $this->translator,
     );
     $this->controller->setContainer($container);
 });
@@ -103,4 +111,23 @@ it('maps isEmailNotificationsEnabled from DTO to entity on form submit', functio
     ($this->controller)(Request::create('/app/user/profile', 'POST'));
 
     expect($this->user->isEmailNotificationsEnabled)->toBeTrue();
+});
+
+it('maps subdivisionCode from DTO to entity on form submit', function (): void {
+    $this->form->allows('handleRequest')->andReturnUsing(function () {
+        $this->capturedDto->subdivisionCode = 'DE-BY';
+
+        return $this->form;
+    });
+    $this->form->allows('isSubmitted')->andReturn(true);
+    $this->form->allows('isValid')->andReturn(true);
+
+    $this->em->expects('persist')->once();
+    $this->em->expects('flush')->once();
+
+    expect($this->user->subdivisionCode)->toBeNull();
+
+    ($this->controller)(Request::create('/app/user/profile', 'POST'));
+
+    expect($this->user->subdivisionCode)->toBe('DE-BY');
 });

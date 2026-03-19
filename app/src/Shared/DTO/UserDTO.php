@@ -26,6 +26,7 @@ class UserDTO
         public ?string $profileImageUrl = null,
         public ?string $slackMemberId = null,
         public ?string $calendarCountryCode = null,
+        public ?string $subdivisionCode = null,
         public ?bool $hasCelebrateWorkAnniversary = false,
         public bool $isEmailNotificationsEnabled = true,
         public ?\DateTimeImmutable $birthDate = null,
@@ -60,6 +61,7 @@ class UserDTO
             profileImageUrl: $user->profileImageUrl,
             slackMemberId: $user->slackIntegration?->slackMemberId,
             calendarCountryCode: $user->holidayCalendar->countryCode ?? null,
+            subdivisionCode: $user->subdivisionCode,
             hasCelebrateWorkAnniversary: $user->hasCelebrateWorkAnniversary,
             isEmailNotificationsEnabled: $user->isEmailNotificationsEnabled,
             birthDate: $user->birthDate,
@@ -95,6 +97,7 @@ class UserDTO
             themePreference: $data['theme_preference'] ?? 'auto',
             palettePreference: $data['palette_preference'] ?? 'teal',
             icalHashSalt: $data['ical_hash_salt'] ?? null,
+            subdivisionCode: $data['subdivision_code'] ?? null,
         );
     }
 }

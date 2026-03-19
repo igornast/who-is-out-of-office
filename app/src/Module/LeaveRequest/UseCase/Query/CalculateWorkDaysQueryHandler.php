@@ -30,7 +30,8 @@ class CalculateWorkDaysQueryHandler
             $holidayDTOs = $this->holidayFacade->getHolidayDaysForCountryBetweenDates(
                 $query->startDate,
                 $query->endDate,
-                $query->holidayCalendarCountryCode
+                $query->holidayCalendarCountryCode,
+                $query->subdivisionCode,
             );
             $holidayDates = array_map(
                 fn ($h) => $h->date->format('Y-m-d'),
