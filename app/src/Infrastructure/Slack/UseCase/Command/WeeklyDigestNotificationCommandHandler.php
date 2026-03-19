@@ -120,14 +120,7 @@ class WeeklyDigestNotificationCommandHandler
 
                 if ($event instanceof UserPublicHolidaysDTO) {
                     foreach ($event->holidays as $holiday) {
-                        $regionSuffix = '';
-                        if (!$holiday->isGlobal && null !== $event->user->subdivisionCode) {
-                            $translationKey = sprintf('subdivision.%s', $event->user->subdivisionCode);
-                            $regionName = $this->translator->trans($translationKey, domain: 'admin');
-                            if ($regionName !== $translationKey) {
-                                $regionSuffix = sprintf('  ·  %s', $regionName);
-                            }
-                        }
+                        $regionSuffix = $this->resolveRegionSuffix($holiday->isGlobal, $event->user->subdivisionCode);
 
                         $text .= sprintf(
                             "    ‣ Public holiday: _%s (%s)_ %s%s\n",
@@ -274,6 +267,22 @@ class WeeklyDigestNotificationCommandHandler
         ]);
 
         $this->chatter->send(new ChatMessage(self::SUBJECT_MESSAGE)->options($options));
+    }
+
+    private function resolveRegionSuffix(bool $isGlobal, ?string $subdivisionCode): string
+    {
+        if ($isGlobal || null === $subdivisionCode) {
+            return '';
+        }
+
+        $translationKey = sprintf('subdivision.%s', $subdivisionCode);
+        $regionName = $this->translator->trans($translationKey, domain: 'admin');
+
+        if ($regionName === $translationKey) {
+            return '';
+        }
+
+        return sprintf('  ·  %s', $regionName);
     }
 
     /**
