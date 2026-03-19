@@ -110,6 +110,9 @@
             days: '{{ "calendar.popover.days"|trans(domain: "admin") }}',
             comment: '{{ "calendar.popover.comment"|trans(domain: "admin") }}',
             date: '{{ "calendar.popover.date"|trans(domain: "admin") }}',
+            scope: '{{ "calendar.popover.scope"|trans(domain: "admin") }}',
+            scopeGlobal: '{{ "calendar.popover.scope_global"|trans(domain: "admin") }}',
+            scopeRegional: '{{ "calendar.popover.scope_regional"|trans(domain: "admin") }}',
             viewDetails: '{{ "calendar.popover.view_details"|trans(domain: "admin") }}',
         };
 
@@ -209,9 +212,7 @@
                 eventFooter.innerHTML = '';
             } else if (type === 'holiday') {
                 eventTitle.textContent = props.description;
-                eventBody.innerHTML = '<div class="cal-event-detail-row">' +
-                    '<span class="cal-event-detail-label">' + TRANSLATIONS.date + '</span>' +
-                    '<span class="cal-event-detail-value">' + props.date + '</span></div>';
+                eventBody.innerHTML = buildHolidayContent(props);
                 eventFooter.innerHTML = '';
             }
 
@@ -238,6 +239,24 @@
                 html += '<div class="cal-event-detail-row cal-event-detail-row-comment">' +
                     '<span class="cal-event-detail-label">' + TRANSLATIONS.comment + '</span>' +
                     '<span class="cal-event-detail-value">' + escapeHtml(props.comment) + '</span></div>';
+            }
+            return html;
+        }
+
+        function buildHolidayContent(props) {
+            var html = '';
+            html += '<div class="cal-event-detail-row">' +
+                '<span class="cal-event-detail-label">' + TRANSLATIONS.date + '</span>' +
+                '<span class="cal-event-detail-value">' + props.date + '</span></div>';
+            var scopeLabel = props.isGlobal ? TRANSLATIONS.scopeGlobal : TRANSLATIONS.scopeRegional;
+            var scopeClass = props.isGlobal ? 'scope-badge-global' : 'scope-badge-regional';
+            html += '<div class="cal-event-detail-row">' +
+                '<span class="cal-event-detail-label">' + TRANSLATIONS.scope + '</span>' +
+                '<span class="cal-event-detail-value"><span class="scope-badge ' + scopeClass + '">' + scopeLabel + '</span></span></div>';
+            if (!props.isGlobal && props.counties && props.counties.length > 0) {
+                html += '<div class="cal-event-detail-row">' +
+                    '<span class="cal-event-detail-label"></span>' +
+                    '<span class="cal-event-detail-value"><small class="text-muted">' + escapeHtml(props.counties.join(', ')) + '</small></span></div>';
             }
             return html;
         }

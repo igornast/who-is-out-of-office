@@ -17,6 +17,7 @@ use CalendarBundle\Event\SetDataEvent;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 beforeEach(function (): void {
     $this->leaveRequestFacade = mock(LeaveRequestFacadeInterface::class);
@@ -26,6 +27,9 @@ beforeEach(function (): void {
 
     $this->urlGenerator = mock(UrlGeneratorInterface::class);
     $this->urlGenerator->allows('generate')->andReturn('/app/dashboard/leave-request/123');
+
+    $this->translator = mock(TranslatorInterface::class);
+    $this->translator->allows('trans')->andReturnUsing(fn (string $key) => $key);
 
     $this->user = new User(
         id: Uuid::uuid4(),
@@ -44,6 +48,7 @@ beforeEach(function (): void {
         holidayFacade: $this->holidayFacade,
         urlGenerator: $this->urlGenerator,
         security: $this->security,
+        translator: $this->translator,
     );
 });
 

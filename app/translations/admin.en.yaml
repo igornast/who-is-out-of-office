@@ -199,6 +199,9 @@ calendar:
         comment: Comment
         date: Date
         view_details: View Full Details
+        scope: Scope
+        scope_global: Global
+        scope_regional: Regional
 
 user:
     action:

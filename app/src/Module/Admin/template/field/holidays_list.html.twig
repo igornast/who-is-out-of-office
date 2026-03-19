@@ -8,15 +8,20 @@
             </tr>
         </thead>
         <tbody>
-            {% for holiday in field.value %}
+            {% set sorted_holidays = field.value|sort((a, b) =>
+                b.date|date('Y') == a.date|date('Y')
+                    ? (a.date|date('md') <=> b.date|date('md'))
+                    : (b.date|date('Y') <=> a.date|date('Y'))
+            ) %}
+            {% for holiday in sorted_holidays %}
                 <tr>
                     <td>{{ holiday.date|date('M d, Y') }}</td>
                     <td>{{ holiday.description }}</td>
                     <td>
                         {% if holiday.isGlobal %}
-                            <span class="badge bg-success">{{ 'crud.holiday_calendar.badge.global'|trans(domain='admin') }}</span>
+                            <span class="scope-badge scope-badge-global">{{ 'crud.holiday_calendar.badge.global'|trans(domain='admin') }}</span>
                         {% else %}
-                            <span class="badge bg-secondary">{{ 'crud.holiday_calendar.badge.regional'|trans(domain='admin') }}</span>
+                            <span class="scope-badge scope-badge-regional">{{ 'crud.holiday_calendar.badge.regional'|trans(domain='admin') }}</span>
                             {% if holiday.counties is not empty %}
                                 <small class="text-body-secondary ms-1">
                                     {%- for code in holiday.counties -%}
