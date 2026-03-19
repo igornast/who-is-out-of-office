@@ -160,6 +160,10 @@ leave_request:
         cancel: Cancel
         submit: Submit Request
         loading: Loading...
+        info_box: '<strong>%workdays%</strong> workdays will be taken. Remaining balance: <strong>%remaining%</strong>.'
+        min_notice_box: 'Leave requests must be submitted at least <strong>%days%</strong> days in advance of the requested notice start date.'
+        max_consecutive_box: 'Leave requests cannot exceed <strong>%days%</strong> consecutive workdays.'
+        no_balance_box: "Oops! It looks like you don't have enough leave days to cover this request.</br>You currently have <strong>%remaining%</strong> days of leave balance remaining."
 
 calendar:
     page_title: Team Calendar

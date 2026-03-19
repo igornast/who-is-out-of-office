@@ -62,6 +62,7 @@ class UserProfileSettingsController extends AbstractController
             $user->holidayCalendar = $dto->holidayCalendar;
             $user->birthDate = $dto->birthDate;
             $user->hasCelebrateWorkAnniversary = $dto->hasCelebrateWorkAnniversary;
+            $user->isEmailNotificationsEnabled = $dto->isEmailNotificationsEnabled;
 
             $this->em->persist($user);
             $this->em->flush();

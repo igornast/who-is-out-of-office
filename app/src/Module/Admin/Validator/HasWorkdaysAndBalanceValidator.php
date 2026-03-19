@@ -7,6 +7,7 @@ namespace App\Module\Admin\Validator;
 use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\DTO\NewLeaveRequestDTO;
+use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -22,6 +23,7 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
     public function __construct(
         private readonly Security $security,
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
+        private readonly AppSettingsFacadeInterface $appSettingsFacade,
     ) {
     }
 
@@ -62,6 +64,21 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
             return;
         }
 
+        $minNoticeDays = $this->appSettingsFacade->minNoticeDays();
+        if ($minNoticeDays > 0) {
+            $today = new \DateTimeImmutable('today');
+            $earliestAllowed = $today->modify(sprintf('+%d days', $minNoticeDays));
+
+            if ($value['start'] < $earliestAllowed) {
+                $this->context
+                    ->buildViolation($constraint->minNoticeDaysMessage)
+                    ->setParameter('{{ days }}', (string) $minNoticeDays)
+                    ->addViolation();
+
+                return;
+            }
+        }
+
         $query = new CalculateWorkdaysQuery(
             startDate: $value['start'],
             endDate: $value['end'],
@@ -70,6 +87,16 @@ class HasWorkdaysAndBalanceValidator extends ConstraintValidator
         );
 
         $workdays = $this->leaveRequestFacade->calculateWorkDays($query);
+
+        $maxConsecutiveDays = $this->appSettingsFacade->maxConsecutiveDays();
+        if ($maxConsecutiveDays > 0 && $workdays > $maxConsecutiveDays) {
+            $this->context
+                ->buildViolation($constraint->maxConsecutiveDaysMessage)
+                ->setParameter('{{ days }}', (string) $maxConsecutiveDays)
+                ->addViolation();
+
+            return;
+        }
 
         if ($workdays < 1) {
             $this->context

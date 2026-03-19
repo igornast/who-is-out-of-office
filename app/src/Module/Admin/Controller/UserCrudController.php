@@ -7,6 +7,7 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
 use App\Shared\Enum\RoleEnum;
+use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Service\RoleTranslator;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -41,6 +42,7 @@ class UserCrudController extends AppAbstractCrudController
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
+        private readonly AppSettingsFacadeInterface $appSettingsFacade,
     ) {
     }
 
@@ -159,12 +161,16 @@ class UserCrudController extends AppAbstractCrudController
 
     public function createEntity(string $entityFqcn): User
     {
+        $allowance = $this->appSettingsFacade->defaultAnnualAllowance();
+
         return new User(
             id: Uuid::uuid4(),
             firstName: '',
             lastName: '',
             email: '',
             password: '',
+            annualLeaveAllowance: $allowance,
+            currentLeaveBalance: $allowance,
         );
     }
 

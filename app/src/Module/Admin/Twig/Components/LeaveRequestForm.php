@@ -7,11 +7,13 @@ namespace App\Module\Admin\Twig\Components;
 use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Form\NewLeaveRequestFormType;
+use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -41,6 +43,8 @@ class LeaveRequestForm extends AbstractController
         #[CurrentUser]
         User $user,
         LeaveRequestFacadeInterface $leaveRequestFacade,
+        AppSettingsFacadeInterface $appSettingsFacade,
+        TranslatorInterface $translator,
     ): void {
         $this->isSubmitDisabled = true;
         $this->infoBox = '';
@@ -72,6 +76,18 @@ class LeaveRequestForm extends AbstractController
             throw new \InvalidArgumentException('Start date and end date are not valid');
         }
 
+        $minNoticeDays = $appSettingsFacade->minNoticeDays();
+        if ($minNoticeDays > 0) {
+            $today = new \DateTimeImmutable('today');
+            $earliestAllowed = $today->modify(sprintf('+%d days', $minNoticeDays));
+
+            if ($startDate < $earliestAllowed) {
+                $this->infoBox = $this->generateMinNoticeBox($minNoticeDays, $translator);
+
+                return;
+            }
+        }
+
         $query = new CalculateWorkdaysQuery(
             startDate: $startDate,
             endDate: $endDate,
@@ -80,15 +96,23 @@ class LeaveRequestForm extends AbstractController
         );
 
         $workdaysNumber = $leaveRequestFacade->calculateWorkDays($query);
-        $remainingBalance = $user->currentLeaveBalance - $workdaysNumber;
 
-        if ($remainingBalance < 0) {
-            $this->infoBox = $this->generateNoBalanceBox($user->currentLeaveBalance);
+        $maxConsecutiveDays = $appSettingsFacade->maxConsecutiveDays();
+        if ($maxConsecutiveDays > 0 && $workdaysNumber > $maxConsecutiveDays) {
+            $this->infoBox = $this->generateMaxConsecutiveDaysBox($maxConsecutiveDays, $translator);
 
             return;
         }
 
-        $this->infoBox = $this->generateInfoBox($workdaysNumber, $remainingBalance);
+        $remainingBalance = $user->currentLeaveBalance - $workdaysNumber;
+
+        if ($remainingBalance < 0) {
+            $this->infoBox = $this->generateNoBalanceBox($user->currentLeaveBalance, $translator);
+
+            return;
+        }
+
+        $this->infoBox = $this->generateInfoBox($workdaysNumber, $remainingBalance, $translator);
         $this->isSubmitDisabled = false;
     }
 
@@ -100,24 +124,50 @@ class LeaveRequestForm extends AbstractController
         return explode(' to ', $rageString.' to ');
     }
 
-    private function generateInfoBox(int $workdaysNumber, int $remainingBalance): string
-    {
-        return <<<HTML
-        <div class="alert alert-info mt-3" id="infoBox">
-            <strong>{$workdaysNumber}</strong> workdays will be taken.
-            Remaining balance: <strong>{$remainingBalance}</strong>.
-        </div>
-HTML;
+    private function generateInfoBox(
+        int $workdaysNumber,
+        int $remainingBalance,
+        TranslatorInterface $translator,
+    ): string {
+        $message = $translator->trans(
+            'leave_request.new.info_box',
+            ['%workdays%' => $workdaysNumber, '%remaining%' => $remainingBalance],
+            'admin',
+        );
 
+        return sprintf('<div class="alert alert-info mt-3" id="infoBox">%s</div>', $message);
     }
 
-    private function generateNoBalanceBox(int $remainingBalance): string
+    private function generateMinNoticeBox(int $minNoticeDays, TranslatorInterface $translator): string
     {
-        return <<<HTML
-        <div class="alert alert-warning mt-3" id="noBalanceBox">
-            Oops! It looks like you don’t have enough leave days to cover this request.</br>
-            You currently have <strong>{$remainingBalance}</strong> days of leave balance remaining.
-        </div>
-HTML;
+        $message = $translator->trans(
+            'leave_request.new.min_notice_box',
+            ['%days%' => $minNoticeDays],
+            'admin',
+        );
+
+        return sprintf('<div class="alert alert-warning mt-3" id="minNoticeBox">%s</div>', $message);
+    }
+
+    private function generateMaxConsecutiveDaysBox(int $maxConsecutiveDays, TranslatorInterface $translator): string
+    {
+        $message = $translator->trans(
+            'leave_request.new.max_consecutive_box',
+            ['%days%' => $maxConsecutiveDays],
+            'admin',
+        );
+
+        return sprintf('<div class="alert alert-warning mt-3" id="maxConsecutiveBox">%s</div>', $message);
+    }
+
+    private function generateNoBalanceBox(int $remainingBalance, TranslatorInterface $translator): string
+    {
+        $message = $translator->trans(
+            'leave_request.new.no_balance_box',
+            ['%remaining%' => $remainingBalance],
+            'admin',
+        );
+
+        return sprintf('<div class="alert alert-warning mt-3" id="noBalanceBox">%s</div>', $message);
     }
 }
