@@ -1,0 +1,68 @@
+title: Public Holidays
+slug: public-holidays
+order: 3
+description: Import and manage public holiday calendars that affect leave request workday calculations.
+
+sections:
+  - heading: Overview
+    content: |
+      Public holidays are subtracted from workday calculations when users submit leave requests. If a user requests five days off and one of those days is a public holiday, only four workdays are deducted from their balance.
+
+      Holidays are organized into **calendars** by country and year. Each calendar can be toggled active or inactive, and users are assigned to a calendar in their profile.
+
+  - heading: Import via Admin Panel
+    content: |
+      1. Go to **Settings → Public Holidays**.
+      2. Click **Import**.
+      3. Select the **country** and **year** from the dropdowns.
+      4. Click **Import** to fetch holidays from the Nager.Date API.
+
+      The import creates a calendar with all public holidays for that country and year.
+    screenshot:
+      alt: "Public Holidays import dialog showing country and year dropdown selectors"
+      path: screenshots/holiday-import.png
+      caption: "Import public holidays by selecting a country and year"
+    tip: "You can import multiple years for the same country. Each year creates a separate calendar."
+
+  - heading: Manage Calendars
+    content: |
+      After importing, the calendar appears in the Public Holidays list. From here you can:
+
+      - **View details** — see all holidays in the calendar with their dates and names.
+      - **Toggle active/inactive** — inactive calendars are ignored in workday calculations.
+      - **Sync** — re-import holidays for an existing calendar (useful if the API data was updated).
+      - **Delete** — remove a calendar entirely.
+
+      When a new year approaches, import the next year's holidays so workday calculations remain accurate for leave requests that span the year boundary.
+    screenshot:
+      alt: "Public Holidays list showing multiple country calendars with active/inactive toggles"
+      path: screenshots/holiday-list.png
+      caption: "Manage imported holiday calendars"
+
+  - heading: Regional Subdivisions
+    content: |
+      Some countries have holidays that only apply to specific regions (e.g. state-level holidays in Germany or the US). The app handles this with two concepts:
+
+      - **Global holidays** — apply to everyone in that country (e.g. Christmas Day in Germany).
+      - **Regional holidays** — apply only to users in a specific subdivision (e.g. Assumption Day in Bavaria / `DE-BY`).
+
+      When a holiday is imported, it stores whether it is global and which subdivision codes it applies to. The workday calculation logic:
+
+      1. Global holidays always count.
+      2. Regional holidays count only if the user's subdivision matches.
+    screenshot:
+      alt: "Holiday detail view showing global flag and subdivision codes for regional holidays"
+      path: screenshots/holiday-subdivision.png
+      caption: "Global vs regional holidays with subdivision codes"
+
+  - heading: Assign Calendars to Users
+    content: |
+      Each user must be assigned a public holiday calendar for it to affect their leave calculations.
+
+      1. Go to the user's profile (or **My Organization → Edit User**).
+      2. Under **Holiday Calendar**, select the appropriate calendar from the dropdown.
+      3. If the user is in a region with specific holidays, also set their **Subdivision** (e.g. `DE-BY` for Bavaria).
+      4. **Save**.
+
+      If no calendar is assigned, no public holidays are subtracted from that user's leave requests.
+    tip: "When a user's subdivision is set, they get both global holidays and holidays specific to their region. Without a subdivision, only global holidays apply."

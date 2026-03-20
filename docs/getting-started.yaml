@@ -1,0 +1,121 @@
+title: Getting Started
+slug: getting-started
+order: 1
+description: Set up your local development environment and explore the dashboard.
+
+sections:
+  - heading: Prerequisites
+    content: |
+      You only need three tools installed on your machine:
+
+      | Tool           | Version |
+      |----------------|---------|
+      | Docker         | 20+     |
+      | Docker Compose | 2+      |
+      | Git            | any     |
+
+      No host PHP, MySQL, Node, or Composer required — everything runs inside containers.
+
+  - heading: Clone and Start
+    content: |
+      ```bash
+      git clone https://github.com/igornast/who-is-out-of-office.git
+      cd who-is-out-of-office
+      docker-compose up -d
+      ```
+
+      Three services will start:
+
+      | Service | Port | Description              |
+      |---------|------|--------------------------|
+      | nginx   | 80   | Web server               |
+      | php     | —    | PHP-FPM with Xdebug      |
+      | db      | 3306 | MySQL 8.4                |
+      | mailpit | 8025 | Local email catcher       |
+
+  - heading: Initialize the Database
+    content: |
+      Enter the PHP container and run migrations, then load the demo fixtures:
+
+      ```bash
+      docker exec -it app_ooo_php bash
+
+      # inside the container
+      php bin/console doctrine:migrations:migrate --no-interaction
+      php bin/console doctrine:fixtures:load --no-interaction
+      ```
+
+      Fixtures create sample users, teams, leave types, and leave requests so you can explore the app right away.
+    tip: "Fixtures reset the database every time they run. Use them freely during development — they're designed for a clean starting state."
+
+  - heading: Compile Assets
+    content: |
+      Still inside the container, compile the frontend assets:
+
+      ```bash
+      php bin/console asset-map:compile
+      ```
+
+      The project uses Symfony AssetMapper — no Node or npm needed.
+
+  - heading: Log In
+    content: |
+      Open [http://localhost/app](http://localhost/app) in your browser. You'll see the login page.
+
+      The fixtures create three accounts so you can test every role:
+
+      | Role    | Email              | Password |
+      |---------|--------------------|----------|
+      | Admin   | admin@ooo.com      | 123      |
+      | Manager | manager@ooo.com    | 123      |
+      | User    | user@ooo.com       | 123      |
+    screenshot:
+      alt: "Login page with email and password fields"
+      path: screenshots/login.png
+      caption: "The login page at /app"
+
+  - heading: Dashboard Overview
+    content: |
+      After logging in you land on the dashboard. What you see depends on your role:
+
+      - **Admin** — full organization view: leave balance stats, all pending requests, who's out today, upcoming absences, birthdays, and work anniversaries.
+      - **Manager** — same sections, scoped to your direct reports.
+      - **User** — your personal leave balance, your upcoming absences, and team-wide birthdays and anniversaries.
+
+      The sidebar gives access to leave requests, the team calendar, your profile, and (for admins) organization settings.
+    screenshot:
+      alt: "Admin dashboard showing stats cards, upcoming absences, birthdays, and work anniversaries"
+      path: screenshots/dashboard.png
+      caption: "The admin dashboard with all sections visible"
+
+  - heading: Local Email with Mailpit
+    content: |
+      The development environment includes [Mailpit](https://mailpit.axllent.org/), a local email catcher. Every email the app sends (invitations, leave request notifications) is captured here instead of being delivered.
+
+      Open [http://localhost:8025](http://localhost:8025) to view caught emails.
+    screenshot:
+      alt: "Mailpit inbox showing captured invitation and notification emails"
+      path: screenshots/mailpit.png
+      caption: "Mailpit catches all emails sent in development"
+    tip: "No SMTP configuration needed for local development — Mailpit is pre-configured in the Docker setup."
+
+  - heading: Roles Overview
+    content: |
+      The application has three roles. Roles **do not inherit** from each other — an Admin does not automatically have Manager permissions.
+
+      **Admin**
+      - Manage all users, teams, and leave types
+      - Approve or reject any leave request
+      - Import public holiday calendars
+      - Configure application settings
+
+      **Manager**
+      - View and manage direct reports
+      - Approve or reject leave requests from their team
+      - See team-scoped dashboard data
+
+      **User**
+      - Submit leave requests
+      - View personal leave balance
+      - Update profile and connected services
+    warning: "Roles do not inherit. If someone needs both Admin and Manager capabilities, both roles must be explicitly assigned."

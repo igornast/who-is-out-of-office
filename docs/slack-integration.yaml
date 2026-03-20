@@ -1,0 +1,125 @@
+title: Slack Integration
+slug: slack-integration
+order: 4
+description: Connect Slack for leave request approvals, weekly digests, and personal notifications.
+
+sections:
+  - heading: Overview
+    content: |
+      The Slack integration adds three capabilities:
+
+      - **Approval channel** — new leave requests are posted to a shared channel with Approve / Reject buttons. Managers act directly from Slack.
+      - **Weekly digest** — every Monday at 8:15 AM, a summary is posted: who's out this week, upcoming birthdays, and work anniversaries.
+      - **Private DMs** — users receive a personal Slack message when their leave request is approved, rejected, or withdrawn.
+
+  - heading: Create a Slack App
+    content: |
+      1. Go to [api.slack.com/apps](https://api.slack.com/apps) and click **Create New App → From scratch**.
+      2. Name the app (e.g. "Who's OOO") and select your workspace.
+      3. Under **OAuth & Permissions → Scopes → Bot Token Scopes**, add:
+         - `chat:write`
+         - `chat:write.customize`
+      4. Click **Install to Workspace** and authorize.
+      5. Copy the **Bot User OAuth Token** (starts with `xoxb-`).
+    screenshot:
+      alt: "Slack API dashboard showing OAuth scopes configuration with chat:write and chat:write.customize selected"
+      path: screenshots/slack-oauth-scopes.png
+      caption: "Required bot token scopes"
+
+  - heading: Environment Variables
+    content: |
+      Add these variables to your `.env.local` file:
+
+      ```dotenv
+      SLACK_DSN=slack://TOKEN@default?channel=CHANNEL
+      SLACK_SIGNING_SECRET=your-signing-secret
+      SLACK_AR_APPROVE_CHANNEL_ID=C0123APPROVAL
+      SLACK_AR_HR_DIGEST_CHANNEL_ID=C0123DIGEST
+      ```
+
+      | Variable                          | Where to find it                                                   |
+      |-----------------------------------|--------------------------------------------------------------------|
+      | `SLACK_DSN`                        | Bot token from the previous step. Replace `TOKEN` with the `xoxb-` value. |
+      | `SLACK_SIGNING_SECRET`             | **Basic Information → App Credentials → Signing Secret**           |
+      | `SLACK_AR_APPROVE_CHANNEL_ID`      | Right-click the approval channel in Slack → **View channel details** → copy the Channel ID at the bottom. |
+      | `SLACK_AR_HR_DIGEST_CHANNEL_ID`    | Same steps for the digest channel.                                 |
+    tip: "Channel IDs look like `C04ABCD1234`. Don't use the channel name — it won't work."
+
+  - heading: Enable Interactivity
+    content: |
+      For the Approve / Reject buttons to work, Slack needs to send button clicks back to your app.
+
+      1. In your Slack App settings, go to **Interactivity & Shortcuts**.
+      2. Toggle **Interactivity** to **On**.
+      3. Set the **Request URL** to:
+         ```
+         https://your-domain.com/api/slack/interactive-endpoint
+         ```
+      4. Click **Save Changes**.
+
+      For **local development**, use [ngrok](https://ngrok.com/) to expose your local server:
+
+      ```bash
+      ngrok http 80
+      ```
+
+      Then set the Request URL to the ngrok HTTPS URL, e.g.:
+      ```
+      https://abc123.ngrok-free.app/api/slack/interactive-endpoint
+      ```
+    screenshot:
+      alt: "Slack Interactivity settings page with the Request URL field filled in"
+      path: screenshots/slack-interactivity.png
+      caption: "Enable Interactivity and set the Request URL"
+    warning: "The ngrok URL changes every time you restart it (on the free plan). Update the Slack Request URL accordingly."
+
+  - heading: Invite the Bot to Channels
+    content: |
+      The bot must be a member of both the approval and digest channels to post messages.
+
+      In each channel, type:
+      ```
+      /invite @Who's OOO
+      ```
+
+      Or open the channel settings and add the app under **Integrations → Apps**.
+
+  - heading: Connect Individual Users
+    content: |
+      Each user can link their Slack account to receive personal DMs about their leave requests.
+
+      1. In the app, go to **Profile → Connected Services**.
+      2. In the **Slack** section, enter your **Slack Member ID**.
+      3. Click **Save**.
+
+      To find your Slack Member ID: click your profile picture in Slack → **Profile** → click the three-dot menu → **Copy Member ID**.
+    screenshot:
+      alt: "Profile Connected Services page showing the Slack Member ID input field"
+      path: screenshots/slack-user-connect.png
+      caption: "Enter your Slack Member ID in the Connected Services section"
+
+  - heading: Admin Status Check
+    content: |
+      Admins can verify which users have connected their Slack accounts.
+
+      Go to **My Organization** — each user's row shows a Slack status indicator. A green icon means the user has linked their Slack Member ID; grey means they haven't.
+    screenshot:
+      alt: "Organization user list with Slack connection status indicators"
+      path: screenshots/slack-admin-status.png
+      caption: "Slack connection status visible in the user list"
+
+  - heading: Weekly Digest
+    content: |
+      The weekly digest runs automatically every **Monday at 8:15 AM**. It posts to the digest channel with:
+
+      - Who's out this week (approved leave requests)
+      - Upcoming birthdays
+      - Upcoming work anniversaries
+
+      You can trigger it manually for testing:
+
+      ```bash
+      docker exec -it app_ooo_php bash
+      php bin/console slack:weekly_digest
+      ```
+    tip: "The digest skips sections that have no data — if nobody is out and there are no birthdays or anniversaries, it won't post at all."

@@ -1,0 +1,70 @@
+title: User Invitations
+slug: user-invitations
+order: 2
+description: Invite users to the app and walk through the account activation flow.
+
+sections:
+  - heading: Overview
+    content: |
+      New users are added by an admin through the organization panel. When a user is created, an invitation email is sent automatically with a token-based activation link. The invited user clicks the link, sets their name and password, and their account is ready.
+
+  - heading: Create and Invite a User
+    content: |
+      1. Go to **My Organization** in the sidebar.
+      2. Click **Create User**.
+      3. Fill in the required fields:
+         - **Email** — the user's work email address.
+         - **Role** — Admin, Manager, or User.
+         - **Team** — assign to an existing team (for Managers and Users).
+      4. Click **Save**.
+
+      The invitation email is sent immediately after saving.
+    screenshot:
+      alt: "Create User form showing email, role, and team fields"
+      path: screenshots/invite-create-user.png
+      caption: "Create a new user from the My Organization page"
+
+  - heading: Invitation Email
+    content: |
+      The invited user receives an email with an activation link. The link contains a unique token and expires after a set period.
+
+      In local development, emails are caught by Mailpit at [http://localhost:8025](http://localhost:8025) — no real emails are sent.
+    screenshot:
+      alt: "Invitation email in Mailpit showing the activation link"
+      path: screenshots/invite-email.png
+      caption: "Invitation email as seen in Mailpit"
+    tip: "If an invitation email doesn't appear in Mailpit, make sure the Symfony Messenger async transport is running: `php bin/console messenger:consume async`."
+
+  - heading: Accept the Invitation
+    content: |
+      When the user clicks the activation link, they're taken to a registration form:
+
+      1. Enter **First name** and **Last name**.
+      2. Set a **Password**.
+      3. Enter **Birth date** (used for the birthday section on the dashboard).
+      4. Click **Activate**.
+
+      The account is now active and the user can log in.
+    screenshot:
+      alt: "Account activation form with fields for name, password, and birth date"
+      path: screenshots/invite-accept.png
+      caption: "The account activation form"
+
+  - heading: After Activation
+    content: |
+      Once activated, the user should:
+
+      - **Complete their profile** — set working days, contract start date, and profile image.
+      - **Connect Slack** — enter their Slack Member ID under Connected Services to receive personal notifications.
+      - **Subscribe to iCal** — copy the calendar feed URL for leave request visibility in their calendar app.
+
+  - heading: Resend or Reset
+    content: |
+      If the invitation email was lost or expired:
+
+      1. Go to **My Organization**.
+      2. Find the user and open their detail page.
+      3. Click **Reset Password**.
+
+      This sends a new activation email with a fresh token. The process is the same as the original invitation — the user clicks the link and sets their password.
+    tip: "The Reset Password button works for both un-activated accounts (resends the invitation) and active accounts (sends a password reset)."

@@ -1,0 +1,16 @@
+site:
+  title: "Who's Out of Office"
+  tagline: "Open-source staff leave planner built with Symfony"
+  repo_url: "https://github.com/igornast/who-is-out-of-office"
+
+navigation:
+  - slug: getting-started
+    label: Getting Started
+  - slug: user-invitations
+    label: User Invitations
+  - slug: public-holidays
+    label: Public Holidays
+  - slug: slack-integration
+    label: Slack Integration
+  - slug: ical-feeds
+    label: iCal Feeds
