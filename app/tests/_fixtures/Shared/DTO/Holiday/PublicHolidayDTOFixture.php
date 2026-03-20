@@ -24,6 +24,8 @@ class PublicHolidayDTOFixture implements FixtureInterface
             'description' => $faker->text(),
             'countryCode' => $faker->countryCode(),
             'date' => \DateTimeImmutable::createFromMutable($faker->dateTime()),
+            'isGlobal' => true,
+            'counties' => null,
         ];
     }
 }

@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WeeklyDigestNotificationCommandHandler
 {
@@ -27,6 +28,7 @@ class WeeklyDigestNotificationCommandHandler
         private readonly UserFacadeInterface $userFacade,
         private readonly UsersEventsProvider $usersEventsProvider,
         private readonly AppSettingsFacadeInterface $appSettingsFacade,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -118,11 +120,14 @@ class WeeklyDigestNotificationCommandHandler
 
                 if ($event instanceof UserPublicHolidaysDTO) {
                     foreach ($event->holidays as $holiday) {
+                        $regionSuffix = $this->resolveRegionSuffix($holiday->isGlobal, $event->user->subdivisionCode);
+
                         $text .= sprintf(
-                            "    ‣ Public holiday: _%s (%s)_ %s\n",
+                            "    ‣ Public holiday: _%s (%s)_ %s%s\n",
                             $holiday->date->format('F d'),
                             $holiday->description,
                             EmojisProvider::getFlagEmojiCode($holiday->countryCode),
+                            $regionSuffix,
                         );
                     }
                 }
@@ -262,6 +267,22 @@ class WeeklyDigestNotificationCommandHandler
         ]);
 
         $this->chatter->send(new ChatMessage(self::SUBJECT_MESSAGE)->options($options));
+    }
+
+    private function resolveRegionSuffix(bool $isGlobal, ?string $subdivisionCode): string
+    {
+        if ($isGlobal || null === $subdivisionCode) {
+            return '';
+        }
+
+        $translationKey = sprintf('subdivision.%s', $subdivisionCode);
+        $regionName = $this->translator->trans($translationKey, domain: 'admin');
+
+        if ($regionName === $translationKey) {
+            return '';
+        }
+
+        return sprintf('  ·  %s', $regionName);
     }
 
     /**

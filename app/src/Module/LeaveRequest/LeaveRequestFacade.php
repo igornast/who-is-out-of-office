@@ -119,7 +119,8 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
             startDate: $command->startDate,
             endDate: $command->endDate,
             userWorkingDays: $command->userDTO->workingDays,
-            holidayCalendarCountryCode: $command->userDTO->calendarCountryCode
+            holidayCalendarCountryCode: $command->userDTO->calendarCountryCode,
+            subdivisionCode: $command->userDTO->subdivisionCode,
         );
 
         $workDays = $this->calculateWorkDays($query);

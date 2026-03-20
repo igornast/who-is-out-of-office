@@ -17,8 +17,8 @@ class GetHolidayDaysForCountryBetweenDatesQueryHandler
     /**
      * @return PublicHolidayDTO[]
      */
-    public function handle(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, string $countryCode): array
+    public function handle(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, string $countryCode, ?string $subdivisionCode = null): array
     {
-        return $this->publicHolidayRepository->findBetweenDatesForCountryCode($startDate, $endDate, $countryCode);
+        return $this->publicHolidayRepository->findBetweenDatesForCountryCode($startDate, $endDate, $countryCode, $subdivisionCode);
     }
 }

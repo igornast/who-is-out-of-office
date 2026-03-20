@@ -11,6 +11,8 @@
 
         <field name="description" column="description" length="255"/>
         <field name="date" type="date_immutable" column="date" />
+        <field name="isGlobal" column="is_global" type="boolean"/>
+        <field name="counties" column="counties" type="json" nullable="true"/>
 
         <many-to-one field="holidayCalendar" target-entity="App\Infrastructure\Doctrine\Entity\HolidayCalendar" inversed-by="holidays">
             <join-column name="holiday_calendar_id" nullable="false" />

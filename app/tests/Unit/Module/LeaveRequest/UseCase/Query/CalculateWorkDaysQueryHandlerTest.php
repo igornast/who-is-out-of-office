@@ -68,7 +68,7 @@ it('calculates work days with public holidays', function () {
     $this->holidayFacade
         ->expects('getHolidayDaysForCountryBetweenDates')
         ->once()
-        ->with($startDate, $endDate, 'PL')
+        ->with($startDate, $endDate, 'PL', null)
         ->andReturn([
             PublicHolidayDTOFixture::create(['date' => DateTimeImmutable::createFromFormat('Y-m-d', '2025-06-16')]),
             PublicHolidayDTOFixture::create(['date' => DateTimeImmutable::createFromFormat('Y-m-d', '2025-06-21')]),
@@ -92,7 +92,7 @@ it('calculates work days with public holidays and custom work schedule', functio
     $this->holidayFacade
         ->expects('getHolidayDaysForCountryBetweenDates')
         ->once()
-        ->with($startDate, $endDate, 'PL')
+        ->with($startDate, $endDate, 'PL', null)
         ->andReturn([
             PublicHolidayDTOFixture::create(['date' => DateTimeImmutable::createFromFormat('Y-m-d', '2025-06-16')]),
             PublicHolidayDTOFixture::create(['date' => DateTimeImmutable::createFromFormat('Y-m-d', '2025-06-17')]),
@@ -107,4 +107,28 @@ it('calculates work days with public holidays and custom work schedule', functio
 
     expect($this->handler->handle($query))
     ->toBe(5);
+});
+
+it('passes subdivision code when calculating work days with holidays', function () {
+    $startDate = DateTimeImmutable::createFromFormat('Y-m-d', '2025-06-16');
+    $endDate = DateTimeImmutable::createFromFormat('Y-m-d', '2025-06-25');
+
+    $this->holidayFacade
+        ->expects('getHolidayDaysForCountryBetweenDates')
+        ->once()
+        ->with($startDate, $endDate, 'DE', 'DE-BY')
+        ->andReturn([
+            PublicHolidayDTOFixture::create(['date' => DateTimeImmutable::createFromFormat('Y-m-d', '2025-06-16')]),
+        ]);
+
+    $query = new CalculateWorkdaysQuery(
+        startDate: $startDate,
+        endDate: $endDate,
+        userWorkingDays: [1, 2, 3, 4, 5],
+        holidayCalendarCountryCode: 'DE',
+        subdivisionCode: 'DE-BY',
+    );
+
+    expect($this->handler->handle($query))
+    ->toBe(7);
 });

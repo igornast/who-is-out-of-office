@@ -13,6 +13,7 @@ use App\Module\Holiday\UseCase\Query\GetAllCalendarsQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayCalendarForCountryQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysForCountryBetweenDatesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler;
+use App\Module\Holiday\UseCase\Query\GetSubdivisionsGroupedByCalendarQueryHandler;
 use App\Shared\DTO\Holiday\PublicHolidayCalendarDTO;
 use App\Shared\DTO\Holiday\PublicHolidayDTO;
 use App\Shared\DTO\Holiday\UserPublicHolidaysDTO;
@@ -30,6 +31,7 @@ final class HolidayFacade implements HolidayFacadeInterface
         private readonly SyncCalendarCommandHandler $syncCalendarHandler,
         private readonly SyncAllActiveCalendarsCommandHandler $syncAllActiveCalendarsHandler,
         private readonly DeleteCalendarCommandHandler $deleteCalendarHandler,
+        private readonly GetSubdivisionsGroupedByCalendarQueryHandler $subdivisionsHandler,
     ) {
     }
 
@@ -46,9 +48,9 @@ final class HolidayFacade implements HolidayFacadeInterface
     /**
      * @return PublicHolidayDTO[]
      */
-    public function getHolidayDaysForCountryBetweenDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, string $countryCode): array
+    public function getHolidayDaysForCountryBetweenDates(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, string $countryCode, ?string $subdivisionCode = null): array
     {
-        return $this->holidayDaysHandler->handle($startDate, $endDate, $countryCode);
+        return $this->holidayDaysHandler->handle($startDate, $endDate, $countryCode, $subdivisionCode);
     }
 
     /**
@@ -85,5 +87,13 @@ final class HolidayFacade implements HolidayFacadeInterface
     public function deleteCalendar(string $calendarId): void
     {
         $this->deleteCalendarHandler->handle($calendarId);
+    }
+
+    /**
+     * @return array<string, string[]>
+     */
+    public function getSubdivisionsGroupedByCalendar(): array
+    {
+        return $this->subdivisionsHandler->handle();
     }
 }

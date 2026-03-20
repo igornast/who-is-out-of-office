@@ -46,6 +46,51 @@ it('fetches holidays and upserts calendar', function () {
     $this->handler->handle($countryCode, $countryName, $year);
 });
 
+it('passes regional data through sync pipeline', function () {
+    $countryCode = 'DE';
+    $countryName = 'Germany';
+    $year = 2026;
+
+    $nationalHoliday = new NagerPublicHolidayDTO(
+        date: new DateTimeImmutable('2026-01-01'),
+        localName: 'Neujahr',
+        name: 'New Year',
+        global: true,
+        counties: null,
+    );
+
+    $regionalHoliday = new NagerPublicHolidayDTO(
+        date: new DateTimeImmutable('2026-01-06'),
+        localName: 'Heilige Drei Könige',
+        name: 'Epiphany',
+        global: false,
+        counties: ['DE-BW', 'DE-BY', 'DE-ST'],
+    );
+
+    $this->dateNager
+        ->expects('getHolidaysForCountry')
+        ->once()
+        ->with($countryCode, $year)
+        ->andReturn([$nationalHoliday, $regionalHoliday]);
+
+    $this->repository
+        ->expects('upsertByCountryCode')
+        ->once()
+        ->withArgs(function (PublicHolidayCalendarDTO $dto, ?int $syncYear) use ($countryCode, $year) {
+            expect($dto->countryCode)->toBe($countryCode)
+                ->and($dto->holidays)->toHaveCount(2)
+                ->and($dto->holidays[0]->isGlobal)->toBeTrue()
+                ->and($dto->holidays[0]->counties)->toBeNull()
+                ->and($dto->holidays[1]->isGlobal)->toBeFalse()
+                ->and($dto->holidays[1]->counties)->toBe(['DE-BW', 'DE-BY', 'DE-ST'])
+                ->and($syncYear)->toBe($year);
+
+            return true;
+        });
+
+    $this->handler->handle($countryCode, $countryName, $year);
+});
+
 it('syncs calendar with empty holidays', function () {
     $countryCode = 'NG';
     $countryName = 'Nigeria';

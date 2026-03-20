@@ -160,6 +160,10 @@ leave_request:
         cancel: Cancel
         submit: Submit Request
         loading: Loading...
+        info_box: '<strong>%workdays%</strong> workdays will be taken. Remaining balance: <strong>%remaining%</strong>.'
+        min_notice_box: 'Leave requests must be submitted at least <strong>%days%</strong> days in advance of the requested notice start date.'
+        max_consecutive_box: 'Leave requests cannot exceed <strong>%days%</strong> consecutive workdays.'
+        no_balance_box: "Oops! It looks like you don't have enough leave days to cover this request.</br>You currently have <strong>%remaining%</strong> days of leave balance remaining."
 
 calendar:
     page_title: Team Calendar
@@ -195,6 +199,9 @@ calendar:
         comment: Comment
         date: Date
         view_details: View Full Details
+        scope: Scope
+        scope_global: Global
+        scope_regional: Regional
 
 user:
     action:
@@ -281,6 +288,9 @@ crud:
             working_days: Working Days
             holiday_calendar: Holiday Calendar
             holiday_calendar_placeholder: Select your calendar
+            subdivision_code: Region / State
+            subdivision_code_placeholder: "All regions (national holidays only)"
+            subdivision_code_help: "Select your region to see only national and region-specific holidays."
             birth_date: Birth Date
             birth_date_help: If you enter a birthdate, our OOO Slackbot will automatically send a friendly reminder to your teammates before your birthday. This helps everyone celebrate together.
             contract_started_at: Contract Start Date
@@ -297,6 +307,8 @@ crud:
             profile_image_remove: Remove
         action:
             save_changes: Save Changes
+        flash:
+            updated: Profile updated successfully!
         connected_services:
             title: Connected Services
             slack:
@@ -343,6 +355,10 @@ crud:
             date: Date
             name: Holiday Name
             no_holidays: No public holidays configured
+            scope: Scope
+        badge:
+            global: Global
+            regional: Regional
         action:
             toggle_active: Toggle Active
             sync: Sync Now
@@ -479,3 +495,76 @@ settings:
             saved: Appearance preferences saved successfully.
         action:
             save: Save Changes
+
+subdivision:
+    # Germany (10/19 holidays are regional)
+    DE-BW: Baden-Württemberg
+    DE-BY: Bavaria
+    DE-BE: Berlin
+    DE-BB: Brandenburg
+    DE-HB: Bremen
+    DE-HH: Hamburg
+    DE-HE: Hesse
+    DE-MV: Mecklenburg-Vorpommern
+    DE-NI: Lower Saxony
+    DE-NW: North Rhine-Westphalia
+    DE-RP: Rhineland-Palatinate
+    DE-SL: Saarland
+    DE-SN: Saxony
+    DE-ST: Saxony-Anhalt
+    DE-SH: Schleswig-Holstein
+    DE-TH: Thuringia
+    # Switzerland (most holidays are regional, ~28/33)
+    CH-AG: Aargau
+    CH-AR: Appenzell Ausserrhoden
+    CH-AI: Appenzell Innerrhoden
+    CH-BL: Basel-Landschaft
+    CH-BS: Basel-Stadt
+    CH-BE: Bern
+    CH-FR: Fribourg
+    CH-GE: Geneva
+    CH-GL: Glarus
+    CH-GR: Graubünden
+    CH-JU: Jura
+    CH-LU: Lucerne
+    CH-NE: Neuchâtel
+    CH-NW: Nidwalden
+    CH-OW: Obwalden
+    CH-SG: St. Gallen
+    CH-SH: Schaffhausen
+    CH-SZ: Schwyz
+    CH-SO: Solothurn
+    CH-TG: Thurgau
+    CH-TI: Ticino
+    CH-UR: Uri
+    CH-VD: Vaud
+    CH-VS: Valais
+    CH-ZG: Zug
+    CH-ZH: Zürich
+    # Spain (22/31 holidays are regional)
+    ES-AN: Andalusia
+    ES-AR: Aragon
+    ES-AS: Asturias
+    ES-CB: Cantabria
+    ES-CL: Castile and León
+    ES-CM: Castile-La Mancha
+    ES-CT: Catalonia
+    ES-CE: Ceuta
+    ES-EX: Extremadura
+    ES-GA: Galicia
+    ES-IB: Balearic Islands
+    ES-CN: Canary Islands
+    ES-RI: La Rioja
+    ES-MD: Madrid
+    ES-ML: Melilla
+    ES-MC: Murcia
+    ES-NC: Navarre
+    ES-PV: Basque Country
+    ES-VC: Valencia
+    # United Kingdom (9/14 holidays are regional)
+    GB-ENG: England
+    GB-NIR: Northern Ireland
+    GB-SCT: Scotland
+    GB-WLS: Wales
+    # Italy (only Trentino-South Tyrol has 1 regional holiday)
+    IT-32: Trentino-South Tyrol

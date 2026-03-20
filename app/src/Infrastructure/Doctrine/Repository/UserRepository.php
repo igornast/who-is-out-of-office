@@ -76,6 +76,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->themePreference = $userDTO->themePreference;
         $user->palettePreference = $userDTO->palettePreference;
         $user->icalHashSalt = $userDTO->icalHashSalt;
+        $user->subdivisionCode = $userDTO->subdivisionCode;
 
         if (null !== $userDTO->managerId) {
             $user->manager = $this->find($userDTO->managerId);

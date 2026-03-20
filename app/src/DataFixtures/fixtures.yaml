@@ -6,7 +6,6 @@ parameters:
         - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
         - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
         - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
-        - null
 
 
 App\Infrastructure\Doctrine\Entity\User:
@@ -22,9 +21,9 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 30
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: <randomElement($profileImages)>
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
             holidayCalendar: '@holiday_calendar_fr'
-            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 days", "+2 days")->format("Y-m-d H:i:s")))>'
+            birthDate: '<(new \DateTimeImmutable((new DateTime("+3 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+5 days"))->modify("-5 years")->format("Y-m-d H:i:s")))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
     user_2:
@@ -36,13 +35,14 @@ App\Infrastructure\Doctrine\Entity\User:
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_MANAGER']
             annualLeaveAllowance: 30
-            currentLeaveBalance: 30
+            currentLeaveBalance: 25
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: <randomElement($profileImages)>
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
             holidayCalendar: '@holiday_calendar_de'
-            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
-            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
+            subdivisionCode: 'DE-BY'
+            birthDate: '<(new \DateTimeImmutable("1988-06-15"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2021-09-01"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
             manager: '@user_1'
     user_3:
@@ -56,47 +56,138 @@ App\Infrastructure\Doctrine\Entity\User:
             annualLeaveAllowance: 24
             currentLeaveBalance: 24
             isActive: true
-            hasCelebrateWorkAnniversary: false
-            profileImageUrl: <randomElement($profileImages)>
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
             holidayCalendar: '@holiday_calendar_fr'
-            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
-            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
+            birthDate: '<(new \DateTimeImmutable("1992-03-22"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2022-06-15"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
             manager: '@user_2'
-    user_{4..6}:
+    user_4:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            firstName: <firstName()>
-            lastName: <lastName()>
-            email: <email()>
+            firstName: 'Sofia'
+            lastName: 'Bergström'
+            email: 'sofia.bergstrom@ooo.com'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
-            currentLeaveBalance: 24
+            currentLeaveBalance: 21
             isActive: true
-            hasCelebrateWorkAnniversary: <boolean()>
-            profileImageUrl: <randomElement($profileImages)>
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
             holidayCalendar: '@holiday_calendar_fr'
-            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
-            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
+            birthDate: '<(new \DateTimeImmutable((new DateTime("+8 days"))->format("Y-m-d")))>'
+            contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+8 days"))->modify("-3 years")->format("Y-m-d H:i:s")))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
             manager: '@user_2'
-    user_{7..10}:
+    user_5:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            firstName: <firstName()>
-            lastName: <lastName()>
-            email: <email()>
+            firstName: 'Marco'
+            lastName: 'Rossi'
+            email: 'marco.rossi@ooo.com'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
-            currentLeaveBalance: 24
+            currentLeaveBalance: 18
             isActive: true
-            hasCelebrateWorkAnniversary: <boolean()>
-            profileImageUrl: <randomElement($profileImages)>
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
             holidayCalendar: '@holiday_calendar_de'
-            birthDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-60 years", "-18 years")->format("Y-m-d")))>'
-            contractStartedAt: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-1 year", "now")->format("Y-m-d H:i:s")))>'
+            birthDate: '<(new \DateTimeImmutable("1990-11-03"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2020-03-16"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_2'
+    user_6:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Aisha'
+            lastName: 'Patel'
+            email: 'aisha.patel@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 19
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            holidayCalendar: '@holiday_calendar_fr'
+            birthDate: '<(new \DateTimeImmutable((new DateTime("+15 days"))->format("Y-m-d")))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2019-01-07"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_2'
+    user_7:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Lukas'
+            lastName: 'Weber'
+            email: 'lukas.weber@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 22
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
+            holidayCalendar: '@holiday_calendar_de'
+            subdivisionCode: 'DE-BY'
+            birthDate: '<(new \DateTimeImmutable("1995-08-28"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2023-02-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
+    user_8:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Chloé'
+            lastName: 'Dubois'
+            email: 'chloe.dubois@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 16
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+            holidayCalendar: '@holiday_calendar_de'
+            birthDate: '<(new \DateTimeImmutable("1993-12-14"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2018-04-23"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
+    user_9:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Tomás'
+            lastName: 'Oliveira'
+            email: 'tomas.oliveira@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 20
+            isActive: true
+            hasCelebrateWorkAnniversary: false
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            holidayCalendar: '@holiday_calendar_fr'
+            birthDate: '<(new \DateTimeImmutable("1987-05-10"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2024-11-04"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
+    user_10:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Yuki'
+            lastName: 'Tanaka'
+            email: 'yuki.tanaka@ooo.com'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 17
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            holidayCalendar: '@holiday_calendar_de'
+            birthDate: '<(new \DateTimeImmutable("1991-09-18"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2017-08-01"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
             manager: '@user_1'
 
@@ -163,6 +254,24 @@ App\Infrastructure\Doctrine\Entity\LeaveRequestType:
             borderColor: '#db9e9e'
             textColor: '#4527a0'
             icon: '🤒'
+    leave_request_type_3:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            isAffectingBalance: false
+            name: 'Conference'
+            backgroundColor: '#e3f2fd'
+            borderColor: '#1976d2'
+            textColor: '#0d47a1'
+            icon: '📚'
+    leave_request_type_4:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            isAffectingBalance: false
+            name: 'Parental Leave'
+            backgroundColor: '#fff3e0'
+            borderColor: '#ef6c00'
+            textColor: '#e65100'
+            icon: '👶'
 
 App\Infrastructure\Doctrine\Entity\LeaveRequest:
     leave_request_1:
@@ -170,7 +279,7 @@ App\Infrastructure\Doctrine\Entity\LeaveRequest:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
             workDays: 5
-            comment: 'Going on vacation to the Alps'
+            comment: 'Family trip to the Italian coast'
             leaveType: '@leave_request_type_1'
             user: '@user_2'
             approvedBy: '@user_1'
@@ -181,55 +290,162 @@ App\Infrastructure\Doctrine\Entity\LeaveRequest:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
             workDays: 2
-            comment: 'Feeling under the weather'
+            comment: 'Doctor appointment and recovery day'
             leaveType: '@leave_request_type_2'
             user: '@user_2'
             approvedBy: '@user_1'
             startDate: '<(new \DateTimeImmutable((new DateTime("+8 days"))->format("Y-m-d H:i:s")))>'
             endDate: '<(new \DateTimeImmutable((new DateTime("+9 days"))->format("Y-m-d H:i:s")))>'
-    leave_request_{3..5}:
+    leave_request_3:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
-            workDays: <numberBetween(1, 10)>
-            comment: <sentence()>
-            leaveType: '@leave_request_type_<numberBetween(1, 2)>'
-            user: '@user_<numberBetween(3, 10)>'
-            approvedBy: '@user_1'
-            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+3 days")->format("Y-m-d H:i:s")))>'
-            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+4 days", "+10 days")->format("Y-m-d H:i:s")))>'
-    leave_request_{6..10}:
+            workDays: 3
+            comment: 'Visiting family in Stockholm'
+            leaveType: '@leave_request_type_1'
+            user: '@user_4'
+            approvedBy: '@user_2'
+            startDate: '<(new \DateTimeImmutable((new DateTime("+1 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+3 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_4:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
-            workDays: <numberBetween(1, 10)>
-            comment: <sentence()>
-            leaveType: '@leave_request_type_<numberBetween(1, 2)>'
-            user: '@user_<numberBetween(2, 10)>'
+            workDays: 2
+            comment: 'Recovery after minor surgery'
+            leaveType: '@leave_request_type_2'
+            user: '@user_7'
             approvedBy: '@user_1'
-            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-2 days", "now")->format("Y-m-d H:i:s")))>'
-            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+10 days")->format("Y-m-d H:i:s")))>'
-    leave_request_{11..13}:
+            startDate: '<(new \DateTimeImmutable((new DateTime("-1 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+1 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_5:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: 2
+            comment: 'SymfonyCon Brussels'
+            leaveType: '@leave_request_type_3'
+            user: '@user_5'
+            approvedBy: '@user_2'
+            startDate: '<(new \DateTimeImmutable((new DateTime("+4 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+5 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_6:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: 4
+            comment: 'Extended weekend in Lisbon'
+            leaveType: '@leave_request_type_1'
+            user: '@user_9'
+            approvedBy: '@user_1'
+            startDate: '<(new \DateTimeImmutable((new DateTime("-2 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+3 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_7:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: 4
+            comment: 'Road trip through Provence'
+            leaveType: '@leave_request_type_1'
+            user: '@user_8'
+            approvedBy: '@user_1'
+            startDate: '<(new \DateTimeImmutable((new DateTime("-1 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+4 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_8:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: 5
+            comment: 'Visiting Tokyo for Golden Week'
+            leaveType: '@leave_request_type_1'
+            user: '@user_10'
+            approvedBy: '@user_1'
+            startDate: '<(new \DateTimeImmutable((new DateTime("-5 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("-1 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_9:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: 2
+            comment: 'Had the flu, resting at home'
+            leaveType: '@leave_request_type_2'
+            user: '@user_3'
+            approvedBy: '@user_2'
+            startDate: '<(new \DateTimeImmutable((new DateTime("-3 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("-2 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_10:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("approved"))>'
+            workDays: 5
+            comment: 'Family reunion in Mumbai'
+            leaveType: '@leave_request_type_1'
+            user: '@user_6'
+            approvedBy: '@user_2'
+            startDate: '<(new \DateTimeImmutable((new DateTime("-7 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("-3 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_11:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("pending"))>'
-            workDays: <numberBetween(1, 5)>
-            comment: <sentence()>
-            leaveType: '@leave_request_type_<numberBetween(1, 2)>'
+            workDays: 6
+            comment: 'Hiking trip in the Swiss Alps'
+            leaveType: '@leave_request_type_1'
             user: '@user_1'
-            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+5 days")->format("Y-m-d H:i:s")))>'
-            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+6 days", "+10 days")->format("Y-m-d H:i:s")))>'
-    leave_request_{14..16}:
+            startDate: '<(new \DateTimeImmutable((new DateTime("+5 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+12 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_12:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
-            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from(["rejected", "cancelled", "withdrawn"][rand(0,2)]))>'
-            workDays: <numberBetween(1, 10)>
-            comment: <sentence()>
-            leaveType: '@leave_request_type_<numberBetween(1, 2)>'
-            user: '@user_<numberBetween(2, 10)>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("pending"))>'
+            workDays: 5
+            comment: 'Long weekend in Barcelona'
+            leaveType: '@leave_request_type_1'
+            user: '@user_1'
+            startDate: '<(new \DateTimeImmutable((new DateTime("+15 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+19 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_13:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("pending"))>'
+            workDays: 2
+            comment: 'Dental surgery scheduled'
+            leaveType: '@leave_request_type_2'
+            user: '@user_1'
+            startDate: '<(new \DateTimeImmutable((new DateTime("+1 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("+2 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_14:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("rejected"))>'
+            workDays: 4
+            comment: 'Annual summer break in Sardinia'
+            leaveType: '@leave_request_type_1'
+            user: '@user_5'
+            approvedBy: '@user_2'
+            startDate: '<(new \DateTimeImmutable((new DateTime("-10 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("-5 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_15:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("withdrawn"))>'
+            workDays: 4
+            comment: 'Weekend getaway to Amsterdam'
+            leaveType: '@leave_request_type_1'
+            user: '@user_3'
+            startDate: '<(new \DateTimeImmutable((new DateTime("-12 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("-7 days"))->format("Y-m-d H:i:s")))>'
+    leave_request_16:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            status: '<(App\Shared\Enum\LeaveRequestStatusEnum::from("cancelled"))>'
+            workDays: 4
+            comment: 'Spring break trip to Greece'
+            leaveType: '@leave_request_type_1'
+            user: '@user_8'
             approvedBy: '@user_1'
-            startDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("-10 days", "-2 days")->format("Y-m-d H:i:s")))>'
-            endDate: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+1 days", "+10 days")->format("Y-m-d H:i:s")))>'
+            startDate: '<(new \DateTimeImmutable((new DateTime("-15 days"))->format("Y-m-d H:i:s")))>'
+            endDate: '<(new \DateTimeImmutable((new DateTime("-10 days"))->format("Y-m-d H:i:s")))>'
 
 App\Infrastructure\Doctrine\Entity\HolidayCalendar:
     holiday_calendar_fr:
@@ -249,15 +465,44 @@ App\Infrastructure\Doctrine\Entity\HolidayCalendar:
             countryName: 'Netherlands'
 
 App\Infrastructure\Doctrine\Entity\Holiday:
-    holiday_{1..3}:
+    holiday_1:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             holidayCalendar: '@holiday_calendar_fr'
-            description: <word()>
-            date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeBetween("+5 days", "+20 days")->format("Y-m-d H:i:s")))>'
-    holiday_{4..6}:
+            description: 'Bastille Day'
+            date: '<(new \DateTimeImmutable((new DateTime("+15 days"))->format("Y-m-d")))>'
+    holiday_2:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            holidayCalendar: '@holiday_calendar_fr'
+            description: 'Assumption of Mary'
+            date: '<(new \DateTimeImmutable((new DateTime("+25 days"))->format("Y-m-d")))>'
+    holiday_3:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            holidayCalendar: '@holiday_calendar_fr'
+            description: "All Saints' Day"
+            date: '<(new \DateTimeImmutable((new DateTime("+35 days"))->format("Y-m-d")))>'
+    holiday_4:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             holidayCalendar: '@holiday_calendar_de'
-            description: <word()>
-            date: '<(new \DateTimeImmutable((\Faker\Factory::create())->dateTimeThisMonth()->format("Y-m-d H:i:s")))>'
+            description: 'Tag der Deutschen Einheit'
+            date: '<(new \DateTimeImmutable(date("Y") . "-10-03"))>'
+            isGlobal: true
+    holiday_5:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            holidayCalendar: '@holiday_calendar_de'
+            description: 'Heilige Drei Könige'
+            date: '<(new \DateTimeImmutable(date("Y") . "-01-06"))>'
+            isGlobal: false
+            counties: ['DE-BW', 'DE-BY', 'DE-ST']
+    holiday_6:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            holidayCalendar: '@holiday_calendar_de'
+            description: 'Mariä Himmelfahrt'
+            date: '<(new \DateTimeImmutable(date("Y") . "-08-15"))>'
+            isGlobal: false
+            counties: ['DE-SL']

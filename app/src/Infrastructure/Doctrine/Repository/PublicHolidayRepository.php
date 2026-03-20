@@ -24,21 +24,25 @@ class PublicHolidayRepository extends ServiceEntityRepository implements PublicH
     /**
      * @return PublicHolidayDTO[]
      */
-    public function findBetweenDatesForCountryCode(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, string $countryCode): array
+    public function findBetweenDatesForCountryCode(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, string $countryCode, ?string $subdivisionCode = null): array
     {
         $qb = $this->createQueryBuilder('h');
 
-        /** @var Holiday[] $items */
-        $items = $qb->join('h.holidayCalendar', 'hc')
+        $qb->join('h.holidayCalendar', 'hc')
             ->where('h.date BETWEEN :start AND :end')
             ->andWhere('hc.countryCode = :countryCode')
             ->setParameter('start', $startDate->format('Y-m-d'))
             ->setParameter('end', $endDate->format('Y-m-d'))
             ->setParameter('countryCode', $countryCode)
-            ->orderBy('h.date', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('h.date', 'ASC');
 
+        if (null !== $subdivisionCode) {
+            $qb->andWhere('h.isGlobal = true OR JSON_CONTAINS(h.counties, :subdivisionCode) = true')
+                ->setParameter('subdivisionCode', json_encode($subdivisionCode));
+        }
+
+        /** @var Holiday[] $items */
+        $items = $qb->getQuery()->getResult();
 
         return array_map(fn (Holiday $holiday) => PublicHolidayDTO::fromEntity($holiday), $items);
     }
@@ -49,14 +53,15 @@ class PublicHolidayRepository extends ServiceEntityRepository implements PublicH
     public function findBetweenDatesGroupedByUser(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
     {
         $sql = <<<SQL
-            SELECT h.id, h.date, h.description, hc.country_code,
-                   u.id as user_id, u.first_name, u.last_name, u.email, u.roles, u.working_days, 
+            SELECT h.id, h.date, h.description, h.is_global, h.counties, hc.country_code,
+                   u.id as user_id, u.first_name, u.last_name, u.email, u.roles, u.working_days,
                    u.annual_leave_allowance, u.current_leave_balance, u.is_active, u.profile_image_url, u.birth_date,
-                   u.created_at, u.absence_balance_reset_day
+                   u.created_at, u.absence_balance_reset_day, u.subdivision_code
             FROM holiday h
             INNER JOIN holiday_calendar hc ON h.holiday_calendar_id = hc.id
             INNER JOIN user u ON u.holiday_calendar_id = hc.id
             WHERE h.date BETWEEN :startDate AND :endDate
+              AND (h.is_global = 1 OR u.subdivision_code IS NULL OR JSON_CONTAINS(h.counties, JSON_QUOTE(u.subdivision_code)))
 SQL;
 
         $em = $this->getEntityManager();
@@ -78,5 +83,31 @@ SQL;
         }
 
         return array_map(fn (array $groupedData) => UserPublicHolidaysDTO::createFromGroupedArray($groupedData), $grouped);
+    }
+
+    /**
+     * @return array<string, string[]>
+     */
+    public function findDistinctSubdivisionsGroupedByCalendar(): array
+    {
+        $sql = <<<SQL
+            SELECT hc.id AS calendar_id, jt.subdivision
+            FROM holiday h
+            INNER JOIN holiday_calendar hc ON h.holiday_calendar_id = hc.id
+            CROSS JOIN JSON_TABLE(h.counties, '$[*]' COLUMNS (subdivision VARCHAR(10) PATH '$')) AS jt
+            WHERE h.counties IS NOT NULL
+            GROUP BY hc.id, jt.subdivision
+            ORDER BY hc.id, jt.subdivision
+        SQL;
+
+        $conn = $this->getEntityManager()->getConnection();
+        $rows = $conn->executeQuery($sql)->fetchAllAssociative();
+
+        $grouped = [];
+        foreach ($rows as $row) {
+            $grouped[$row['calendar_id']][] = $row['subdivision'];
+        }
+
+        return $grouped;
     }
 }

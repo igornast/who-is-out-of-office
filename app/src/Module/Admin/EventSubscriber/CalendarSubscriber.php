@@ -15,6 +15,7 @@ use CalendarBundle\Event\SetDataEvent;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use CalendarBundle\Entity\Event;
 
 class CalendarSubscriber implements EventSubscriberInterface
@@ -25,6 +26,7 @@ class CalendarSubscriber implements EventSubscriberInterface
         private readonly HolidayFacadeInterface $holidayFacade,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -229,10 +231,34 @@ class CalendarSubscriber implements EventSubscriberInterface
                     'type' => 'holiday',
                     'description' => $holidayDTO->description,
                     'date' => $holidayDTO->date->format('M j, Y'),
+                    'isGlobal' => $holidayDTO->isGlobal,
+                    'counties' => $this->translateCounties($holidayDTO->counties),
                 ],
             ]);
 
             $event->addEvent($calendarEvent);
         }
+    }
+
+    /**
+     * @param string[]|null $counties
+     *
+     * @return string[]
+     */
+    private function translateCounties(?array $counties): array
+    {
+        if (null === $counties || [] === $counties) {
+            return [];
+        }
+
+        return array_map(
+            function (string $code): string {
+                $key = sprintf('subdivision.%s', $code);
+                $translated = $this->translator->trans($key, [], 'admin');
+
+                return $translated === $key ? $code : $translated;
+            },
+            $counties
+        );
     }
 }

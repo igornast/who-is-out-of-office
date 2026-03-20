@@ -13,6 +13,10 @@ class HasWorkdaysAndBalance extends Constraint
 
     public string $notEnoughBalanceMessage = 'Your leave balance is insufficient for this request.';
 
+    public string $minNoticeDaysMessage = 'Leave requests must be submitted at least {{ days }} days in advance.';
+
+    public string $maxConsecutiveDaysMessage = 'Leave requests cannot exceed {{ days }} consecutive workdays.';
+
     public function validatedBy(): string
     {
         return HasWorkdaysAndBalanceValidator::class;

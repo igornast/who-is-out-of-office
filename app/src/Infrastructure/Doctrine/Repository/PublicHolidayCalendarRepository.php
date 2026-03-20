@@ -60,6 +60,8 @@ class PublicHolidayCalendarRepository extends ServiceEntityRepository implements
                 description: $holidayDTO->description,
                 date: $holidayDTO->date,
                 holidayCalendar: $calendarEntity,
+                isGlobal: $holidayDTO->isGlobal,
+                counties: $holidayDTO->counties,
             ));
         }
 

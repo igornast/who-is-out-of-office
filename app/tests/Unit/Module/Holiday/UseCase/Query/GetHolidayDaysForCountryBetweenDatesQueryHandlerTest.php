@@ -46,7 +46,7 @@ it('returns holidays for country between dates', function () {
     $this->publicHolidayRepository
         ->expects('findBetweenDatesForCountryCode')
         ->once()
-        ->with($startDate, $endDate, $countryCode)
+        ->with($startDate, $endDate, $countryCode, null)
         ->andReturn($expectedHolidays);
 
     $result = $this->handler->handle($startDate, $endDate, $countryCode);
@@ -66,7 +66,7 @@ it('returns empty array when no holidays found for country between dates', funct
     $this->publicHolidayRepository
         ->expects('findBetweenDatesForCountryCode')
         ->once()
-        ->with($startDate, $endDate, $countryCode)
+        ->with($startDate, $endDate, $countryCode, null)
         ->andReturn([]);
 
     $result = $this->handler->handle($startDate, $endDate, $countryCode);
@@ -92,7 +92,7 @@ it('returns holidays for specific month range', function () {
     $this->publicHolidayRepository
         ->expects('findBetweenDatesForCountryCode')
         ->once()
-        ->with($startDate, $endDate, $countryCode)
+        ->with($startDate, $endDate, $countryCode, null)
         ->andReturn($expectedHolidays);
 
     $result = $this->handler->handle($startDate, $endDate, $countryCode);
@@ -119,11 +119,39 @@ it('handles different country codes', function () {
     $this->publicHolidayRepository
         ->expects('findBetweenDatesForCountryCode')
         ->once()
-        ->with($startDate, $endDate, 'NG')
+        ->with($startDate, $endDate, 'NG', null)
         ->andReturn($expectedHolidays);
 
     $result = $this->handler->handle($startDate, $endDate, $countryCode);
 
     expect($result)->toBe($expectedHolidays)
         ->and($result[0]->countryCode)->toBe('NG');
+});
+
+it('passes subdivision code to repository', function () {
+    $startDate = new DateTimeImmutable('2025-01-01');
+    $endDate = new DateTimeImmutable('2025-12-31');
+    $countryCode = 'DE';
+    $subdivisionCode = 'DE-BY';
+
+    $holiday = PublicHolidayDTOFixture::create([
+        'id' => 'holiday-de-1',
+        'description' => 'Epiphany',
+        'countryCode' => 'DE',
+        'date' => new DateTimeImmutable('2025-01-06'),
+        'isGlobal' => false,
+        'counties' => ['DE-BW', 'DE-BY', 'DE-ST'],
+    ]);
+
+    $this->publicHolidayRepository
+        ->expects('findBetweenDatesForCountryCode')
+        ->once()
+        ->with($startDate, $endDate, $countryCode, $subdivisionCode)
+        ->andReturn([$holiday]);
+
+    $result = $this->handler->handle($startDate, $endDate, $countryCode, $subdivisionCode);
+
+    expect($result)->toHaveCount(1)
+        ->and($result[0]->isGlobal)->toBeFalse()
+        ->and($result[0]->counties)->toBe(['DE-BW', 'DE-BY', 'DE-ST']);
 });

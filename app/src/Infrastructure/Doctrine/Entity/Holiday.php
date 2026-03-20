@@ -11,11 +11,16 @@ class Holiday implements \Stringable
 {
     use TimestampableTrait;
 
+    /**
+     * @param string[]|null $counties
+     */
     public function __construct(
         public UuidInterface $id,
         public string $description,
         public \DateTimeImmutable $date,
         public HolidayCalendar $holidayCalendar,
+        public bool $isGlobal = true,
+        public ?array $counties = null,
     ) {
         $this->initializeTimestamps();
     }

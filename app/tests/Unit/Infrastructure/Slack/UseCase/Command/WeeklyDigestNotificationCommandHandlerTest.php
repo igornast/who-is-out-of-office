@@ -14,6 +14,7 @@ use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 beforeEach(function (): void {
     $this->dailyDigestChannelId = 'C1234567890';
@@ -21,6 +22,12 @@ beforeEach(function (): void {
     $this->userFacade = mock(UserFacadeInterface::class);
     $this->usersEventsProvider = mock(UsersEventsProvider::class);
     $this->appSettingsFacade = mock(AppSettingsFacadeInterface::class);
+    $this->translator = mock(TranslatorInterface::class);
+    $this->translator->allows('trans')->andReturnUsing(fn (string $id, array $params = [], ?string $domain = null) => match ($id) {
+        'subdivision.DE-BY' => 'Bavaria',
+        'subdivision.CH-BE' => 'Bern',
+        default => $id,
+    });
 
     $this->appSettingsFacade
         ->allows('skipWeekendHolidays')
@@ -32,6 +39,7 @@ beforeEach(function (): void {
         userFacade: $this->userFacade,
         usersEventsProvider: $this->usersEventsProvider,
         appSettingsFacade: $this->appSettingsFacade,
+        translator: $this->translator,
     );
 });
 
@@ -507,6 +515,149 @@ it('sends digest with single day leave request', function () {
                 ->and($blocks[4]['text']['text'])->toContain('August 15')
                 ->and($blocks[4]['text']['text'])->not()->toContain('August 15 - August 15')
                 ->and(count($blocks))->toBe(5);
+
+            return true;
+        });
+
+    $this->handler->handle();
+});
+
+it('shows region name for regional public holidays', function () {
+    $user = UserDTOFixture::create([
+        'id' => 'user-1',
+        'firstName' => 'Hans',
+        'lastName' => 'Müller',
+        'subdivisionCode' => 'DE-BY',
+    ]);
+
+    $regionalHoliday = PublicHolidayDTOFixture::create([
+        'id' => 'holiday-regional',
+        'description' => 'Epiphany',
+        'countryCode' => 'DE',
+        'date' => new DateTimeImmutable('2026-01-06'),
+        'isGlobal' => false,
+        'counties' => ['DE-BW', 'DE-BY', 'DE-ST'],
+    ]);
+
+    $globalHoliday = PublicHolidayDTOFixture::create([
+        'id' => 'holiday-global',
+        'description' => 'New Year',
+        'countryCode' => 'DE',
+        'date' => new DateTimeImmutable('2026-01-01'),
+        'isGlobal' => true,
+        'counties' => null,
+    ]);
+
+    $userPublicHolidays = UserPublicHolidaysDTOFixture::create([
+        'user' => $user,
+        'holidays' => [$globalHoliday, $regionalHoliday],
+    ]);
+
+    $mergedEvents = [
+        'user-1' => [$userPublicHolidays],
+    ];
+
+    $this->usersEventsProvider
+        ->expects('provideMergedAbsencesPerUser')
+        ->once()
+        ->andReturn($mergedEvents);
+
+    $this->userFacade
+        ->expects('getUsersWithBirthdaysForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->chatter
+        ->expects('send')
+        ->once()
+        ->withArgs(function (ChatMessage $message) {
+            $options = $message->getOptions();
+            $blocks = $options->toArray()['blocks'];
+            $text = $blocks[4]['text']['text'];
+
+            $lines = explode("\n", $text);
+            $newYearLine = '';
+            $epiphanyLine = '';
+            foreach ($lines as $line) {
+                if (str_contains($line, 'New Year')) {
+                    $newYearLine = $line;
+                }
+                if (str_contains($line, 'Epiphany')) {
+                    $epiphanyLine = $line;
+                }
+            }
+
+            // Regional holiday should show region name
+            expect($epiphanyLine)->toContain('Bavaria')
+                ->and($epiphanyLine)->toContain('·');
+
+            // Global holiday should NOT show region
+            expect($newYearLine)->not()->toContain('Bavaria')
+                ->and($newYearLine)->not()->toContain('·');
+
+            return true;
+        });
+
+    $this->handler->handle();
+});
+
+it('shows global public holidays without region annotation', function () {
+    $user = UserDTOFixture::create([
+        'id' => 'user-1',
+        'firstName' => 'Emma',
+        'lastName' => 'Brown',
+    ]);
+
+    $holiday = PublicHolidayDTOFixture::create([
+        'id' => 'holiday-1',
+        'description' => 'Christmas Day',
+        'countryCode' => 'GB',
+        'date' => new DateTimeImmutable('2025-12-25'),
+        'isGlobal' => true,
+        'counties' => null,
+    ]);
+
+    $userPublicHolidays = UserPublicHolidaysDTOFixture::create([
+        'user' => $user,
+        'holidays' => [$holiday],
+    ]);
+
+    $mergedEvents = [
+        'user-1' => [$userPublicHolidays],
+    ];
+
+    $this->usersEventsProvider
+        ->expects('provideMergedAbsencesPerUser')
+        ->once()
+        ->andReturn($mergedEvents);
+
+    $this->userFacade
+        ->expects('getUsersWithBirthdaysForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->userFacade
+        ->expects('getUsersWithWorkAnniversariesForDates')
+        ->once()
+        ->andReturn([]);
+
+    $this->chatter
+        ->expects('send')
+        ->once()
+        ->withArgs(function (ChatMessage $message) {
+            $options = $message->getOptions();
+            $blocks = $options->toArray()['blocks'];
+            $text = $blocks[4]['text']['text'];
+
+            // Global holiday: no region suffix
+            expect($text)->toContain('Public holiday:')
+                ->and($text)->toContain('Christmas Day')
+                ->and($text)->not()->toContain('·');
 
             return true;
         });

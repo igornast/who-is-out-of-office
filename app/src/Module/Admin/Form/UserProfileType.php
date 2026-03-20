@@ -47,6 +47,11 @@ class UserProfileType extends AbstractType
                     ->setParameter('active', true)
                     ->orderBy('c.countryName', 'ASC'),
             ])
+            ->add('subdivisionCode', TextType::class, [
+                'label' => 'crud.user_profile.field.subdivision_code',
+                'required' => false,
+                'help' => 'crud.user_profile.field.subdivision_code_help',
+            ])
 
             ->add('birthDate', DateType::class, [
                 'label' => 'crud.user_profile.field.birth_date',
