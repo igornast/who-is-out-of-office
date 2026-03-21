@@ -1,7 +1,7 @@
 {
     "name": "igornast/who-is-out-of-office",
     "type": "project",
-    "license": "proprietary",
+    "license": "AGPL-3.0-or-later",
     "authors": [
         {
             "name": "igor.nastarowicz",
