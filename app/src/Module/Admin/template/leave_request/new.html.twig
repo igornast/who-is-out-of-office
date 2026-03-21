@@ -3,8 +3,8 @@
 {% block page_title %}{{ 'leave_request.new.page_title'|trans(domain: 'admin') }}{% endblock %}
 
 {% block head_stylesheets %}
-    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('vendor/flatpickr/dist/flatpickr.min.css') }}">
+    {{ parent() }}
 {% endblock %}
 
 {% block content_header %}

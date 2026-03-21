@@ -44,16 +44,16 @@
 /* new leave request */
 .ea-request-form-date-range {
     background-color: var(--app-surface-sunken);
-    background-repeat: no-repeat;
-    block-size: 30px;
+    height: 42px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-sm);
     color: var(--text-primary);
-    font-size: var(--text-base);
+    font-family: var(--font-body);
+    font-size: 13px;
     width: 100%;
-    transition: box-shadow 0.08s ease-in, color 0.08s ease-in;
-    padding: 3px 7px 4px;
+    padding: 0 12px;
+    outline: none;
+    transition: all 0.15s ease;
 }
 
 .ea-request-form-date-range:focus {

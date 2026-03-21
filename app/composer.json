@@ -4,7 +4,8 @@
     "license": "proprietary",
     "authors": [
         {
-            "name": "igor.nastarowicz"
+            "name": "igor.nastarowicz",
+            "email": "nastarowicz@hotmail.com"
         }
     ],
     "minimum-stability": "stable",

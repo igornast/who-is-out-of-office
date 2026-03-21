@@ -3,6 +3,7 @@
     border: 1px solid var(--border-light);
     box-shadow: var(--shadow-lg);
     border-radius: var(--radius-md);
+    font-family: var(--font-body);
 }
 
 .flatpickr-months {
@@ -53,7 +54,13 @@
 
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
-.flatpickr-day.endRange {
+.flatpickr-day.endRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange {
     background-color: var(--primary);
     border-color: var(--primary);
     color: var(--text-on-primary) !important;
@@ -69,6 +76,12 @@
     color: var(--text-on-primary) !important;
 }
 
+.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),
+.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),
+.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {
+    box-shadow: -10px 0 0 var(--primary);
+}
+
 .flatpickr-day.inRange {
     background-color: var(--primary-subtle);
     border-color: transparent;
@@ -80,6 +93,34 @@
 .flatpickr-day.prevMonthDay,
 .flatpickr-day.nextMonthDay {
     color: var(--text-muted);
+}
+
+.flatpickr-day.prevMonthDay.inRange,
+.flatpickr-day.nextMonthDay.inRange,
+.flatpickr-day.prevMonthDay:hover,
+.flatpickr-day.nextMonthDay:hover {
+    background-color: var(--primary-subtle);
+    border-color: transparent;
+    box-shadow: -5px 0 0 var(--primary-subtle), 5px 0 0 var(--primary-subtle);
+    color: var(--text-primary);
+}
+
+.flatpickr-day.prevMonthDay.startRange,
+.flatpickr-day.nextMonthDay.startRange,
+.flatpickr-day.prevMonthDay.endRange,
+.flatpickr-day.nextMonthDay.endRange {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--text-on-primary) !important;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.flatpickr-day.prevMonthDay.today,
+.flatpickr-day.nextMonthDay.today {
+    border-color: var(--primary);
+    background-color: var(--primary-subtle);
+    color: var(--text-primary);
 }
 
 .flatpickr-monthDropdown-months,

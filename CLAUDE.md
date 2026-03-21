@@ -19,10 +19,11 @@ This is "Who's Out of Office" - an online staff leave planner built with **Symfo
 
 ### Docker Setup
 
-The project runs in Docker with three services:
+The project runs in Docker with four services:
 - **nginx** (port 80): Web server
 - **php**: PHP-FPM with Xdebug support
 - **db**: MySQL 8.4 (port 3306)
+- **mailer**: MailPit (port 8025 web UI) — catches all outgoing emails in development
 
 Start services:
 ```bash
@@ -48,7 +49,7 @@ Default admin account (development only):
 
 ### Running commands with `just` (IMPORTANT)
 
-The project uses a `justfile` in `app/` with predefined commands. **When running commands from outside the container (e.g. from Claude Code), always use `docker exec` with `just` commands — never use `-it` flag (non-interactive context) and never run raw `php vendor/bin/pest`, `bash -c` wrappers, or `composer` commands directly.** Note: pest output may be silently swallowed when run via `docker exec`; the exit code (0 = pass, non-0 = fail) is the reliable signal.
+The project uses a `justfile` in `app/` with predefined commands. The justfile auto-detects whether it's running inside or outside the container and prefixes commands with `docker exec` accordingly. **When running commands from outside the container (e.g. from Claude Code), always use `docker exec` with `just` commands — never use `-it` flag (non-interactive context) and never run raw `php vendor/bin/pest`, `bash -c` wrappers, or `composer` commands directly.** Note: pest output may be silently swallowed when run via `docker exec`; the exit code (0 = pass, non-0 = fail) is the reliable signal.
 
 ```bash
 # Run full test suite (CS, PHPStan, Architecture, Unit, Functional)
@@ -509,7 +510,21 @@ public function getUsersWithIncoming[Event]ForDates(\DateTimeImmutable $start, \
 - Include in empty state condition check
 - Add to blocks array in options
 
-### Fixture Design for Tests
+### Test Fixture Pattern (DTO Factories)
+
+Unit tests use factory-style fixtures in `tests/_fixtures/` implementing `FixtureInterface`. Each fixture provides `create()` (returns a DTO with Faker defaults) and `definitions()` (returns the raw array). Override specific fields via `create(['field' => 'value'])`:
+
+```php
+// Create a UserDTO with all defaults
+$user = UserDTOFixture::create();
+
+// Override specific fields
+$manager = UserDTOFixture::create(['roles' => [RoleEnum::Manager->value], 'firstName' => 'Jane']);
+```
+
+When adding a new DTO, create a corresponding fixture in `tests/_fixtures/Shared/DTO/`.
+
+### Fixture Design for Functional Tests
 
 **Principles**:
 1. **Guarantee conditions**: Design fixtures to always meet test requirements
