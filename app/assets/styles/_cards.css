@@ -402,6 +402,15 @@ body.ea .panel-body {
     flex-shrink: 0;
 }
 
+.connected-service-row:has(.connected-service-url-group) {
+    flex-wrap: wrap;
+}
+
+.connected-service-row:has(.connected-service-url-group) .connected-service-action {
+    flex: 1 1 100%;
+    padding-left: 50px;
+}
+
 .connected-service-url-group {
     display: flex;
     gap: 8px;
