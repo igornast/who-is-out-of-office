@@ -15,17 +15,10 @@ Thank you for your interest in contributing! This guide covers how to get set up
 ```bash
 git clone https://github.com/igornast/who-is-out-of-office.git
 cd who-is-out-of-office
-
-# Start the Docker environment
-docker-compose up -d
-
-# Install PHP dependencies
-docker exec app_ooo_php composer install --working-dir=/var/www
-
-# Run database migrations and load dev fixtures
-docker exec app_ooo_php php /var/www/bin/console doctrine:migrations:migrate --no-interaction
-docker exec app_ooo_php php /var/www/bin/console doctrine:fixtures:load --no-interaction
+just start
 ```
+
+The PHP container handles everything on first boot: installs dependencies, waits for the database, runs migrations, and loads dev fixtures.
 
 The app is available at `http://localhost/app/dashboard`.
 
