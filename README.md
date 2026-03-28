@@ -4,13 +4,13 @@ The Online Staff Leave Planner
 
 ## 🛠️ Admin Account
 
-The database migrations include a default admin account for initial access:
+The dev fixtures include a default admin account for initial access:
 
 - **Email:** `admin@ooo.com`
-- **Password:** `admin`
+- **Password:** `123`
 
-> ⚠️ **Important:** This account is intended for development and testing purposes only.
-> Please update the password or remove it after deploying to a production environment.
+> ⚠️ **Important:** This account is only available in development (fixtures are never loaded in production).
+> Create your own admin account before going live.
 
 
 ## ⚙️ Application Settings
