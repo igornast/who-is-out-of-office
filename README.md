@@ -1,6 +1,35 @@
-# who-is-out-of-office
-![PHPStan](https://img.shields.io/badge/PHPStan-Level%208-brightgreen)  
-The Online Staff Leave Planner
+# Who's Out of Office
+
+[![CI](https://github.com/igornast/who-is-out-of-office/actions/workflows/php.yml/badge.svg)](https://github.com/igornast/who-is-out-of-office/actions/workflows/php.yml)
+![PHPStan](https://img.shields.io/badge/PHPStan-Level%208-brightgreen)
+![PHP](https://img.shields.io/badge/PHP-8.5-blue)
+![License](https://img.shields.io/github/license/igornast/who-is-out-of-office)
+
+A self-hosted staff leave planner built with Symfony 7.4. Manage leave requests, team calendars, public holidays, and Slack notifications — all in one place.
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+**Features:**
+- Leave request workflow with approval/rejection
+- Role-based access — Admin, Manager, Employee
+- Slack integration — in-channel approvals and weekly digest
+- Public holiday calendars with regional subdivision support
+- iCal feed export per user
+- Email notifications
+
+## 🚀 Quick Start
+
+```bash
+git clone https://github.com/igornast/who-is-out-of-office.git
+cd who-is-out-of-office
+just start
+```
+
+The PHP container handles everything on first boot: installs dependencies, waits for the database, runs migrations, and loads dev fixtures.
+
+The app is available at **`http://localhost/app/dashboard`**.
+
+For full setup details and how to run tests, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 🛠️ Admin Account
 
@@ -149,5 +178,13 @@ The bot will post a summary of:
       3. Updates the leave request status in the system.
       4. Updates the original Slack message to reflect the outcome.
 
-5. **Notify the Requester**  
-   If the user has provided a Slack member ID, the bot will send them a direct message with the updated request status.  
+5. **Notify the Requester**
+   If the user has provided a Slack member ID, the bot will send them a direct message with the updated request status.
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, coding standards, and how to submit changes.
+
+## License
+
+[MIT](LICENSE)
