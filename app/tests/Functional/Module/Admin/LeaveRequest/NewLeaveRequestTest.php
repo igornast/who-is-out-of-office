@@ -13,7 +13,7 @@ beforeEach(function (): void {
 
     $this->user = $this->entityManager
         ->getRepository(User::class)
-        ->findOneBy(['email' => 'user@ooo.com']);
+        ->findOneBy(['email' => 'user@whoisooo.app']);
 
     $this->vacationLeaveType = $this->entityManager
         ->getRepository(LeaveRequestType::class)
@@ -22,7 +22,7 @@ beforeEach(function (): void {
 
 it('calculates workdays and submit a new request', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'user@ooo.com', '123');
+    loginUserWithLoginForm($client, 'user@whoisooo.app', '123');
 
     $crawler = $client->request('GET', '/app/dashboard/leave-requests/new');
 

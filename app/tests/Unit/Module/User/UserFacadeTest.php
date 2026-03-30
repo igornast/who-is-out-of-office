@@ -286,10 +286,10 @@ it('delegates createPasswordResetToken to handler', function () {
     $this->createPasswordResetTokenHandler
         ->expects('handle')
         ->once()
-        ->with('user@ooo.com')
+        ->with('user@whoisooo.app')
         ->andReturn('reset-token');
 
-    $result = $this->facade->createPasswordResetToken('user@ooo.com');
+    $result = $this->facade->createPasswordResetToken('user@whoisooo.app');
 
     expect($result)->toBe('reset-token');
 });

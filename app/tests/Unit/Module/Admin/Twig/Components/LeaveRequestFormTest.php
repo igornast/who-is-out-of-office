@@ -22,7 +22,7 @@ beforeEach(function (): void {
         id: Uuid::uuid4(),
         firstName: 'John',
         lastName: 'Doe',
-        email: 'john@ooo.com',
+        email: 'john@whoisooo.app',
         password: 'hashed',
         workingDays: [1, 2, 3, 4, 5],
         currentLeaveBalance: 20,

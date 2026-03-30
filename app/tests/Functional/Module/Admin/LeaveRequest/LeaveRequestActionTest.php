@@ -13,9 +13,9 @@ beforeEach(function (): void {
     $this->client = static::createClient();
     $this->em = static::getContainer()->get('doctrine')->getManager();
 
-    $this->admin = $this->em->getRepository(User::class)->findOneBy(['email' => 'admin@ooo.com']);
-    $this->managerUser = $this->em->getRepository(User::class)->findOneBy(['email' => 'manager@ooo.com']);
-    $this->regularUser = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@ooo.com']);
+    $this->admin = $this->em->getRepository(User::class)->findOneBy(['email' => 'admin@whoisooo.app']);
+    $this->managerUser = $this->em->getRepository(User::class)->findOneBy(['email' => 'manager@whoisooo.app']);
+    $this->regularUser = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@whoisooo.app']);
     $sickLeaveType = $this->em->getRepository(LeaveRequestType::class)->findOneBy(['name' => 'Sick Leave']);
 
     $this->pendingRequest = new LeaveRequest(
@@ -57,7 +57,7 @@ beforeEach(function (): void {
         ->where('u.manager = :admin')
         ->andWhere('u.email != :managerEmail')
         ->setParameter('admin', $this->admin)
-        ->setParameter('managerEmail', 'manager@ooo.com')
+        ->setParameter('managerEmail', 'manager@whoisooo.app')
         ->setMaxResults(1)
         ->getQuery()
         ->getSingleResult();

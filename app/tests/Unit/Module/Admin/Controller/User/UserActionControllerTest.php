@@ -103,10 +103,10 @@ describe('resetPassword', function (): void {
 
     it('returns 422 when token creation fails', function (): void {
         $userId = Uuid::uuid4()->toString();
-        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => true, 'email' => 'test@ooo.com']);
+        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => true, 'email' => 'test@whoisooo.app']);
 
         $this->userFacade->expects('getUser')->with($userId)->andReturn($userDTO);
-        $this->userFacade->expects('createPasswordResetToken')->with('test@ooo.com')->andReturn(null);
+        $this->userFacade->expects('createPasswordResetToken')->with('test@whoisooo.app')->andReturn(null);
 
         $response = $this->controller->resetPassword(resetPasswordRequest(), $userId);
 
@@ -117,11 +117,11 @@ describe('resetPassword', function (): void {
 
     it('sends password reset email to active user', function (): void {
         $userId = Uuid::uuid4()->toString();
-        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => true, 'email' => 'test@ooo.com']);
+        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => true, 'email' => 'test@whoisooo.app']);
 
         $this->userFacade->expects('getUser')->with($userId)->andReturn($userDTO);
-        $this->userFacade->expects('createPasswordResetToken')->with('test@ooo.com')->andReturn('reset-token-abc');
-        $this->emailFacade->expects('sendPasswordResetEmail')->with('test@ooo.com', 'reset-token-abc')->once();
+        $this->userFacade->expects('createPasswordResetToken')->with('test@whoisooo.app')->andReturn('reset-token-abc');
+        $this->emailFacade->expects('sendPasswordResetEmail')->with('test@whoisooo.app', 'reset-token-abc')->once();
 
         $response = $this->controller->resetPassword(resetPasswordRequest(), $userId);
 
@@ -132,12 +132,12 @@ describe('resetPassword', function (): void {
 
     it('returns 500 and logs error when email sending fails', function (): void {
         $userId = Uuid::uuid4()->toString();
-        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => true, 'email' => 'test@ooo.com']);
+        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => true, 'email' => 'test@whoisooo.app']);
 
         $this->userFacade->expects('getUser')->with($userId)->andReturn($userDTO);
-        $this->userFacade->expects('createPasswordResetToken')->with('test@ooo.com')->andReturn('reset-token-abc');
+        $this->userFacade->expects('createPasswordResetToken')->with('test@whoisooo.app')->andReturn('reset-token-abc');
         $this->emailFacade->expects('sendPasswordResetEmail')->andThrow(new Symfony\Component\Messenger\Exception\HandlerFailedException(
-            new Symfony\Component\Messenger\Envelope(new App\Infrastructure\Email\Message\SendPasswordResetEmailMessage('test@ooo.com', 'reset-token-abc')),
+            new Symfony\Component\Messenger\Envelope(new App\Infrastructure\Email\Message\SendPasswordResetEmailMessage('test@whoisooo.app', 'reset-token-abc')),
             [new RuntimeException('SMTP down')],
         ));
         $this->logger->expects('error')->once();

@@ -22,48 +22,48 @@ beforeEach(function (): void {
 
 describe('CreatePasswordResetTokenCommandHandler', function (): void {
     it('returns token for active user', function (): void {
-        $userDTO = UserDTOFixture::create(['email' => 'test@ooo.com', 'isActive' => true]);
+        $userDTO = UserDTOFixture::create(['email' => 'test@whoisooo.app', 'isActive' => true]);
 
-        $this->userRepository->expects('findOneByEmail')->with('test@ooo.com')->andReturn($userDTO);
+        $this->userRepository->expects('findOneByEmail')->with('test@whoisooo.app')->andReturn($userDTO);
         $this->tokenRepository->expects('removeByUserId')->with($userDTO->id)->once();
         $this->tokenRepository->expects('save')->once();
 
-        $result = $this->handler->handle('test@ooo.com');
+        $result = $this->handler->handle('test@whoisooo.app');
 
         expect($result)->toBeString()
             ->and(strlen($result))->toBe(64);
     });
 
     it('returns null for missing user', function (): void {
-        $this->userRepository->expects('findOneByEmail')->with('missing@ooo.com')->andReturn(null);
+        $this->userRepository->expects('findOneByEmail')->with('missing@whoisooo.app')->andReturn(null);
 
-        $result = $this->handler->handle('missing@ooo.com');
+        $result = $this->handler->handle('missing@whoisooo.app');
 
         expect($result)->toBeNull();
     });
 
     it('returns null for inactive user', function (): void {
-        $userDTO = UserDTOFixture::create(['email' => 'inactive@ooo.com', 'isActive' => false]);
+        $userDTO = UserDTOFixture::create(['email' => 'inactive@whoisooo.app', 'isActive' => false]);
 
-        $this->userRepository->expects('findOneByEmail')->with('inactive@ooo.com')->andReturn($userDTO);
+        $this->userRepository->expects('findOneByEmail')->with('inactive@whoisooo.app')->andReturn($userDTO);
 
-        $result = $this->handler->handle('inactive@ooo.com');
+        $result = $this->handler->handle('inactive@whoisooo.app');
 
         expect($result)->toBeNull();
     });
 
     it('removes existing tokens before creating a new one', function (): void {
-        $userDTO = UserDTOFixture::create(['email' => 'test@ooo.com', 'isActive' => true]);
+        $userDTO = UserDTOFixture::create(['email' => 'test@whoisooo.app', 'isActive' => true]);
 
         $this->userRepository->expects('findOneByEmail')->andReturn($userDTO);
         $this->tokenRepository->expects('removeByUserId')->with($userDTO->id)->once();
         $this->tokenRepository->expects('save')->once();
 
-        $this->handler->handle('test@ooo.com');
+        $this->handler->handle('test@whoisooo.app');
     });
 
     it('saves token with 1-hour expiry', function (): void {
-        $userDTO = UserDTOFixture::create(['email' => 'test@ooo.com', 'isActive' => true]);
+        $userDTO = UserDTOFixture::create(['email' => 'test@whoisooo.app', 'isActive' => true]);
         $expectedExpiry = new DateTimeImmutable('2026-03-10 13:00:00');
 
         $this->userRepository->expects('findOneByEmail')->andReturn($userDTO);
@@ -74,6 +74,6 @@ describe('CreatePasswordResetTokenCommandHandler', function (): void {
                     && $expiresAt->getTimestamp() === $expectedExpiry->getTimestamp())
             ->once();
 
-        $this->handler->handle('test@ooo.com');
+        $this->handler->handle('test@whoisooo.app');
     });
 });

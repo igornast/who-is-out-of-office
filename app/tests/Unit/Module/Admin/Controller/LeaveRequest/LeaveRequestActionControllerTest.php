@@ -34,7 +34,7 @@ beforeEach(function (): void {
         id: $this->currentUserId,
         firstName: 'Current',
         lastName: 'User',
-        email: 'current@ooo.com',
+        email: 'current@whoisooo.app',
         password: 'password',
         workingDays: [1, 2, 3, 4, 5],
     );

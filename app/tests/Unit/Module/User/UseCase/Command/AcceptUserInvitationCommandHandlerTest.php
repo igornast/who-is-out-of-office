@@ -25,7 +25,7 @@ beforeEach(function (): void {
 
 it('accepts invitation and updates user', function () {
     $userDTO = UserDTOFixture::create([
-        'email' => 'john@ooo.com',
+        'email' => 'john@whoisooo.app',
         'roles' => ['ROLE_USER'],
         'isActive' => false,
     ]);
@@ -48,7 +48,7 @@ it('accepts invitation and updates user', function () {
     $this->passwordHasher
         ->expects('hashPassword')
         ->once()
-        ->withArgs(fn (PasswordHashUserDTO $dto, string $password) => 'john@ooo.com' === $dto->getUserIdentifier()
+        ->withArgs(fn (PasswordHashUserDTO $dto, string $password) => 'john@whoisooo.app' === $dto->getUserIdentifier()
             && 'securePassword123' === $password)
         ->andReturn('hashed-password');
 
@@ -73,7 +73,7 @@ it('accepts invitation and updates user', function () {
 
 it('accepts invitation without birthdate', function () {
     $userDTO = UserDTOFixture::create([
-        'email' => 'jane@ooo.com',
+        'email' => 'jane@whoisooo.app',
         'roles' => ['ROLE_USER'],
         'isActive' => false,
     ]);

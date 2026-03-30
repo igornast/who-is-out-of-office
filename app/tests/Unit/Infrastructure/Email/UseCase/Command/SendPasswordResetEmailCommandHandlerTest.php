@@ -15,7 +15,7 @@ beforeEach(function (): void {
     $this->translator->allows('trans')->andReturnUsing(fn (string $id) => $id);
 
     $this->handler = new SendPasswordResetEmailCommandHandler(
-        'noreply@ooo.com',
+        'noreply@whoisooo.app',
         "Who's OOO",
         $this->mailer,
         $this->urlGenerator,
@@ -30,10 +30,10 @@ describe('SendPasswordResetEmailCommandHandler', function (): void {
             ->andReturn('https://ooo.com/password-reset/abc123');
 
         $this->mailer->expects('send')
-            ->withArgs(fn (TemplatedEmail $email): bool => 'user@ooo.com' === $email->getTo()[0]->getAddress())
+            ->withArgs(fn (TemplatedEmail $email): bool => 'user@whoisooo.app' === $email->getTo()[0]->getAddress())
             ->once();
 
-        $this->handler->handle('user@ooo.com', 'abc123');
+        $this->handler->handle('user@whoisooo.app', 'abc123');
     });
 
     it('generates correct reset URL', function (): void {
@@ -44,7 +44,7 @@ describe('SendPasswordResetEmailCommandHandler', function (): void {
 
         $this->mailer->expects('send')->once();
 
-        $this->handler->handle('user@ooo.com', 'token-xyz');
+        $this->handler->handle('user@whoisooo.app', 'token-xyz');
     });
 
     it('uses correct from address', function (): void {
@@ -54,12 +54,12 @@ describe('SendPasswordResetEmailCommandHandler', function (): void {
             ->withArgs(function (TemplatedEmail $email): bool {
                 $from = $email->getFrom()[0];
 
-                return 'noreply@ooo.com' === $from->getAddress()
+                return 'noreply@whoisooo.app' === $from->getAddress()
                     && "Who's OOO" === $from->getName();
             })
             ->once();
 
-        $this->handler->handle('user@ooo.com', 'token');
+        $this->handler->handle('user@whoisooo.app', 'token');
     });
 
     it('uses correct email template', function (): void {
@@ -69,6 +69,6 @@ describe('SendPasswordResetEmailCommandHandler', function (): void {
             ->withArgs(fn (TemplatedEmail $email): bool => '@AppEmail/password_reset.html.twig' === $email->getHtmlTemplate())
             ->once();
 
-        $this->handler->handle('user@ooo.com', 'token');
+        $this->handler->handle('user@whoisooo.app', 'token');
     });
 });

@@ -12,7 +12,7 @@ beforeEach(function (): void {
 
     $this->adminUser = $this->entityManager
         ->getRepository(User::class)
-        ->findOneBy(['email' => 'admin@ooo.com']);
+        ->findOneBy(['email' => 'admin@whoisooo.app']);
 });
 
 it('redirects unauthenticated users to login', function (): void {
@@ -27,7 +27,7 @@ it('redirects unauthenticated users to login', function (): void {
 
 it('displays error message for invalid credentials', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'unknown@ooo.com', '123');
+    loginUserWithLoginForm($client, 'unknown@whoisooo.app', '123');
 
     $content = $client->getCrawler()->text();
     expect($content)->toContain('Invalid credentials');
@@ -35,7 +35,7 @@ it('displays error message for invalid credentials', function (): void {
 
 it('displays user information on dashboard', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'admin@ooo.com', '123');
+    loginUserWithLoginForm($client, 'admin@whoisooo.app', '123');
 
     $client->waitForVisibility('.ooo-sidebar');
 
@@ -45,7 +45,7 @@ it('displays user information on dashboard', function (): void {
 
 it('admin can access menu items', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'admin@ooo.com', '123');
+    loginUserWithLoginForm($client, 'admin@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
 
@@ -62,7 +62,7 @@ it('admin can access menu items', function (): void {
 
 it('displays upcoming absences in team', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'admin@ooo.com', '123');
+    loginUserWithLoginForm($client, 'admin@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
 

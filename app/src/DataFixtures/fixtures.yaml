@@ -14,7 +14,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Hans'
             lastName: 'Müller'
-            email: 'admin@ooo.com'
+            email: 'admin@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_ADMIN']
             annualLeaveAllowance: 30
@@ -31,7 +31,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Petra'
             lastName: 'Schmidt'
-            email: 'manager@ooo.com'
+            email: 'manager@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_MANAGER']
             annualLeaveAllowance: 30
@@ -50,7 +50,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'John'
             lastName: 'Doe'
-            email: 'user@ooo.com'
+            email: 'user@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
@@ -68,7 +68,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Sofia'
             lastName: 'Bergström'
-            email: 'sofia.bergstrom@ooo.com'
+            email: 'sofia.bergstrom@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
@@ -86,7 +86,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Marco'
             lastName: 'Rossi'
-            email: 'marco.rossi@ooo.com'
+            email: 'marco.rossi@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
@@ -104,7 +104,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Aisha'
             lastName: 'Patel'
-            email: 'aisha.patel@ooo.com'
+            email: 'aisha.patel@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
@@ -122,7 +122,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Lukas'
             lastName: 'Weber'
-            email: 'lukas.weber@ooo.com'
+            email: 'lukas.weber@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
@@ -141,7 +141,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Chloé'
             lastName: 'Dubois'
-            email: 'chloe.dubois@ooo.com'
+            email: 'chloe.dubois@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
@@ -159,7 +159,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Tomás'
             lastName: 'Oliveira'
-            email: 'tomas.oliveira@ooo.com'
+            email: 'tomas.oliveira@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
@@ -177,7 +177,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Yuki'
             lastName: 'Tanaka'
-            email: 'yuki.tanaka@ooo.com'
+            email: 'yuki.tanaka@whoisooo.app'
             password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
@@ -196,7 +196,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Invited'
             lastName: 'User'
-            email: 'invited@ooo.com'
+            email: 'invited@whoisooo.app'
             password: 'not-set'
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24
@@ -212,7 +212,7 @@ App\Infrastructure\Doctrine\Entity\User:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
             firstName: 'Invited'
             lastName: 'User Two'
-            email: 'invited2@ooo.com'
+            email: 'invited2@whoisooo.app'
             password: 'not-set'
             roles: ['ROLE_USER']
             annualLeaveAllowance: 24

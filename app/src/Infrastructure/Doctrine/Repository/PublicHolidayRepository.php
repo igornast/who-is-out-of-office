@@ -26,25 +26,37 @@ class PublicHolidayRepository extends ServiceEntityRepository implements PublicH
      */
     public function findBetweenDatesForCountryCode(\DateTimeImmutable $startDate, \DateTimeImmutable $endDate, string $countryCode, ?string $subdivisionCode = null): array
     {
-        $qb = $this->createQueryBuilder('h');
+        $sql = <<<'SQL'
+            SELECT h.id, h.date, h.description, h.is_global, h.counties, hc.country_code
+            FROM holiday h
+            INNER JOIN holiday_calendar hc ON h.holiday_calendar_id = hc.id
+            WHERE h.date BETWEEN :startDate AND :endDate
+              AND hc.country_code = :countryCode
+        SQL;
 
-        $qb->join('h.holidayCalendar', 'hc')
-            ->where('h.date BETWEEN :start AND :end')
-            ->andWhere('hc.countryCode = :countryCode')
-            ->setParameter('start', $startDate->format('Y-m-d'))
-            ->setParameter('end', $endDate->format('Y-m-d'))
-            ->setParameter('countryCode', $countryCode)
-            ->orderBy('h.date', 'ASC');
+        $params = [
+            'startDate' => $startDate->format('Y-m-d'),
+            'endDate' => $endDate->format('Y-m-d'),
+            'countryCode' => $countryCode,
+        ];
 
         if (null !== $subdivisionCode) {
-            $qb->andWhere('h.isGlobal = true OR JSON_CONTAINS(h.counties, :subdivisionCode) = true')
-                ->setParameter('subdivisionCode', json_encode($subdivisionCode));
+            $sql .= ' AND (h.is_global = 1 OR JSON_CONTAINS(h.counties, JSON_QUOTE(:subdivisionCode)))';
+            $params['subdivisionCode'] = $subdivisionCode;
         }
 
-        /** @var Holiday[] $items */
-        $items = $qb->getQuery()->getResult();
+        $sql .= ' ORDER BY h.date ASC';
 
-        return array_map(fn (Holiday $holiday) => PublicHolidayDTO::fromEntity($holiday), $items);
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($sql);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $rows = $stmt->executeQuery()->fetchAllAssociative();
+
+        return array_map(fn (array $row) => PublicHolidayDTO::fromArray($row), $rows);
     }
 
     /**

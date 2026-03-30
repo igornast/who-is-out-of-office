@@ -61,7 +61,7 @@ it('completes the invitation and activates the user account', function (): void 
 
     $user = $this->entityManager
         ->getRepository(User::class)
-        ->findOneBy(['email' => 'invited@ooo.com']);
+        ->findOneBy(['email' => 'invited@whoisooo.app']);
 
     expect($user)
         ->firstName->toBe('Jane')

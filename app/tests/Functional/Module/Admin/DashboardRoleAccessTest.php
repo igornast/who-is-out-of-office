@@ -8,7 +8,7 @@ afterAll(function (): void {
 
 it('admin sees full sidebar with settings and organization sections', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'admin@ooo.com', '123');
+    loginUserWithLoginForm($client, 'admin@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
     $client->waitForVisibility('.ooo-sidebar');
@@ -28,7 +28,7 @@ it('admin sees full sidebar with settings and organization sections', function (
 
 it('admin sees awaiting approval stat card', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'admin@ooo.com', '123');
+    loginUserWithLoginForm($client, 'admin@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
 
@@ -39,7 +39,7 @@ it('admin sees awaiting approval stat card', function (): void {
 
 it('manager sees team section but not settings section', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'manager@ooo.com', '123');
+    loginUserWithLoginForm($client, 'manager@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
     $client->waitForVisibility('.ooo-sidebar');
@@ -59,7 +59,7 @@ it('manager sees team section but not settings section', function (): void {
 
 it('manager sees awaiting approval stat card', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'manager@ooo.com', '123');
+    loginUserWithLoginForm($client, 'manager@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
 
@@ -70,7 +70,7 @@ it('manager sees awaiting approval stat card', function (): void {
 
 it('regular user sees minimal sidebar without organization or settings', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'user@ooo.com', '123');
+    loginUserWithLoginForm($client, 'user@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
     $client->waitForVisibility('.ooo-sidebar');
@@ -90,7 +90,7 @@ it('regular user sees minimal sidebar without organization or settings', functio
 
 it('regular user sees pending requests instead of awaiting approval', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'user@ooo.com', '123');
+    loginUserWithLoginForm($client, 'user@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
 
@@ -103,7 +103,7 @@ it('regular user sees pending requests instead of awaiting approval', function (
 
 it('regular user cannot access admin settings page', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'user@ooo.com', '123');
+    loginUserWithLoginForm($client, 'user@whoisooo.app', '123');
 
     $client->request('GET', '/app/settings');
 
@@ -114,7 +114,7 @@ it('regular user cannot access admin settings page', function (): void {
 
 it('dashboard displays greeting with user first name', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'manager@ooo.com', '123');
+    loginUserWithLoginForm($client, 'manager@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
 
@@ -125,7 +125,7 @@ it('dashboard displays greeting with user first name', function (): void {
 
 it('dashboard displays vacation balance for logged-in user', function (): void {
     $client = createPantherClient();
-    loginUserWithLoginForm($client, 'user@ooo.com', '123');
+    loginUserWithLoginForm($client, 'user@whoisooo.app', '123');
 
     $client->request('GET', '/app/dashboard');
 

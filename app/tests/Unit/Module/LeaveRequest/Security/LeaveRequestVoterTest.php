@@ -27,7 +27,7 @@ function createUser(string $id, array $roles = [RoleEnum::User->value]): User
         id: Uuid::fromString($id),
         firstName: 'Test',
         lastName: 'User',
-        email: 'test@ooo.com',
+        email: 'test@whoisooo.app',
         password: 'password',
         roles: $roles,
         workingDays: [1, 2, 3, 4, 5],
