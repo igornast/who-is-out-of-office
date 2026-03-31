@@ -8,6 +8,7 @@
             "email": "nastarowicz@hotmail.com"
         }
     ],
+    "homepage": "https://www.whoisooo.app",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {

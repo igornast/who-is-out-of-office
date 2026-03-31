@@ -62,3 +62,9 @@ jobs:
               env:
                   DATABASE_URL: 'mysql://root:@127.0.0.1:${{ job.services.mysql.ports[3306] }}/ooo_db_test?serverVersion=8.4&charset=utf8mb4'
                   APP_ENV: 'test'
+
+            - name: Upload coverage to Codecov
+              uses: codecov/codecov-action@v5
+              with:
+                  files: app/clover.xml
+                  token: ${{ secrets.CODECOV_TOKEN }}

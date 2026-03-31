@@ -1,11 +1,14 @@
 # Who's Out of Office
 
 [![CI](https://github.com/igornast/who-is-out-of-office/actions/workflows/php.yml/badge.svg)](https://github.com/igornast/who-is-out-of-office/actions/workflows/php.yml)
+[![codecov](https://codecov.io/gh/igornast/who-is-out-of-office/graph/badge.svg)](https://codecov.io/gh/igornast/who-is-out-of-office)
 ![PHPStan](https://img.shields.io/badge/PHPStan-Level%208-brightgreen)
 ![PHP](https://img.shields.io/badge/PHP-8.5-blue)
 ![License](https://img.shields.io/github/license/igornast/who-is-out-of-office)
 
 A self-hosted staff leave planner built with Symfony 7.4. Manage leave requests, team calendars, public holidays, and Slack notifications — all in one place.
+
+**[www.whoisooo.app](https://www.whoisooo.app)**
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
@@ -35,7 +38,7 @@ For full setup details and how to run tests, see [CONTRIBUTING.md](CONTRIBUTING.
 
 The dev fixtures include a default admin account for initial access:
 
-- **Email:** `admin@ooo.com`
+- **Email:** `admin@whoisooo.app`
 - **Password:** `123`
 
 > ⚠️ **Important:** This account is only available in development (fixtures are never loaded in production).
@@ -187,4 +190,4 @@ Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup inst
 
 ## License
 
-[MIT](LICENSE)
+[AGPL-3.0](LICENSE)

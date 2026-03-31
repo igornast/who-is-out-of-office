@@ -30,7 +30,7 @@ final class Version20250514181658 extends AbstractMigration
         $this->addSql('ALTER TABLE leave_request ADD CONSTRAINT FK_7DC8F778A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE leave_request ADD CONSTRAINT FK_7DC8F7782D234F6A FOREIGN KEY (approved_by_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE user_slack_integration ADD CONSTRAINT FK_A27FC920A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
-        $this->addSql('INSERT INTO user (id, first_name, last_name, email, password, roles, annual_leave_allowance, current_leave_balance, profile_image_url, birth_date, created_at, updated_at) VALUES (UUID(), \'John\', \'Doe\', \'admin@ooo.com\', \'$argon2id$v=19$m=65536,t=4,p=1$hjMoe4D7E903U/y/oS8EaQ$kOPqvNjlxu4QxdSRzJUgxCgrA4oFZuIDuwDoQVkSSZw\', \'["ROLE_ADMIN"]\', 30, 30, \'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png\', \'1991-01-01\', NOW(), NOW());');
+        $this->addSql('INSERT INTO user (id, first_name, last_name, email, password, roles, annual_leave_allowance, current_leave_balance, profile_image_url, birth_date, created_at, updated_at) VALUES (UUID(), \'John\', \'Doe\', \'admin@whoisooo.app\', \'$argon2id$v=19$m=65536,t=4,p=1$hjMoe4D7E903U/y/oS8EaQ$kOPqvNjlxu4QxdSRzJUgxCgrA4oFZuIDuwDoQVkSSZw\', \'["ROLE_ADMIN"]\', 30, 30, \'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png\', \'1991-01-01\', NOW(), NOW());');
 
     }
 

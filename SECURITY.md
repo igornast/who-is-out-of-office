@@ -39,4 +39,4 @@ When deploying, make sure to:
 - Set a strong `APP_SECRET` in your server environment (never use the dev default)
 - Set a unique `ICAL_SECRET` to protect calendar feed URLs
 - Store `SLACK_SIGNING_SECRET` and `SLACK_DSN` only in `.env.local` or server environment variables — never commit them
-- Change or disable the default admin account created by fixtures (`admin@ooo.com`) before going live
+- Change or disable the default admin account created by fixtures (`admin@whoisooo.app`) before going live

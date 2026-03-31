@@ -23,7 +23,7 @@ The PHP container handles everything on first boot: installs dependencies, waits
 The app is available at `http://localhost/app/dashboard`.
 
 Default dev credentials:
-- Email: `admin@ooo.com`
+- Email: `admin@whoisooo.app`
 - Password: `123`
 
 ## Running Tests

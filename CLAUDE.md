@@ -42,7 +42,7 @@ docker exec -it app_ooo_php bash
 - Password: `mysql`
 
 Default admin account (development only):
-- Email: `admin@ooo.com`
+- Email: `admin@whoisooo.app`
 - Password: `123` (default for all users in local env)
 
 ## Common Commands
