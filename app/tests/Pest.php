@@ -1,5 +1,9 @@
 <?php
 
+use App\Infrastructure\Doctrine\Entity\PasswordResetToken;
+use App\Infrastructure\Doctrine\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\PantherTestCase;
 
@@ -23,6 +27,24 @@ function createPantherClient(array $options = [], array $kernelOptions = [], arr
     $client = $reflection->invoke(null, $options, $kernelOptions, $managerOptions);
 
     return $client;
+}
+
+function createPasswordResetToken(EntityManagerInterface $em, string $userEmail): string
+{
+    $user = $em->getRepository(User::class)->findOneBy(['email' => $userEmail]);
+    $rawToken = bin2hex(random_bytes(32));
+
+    $entity = new PasswordResetToken(
+        id: Uuid::uuid4(),
+        token: hash('sha256', $rawToken),
+        user: $user,
+        expiresAt: new DateTimeImmutable('+1 hour'),
+    );
+
+    $em->persist($entity);
+    $em->flush();
+
+    return $rawToken;
 }
 
 function loginUserWithLoginForm(Client $client, string $email, string $password): void
