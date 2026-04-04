@@ -41,25 +41,40 @@
     line-height: 1;
 }
 
-/* new leave request */
-.ea-request-form-date-range {
-    background-color: var(--app-surface-sunken);
-    height: 42px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    font-family: var(--font-body);
-    font-size: 13px;
-    width: 100%;
-    padding: 0 12px;
-    outline: none;
-    transition: all 0.15s ease;
+/* new leave request — inline calendar */
+.flatpickr-inline-calendar {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
 }
 
-.ea-request-form-date-range:focus {
-    border-color: var(--border-focus);
-    box-shadow: var(--shadow-focus);
-    outline: none;
+.flatpickr-inline-calendar .flatpickr-calendar.inline {
+    box-shadow: none;
+    border-color: var(--border);
+    width: 100%;
+    max-width: 100%;
+    font-size: var(--text-md);
+}
+
+.flatpickr-inline-calendar .flatpickr-days {
+    width: 100% !important;
+}
+
+.flatpickr-inline-calendar .dayContainer {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+}
+
+.flatpickr-inline-calendar .flatpickr-day {
+    max-width: unset;
+    flex: 1 1 auto;
+    height: 2.75rem;
+    line-height: 2.75rem;
+}
+
+.flatpickr-inline-calendar .flatpickr-weekdaycontainer {
+    width: 100%;
 }
 
 .checkbox-large input[type="checkbox"] {

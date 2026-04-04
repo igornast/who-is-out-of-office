@@ -116,3 +116,82 @@ it('allows submit when within minNoticeDays and maxConsecutiveDays limits', func
 
     expect($this->component->isSubmitDisabled)->toBeFalse();
 });
+
+it('disables submit and clears info box when dateRange is empty', function (): void {
+    $this->component->formValues = ['dateRange' => ''];
+
+    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade);
+
+    expect($this->component->isSubmitDisabled)->toBeTrue()
+        ->and($this->component->infoBox)->toBe('');
+});
+
+it('disables submit when leaveType is null and dateRange is provided', function (): void {
+    $this->component->leaveType = null;
+    $startDate = new DateTimeImmutable('+5 days');
+    $this->component->formValues = [
+        'dateRange' => $startDate->format('Y-m-d'),
+    ];
+
+    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade);
+
+    expect($this->component->isSubmitDisabled)->toBeTrue()
+        ->and($this->component->infoBox)->toBe('');
+});
+
+it('enables submit immediately when leave type does not affect balance', function (): void {
+    $nonBalanceLeaveType = new LeaveRequestType(
+        id: Uuid::uuid4(),
+        isAffectingBalance: false,
+        name: 'Remote Work',
+        backgroundColor: '#000',
+        borderColor: '#000',
+        textColor: '#fff',
+        icon: 'icon',
+    );
+    $this->component->leaveType = $nonBalanceLeaveType;
+
+    $startDate = new DateTimeImmutable('+5 days');
+    $this->component->formValues = [
+        'dateRange' => sprintf('%s to %s', $startDate->format('Y-m-d'), $startDate->modify('+2 days')->format('Y-m-d')),
+    ];
+
+    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade);
+
+    expect($this->component->isSubmitDisabled)->toBeFalse()
+        ->and($this->component->infoBox)->toBe('');
+});
+
+it('shows no balance warning and disables submit when remaining balance is negative', function (): void {
+    $this->appSettingsFacade->allows('minNoticeDays')->andReturn(0);
+    $this->appSettingsFacade->allows('maxConsecutiveDays')->andReturn(0);
+
+    $startDate = new DateTimeImmutable('+5 days');
+    $endDate = $startDate->modify('+10 days');
+    $this->component->formValues = [
+        'dateRange' => sprintf('%s to %s', $startDate->format('Y-m-d'), $endDate->format('Y-m-d')),
+    ];
+
+    $this->leaveRequestFacade->allows('calculateWorkDays')->andReturn(25);
+
+    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade);
+
+    expect($this->component->isSubmitDisabled)->toBeTrue()
+        ->and($this->component->infoBox)->toContain('no_balance_box');
+});
+
+it('treats single date selection as same start and end date', function (): void {
+    $this->appSettingsFacade->allows('minNoticeDays')->andReturn(0);
+    $this->appSettingsFacade->allows('maxConsecutiveDays')->andReturn(0);
+
+    $startDate = new DateTimeImmutable('+5 days');
+    $this->component->formValues = [
+        'dateRange' => $startDate->format('Y-m-d'),
+    ];
+
+    $this->leaveRequestFacade->allows('calculateWorkDays')->andReturn(1);
+
+    $this->component->updated($this->user, $this->leaveRequestFacade, $this->appSettingsFacade);
+
+    expect($this->component->isSubmitDisabled)->toBeFalse();
+});

@@ -32,8 +32,6 @@ class NewLeaveRequestFormType extends AbstractType
             ->add('dateRange', TextType::class, [
                 'label' => 'When',
                 'attr' => [
-                    'placeholder' => 'YYYY-MM-DD to YYYY-MM-DD',
-                    'data-controller' => 'flatpickr',
                     'data-action' => 'live#action',
                     'data-live-action-param' => 'updated',
                 ],

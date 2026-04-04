@@ -16,17 +16,33 @@
     color: var(--text-primary);
 }
 
+.flatpickr-current-month {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100% !important;
+    left: 0 !important;
+    padding: 0 2rem !important;
+    box-sizing: border-box !important;
+}
+
+.flatpickr-current-month .numInputWrapper {
+    flex: 1;
+    background-color: var(--app-surface-sunken);
+    border: none;
+}
+
 .flatpickr-current-month input.cur-year {
     color: var(--text-primary);
-    font-weight: 600;
 }
 
 .flatpickr-weekdays {
     background-color: var(--app-surface-sunken);
 }
 
-.flatpickr-weekday {
-    color: var(--text-muted);
+.flatpickr-weekdays .flatpickr-weekday {
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
@@ -123,18 +139,31 @@
     color: var(--text-primary);
 }
 
-.flatpickr-monthDropdown-months,
-.flatpickr-current-month .numInputWrapper input {
+.flatpickr-monthDropdown-months {
+    flex: 1;
     background-color: var(--app-surface);
     color: var(--text-primary);
     border: 1px solid var(--border);
-    font-weight: 600;
+    font-family: var(--font-body);
+    font-weight: 300;
+    text-align: center;
+    text-align-last: center;
 }
 
-.flatpickr-monthDropdown-months:hover,
-.flatpickr-current-month .numInputWrapper input:hover {
+.flatpickr-monthDropdown-months:hover {
     background-color: var(--app-surface-sunken);
     border-color: var(--primary);
+}
+
+.flatpickr-current-month .numInputWrapper input.cur-year {
+    background-color: var(--app-surface-sunken);
+    border: none;
+    box-shadow: none;
+    font-family: var(--font-body);
+    font-size: var(--text-lg);
+    font-weight: 300;
+    color: var(--text-primary);
+    text-align: center;
 }
 
 .flatpickr-months .flatpickr-prev-month:hover svg,
@@ -158,4 +187,11 @@
 .flatpickr-time .flatpickr-am-pm:hover {
     background-color: var(--app-surface);
     border-color: var(--primary);
+}
+
+html.dark .flatpickr-day.inRange,
+html.dark .flatpickr-day.prevMonthDay.inRange,
+html.dark .flatpickr-day.nextMonthDay.inRange {
+    background-color: var(--primary-dark);
+    box-shadow: -5px 0 0 var(--primary-dark), 5px 0 0 var(--primary-dark);
 }
