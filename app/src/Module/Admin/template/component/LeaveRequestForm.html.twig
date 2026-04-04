@@ -7,8 +7,16 @@
         </div>
     </div>
     <div class="field-text form-group mb-3">
-        <div class="form-widget">
-            {{ form_row(form.dateRange, {'attr': {'class': 'ea-request-form-date-range'}}) }}
+        <div data-controller="flatpickr-inline">
+            {{ form_label(form.dateRange) }}
+            {{ form_widget(form.dateRange, {
+                'attr': {
+                    'class': 'visually-hidden',
+                    'data-flatpickr-inline-target': 'input'
+                }
+            }) }}
+            {{ form_errors(form.dateRange) }}
+            <div data-flatpickr-inline-target="calendar" class="flatpickr-inline-calendar" data-live-ignore></div>
         </div>
     </div>
 
