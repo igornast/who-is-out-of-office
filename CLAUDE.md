@@ -49,7 +49,11 @@ Default admin account (development only):
 
 ### Running commands with `just` (IMPORTANT)
 
-The project uses a `justfile` in `app/` with predefined commands. The justfile auto-detects whether it's running inside or outside the container and prefixes commands with `docker exec` accordingly. **When running commands from outside the container (e.g. from Claude Code), always use `docker exec` with `just` commands — never use `-it` flag (non-interactive context) and never run raw `php vendor/bin/pest`, `bash -c` wrappers, or `composer` commands directly.** Note: pest output may be silently swallowed when run via `docker exec`; the exit code (0 = pass, non-0 = fail) is the reliable signal.
+The project uses a `justfile` in `app/` with predefined commands. The justfile auto-detects whether it's running inside or outside the container and prefixes commands with `docker exec` accordingly. **When running commands from outside the container (e.g. from Claude Code), always use `docker exec` with `just` commands — never use `-it` flag (non-interactive context) and never run raw `php vendor/bin/pest`, `bash -c` wrappers, or `composer` commands directly.** Note: pest output may be silently swallowed when run via `docker exec`; the exit code (0 = pass, non-0 = fail) is the reliable signal. For Panther tests where you need to see the result details, redirect output to a file inside the container and read it back:
+
+```bash
+docker exec app_ooo_php bash -c "php vendor/bin/pest tests/Functional/Path/To/Test.php --no-coverage --log-junit /tmp/result.xml 2>&1; cat /tmp/result.xml"
+```
 
 ```bash
 # Run full test suite (CS, PHPStan, Architecture, Unit, Functional)
@@ -64,7 +68,7 @@ docker exec app_ooo_php just test-functional
 # Run tests matching a filter name
 docker exec app_ooo_php just pest-filter "LeaveRequestVoter"
 
-# Run a specific test file
+# Run a specific test file (NOTE: does NOT reset the test DB — run db-reset-test first for functional/Panther tests)
 docker exec app_ooo_php just pest-file tests/Unit/Path/To/YourTest.php
 
 # Fix code style
@@ -335,6 +339,13 @@ Pest architecture tests in `tests/Architecture/` enforce critical boundaries:
 - **UseCase handlers** cannot use Symfony HttpFoundation or Doctrine entities directly
 - **Shared layer** facades must be interfaces, enums must be pure
 - **Facades must be final** and implement their interface
+- **Naming conventions** (enforced, will fail CI if violated):
+  - Classes in `Module/*/Controller/` must end with `Controller`
+  - Classes in `Module/*/UseCase/Command/` must end with `CommandHandler`
+  - Classes in `Module/*/UseCase/Query/` must end with `QueryHandler`
+  - Classes in `Infrastructure/Doctrine/Repository/` must end with `Repository`
+  - Classes in `Shared/DTO/` must end with `DTO`
+- **`declare(strict_types=1)`** required in every PHP file
 
 These tests run via `composer test:arch`. Violating these rules will fail CI.
 
@@ -349,6 +360,8 @@ These tests run via `composer test:arch`. Violating these rules will fail CI.
 ### No `final` on Classes
 
 Do **not** use `final` on project classes — mocking in tests is more important than sealing inheritance. Use interfaces where contract enforcement is needed instead.
+
+**Exception: Facades MUST be `final`** — architecture tests enforce this via `->toBeFinal()` assertions. All module Facades (e.g., `LeaveRequestFacade`, `UserFacade`) and infrastructure Facades (e.g., `EmailFacade`, `SlackFacade`) must be declared `final`. These are not mocked directly; their interfaces are used instead.
 
 ### Constructor Parameter Order
 

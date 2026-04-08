@@ -1,0 +1,83 @@
+# git-cliff configuration — Who's Out of Office
+#
+# Used from v0.2.0 onwards. The v0.1.0 changelog section was written manually
+# (narrative grouping by theme) and must NOT be regenerated.
+#
+# Typical usage, from repo root:
+#
+#   # Preview the next release section without touching CHANGELOG.md
+#   git cliff --tag v0.2.0 --unreleased
+#
+#   # Prepend the new section to CHANGELOG.md (preserves [0.1.0])
+#   git cliff --tag v0.2.0 --unreleased --prepend CHANGELOG.md
+#
+#   # Generate only a range (e.g. between two tags)
+#   git cliff v0.1.0..HEAD --tag v0.2.0
+#
+# Docs: https://git-cliff.org/docs/configuration
+
+[changelog]
+# CHANGELOG.md already carries the Keep a Changelog preamble — don't duplicate it.
+header = ""
+
+# Keep a Changelog body, matching the v0.1.0 section style (em dash before date).
+body = """
+{% if version -%}
+## [{{ version | trim_start_matches(pat="v") }}] — {{ timestamp | date(format="%Y-%m-%d") }}
+{% else -%}
+## [Unreleased]
+{% endif -%}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits %}
+- {{ commit.message | split(pat="\n") | first | upper_first }}\
+  {% if commit.id %} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/igornast/who-is-out-of-office/commit/{{ commit.id }})){% endif %}
+{%- endfor %}
+{% endfor %}
+{% if version %}
+[{{ version | trim_start_matches(pat="v") }}]: https://github.com/igornast/who-is-out-of-office/releases/tag/{{ version }}
+{% endif %}
+"""
+
+footer = ""
+trim = true
+postprocessors = []
+
+[git]
+conventional_commits = true
+# Drop commits that don't follow conventional format (e.g. "cleanup", "wip").
+filter_unconventional = true
+split_commits = false
+# Allow both `type: subject` and `type(scope): subject`.
+commit_preprocessors = []
+
+commit_parsers = [
+    # Security first — catch `fix(security): ...`, `feat(security): ...`,
+    # or any commit with `security` in the scope.
+    { message = "^[a-z]+\\(security\\)", group = "Security" },
+    { body = ".*security", group = "Security" },
+
+    { message = "^feat", group = "Added" },
+    { message = "^fix", group = "Fixed" },
+    { message = "^perf", group = "Changed" },
+    { message = "^refactor", group = "Changed" },
+    { message = "^revert", group = "Removed" },
+
+    # Noise — never show in the changelog.
+    { message = "^chore", skip = true },
+    { message = "^tests?", skip = true },
+    { message = "^docs", skip = true },
+    { message = "^style", skip = true },
+    { message = "^ci", skip = true },
+    { message = "^build", skip = true },
+    { message = "^deps", skip = true },
+]
+
+protect_breaking_commits = false
+filter_commits = true
+tag_pattern = "v[0-9]+\\.[0-9]+\\.[0-9]+"
+# Skip pre-release / RC tags so they never appear as a released section.
+skip_tags = "v[0-9]+\\.[0-9]+\\.[0-9]+-.*"
+ignore_tags = ""
+topo_order = false
+sort_commits = "newest"
