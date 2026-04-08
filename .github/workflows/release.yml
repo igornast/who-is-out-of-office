@@ -31,11 +31,10 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Checkout main with full history
+            - name: Checkout repository with full history
               uses: actions/checkout@v4
               with:
                   fetch-depth: 0
-                  ref: main
 
             - name: Resolve tag name and dry-run mode
               id: ctx
