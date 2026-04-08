@@ -60,24 +60,25 @@ jobs:
                   echo "Resolved tag: ${TAG} (dry_run=${DRY})"
 
             - name: Generate release notes (new section only)
-              uses: orhun/git-cliff-action@v3
+              id: notes
+              uses: orhun/git-cliff-action@v4
               with:
                   config: cliff.toml
                   args: --tag ${{ steps.ctx.outputs.tag }} --unreleased --strip header
-                  output: /tmp/release-notes.md
+              env:
+                  OUTPUT: /tmp/release-notes.md
 
             - name: Show generated release notes
               run: |
-                  echo "===== /tmp/release-notes.md ====="
-                  cat /tmp/release-notes.md
+                  echo "===== ${{ steps.notes.outputs.changelog }} ====="
+                  cat "${{ steps.notes.outputs.changelog }}"
                   echo "===== end ====="
 
             - name: Prepend new section to CHANGELOG.md
-              uses: orhun/git-cliff-action@v3
+              uses: orhun/git-cliff-action@v4
               with:
                   config: cliff.toml
                   args: --tag ${{ steps.ctx.outputs.tag }} --unreleased --prepend CHANGELOG.md
-                  output: ''
 
             - name: Show CHANGELOG.md diff
               run: git --no-pager diff -- CHANGELOG.md
@@ -110,9 +111,9 @@ jobs:
                   TAG: ${{ steps.ctx.outputs.tag }}
               run: |
                   if gh release view "$TAG" > /dev/null 2>&1; then
-                      gh release edit "$TAG" --notes-file /tmp/release-notes.md
+                      gh release edit "$TAG" --notes-file "${{ steps.notes.outputs.changelog }}"
                   else
                       gh release create "$TAG" \
                           --title "$TAG" \
-                          --notes-file /tmp/release-notes.md
+                          --notes-file "${{ steps.notes.outputs.changelog }}"
                   fi
