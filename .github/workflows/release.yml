@@ -4,6 +4,11 @@ on:
     push:
         tags:
             - 'v[0-9]+.[0-9]+.[0-9]+'
+        # TEMPORARY: remove this branch before merging to main.
+        # While present, every push to this branch runs the workflow in
+        # forced dry-run mode (no commit, no release side effects).
+        branches:
+            - ci/test-release-workflow
     release:
         types: [published]
     workflow_dispatch:
@@ -32,24 +37,33 @@ jobs:
                   fetch-depth: 0
                   ref: main
 
-            - name: Resolve tag name
-              id: tag
+            - name: Resolve tag name and dry-run mode
+              id: ctx
               run: |
+                  DRY=false
                   if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
                       TAG="${{ github.event.inputs.tag }}"
+                      if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+                          DRY=true
+                      fi
                   elif [ "${{ github.event_name }}" = "release" ]; then
                       TAG="${{ github.event.release.tag_name }}"
+                  elif [ "${{ github.event_name }}" = "push" ] && [[ "$GITHUB_REF" == refs/heads/* ]]; then
+                      # Branch push — forced dry-run with a fake tag.
+                      TAG="v99.99.99"
+                      DRY=true
                   else
                       TAG="${GITHUB_REF_NAME}"
                   fi
-                  echo "name=${TAG}" >> "$GITHUB_OUTPUT"
-                  echo "Resolved tag: ${TAG}"
+                  echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+                  echo "dry_run=${DRY}" >> "$GITHUB_OUTPUT"
+                  echo "Resolved tag: ${TAG} (dry_run=${DRY})"
 
             - name: Generate release notes (new section only)
               uses: orhun/git-cliff-action@v3
               with:
                   config: cliff.toml
-                  args: --tag ${{ steps.tag.outputs.name }} --unreleased --strip header
+                  args: --tag ${{ steps.ctx.outputs.tag }} --unreleased --strip header
                   output: /tmp/release-notes.md
 
             - name: Show generated release notes
@@ -62,17 +76,17 @@ jobs:
               uses: orhun/git-cliff-action@v3
               with:
                   config: cliff.toml
-                  args: --tag ${{ steps.tag.outputs.name }} --unreleased --prepend CHANGELOG.md
+                  args: --tag ${{ steps.ctx.outputs.tag }} --unreleased --prepend CHANGELOG.md
                   output: ''
 
             - name: Show CHANGELOG.md diff
               run: git --no-pager diff -- CHANGELOG.md
 
             - name: Commit CHANGELOG.md via GitHub API (signed)
-              if: github.event_name != 'workflow_dispatch' || github.event.inputs.dry_run != 'true'
+              if: steps.ctx.outputs.dry_run != 'true'
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  TAG: ${{ steps.tag.outputs.name }}
+                  TAG: ${{ steps.ctx.outputs.tag }}
               run: |
                   if git diff --quiet -- CHANGELOG.md; then
                       echo "CHANGELOG.md unchanged, nothing to commit"
@@ -90,10 +104,10 @@ jobs:
                       -f branch="main"
 
             - name: Upsert GitHub release with generated notes
-              if: github.event_name != 'workflow_dispatch' || github.event.inputs.dry_run != 'true'
+              if: steps.ctx.outputs.dry_run != 'true'
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  TAG: ${{ steps.tag.outputs.name }}
+                  TAG: ${{ steps.ctx.outputs.tag }}
               run: |
                   if gh release view "$TAG" > /dev/null 2>&1; then
                       gh release edit "$TAG" --notes-file /tmp/release-notes.md
