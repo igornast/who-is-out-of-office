@@ -4,11 +4,6 @@ on:
     push:
         tags:
             - 'v[0-9]+.[0-9]+.[0-9]+'
-        # TEMPORARY: remove this branch before merging to main.
-        # While present, every push to this branch runs the workflow in
-        # forced dry-run mode (no commit, no release side effects).
-        branches:
-            - ci/test-release-workflow
     release:
         types: [published]
     workflow_dispatch:
@@ -47,10 +42,6 @@ jobs:
                       fi
                   elif [ "${{ github.event_name }}" = "release" ]; then
                       TAG="${{ github.event.release.tag_name }}"
-                  elif [ "${{ github.event_name }}" = "push" ] && [[ "$GITHUB_REF" == refs/heads/* ]]; then
-                      # Branch push — forced dry-run with a fake tag.
-                      TAG="v99.99.99"
-                      DRY=true
                   else
                       TAG="${GITHUB_REF_NAME}"
                   fi
