@@ -17,8 +17,17 @@
 # Docs: https://git-cliff.org/docs/configuration
 
 [changelog]
-# CHANGELOG.md already carries the Keep a Changelog preamble — don't duplicate it.
-header = ""
+# Header must match the preamble in CHANGELOG.md exactly. git-cliff uses it
+# to detect where to insert new sections when running with --prepend, and to
+# avoid duplicating the preamble in the output.
+header = """# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+"""
 
 # Keep a Changelog body, matching the v0.1.0 section style (em dash before date).
 body = """
@@ -40,7 +49,9 @@ body = """
 """
 
 footer = ""
-trim = true
+# Keep trailing newlines from the body template so prepended sections stay
+# visually separated from the next version below.
+trim = false
 postprocessors = []
 
 [git]
