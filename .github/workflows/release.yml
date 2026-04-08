@@ -1,0 +1,109 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - 'v[0-9]+.[0-9]+.[0-9]+'
+    release:
+        types: [published]
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: 'Tag to simulate (e.g. v0.2.0)'
+                required: true
+                type: string
+            dry_run:
+                description: 'Skip CHANGELOG commit and release upsert'
+                type: boolean
+                default: true
+
+permissions:
+    contents: write
+
+jobs:
+    release:
+        name: Generate changelog and publish release
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository with full history
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Resolve tag name and dry-run mode
+              id: ctx
+              run: |
+                  DRY=false
+                  if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+                      TAG="${{ github.event.inputs.tag }}"
+                      if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+                          DRY=true
+                      fi
+                  elif [ "${{ github.event_name }}" = "release" ]; then
+                      TAG="${{ github.event.release.tag_name }}"
+                  else
+                      TAG="${GITHUB_REF_NAME}"
+                  fi
+                  echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+                  echo "dry_run=${DRY}" >> "$GITHUB_OUTPUT"
+                  echo "Resolved tag: ${TAG} (dry_run=${DRY})"
+
+            - name: Generate release notes (new section only)
+              id: notes
+              uses: orhun/git-cliff-action@v4
+              with:
+                  config: cliff.toml
+                  args: --tag ${{ steps.ctx.outputs.tag }} --unreleased --strip header
+              env:
+                  OUTPUT: /tmp/release-notes.md
+
+            - name: Show generated release notes
+              run: |
+                  echo "===== ${{ steps.notes.outputs.changelog }} ====="
+                  cat "${{ steps.notes.outputs.changelog }}"
+                  echo "===== end ====="
+
+            - name: Prepend new section to CHANGELOG.md
+              uses: orhun/git-cliff-action@v4
+              with:
+                  config: cliff.toml
+                  args: --tag ${{ steps.ctx.outputs.tag }} --unreleased --prepend CHANGELOG.md
+
+            - name: Show CHANGELOG.md diff
+              run: git --no-pager diff -- CHANGELOG.md
+
+            - name: Commit CHANGELOG.md via GitHub API (signed)
+              if: steps.ctx.outputs.dry_run != 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  TAG: ${{ steps.ctx.outputs.tag }}
+              run: |
+                  if git diff --quiet -- CHANGELOG.md; then
+                      echo "CHANGELOG.md unchanged, nothing to commit"
+                      exit 0
+                  fi
+
+                  SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/CHANGELOG.md?ref=main" --jq .sha)
+                  CONTENT=$(base64 -w0 CHANGELOG.md)
+
+                  gh api "repos/${GITHUB_REPOSITORY}/contents/CHANGELOG.md" \
+                      --method PUT \
+                      -f message="docs(changelog): update for ${TAG}" \
+                      -f content="${CONTENT}" \
+                      -f sha="${SHA}" \
+                      -f branch="main"
+
+            - name: Upsert GitHub release with generated notes
+              if: steps.ctx.outputs.dry_run != 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  TAG: ${{ steps.ctx.outputs.tag }}
+              run: |
+                  if gh release view "$TAG" > /dev/null 2>&1; then
+                      gh release edit "$TAG" --notes-file "${{ steps.notes.outputs.changelog }}"
+                  else
+                      gh release create "$TAG" \
+                          --title "$TAG" \
+                          --notes-file "${{ steps.notes.outputs.changelog }}"
+                  fi
