@@ -19,6 +19,7 @@ class LeaveRequestType
         public string $borderColor,
         public string $textColor,
         public string $icon,
+        public ?int $sort = null,
     ) {
         $this->initializeTimestamps();
     }

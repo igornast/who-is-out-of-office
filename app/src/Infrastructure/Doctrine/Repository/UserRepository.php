@@ -31,6 +31,16 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return array_map(fn (User $user) => UserDTO::fromEntity($user), $users);
     }
 
+    /**
+     * @return UserDTO[]
+     */
+    public function findAllActive(): array
+    {
+        $users = $this->findBy(['isActive' => true], ['firstName' => 'ASC', 'lastName' => 'ASC']);
+
+        return array_map(fn (User $user) => UserDTO::fromEntity($user), $users);
+    }
+
     public function findOneById(string $id): ?UserDTO
     {
         $user = $this->find($id);

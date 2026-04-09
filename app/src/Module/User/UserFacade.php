@@ -17,6 +17,7 @@ use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
 use App\Module\User\UseCase\Command\ResetPasswordCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
+use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
@@ -58,6 +59,7 @@ final class UserFacade implements UserFacadeInterface
         private readonly ResetPasswordCommandHandler $resetPasswordHandler,
         private readonly CleanupExpiredPasswordResetTokensCommandHandler $cleanupExpiredPasswordResetTokensHandler,
         private readonly GetPasswordResetTokenQueryHandler $getPasswordResetTokenHandler,
+        private readonly GetAllActiveUsersQueryHandler $getAllActiveUsersHandler,
     ) {
     }
 
@@ -182,5 +184,13 @@ final class UserFacade implements UserFacadeInterface
     public function getPasswordResetToken(string $token): ?PasswordResetTokenDTO
     {
         return $this->getPasswordResetTokenHandler->handle($token);
+    }
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getAllActiveUsers(): array
+    {
+        return $this->getAllActiveUsersHandler->handle();
     }
 }

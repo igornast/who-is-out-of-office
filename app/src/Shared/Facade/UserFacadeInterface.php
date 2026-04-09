@@ -73,4 +73,9 @@ interface UserFacadeInterface
     public function cleanupExpiredPasswordResetTokens(): int;
 
     public function getPasswordResetToken(string $token): ?PasswordResetTokenDTO;
+
+    /**
+     * @return UserDTO[]
+     */
+    public function getAllActiveUsers(): array;
 }

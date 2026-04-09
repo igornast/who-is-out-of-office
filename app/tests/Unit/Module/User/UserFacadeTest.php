@@ -15,6 +15,7 @@ use App\Module\User\UseCase\Command\ResetPasswordCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
+use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -53,6 +54,7 @@ beforeEach(function (): void {
     $this->resetPasswordHandler = mock(ResetPasswordCommandHandler::class);
     $this->cleanupExpiredPasswordResetTokensHandler = mock(CleanupExpiredPasswordResetTokensCommandHandler::class);
     $this->getPasswordResetTokenHandler = mock(GetPasswordResetTokenQueryHandler::class);
+    $this->getAllActiveUsersHandler = mock(GetAllActiveUsersQueryHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -76,6 +78,7 @@ beforeEach(function (): void {
         resetPasswordHandler: $this->resetPasswordHandler,
         cleanupExpiredPasswordResetTokensHandler: $this->cleanupExpiredPasswordResetTokensHandler,
         getPasswordResetTokenHandler: $this->getPasswordResetTokenHandler,
+        getAllActiveUsersHandler: $this->getAllActiveUsersHandler,
     );
 });
 

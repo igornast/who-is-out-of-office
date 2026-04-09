@@ -222,6 +222,175 @@ it('skips public holidays when user has no calendarCountryCode', function (): vo
     expect($holidayEvents)->toBeEmpty();
 });
 
+it('shows all leave requests when no person filter is set', function (): void {
+    $currentUserId = $this->user->id->toString();
+    $otherPersonId = Uuid::uuid4()->toString();
+
+    $currentUserLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $currentUserId, 'firstName' => 'John']),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+    $otherPersonLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $otherPersonId, 'firstName' => 'Other']),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')->andReturn([$currentUserLR, $otherPersonLR]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->never();
+
+    $event = new SetDataEvent(new DateTime('2026-04-01'), new DateTime('2026-04-30'), []);
+    $this->subscriber->onCalendarSetData($event);
+
+    $leaveEvents = array_filter($event->getEvents(), fn ($e) => ($e->getOptions()['extendedProps']['type'] ?? null) === 'leave');
+    expect($leaveEvents)->toHaveCount(2);
+});
+
+it('filters leave requests to current user and selected persons', function (): void {
+    $currentUserId = $this->user->id->toString();
+    $selectedId = Uuid::uuid4()->toString();
+    $otherId = Uuid::uuid4()->toString();
+
+    $currentUserLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $currentUserId, 'firstName' => 'Current', 'lastName' => 'Person']),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+    $selectedLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $selectedId, 'firstName' => 'Selected', 'lastName' => 'Person']),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+    $otherLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $otherId, 'firstName' => 'Other', 'lastName' => 'Person']),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')->andReturn([$currentUserLR, $selectedLR, $otherLR]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->never();
+
+    $event = new SetDataEvent(
+        new DateTime('2026-04-01'),
+        new DateTime('2026-04-30'),
+        ['personIds' => [$selectedId]],
+    );
+    $this->subscriber->onCalendarSetData($event);
+
+    $leaveEvents = array_values(array_filter($event->getEvents(), fn ($e) => ($e->getOptions()['extendedProps']['type'] ?? null) === 'leave'));
+    $names = array_map(fn ($e) => $e->getOptions()['extendedProps']['employeeName'], $leaveEvents);
+
+    expect($leaveEvents)->toHaveCount(2)
+        ->and($names)->toContain('Current Person')
+        ->and($names)->toContain('Selected Person');
+});
+
+it('always includes current user absences even when not in person selection', function (): void {
+    $currentUserId = $this->user->id->toString();
+    $selectedId = Uuid::uuid4()->toString();
+
+    $currentUserLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $currentUserId, 'firstName' => 'Current']),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+    $selectedLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $selectedId, 'firstName' => 'Selected']),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')->andReturn([$currentUserLR, $selectedLR]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->never();
+
+    $event = new SetDataEvent(
+        new DateTime('2026-04-01'),
+        new DateTime('2026-04-30'),
+        ['personIds' => [$selectedId]],
+    );
+    $this->subscriber->onCalendarSetData($event);
+
+    $leaveEvents = array_filter($event->getEvents(), fn ($e) => ($e->getOptions()['extendedProps']['type'] ?? null) === 'leave');
+    expect($leaveEvents)->toHaveCount(2);
+});
+
+it('ignores invalid UUIDs in personIds filter', function (): void {
+    $currentUserId = $this->user->id->toString();
+    $validId = Uuid::uuid4()->toString();
+
+    $currentUserLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $currentUserId, 'firstName' => 'Current', 'lastName' => 'Person']),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+    $validLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $validId, 'firstName' => 'Valid', 'lastName' => 'Person']),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')->andReturn([$currentUserLR, $validLR]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->never();
+
+    $event = new SetDataEvent(
+        new DateTime('2026-04-01'),
+        new DateTime('2026-04-30'),
+        ['personIds' => [$validId, 'not-a-uuid', '<script>alert(1)</script>']],
+    );
+    $this->subscriber->onCalendarSetData($event);
+
+    $leaveEvents = array_values(array_filter($event->getEvents(), fn ($e) => ($e->getOptions()['extendedProps']['type'] ?? null) === 'leave'));
+    $names = array_map(fn ($e) => $e->getOptions()['extendedProps']['employeeName'], $leaveEvents);
+
+    expect($leaveEvents)->toHaveCount(2)
+        ->and($names)->toContain('Current Person')
+        ->and($names)->toContain('Valid Person');
+});
+
+it('treats all invalid personIds as no filter (shows everyone)', function (): void {
+    $currentUserId = $this->user->id->toString();
+    $otherId = Uuid::uuid4()->toString();
+
+    $currentUserLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $currentUserId]),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+    $otherLR = LeaveRequestDTOFixture::create([
+        'user' => UserDTOFixture::create(['id' => $otherId]),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')->andReturn([$currentUserLR, $otherLR]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->never();
+
+    $event = new SetDataEvent(
+        new DateTime('2026-04-01'),
+        new DateTime('2026-04-30'),
+        ['personIds' => ['garbage', '123', "'; DROP TABLE--"]],
+    );
+    $this->subscriber->onCalendarSetData($event);
+
+    $leaveEvents = array_filter($event->getEvents(), fn ($e) => ($e->getOptions()['extendedProps']['type'] ?? null) === 'leave');
+    expect($leaveEvents)->toHaveCount(2);
+});
+
+it('ignores invalid UUID in leaveTypeId filter', function (): void {
+    $leaveRequest = LeaveRequestDTOFixture::create([
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')->andReturn([$leaveRequest]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->never();
+
+    $event = new SetDataEvent(
+        new DateTime('2026-04-01'),
+        new DateTime('2026-04-30'),
+        ['leaveTypeId' => 'not-a-valid-uuid'],
+    );
+    $this->subscriber->onCalendarSetData($event);
+
+    $leaveEvents = array_filter($event->getEvents(), fn ($e) => ($e->getOptions()['extendedProps']['type'] ?? null) === 'leave');
+    expect($leaveEvents)->toHaveCount(1);
+});
+
 it('marks non-working days as background events', function (): void {
     $this->user->workingDays = [1, 2, 3, 4];
 

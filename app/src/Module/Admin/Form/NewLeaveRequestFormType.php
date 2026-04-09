@@ -4,25 +4,31 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Form;
 
-use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Module\Admin\DTO\NewLeaveRequestDTO;
 use App\Module\Admin\Form\DataTransformerm\DateRangeToStartEndTransformer;
 use App\Module\Admin\Validator\HasWorkdaysAndBalance;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
+use App\Shared\Facade\LeaveRequestFacadeInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NewLeaveRequestFormType extends AbstractType
 {
+    public function __construct(private readonly LeaveRequestFacadeInterface $leaveRequestFacade)
+    {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('leaveType', EntityType::class, [
-                'class' => LeaveRequestType::class,
+            ->add('leaveType', ChoiceType::class, [
                 'label' => 'What type of absence',
-                'choice_label' => 'name',
+                'choices' => $this->leaveRequestFacade->getAllLeaveTypes(),
+                'choice_label' => fn (LeaveRequestTypeDTO $dto) => $dto->name,
+                'choice_value' => fn (?LeaveRequestTypeDTO $dto) => $dto?->id->toString(),
                 'attr' => [
                     'data-action' => 'live#action',
                     'data-live-action-param' => 'updated',

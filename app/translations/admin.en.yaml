@@ -190,6 +190,12 @@ calendar:
         all_statuses: All Statuses
         status_pending: Pending
         status_approved: Approved
+        colleagues: Colleagues
+        all_colleagues: Everyone
+        selected_count: '%count% selected'
+        search_placeholder: Search colleagues...
+        select_all: Select All
+        clear_all: Clear All
     popover:
         type: Type
         status: Status
@@ -393,6 +399,8 @@ crud:
             title: The leave type details
         action:
             new: Add a new type
+        sort:
+            help: 'Controls display order. Lower numbers appear first. Leave empty for no preference.'
 
     app_settings:
         source_filename: The app settings source file

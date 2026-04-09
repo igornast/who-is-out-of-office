@@ -17,6 +17,7 @@ class LeaveRequestTypeDTO
         public string $borderColor,
         public string $textColor,
         public string $icon,
+        public ?int $sort = null,
     ) {
     }
 
@@ -30,6 +31,7 @@ class LeaveRequestTypeDTO
             borderColor: $leaveRequestType->borderColor,
             textColor: $leaveRequestType->textColor,
             icon: $leaveRequestType->icon,
+            sort: $leaveRequestType->sort,
         );
     }
 }

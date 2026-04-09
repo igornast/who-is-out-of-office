@@ -24,27 +24,83 @@
 {% block main %}
     <div class="cal-filter-bar">
         <div class="cal-filter-group">
-            <label class="cal-filter-label" for="cal-filter-type">
+            <label class="cal-filter-label">
                 <i data-lucide="tag"></i>
                 {{ 'calendar.filter.leave_type'|trans(domain: 'admin') }}
             </label>
-            <select class="cal-filter-select" id="cal-filter-type">
-                <option value="">{{ 'calendar.filter.all_types'|trans(domain: 'admin') }}</option>
-                {% for leaveType in leave_types %}
-                    <option value="{{ leaveType.id }}">{{ leaveType.icon }} {{ leaveType.name }}</option>
-                {% endfor %}
-            </select>
+            <div class="cal-singleselect" id="cal-type-singleselect">
+                <button type="button" class="cal-multiselect-toggle" id="cal-type-toggle">
+                    <span class="cal-multiselect-label" id="cal-type-label">{{ 'calendar.filter.all_types'|trans(domain: 'admin') }}</span>
+                    <i data-lucide="chevron-down" class="cal-multiselect-chevron"></i>
+                </button>
+                <div class="cal-multiselect-dropdown" id="cal-type-dropdown">
+                    <div class="cal-multiselect-options" id="cal-type-options">
+                        <label class="cal-multiselect-option cal-singleselect-selected" data-value="">
+                            <span class="cal-multiselect-option-text">{{ 'calendar.filter.all_types'|trans(domain: 'admin') }}</span>
+                        </label>
+                        {% for leaveType in leave_types %}
+                            <label class="cal-multiselect-option" data-value="{{ leaveType.id }}">
+                                <span class="cal-multiselect-option-text">{{ leaveType.icon }} {{ leaveType.name }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="cal-filter-group">
-            <label class="cal-filter-label" for="cal-filter-status">
+            <label class="cal-filter-label">
                 <i data-lucide="filter"></i>
                 {{ 'calendar.filter.status'|trans(domain: 'admin') }}
             </label>
-            <select class="cal-filter-select" id="cal-filter-status">
-                <option value="">{{ 'calendar.filter.all_statuses'|trans(domain: 'admin') }}</option>
-                <option value="pending">{{ 'calendar.filter.status_pending'|trans(domain: 'admin') }}</option>
-                <option value="approved">{{ 'calendar.filter.status_approved'|trans(domain: 'admin') }}</option>
-            </select>
+            <div class="cal-singleselect" id="cal-status-singleselect">
+                <button type="button" class="cal-multiselect-toggle" id="cal-status-toggle">
+                    <span class="cal-multiselect-label" id="cal-status-label">{{ 'calendar.filter.all_statuses'|trans(domain: 'admin') }}</span>
+                    <i data-lucide="chevron-down" class="cal-multiselect-chevron"></i>
+                </button>
+                <div class="cal-multiselect-dropdown" id="cal-status-dropdown">
+                    <div class="cal-multiselect-options" id="cal-status-options">
+                        <label class="cal-multiselect-option cal-singleselect-selected" data-value="">
+                            <span class="cal-multiselect-option-text">{{ 'calendar.filter.all_statuses'|trans(domain: 'admin') }}</span>
+                        </label>
+                        <label class="cal-multiselect-option" data-value="pending">
+                            <span class="cal-multiselect-option-text">{{ 'calendar.filter.status_pending'|trans(domain: 'admin') }}</span>
+                        </label>
+                        <label class="cal-multiselect-option" data-value="approved">
+                            <span class="cal-multiselect-option-text">{{ 'calendar.filter.status_approved'|trans(domain: 'admin') }}</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cal-filter-group cal-filter-group-persons">
+            <label class="cal-filter-label">
+                <i data-lucide="users"></i>
+                {{ 'calendar.filter.colleagues'|trans(domain: 'admin') }}
+            </label>
+            <div class="cal-multiselect" id="cal-person-multiselect">
+                <button type="button" class="cal-multiselect-toggle" id="cal-person-toggle">
+                    <span class="cal-multiselect-label" id="cal-person-label">{{ 'calendar.filter.all_colleagues'|trans(domain: 'admin') }}</span>
+                    <i data-lucide="chevron-down" class="cal-multiselect-chevron"></i>
+                </button>
+                <div class="cal-multiselect-dropdown" id="cal-person-dropdown">
+                    <div class="cal-multiselect-search">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="cal-person-search" placeholder="{{ 'calendar.filter.search_placeholder'|trans(domain: 'admin') }}" autocomplete="off">
+                    </div>
+                    <div class="cal-multiselect-actions">
+                        <button type="button" class="cal-multiselect-action" id="cal-person-select-all">{{ 'calendar.filter.select_all'|trans(domain: 'admin') }}</button>
+                        <button type="button" class="cal-multiselect-action" id="cal-person-clear-all">{{ 'calendar.filter.clear_all'|trans(domain: 'admin') }}</button>
+                    </div>
+                    <div class="cal-multiselect-options" id="cal-person-options">
+                        {% for person in colleagues %}
+                            <label class="cal-multiselect-option" data-name="{{ person.firstName|lower }} {{ person.lastName|lower }}">
+                                <input type="checkbox" value="{{ person.id }}" class="cal-person-checkbox">
+                                <span class="cal-multiselect-option-text">{{ person.firstName }} {{ person.lastName }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -116,13 +172,24 @@
             viewDetails: '{{ "calendar.popover.view_details"|trans(domain: "admin") }}',
         };
 
-        var filterTypeEl = document.getElementById('cal-filter-type');
-        var filterStatusEl = document.getElementById('cal-filter-status');
+        var selectedTypeValue = '';
+        var selectedStatusValue = '';
 
         function getFilters() {
+            var personCheckboxes = document.querySelectorAll('.cal-person-checkbox:checked');
+            var allCheckboxes = document.querySelectorAll('.cal-person-checkbox');
+            var personIds = [];
+
+            if (personCheckboxes.length > 0 && personCheckboxes.length < allCheckboxes.length) {
+                personCheckboxes.forEach(function(cb) {
+                    personIds.push(cb.value);
+                });
+            }
+
             return {
-                leaveTypeId: filterTypeEl.value,
-                status: filterStatusEl.value,
+                leaveTypeId: selectedTypeValue,
+                status: selectedStatusValue,
+                personIds: personIds,
             };
         }
 
@@ -179,11 +246,128 @@
 
         calendar.render();
 
-        filterTypeEl.addEventListener('change', function() {
+        // Single-select dropdown logic (Leave Type & Status)
+        function initSingleSelect(containerId, toggleId, dropdownId, optionsId, labelId, onSelect) {
+            var container = document.getElementById(containerId);
+            var toggle = document.getElementById(toggleId);
+            var dropdown = document.getElementById(dropdownId);
+            var optionsEl = document.getElementById(optionsId);
+            var label = document.getElementById(labelId);
+
+            toggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeAllDropdowns();
+                dropdown.classList.toggle('open');
+                container.classList.toggle('open');
+            });
+
+            optionsEl.addEventListener('click', function(e) {
+                var option = e.target.closest('.cal-multiselect-option');
+                if (!option) return;
+
+                optionsEl.querySelectorAll('.cal-multiselect-option').forEach(function(opt) {
+                    opt.classList.remove('cal-singleselect-selected');
+                });
+                option.classList.add('cal-singleselect-selected');
+
+                label.textContent = option.querySelector('.cal-multiselect-option-text').textContent;
+                onSelect(option.getAttribute('data-value'));
+
+                dropdown.classList.remove('open');
+                container.classList.remove('open');
+                calendar.refetchEvents();
+            });
+
+            return { container: container, dropdown: dropdown };
+        }
+
+        var typeSelect = initSingleSelect('cal-type-singleselect', 'cal-type-toggle', 'cal-type-dropdown', 'cal-type-options', 'cal-type-label', function(val) {
+            selectedTypeValue = val;
+        });
+
+        var statusSelect = initSingleSelect('cal-status-singleselect', 'cal-status-toggle', 'cal-status-dropdown', 'cal-status-options', 'cal-status-label', function(val) {
+            selectedStatusValue = val;
+        });
+
+        var personMultiselect = document.getElementById('cal-person-multiselect');
+        var personToggle = document.getElementById('cal-person-toggle');
+        var personDropdown = document.getElementById('cal-person-dropdown');
+        var personSearch = document.getElementById('cal-person-search');
+        var personLabel = document.getElementById('cal-person-label');
+        var personSelectAll = document.getElementById('cal-person-select-all');
+        var personClearAll = document.getElementById('cal-person-clear-all');
+        var personOptions = document.getElementById('cal-person-options');
+        var LABEL_ALL = '{{ "calendar.filter.all_colleagues"|trans(domain: "admin") }}';
+        var LABEL_SELECTED = '{{ "calendar.filter.selected_count"|trans({}, "admin") }}';
+
+        function closeAllDropdowns() {
+            document.querySelectorAll('.cal-multiselect-dropdown').forEach(function(d) { d.classList.remove('open'); });
+            document.querySelectorAll('.cal-singleselect, .cal-multiselect').forEach(function(c) { c.classList.remove('open'); });
+        }
+
+        function updatePersonLabel() {
+            var checked = document.querySelectorAll('.cal-person-checkbox:checked');
+            var all = document.querySelectorAll('.cal-person-checkbox');
+
+            if (checked.length === 0 || checked.length === all.length) {
+                personLabel.textContent = LABEL_ALL;
+            } else {
+                personLabel.textContent = LABEL_SELECTED.replace('%count%', checked.length);
+            }
+        }
+
+        personToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var isOpen = personDropdown.classList.contains('open');
+            closeAllDropdowns();
+            if (!isOpen) {
+                personDropdown.classList.add('open');
+                personMultiselect.classList.add('open');
+                personSearch.value = '';
+                filterPersonOptions('');
+                personSearch.focus();
+            }
+        });
+
+        personSearch.addEventListener('input', function() {
+            filterPersonOptions(this.value.toLowerCase());
+        });
+
+        function filterPersonOptions(query) {
+            var options = personOptions.querySelectorAll('.cal-multiselect-option');
+            options.forEach(function(opt) {
+                var name = opt.getAttribute('data-name');
+                opt.style.display = name.indexOf(query) !== -1 ? '' : 'none';
+            });
+        }
+
+        personSelectAll.addEventListener('click', function() {
+            document.querySelectorAll('.cal-person-checkbox').forEach(function(cb) {
+                cb.checked = true;
+            });
+            updatePersonLabel();
             calendar.refetchEvents();
         });
-        filterStatusEl.addEventListener('change', function() {
+
+        personClearAll.addEventListener('click', function() {
+            document.querySelectorAll('.cal-person-checkbox').forEach(function(cb) {
+                cb.checked = false;
+            });
+            updatePersonLabel();
             calendar.refetchEvents();
+        });
+
+        personOptions.addEventListener('change', function(e) {
+            if (e.target.classList.contains('cal-person-checkbox')) {
+                updatePersonLabel();
+                calendar.refetchEvents();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.cal-singleselect, .cal-multiselect')) {
+                closeAllDropdowns();
+            }
         });
 
         var eventPopover = document.getElementById('cal-event-popover');
@@ -342,6 +526,7 @@
           if (e.key === 'Escape') {
             subscribePopover.classList.remove('active');
             closeEventPopover();
+            closeAllDropdowns();
           }
         });
 
