@@ -245,6 +245,7 @@ App\Infrastructure\Doctrine\Entity\LeaveRequestType:
             borderColor: '#28a745'
             textColor: '#000000'
             icon: '🌴'
+            sort: 1
     leave_request_type_2:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -254,6 +255,7 @@ App\Infrastructure\Doctrine\Entity\LeaveRequestType:
             borderColor: '#db9e9e'
             textColor: '#4527a0'
             icon: '🤒'
+            sort: 2
     leave_request_type_3:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -263,6 +265,7 @@ App\Infrastructure\Doctrine\Entity\LeaveRequestType:
             borderColor: '#1976d2'
             textColor: '#0d47a1'
             icon: '📚'
+            sort: 3
     leave_request_type_4:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -272,6 +275,7 @@ App\Infrastructure\Doctrine\Entity\LeaveRequestType:
             borderColor: '#ef6c00'
             textColor: '#e65100'
             icon: '👶'
+            sort: 4
 
 App\Infrastructure\Doctrine\Entity\LeaveRequest:
     leave_request_1:

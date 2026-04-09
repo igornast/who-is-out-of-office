@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ColorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Ramsey\Uuid\Uuid;
 
@@ -34,7 +35,8 @@ class LeaveRequestTypeCrudController extends AppAbstractCrudController
             ->setPageTitle(Crud::PAGE_EDIT, 'crud.absence_request_type.edit.title')
             ->setPageTitle(Crud::PAGE_NEW, 'crud.absence_request_type.create.title')
             ->setPageTitle(Crud::PAGE_DETAIL, 'crud.absence_request_type.detail.title')
-            ->setEntityPermission(RoleEnum::Admin->value);
+            ->setEntityPermission(RoleEnum::Admin->value)
+            ->setDefaultSort(['sort' => 'ASC', 'name' => 'ASC']);
     }
 
     public function configureActions(Actions $actions): Actions
@@ -48,6 +50,8 @@ class LeaveRequestTypeCrudController extends AppAbstractCrudController
     {
         yield TextField::new('name');
         yield TextField::new('icon');
+        yield IntegerField::new('sort')
+            ->setHelp('crud.absence_request_type.sort.help');
         yield BooleanField::new('isAffectingBalance')->setDisabled(Action::INDEX === $pageName);
         yield ColorField::new('backgroundColor');
         yield ColorField::new('borderColor');

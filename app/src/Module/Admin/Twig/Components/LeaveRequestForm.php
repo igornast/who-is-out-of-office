@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Twig\Components;
 
-use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\DTO\NewLeaveRequestDTO;
 use App\Module\Admin\Form\NewLeaveRequestFormType;
+use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
+use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
@@ -31,16 +33,55 @@ class LeaveRequestForm extends AbstractController
     public bool $isSubmitDisabled = true;
 
     #[LiveProp(writable: true)]
-    public ?LeaveRequestType $leaveType = null;
+    public ?string $leaveType = null;
 
     public function __construct(
         private readonly TranslatorInterface $translator,
+        private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
     ) {
+    }
+
+    /**
+     * @return array<int, array{start: string, end: string, type: string, color: string, status: string}>
+     */
+    public function getExistingLeaves(): array
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $leaveRequests = $this->leaveRequestFacade->getLeaveRequestsForUser(
+            $user->id->toString(),
+            [LeaveRequestStatusEnum::Pending, LeaveRequestStatusEnum::Approved],
+        );
+
+        return array_map(
+            fn (LeaveRequestDTO $lr) => [
+                'start' => $lr->startDate->format('Y-m-d'),
+                'end' => $lr->endDate->format('Y-m-d'),
+                'type' => $lr->leaveType->name,
+                'color' => $lr->leaveType->borderColor,
+                'status' => $lr->status->value,
+            ],
+            $leaveRequests,
+        );
     }
 
     protected function instantiateForm(): FormInterface
     {
-        return $this->createForm(NewLeaveRequestFormType::class, null);
+        $dto = new NewLeaveRequestDTO();
+        if (null !== $this->leaveType) {
+            $dto->leaveType = $this->leaveRequestFacade->getLeaveTypeById($this->leaveType);
+
+            return $this->createForm(NewLeaveRequestFormType::class, $dto);
+        }
+
+        $allTypes = $this->leaveRequestFacade->getAllLeaveTypes();
+        if (!empty($allTypes)) {
+            $dto->leaveType = array_first($allTypes);
+            $this->leaveType = array_first($allTypes)->id->toString();
+        }
+
+        return $this->createForm(NewLeaveRequestFormType::class, $dto);
     }
 
     #[LiveAction]
@@ -63,7 +104,8 @@ class LeaveRequestForm extends AbstractController
             return;
         }
 
-        if (false === $this->leaveType->isAffectingBalance) {
+        $leaveTypeDTO = $this->leaveRequestFacade->getLeaveTypeById($this->leaveType);
+        if (null === $leaveTypeDTO || false === $leaveTypeDTO->isAffectingBalance) {
             $this->isSubmitDisabled = false;
 
             return;

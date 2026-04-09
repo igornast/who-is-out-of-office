@@ -195,3 +195,79 @@ html.dark .flatpickr-day.nextMonthDay.inRange {
     background-color: var(--primary-dark);
     box-shadow: -5px 0 0 var(--primary-dark), 5px 0 0 var(--primary-dark);
 }
+
+/* existing leave request indicators */
+.flatpickr-inline-calendar .flatpickr-day {
+    position: relative;
+    overflow: visible;
+}
+
+.flatpickr-leave-bar {
+    position: absolute;
+    height: 6px;
+    pointer-events: auto;
+    filter: saturate(3) brightness(0.55);
+}
+
+.flatpickr-leave-bar--start {
+    left: 0;
+    right: -1px;
+    border-radius: 3px 0 0 3px;
+}
+
+.flatpickr-leave-bar--middle {
+    left: -1px;
+    right: -1px;
+}
+
+.flatpickr-leave-bar--end {
+    left: -1px;
+    right: 0;
+    border-radius: 0 3px 3px 0;
+}
+
+.flatpickr-leave-bar--single {
+    left: 0;
+    right: 0;
+    border-radius: 3px;
+}
+
+.flatpickr-leave-bar--pending {
+    opacity: 0.5;
+}
+
+/* leave tooltip */
+.flatpickr-leave-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background-color: var(--app-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 0.4rem 0.6rem;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 150ms ease;
+    white-space: nowrap;
+}
+
+.flatpickr-leave-tooltip--visible {
+    opacity: 1;
+}
+
+.flatpickr-leave-tooltip__row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.15rem 0;
+}
+
+.flatpickr-leave-tooltip__swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    filter: saturate(2) brightness(0.75);
+}

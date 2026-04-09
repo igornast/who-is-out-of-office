@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\DTO\NewLeaveRequestDTO;
 use App\Module\Admin\Validator\HasWorkdaysAndBalance;
 use App\Module\Admin\Validator\HasWorkdaysAndBalanceValidator;
+use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
+use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestTypeDTOFixture;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
@@ -31,25 +32,15 @@ beforeEach(function (): void {
     );
     $this->security->allows('getUser')->andReturn($this->user);
 
-    $this->balanceLeaveType = new LeaveRequestType(
-        id: Uuid::uuid4(),
-        isAffectingBalance: true,
-        name: 'Vacation',
-        backgroundColor: '#000',
-        borderColor: '#000',
-        textColor: '#fff',
-        icon: 'icon',
-    );
+    $this->balanceLeaveType = LeaveRequestTypeDTOFixture::create([
+        'isAffectingBalance' => true,
+        'name' => 'Vacation',
+    ]);
 
-    $this->nonBalanceLeaveType = new LeaveRequestType(
-        id: Uuid::uuid4(),
-        isAffectingBalance: false,
-        name: 'Remote',
-        backgroundColor: '#000',
-        borderColor: '#000',
-        textColor: '#fff',
-        icon: 'icon',
-    );
+    $this->nonBalanceLeaveType = LeaveRequestTypeDTOFixture::create([
+        'isAffectingBalance' => false,
+        'name' => 'Remote',
+    ]);
 
     $this->constraint = new HasWorkdaysAndBalance();
     $this->context = mock(ExecutionContextInterface::class);
@@ -62,7 +53,7 @@ beforeEach(function (): void {
     $this->validator->initialize($this->context);
 });
 
-function setupFormContext(object $testCase, LeaveRequestType $leaveType): void
+function setupFormContext(object $testCase, LeaveRequestTypeDTO $leaveType): void
 {
     $dto = new NewLeaveRequestDTO(leaveType: $leaveType);
     $parentForm = mock(FormInterface::class);
@@ -71,6 +62,17 @@ function setupFormContext(object $testCase, LeaveRequestType $leaveType): void
     $form->allows('getParent')->andReturn($parentForm);
     $testCase->context->allows('getObject')->andReturn($form);
 }
+
+it('throws UnexpectedTypeException when leaveType is not a LeaveRequestTypeDTO', function (): void {
+    $dto = new NewLeaveRequestDTO(leaveType: null);
+    $parentForm = mock(FormInterface::class);
+    $parentForm->allows('getData')->andReturn($dto);
+    $form = mock(FormInterface::class);
+    $form->allows('getParent')->andReturn($parentForm);
+    $this->context->allows('getObject')->andReturn($form);
+
+    $this->validator->validate(['start' => new DateTimeImmutable(), 'end' => new DateTimeImmutable()], $this->constraint);
+})->throws(Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
 
 it('adds violation when start date is less than minNoticeDays from today', function (): void {
     $this->appSettingsFacade->allows('minNoticeDays')->andReturn(3);

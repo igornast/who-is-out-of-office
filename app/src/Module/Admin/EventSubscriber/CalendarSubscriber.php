@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use CalendarBundle\Entity\Event;
+use Ramsey\Uuid\Uuid;
 
 class CalendarSubscriber implements EventSubscriberInterface
 {
@@ -49,31 +50,43 @@ class CalendarSubscriber implements EventSubscriberInterface
 
         $this->markNonWorkingDaysForUser($event, $currentUserDTO);
         $this->addPublicHolidayEvents($event, $currentUserDTO);
-        $this->addLeaveRequestEvents($event, $start, $end, $filters);
+        $this->addLeaveRequestEvents($event, $start, $end, $filters, $currentUserDTO->id);
         $this->addBirthdayEvents($event, $start);
     }
 
     /**
      * @param mixed[] $rawFilters
      *
-     * @return array{leaveTypeId: ?string, status: ?string}
+     * @return array{leaveTypeId: ?string, status: ?string, personIds: ?string[]}
      */
     private function parseFilters(array $rawFilters): array
     {
+        $personIds = null;
+        if (isset($rawFilters['personIds']) && is_array($rawFilters['personIds']) && [] !== $rawFilters['personIds']) {
+            $personIds = array_filter(
+                array_map('strval', $rawFilters['personIds']),
+                static fn (string $id): bool => Uuid::isValid($id),
+            );
+            $personIds = [] === $personIds ? null : array_values($personIds);
+        }
+
+        $leaveTypeId = isset($rawFilters['leaveTypeId']) && '' !== $rawFilters['leaveTypeId']
+            ? (string) $rawFilters['leaveTypeId']
+            : null;
+
         return [
-            'leaveTypeId' => isset($rawFilters['leaveTypeId']) && '' !== $rawFilters['leaveTypeId']
-                ? (string) $rawFilters['leaveTypeId']
-                : null,
+            'leaveTypeId' => null !== $leaveTypeId && Uuid::isValid($leaveTypeId) ? $leaveTypeId : null,
             'status' => isset($rawFilters['status']) && '' !== $rawFilters['status']
                 ? (string) $rawFilters['status']
                 : null,
+            'personIds' => $personIds,
         ];
     }
 
     /**
-     * @param array{leaveTypeId: ?string, status: ?string} $filters
+     * @param array{leaveTypeId: ?string, status: ?string, personIds: ?string[]} $filters
      */
-    private function addLeaveRequestEvents(SetDataEvent $event, \DateTimeImmutable $start, \DateTimeImmutable $end, array $filters): void
+    private function addLeaveRequestEvents(SetDataEvent $event, \DateTimeImmutable $start, \DateTimeImmutable $end, array $filters, string $currentUserId): void
     {
         $statuses = match ($filters['status']) {
             'pending' => [LeaveRequestStatusEnum::Pending],
@@ -85,6 +98,12 @@ class CalendarSubscriber implements EventSubscriberInterface
 
         foreach ($leaveRequestDTOs as $dto) {
             if (null !== $filters['leaveTypeId'] && $dto->leaveType->id->toString() !== $filters['leaveTypeId']) {
+                continue;
+            }
+            if (null !== $filters['personIds']
+                && $dto->user->id !== $currentUserId
+                && !in_array($dto->user->id, $filters['personIds'], true)
+            ) {
                 continue;
             }
             $leaveTypeDTO = $dto->leaveType;

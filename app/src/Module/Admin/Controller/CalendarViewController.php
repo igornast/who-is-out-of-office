@@ -7,6 +7,7 @@ namespace App\Module\Admin\Controller;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
+use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\Ical\IcalSubscriptionUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,7 @@ class CalendarViewController extends AbstractController
     public function __construct(
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
         private readonly IcalSubscriptionUrlGenerator $icalSubscriptionUrlGenerator,
+        private readonly UserFacadeInterface $userFacade,
     ) {
     }
 
@@ -29,6 +31,8 @@ class CalendarViewController extends AbstractController
         return $this->render('@AppAdmin/calendar_view.html.twig', [
             'calendar_subscription_url' => $this->icalSubscriptionUrlGenerator->generateForUser(UserDTO::fromEntity($user)),
             'leave_types' => $this->leaveRequestFacade->getAllLeaveTypes(),
+            'colleagues' => $this->userFacade->getAllActiveUsers(),
+            'current_user_id' => $user->id->toString(),
         ]);
     }
 }

@@ -32,7 +32,12 @@ class LeaveRequestTypeRepository extends ServiceEntityRepository implements Leav
      */
     public function findAllActive(): array
     {
-        $types = $this->findAll();
+        $types = $this->createQueryBuilder('t')
+            ->addSelect('CASE WHEN t.sort IS NULL THEN 2147483647 ELSE t.sort END AS HIDDEN sortKey')
+            ->orderBy('sortKey', 'ASC')
+            ->addOrderBy('t.name', 'ASC')
+            ->getQuery()
+            ->getResult();
 
         return array_map(fn (LeaveRequestType $type) => LeaveRequestTypeDTO::fromEntity($type), $types);
     }

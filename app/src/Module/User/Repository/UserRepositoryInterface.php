@@ -13,6 +13,11 @@ interface UserRepositoryInterface
      */
     public function findAll(): array;
 
+    /**
+     * @return UserDTO[]
+     */
+    public function findAllActive(): array;
+
     public function findOneById(string $id): ?UserDTO;
 
     public function findOneByEmail(string $email): ?UserDTO;

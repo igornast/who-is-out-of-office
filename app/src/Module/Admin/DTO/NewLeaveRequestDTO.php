@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\DTO;
 
-use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
+use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class NewLeaveRequestDTO
@@ -15,7 +15,7 @@ class NewLeaveRequestDTO
         #[Assert\NotBlank]
         public ?\DateTimeImmutable $endDate = null,
         #[Assert\NotBlank]
-        public ?LeaveRequestType $leaveType = null,
+        public ?LeaveRequestTypeDTO $leaveType = null,
     ) {
     }
 

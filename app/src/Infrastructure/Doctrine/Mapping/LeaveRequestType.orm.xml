@@ -12,6 +12,7 @@
         <field name="borderColor" column="border_color" length="10"/>
         <field name="textColor" column="text_color" length="10"/>
         <field name="icon" column="icon" length="10"/>
+        <field name="sort" column="sort" type="integer" nullable="true"/>
 
         <field name="createdAt" column="created_at" type="datetime_immutable"/>
         <field name="updatedAt" column="updated_at" type="datetime_immutable"/>

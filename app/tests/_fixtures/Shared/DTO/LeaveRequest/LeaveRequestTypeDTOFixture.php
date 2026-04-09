@@ -28,6 +28,7 @@ class LeaveRequestTypeDTOFixture implements FixtureInterface
             'borderColor' => $faker->hexColor(),
             'textColor' => $faker->hexColor(),
             'icon' => '',
+            'sort' => $faker->optional()->numberBetween(1, 100),
         ];
     }
 }

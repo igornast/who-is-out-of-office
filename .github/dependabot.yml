@@ -7,7 +7,7 @@ updates:
           interval: "monthly"
       versioning-strategy: increase-if-necessary
       assignees:
-          - igorfrbit
+          - igornast
       commit-message:
           prefix: "deps(dependabot): "
       groups:
