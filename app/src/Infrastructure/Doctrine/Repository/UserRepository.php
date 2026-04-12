@@ -288,6 +288,27 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $em->flush();
     }
 
+    public function updateSlackStatusSyncEnabled(string $userId, bool $enabled): bool
+    {
+        $user = $this->find($userId);
+
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        if (null === $user->slackIntegration) {
+            return false;
+        }
+
+        $user->slackIntegration->slackStatusSyncEnabled = $enabled;
+
+        $em = $this->getEntityManager();
+        $em->persist($user->slackIntegration);
+        $em->flush();
+
+        return true;
+    }
+
     public function findUserBySlackMemberId(string $slackMemberId): ?UserDTO
     {
         $em = $this->getEntityManager();

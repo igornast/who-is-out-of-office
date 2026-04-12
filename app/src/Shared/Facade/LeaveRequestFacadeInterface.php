@@ -115,4 +115,16 @@ interface LeaveRequestFacadeInterface
      * @return LeaveRequestTypeDTO[]
      */
     public function getAllLeaveTypes(): array;
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findApprovedActiveNotSynced(): array;
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findSyncedNeedingClear(): array;
+
+    public function markExternalStatusSynced(string $leaveRequestId, bool $synced): void;
 }

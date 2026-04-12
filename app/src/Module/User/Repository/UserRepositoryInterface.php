@@ -55,4 +55,6 @@ interface UserRepositoryInterface
     public function updateSlackMemberId(string $userId, string $slackMemberId): void;
 
     public function removeSlackIntegration(string $userId): void;
+
+    public function updateSlackStatusSyncEnabled(string $userId, bool $enabled): bool;
 }

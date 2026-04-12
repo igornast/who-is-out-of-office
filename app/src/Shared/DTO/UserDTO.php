@@ -36,6 +36,7 @@ class UserDTO
         public string $themePreference = 'auto',
         public string $palettePreference = 'teal',
         public ?string $icalHashSalt = null,
+        public bool $slackStatusSyncEnabled = true,
     ) {
     }
 
@@ -71,6 +72,7 @@ class UserDTO
             themePreference: $user->themePreference,
             palettePreference: $user->palettePreference,
             icalHashSalt: $user->icalHashSalt,
+            slackStatusSyncEnabled: $user->slackIntegration?->slackStatusSyncEnabled ?? true,
         );
     }
 
@@ -98,6 +100,7 @@ class UserDTO
             palettePreference: $data['palette_preference'] ?? 'teal',
             icalHashSalt: $data['ical_hash_salt'] ?? null,
             subdivisionCode: $data['subdivision_code'] ?? null,
+            slackStatusSyncEnabled: (bool) ($data['slack_status_sync_enabled'] ?? true),
         );
     }
 }

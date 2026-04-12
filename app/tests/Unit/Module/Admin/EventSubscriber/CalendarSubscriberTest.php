@@ -391,6 +391,149 @@ it('ignores invalid UUID in leaveTypeId filter', function (): void {
     expect($leaveEvents)->toHaveCount(1);
 });
 
+it('filters by status pending when status filter is set', function (): void {
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')
+        ->once()
+        ->withArgs(fn ($start, $end, $statuses) => $statuses === [LeaveRequestStatusEnum::Pending])
+        ->andReturn([]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->never();
+
+    $event = new SetDataEvent(new DateTime('2026-04-01'), new DateTime('2026-04-30'), ['status' => 'pending']);
+    $this->subscriber->onCalendarSetData($event);
+});
+
+it('filters by status approved when status filter is set', function (): void {
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')
+        ->once()
+        ->withArgs(fn ($start, $end, $statuses) => $statuses === [LeaveRequestStatusEnum::Approved])
+        ->andReturn([]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->never();
+
+    $event = new SetDataEvent(new DateTime('2026-04-01'), new DateTime('2026-04-30'), ['status' => 'approved']);
+    $this->subscriber->onCalendarSetData($event);
+});
+
+it('filters out leave requests not matching leaveTypeId filter', function (): void {
+    $matchingTypeId = Uuid::uuid4();
+    $otherTypeId = Uuid::uuid4();
+
+    $matchingLR = LeaveRequestDTOFixture::create([
+        'leaveType' => LeaveRequestTypeDTOFixture::create(['id' => $matchingTypeId]),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+    $otherLR = LeaveRequestDTOFixture::create([
+        'leaveType' => LeaveRequestTypeDTOFixture::create(['id' => $otherTypeId]),
+        'status' => LeaveRequestStatusEnum::Approved,
+    ]);
+
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')->andReturn([$matchingLR, $otherLR]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->never();
+
+    $event = new SetDataEvent(
+        new DateTime('2026-04-01'),
+        new DateTime('2026-04-30'),
+        ['leaveTypeId' => $matchingTypeId->toString()],
+    );
+    $this->subscriber->onCalendarSetData($event);
+
+    $leaveEvents = array_filter($event->getEvents(), fn ($e) => ($e->getOptions()['extendedProps']['type'] ?? null) === 'leave');
+    expect($leaveEvents)->toHaveCount(1);
+});
+
+it('translates county codes in public holiday events', function (): void {
+    $this->user->holidayCalendar = new App\Infrastructure\Doctrine\Entity\HolidayCalendar(
+        id: Uuid::uuid4(),
+        countryCode: 'DE',
+        countryName: 'Germany',
+    );
+
+    $holiday = new PublicHolidayDTO(
+        id: Uuid::uuid4()->toString(),
+        description: 'Fronleichnam',
+        countryCode: 'DE',
+        date: new DateTimeImmutable('2026-06-04'),
+        isGlobal: false,
+        counties: ['DE-BY', 'DE-NW'],
+    );
+
+    $calendar = new PublicHolidayCalendarDTO(
+        id: Uuid::uuid4(),
+        countryCode: 'DE',
+        countryName: 'Germany',
+        holidays: [$holiday],
+    );
+
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')->andReturn([]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->with('DE')->andReturn($calendar);
+
+    $translator = mock(TranslatorInterface::class);
+    $translator->allows('trans')->andReturnUsing(fn (string $key) => match ($key) {
+        'subdivision.DE-BY' => 'Bavaria',
+        'subdivision.DE-NW' => 'North Rhine-Westphalia',
+        default => $key,
+    });
+
+    $this->subscriber = new CalendarSubscriber(
+        leaveRequestFacade: $this->leaveRequestFacade,
+        userFacade: $this->userFacade,
+        holidayFacade: $this->holidayFacade,
+        urlGenerator: $this->urlGenerator,
+        security: $this->security,
+        translator: $translator,
+    );
+
+    $event = createSetDataEvent(new DateTime('2026-06-01'), new DateTime('2026-06-30'));
+    $this->subscriber->onCalendarSetData($event);
+
+    $holidayEvents = array_filter($event->getEvents(), fn ($e) => ($e->getOptions()['extendedProps']['type'] ?? null) === 'holiday');
+    $holidayEvent = array_values($holidayEvents)[0];
+
+    expect($holidayEvent->getOptions()['extendedProps']['counties'])->toBe(['Bavaria', 'North Rhine-Westphalia'])
+        ->and($holidayEvent->getOptions()['extendedProps']['isGlobal'])->toBeFalse();
+});
+
+it('returns raw county code when translation key matches', function (): void {
+    $this->user->holidayCalendar = new App\Infrastructure\Doctrine\Entity\HolidayCalendar(
+        id: Uuid::uuid4(),
+        countryCode: 'DE',
+        countryName: 'Germany',
+    );
+
+    $holiday = new PublicHolidayDTO(
+        id: Uuid::uuid4()->toString(),
+        description: 'Some Holiday',
+        countryCode: 'DE',
+        date: new DateTimeImmutable('2026-06-04'),
+        isGlobal: false,
+        counties: ['DE-XX'],
+    );
+
+    $calendar = new PublicHolidayCalendarDTO(
+        id: Uuid::uuid4(),
+        countryCode: 'DE',
+        countryName: 'Germany',
+        holidays: [$holiday],
+    );
+
+    $this->leaveRequestFacade->expects('getLeaveRequestsForDates')->andReturn([]);
+    $this->userFacade->expects('getUsersWithBirthdaysForDates')->andReturn([]);
+    $this->holidayFacade->expects('getHolidayCalendarForCountry')->with('DE')->andReturn($calendar);
+
+    $this->translator->allows('trans')->with('subdivision.DE-XX', [], 'admin')->andReturn('subdivision.DE-XX');
+
+    $event = createSetDataEvent(new DateTime('2026-06-01'), new DateTime('2026-06-30'));
+    $this->subscriber->onCalendarSetData($event);
+
+    $holidayEvents = array_filter($event->getEvents(), fn ($e) => ($e->getOptions()['extendedProps']['type'] ?? null) === 'holiday');
+    $holidayEvent = array_values($holidayEvents)[0];
+
+    expect($holidayEvent->getOptions()['extendedProps']['counties'])->toBe(['DE-XX']);
+});
+
 it('marks non-working days as background events', function (): void {
     $this->user->workingDays = [1, 2, 3, 4];
 

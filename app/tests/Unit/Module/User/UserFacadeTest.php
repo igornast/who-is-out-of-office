@@ -14,6 +14,7 @@ use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\ResetPasswordCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
+use App\Module\User\UseCase\Command\UpdateSlackStatusSyncPreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
@@ -55,6 +56,7 @@ beforeEach(function (): void {
     $this->cleanupExpiredPasswordResetTokensHandler = mock(CleanupExpiredPasswordResetTokensCommandHandler::class);
     $this->getPasswordResetTokenHandler = mock(GetPasswordResetTokenQueryHandler::class);
     $this->getAllActiveUsersHandler = mock(GetAllActiveUsersQueryHandler::class);
+    $this->updateSlackStatusSyncPreferenceHandler = mock(UpdateSlackStatusSyncPreferenceCommandHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -79,6 +81,7 @@ beforeEach(function (): void {
         cleanupExpiredPasswordResetTokensHandler: $this->cleanupExpiredPasswordResetTokensHandler,
         getPasswordResetTokenHandler: $this->getPasswordResetTokenHandler,
         getAllActiveUsersHandler: $this->getAllActiveUsersHandler,
+        updateSlackStatusSyncPreferenceHandler: $this->updateSlackStatusSyncPreferenceHandler,
     );
 });
 
@@ -330,4 +333,16 @@ it('delegates getPasswordResetToken to handler', function () {
     $result = $this->facade->getPasswordResetToken('token-xyz');
 
     expect($result)->toBeNull();
+});
+
+it('delegates updateSlackStatusSyncPreference to handler', function () {
+    $this->updateSlackStatusSyncPreferenceHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', true)
+        ->andReturn(true);
+
+    $result = $this->facade->updateSlackStatusSyncPreference('user-1', true);
+
+    expect($result)->toBeTrue();
 });

@@ -50,6 +50,10 @@ class LeaveRequestTypeCrudController extends AppAbstractCrudController
     {
         yield TextField::new('name');
         yield TextField::new('icon');
+        yield TextField::new('slackStatusEmoji')
+            ->setLabel('crud.absence_request_type.slack_status_emoji')
+            ->setHelp('crud.absence_request_type.slack_status_emoji.help')
+            ->hideOnIndex();
         yield IntegerField::new('sort')
             ->setHelp('crud.absence_request_type.sort.help');
         yield BooleanField::new('isAffectingBalance')->setDisabled(Action::INDEX === $pageName);

@@ -92,6 +92,21 @@ final class SettingsFacade implements AppSettingsFacadeInterface
         return $value;
     }
 
+    public function isSlackStatusSyncEnabled(): bool
+    {
+        $value = $this->appSettingValueHandler->handle(AppSettingsEnum::SLACK_STATUS_SYNC_ENABLED);
+
+        if (null === $value) {
+            return false;
+        }
+
+        if (!is_bool($value)) {
+            throw new InvalidAppSettingTypeException(expected: 'bool', settingsEnum: AppSettingsEnum::SLACK_STATUS_SYNC_ENABLED);
+        }
+
+        return $value;
+    }
+
     public function getAllSettings(): AppSettingsDTO
     {
         return $this->getAllAppSettingsQueryHandler->handle();

@@ -9,6 +9,7 @@ use App\Module\Admin\DTO\UserProfileDTO;
 use App\Module\Admin\Form\UserProfileType;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Facade\HolidayFacadeInterface;
+use App\Shared\Facade\SlackFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\Ical\IcalSubscriptionUrlGenerator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,6 +34,7 @@ class UserProfileSettingsController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly UserFacadeInterface $userFacade,
         private readonly HolidayFacadeInterface $holidayFacade,
+        private readonly SlackFacadeInterface $slackFacade,
         private readonly IcalSubscriptionUrlGenerator $icalSubscriptionUrlGenerator,
         private readonly TranslatorInterface $translator,
     ) {
@@ -72,6 +74,8 @@ class UserProfileSettingsController extends AbstractController
             $this->em->persist($user);
             $this->em->flush();
 
+            $this->userFacade->updateSlackStatusSyncPreference($user->id->toString(), $dto->slackStatusSyncEnabled);
+
             $this->addFlash('success', $this->translator->trans('crud.user_profile.flash.updated', domain: 'admin'));
 
             return $this->redirectToRoute('app_user_profile');
@@ -83,6 +87,7 @@ class UserProfileSettingsController extends AbstractController
             'calendar_subscription_url' => $this->icalSubscriptionUrlGenerator->generateForUser(UserDTO::fromEntity($user)),
             'slack_connected' => null !== $user->slackIntegration,
             'slack_member_id' => $user->slackIntegration?->slackMemberId,
+            'slack_admin_token_present' => null !== $this->slackFacade->getAdminToken(),
             'subdivisions_by_calendar' => $this->holidayFacade->getSubdivisionsGroupedByCalendar(),
         ]);
     }

@@ -64,6 +64,8 @@ interface UserFacadeInterface
 
     public function disconnectSlack(string $userId): void;
 
+    public function updateSlackStatusSyncPreference(string $userId, bool $enabled): bool;
+
     public function deleteOldProfileImage(?string $currentProfileImageUrl): void;
 
     public function createPasswordResetToken(string $email): ?string;

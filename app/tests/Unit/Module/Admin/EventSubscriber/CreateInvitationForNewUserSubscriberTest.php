@@ -59,3 +59,10 @@ it('skips non-User entities', function () {
 
     $this->subscriber->createInvitationForNewUser($event);
 });
+
+it('subscribes to AfterEntityPersistedEvent', function () {
+    $events = CreateInvitationForNewUserSubscriber::getSubscribedEvents();
+
+    expect($events)->toHaveKey(AfterEntityPersistedEvent::class)
+        ->and($events[AfterEntityPersistedEvent::class])->toBe('createInvitationForNewUser');
+});

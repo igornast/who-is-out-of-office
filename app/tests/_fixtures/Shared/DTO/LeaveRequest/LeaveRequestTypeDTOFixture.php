@@ -29,6 +29,7 @@ class LeaveRequestTypeDTOFixture implements FixtureInterface
             'textColor' => $faker->hexColor(),
             'icon' => '',
             'sort' => $faker->optional()->numberBetween(1, 100),
+            'slackStatusEmoji' => null,
         ];
     }
 }

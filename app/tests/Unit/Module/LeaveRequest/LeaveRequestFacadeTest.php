@@ -11,7 +11,10 @@ use App\Module\LeaveRequest\UseCase\Query\CountAbsencesThisWeekQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAllPendingRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAllRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountOnLeaveTodayQueryHandler;
+use App\Module\LeaveRequest\UseCase\Command\MarkExternalStatusSyncedCommandHandler;
+use App\Module\LeaveRequest\UseCase\Query\FindApprovedActiveNotSyncedQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\FindOnLeaveTodayQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\FindSyncedNeedingClearQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetAllLeaveTypesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetDailyAbsenceSummaryQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetDashboardStatsQueryHandler;
@@ -56,6 +59,9 @@ beforeEach(function (): void {
     $this->countAllRequestsHandler = mock(CountAllRequestsQueryHandler::class);
     $this->userFacade = mock(UserFacadeInterface::class);
     $this->getAllLeaveTypesHandler = mock(GetAllLeaveTypesQueryHandler::class);
+    $this->findApprovedActiveNotSyncedHandler = mock(FindApprovedActiveNotSyncedQueryHandler::class);
+    $this->findSyncedNeedingClearHandler = mock(FindSyncedNeedingClearQueryHandler::class);
+    $this->markExternalStatusSyncedHandler = mock(MarkExternalStatusSyncedCommandHandler::class);
 
     $this->facade = new LeaveRequestFacade(
         getCalculateWorkDaysHandler: $this->calculateWorkDaysHandler,
@@ -80,6 +86,9 @@ beforeEach(function (): void {
         countAllRequestsHandler: $this->countAllRequestsHandler,
         userFacade: $this->userFacade,
         getAllLeaveTypesHandler: $this->getAllLeaveTypesHandler,
+        findApprovedActiveNotSyncedHandler: $this->findApprovedActiveNotSyncedHandler,
+        findSyncedNeedingClearHandler: $this->findSyncedNeedingClearHandler,
+        markExternalStatusSyncedHandler: $this->markExternalStatusSyncedHandler,
     );
 });
 
@@ -402,4 +411,35 @@ it('delegates getLeaveRequestsForDatesGroupedByUserId to handler', function () {
         ->andReturn($expected);
 
     expect($this->facade->getLeaveRequestsForDatesGroupedByUserId($start, $end, $statuses))->toBe($expected);
+});
+
+it('delegates findApprovedActiveNotSynced to handler', function () {
+    $expected = [LeaveRequestDTOFixture::create()];
+
+    $this->findApprovedActiveNotSyncedHandler
+        ->expects('handle')
+        ->once()
+        ->andReturn($expected);
+
+    expect($this->facade->findApprovedActiveNotSynced())->toBe($expected);
+});
+
+it('delegates findSyncedNeedingClear to handler', function () {
+    $expected = [LeaveRequestDTOFixture::create()];
+
+    $this->findSyncedNeedingClearHandler
+        ->expects('handle')
+        ->once()
+        ->andReturn($expected);
+
+    expect($this->facade->findSyncedNeedingClear())->toBe($expected);
+});
+
+it('delegates markExternalStatusSynced to handler', function () {
+    $this->markExternalStatusSyncedHandler
+        ->expects('handle')
+        ->once()
+        ->with('lr-1', true);
+
+    $this->facade->markExternalStatusSynced('lr-1', true);
 });

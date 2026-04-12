@@ -362,6 +362,68 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
             ->execute();
     }
 
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findApprovedActiveNotSynced(): array
+    {
+        $today = new \DateTimeImmutable('today');
+
+        $qb = $this->createQueryBuilder('lr');
+        $qb->where('lr.status = :approved')
+            ->andWhere('lr.startDate <= :today')
+            ->andWhere('lr.endDate >= :today')
+            ->andWhere('lr.isExternalStatusSynced = :notSynced')
+            ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
+            ->setParameter('today', $today)
+            ->setParameter('notSynced', false)
+            ->orderBy('lr.startDate', 'ASC');
+
+        /** @var LeaveRequest[] $items */
+        $items = $qb->getQuery()->getResult();
+
+        return array_map(fn (LeaveRequest $lr) => LeaveRequestDTO::fromEntity($lr), $items);
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findSyncedNeedingClear(): array
+    {
+        $today = new \DateTimeImmutable('today');
+
+        $qb = $this->createQueryBuilder('lr');
+        $qb->where('lr.isExternalStatusSynced = :synced')
+            ->andWhere($qb->expr()->orX(
+                'lr.endDate < :today',
+                'lr.status != :approved'
+            ))
+            ->setParameter('synced', true)
+            ->setParameter('today', $today)
+            ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
+            ->orderBy('lr.endDate', 'ASC');
+
+        /** @var LeaveRequest[] $items */
+        $items = $qb->getQuery()->getResult();
+
+        return array_map(fn (LeaveRequest $lr) => LeaveRequestDTO::fromEntity($lr), $items);
+    }
+
+    public function markExternalStatusSynced(string $leaveRequestId, bool $synced): void
+    {
+        /** @var ?LeaveRequest $leaveRequest */
+        $leaveRequest = $this->findOneBy(['id' => $leaveRequestId]);
+
+        if (null === $leaveRequest) {
+            return;
+        }
+
+        $leaveRequest->isExternalStatusSynced = $synced;
+
+        $this->getEntityManager()->persist($leaveRequest);
+        $this->getEntityManager()->flush();
+    }
+
     public function beginTransaction(): void
     {
         $this->getEntityManager()->beginTransaction();

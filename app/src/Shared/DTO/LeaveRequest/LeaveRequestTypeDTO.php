@@ -9,6 +9,8 @@ use Ramsey\Uuid\UuidInterface;
 
 class LeaveRequestTypeDTO
 {
+    public const DEFAULT_SLACK_STATUS_EMOJI = ':calendar:';
+
     public function __construct(
         public UuidInterface $id,
         public bool $isAffectingBalance,
@@ -18,6 +20,7 @@ class LeaveRequestTypeDTO
         public string $textColor,
         public string $icon,
         public ?int $sort = null,
+        public ?string $slackStatusEmoji = null,
     ) {
     }
 
@@ -32,6 +35,7 @@ class LeaveRequestTypeDTO
             textColor: $leaveRequestType->textColor,
             icon: $leaveRequestType->icon,
             sort: $leaveRequestType->sort,
+            slackStatusEmoji: $leaveRequestType->slackStatusEmoji,
         );
     }
 }

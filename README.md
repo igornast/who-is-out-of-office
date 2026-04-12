@@ -184,6 +184,74 @@ The bot will post a summary of:
 5. **Notify the Requester**
    If the user has provided a Slack member ID, the bot will send them a direct message with the updated request status.
 
+---
+
+### 7. Slack Status Auto-Sync
+
+Automatically set a user's Slack status (emoji + text) when they are on approved leave, and clear it when the leave ends or is cancelled. This feature requires a **paid Slack workspace**.
+
+#### How it works
+
+A background command (`slack:sync-statuses`) runs every 30 minutes and:
+
+- **Sets** the Slack status for users whose approved leave is currently active and hasn't been synced yet. The status shows the leave type name and end date (e.g. "Vacation until Apr 18") with a configurable emoji.
+- **Clears** the Slack status for users whose leave has ended or is no longer approved (rejected, withdrawn).
+
+The sync is idempotent — each leave request is tracked with an internal flag, so statuses are never set twice and the command safely catches up after downtime.
+
+#### Prerequisites
+
+- A **paid Slack workspace** (free plans do not allow setting another user's status).
+- The Slack App must be configured with an **OAuth redirect URL** pointing to your instance.
+- Each user must have their **Slack Member ID** linked in their profile settings.
+
+#### Admin setup
+
+1. Add these environment variables to `.env.local`:
+
+   ```dotenv
+   ###> app/slack-status-sync ###
+   SLACK_CLIENT_ID="your-slack-app-client-id"
+   SLACK_CLIENT_SECRET="your-slack-app-client-secret"
+   SLACK_TOKEN_ENCRYPTION_KEY="base64-encoded-32-byte-key"
+   ###< app/slack-status-sync ###
+   ```
+
+   To generate the encryption key, run:
+
+   ```bash
+   php -r "echo base64_encode(sodium_crypto_secretbox_keygen());"
+   ```
+
+   Copy the output and paste it as the `SLACK_TOKEN_ENCRYPTION_KEY` value. This key is used to encrypt the admin OAuth token at rest — keep it secret and do not rotate it without re-authorizing.
+
+2. In your Slack App settings, add the OAuth redirect URL:
+   ```
+   https://your-domain.com/app/settings/slack-status-sync/oauth/callback
+   ```
+
+3. Add the `users.profile:write` **user scope** to your Slack App (under OAuth & Permissions > User Token Scopes).
+
+   > **Important:** Adding a new scope requires reinstalling the Slack App to your workspace. This generates a new **Bot User OAuth Token**, so you must update the `SLACK_DSN` environment variable in production with the new token.
+
+4. Log in as admin and go to **Settings > Integrations**.
+
+5. Click **Authorize status sync** — you'll be redirected to Slack to grant permission. The admin account performing this step must be a **Slack workspace Owner or Admin**.
+
+6. After authorization, the status shows as "Active" and the feature is live.
+
+#### Configuring leave type emojis
+
+Each leave type can have a custom Slack emoji code (e.g. `:palm_tree:`, `:face_with_thermometer:`). Set this in **Leave Request Types > Edit** via the "Slack status emoji" field. If left blank, the default `:calendar:` emoji is used.
+
+#### User opt-out
+
+Users can disable status sync for their account in **Profile Settings** — a toggle appears when the admin has authorized status sync and the user has linked their Slack Member ID.
+
+#### Revoking access
+
+An admin can revoke the status sync authorization at any time from **Settings > Slack Status Sync > Revoke**. This immediately disables the feature for all users. If the admin token becomes invalid (e.g. the authorizing user is removed from Slack), the app detects this automatically and disables the feature.
+
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, coding standards, and how to submit changes.

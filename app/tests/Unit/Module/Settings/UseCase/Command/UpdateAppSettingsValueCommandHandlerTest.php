@@ -26,6 +26,7 @@ it('writes settings to yaml file', function () {
         minNoticeDays: 1,
         maxConsecutiveDays: 0,
         skipWeekendHolidays: false,
+        slackStatusSyncEnabled: false,
     );
 
     $this->handler->handle($settingsDTO);
@@ -37,7 +38,8 @@ it('writes settings to yaml file', function () {
         ->and($content['leave_request']['default_annual_allowance'])->toBe(25)
         ->and($content['leave_request']['min_notice_days'])->toBe(1)
         ->and($content['leave_request']['max_consecutive_days'])->toBe(0)
-        ->and($content['notification']['skip_weekend_holidays'])->toBeFalse();
+        ->and($content['notification']['skip_weekend_holidays'])->toBeFalse()
+        ->and($content['slack']['status_sync_enabled'])->toBeFalse();
 });
 
 it('overwrites existing settings file', function () {
@@ -56,6 +58,7 @@ it('overwrites existing settings file', function () {
         minNoticeDays: 2,
         maxConsecutiveDays: 10,
         skipWeekendHolidays: true,
+        slackStatusSyncEnabled: true,
     );
 
     $this->handler->handle($settingsDTO);
@@ -67,5 +70,6 @@ it('overwrites existing settings file', function () {
         ->and($content['leave_request']['default_annual_allowance'])->toBe(30)
         ->and($content['leave_request']['min_notice_days'])->toBe(2)
         ->and($content['leave_request']['max_consecutive_days'])->toBe(10)
-        ->and($content['notification']['skip_weekend_holidays'])->toBeTrue();
+        ->and($content['notification']['skip_weekend_holidays'])->toBeTrue()
+        ->and($content['slack']['status_sync_enabled'])->toBeTrue();
 });

@@ -11,13 +11,16 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendLeaveRequestWithdrawnEmailCommandHandler
 {
     public function __construct(
+        #[Autowire(env: 'EMAIL_FROM_ADDRESS')]
         private readonly string $emailFromAddress,
+        #[Autowire(env: 'EMAIL_FROM_NAME')]
         private readonly string $emailFromName,
         private readonly MailerInterface $mailer,
         private readonly UrlGeneratorInterface $urlGenerator,

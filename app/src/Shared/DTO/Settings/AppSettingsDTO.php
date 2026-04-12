@@ -26,6 +26,8 @@ class AppSettingsDTO
         public int $maxConsecutiveDays,
         #[Assert\NotNull]
         public bool $skipWeekendHolidays,
+        #[Assert\NotNull]
+        public bool $slackStatusSyncEnabled,
     ) {
     }
 
@@ -38,6 +40,7 @@ class AppSettingsDTO
             minNoticeDays: self::getNestedValue($data, AppSettingsEnum::MIN_NOTICE_DAYS),
             maxConsecutiveDays: self::getNestedValue($data, AppSettingsEnum::MAX_CONSECUTIVE_DAYS),
             skipWeekendHolidays: self::getNestedValue($data, AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS, false),
+            slackStatusSyncEnabled: self::getNestedValue($data, AppSettingsEnum::SLACK_STATUS_SYNC_ENABLED, false),
         );
     }
 
@@ -50,6 +53,7 @@ class AppSettingsDTO
         self::setNestedValue($result, AppSettingsEnum::MIN_NOTICE_DAYS, $this->minNoticeDays);
         self::setNestedValue($result, AppSettingsEnum::MAX_CONSECUTIVE_DAYS, $this->maxConsecutiveDays);
         self::setNestedValue($result, AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS, $this->skipWeekendHolidays);
+        self::setNestedValue($result, AppSettingsEnum::SLACK_STATUS_SYNC_ENABLED, $this->slackStatusSyncEnabled);
 
         return $result;
     }

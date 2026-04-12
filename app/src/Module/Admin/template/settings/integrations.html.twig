@@ -10,6 +10,35 @@
     </div>
 {% endblock %}
 
+{% macro integration_status(label, integration, url = null) %}
+    <div class="settings-status-row">
+        <div class="settings-status-label">
+            {% if url %}<a href="{{ url }}">{{ label }}</a>{% else %}{{ label }}{% endif %}
+        </div>
+        <div class="settings-status-value">
+            {% if integration.status == constant('App\\Module\\Admin\\DTO\\IntegrationStatusDTO::STATUS_ACTIVE') %}
+                <span class="settings-badge settings-badge-success">{{ 'settings.status.active'|trans(domain='admin') }}</span>
+            {% elseif integration.status == constant('App\\Module\\Admin\\DTO\\IntegrationStatusDTO::STATUS_NEEDS_AUTH') %}
+                <span class="settings-badge settings-badge-warning">{{ 'settings.status.needs_auth'|trans(domain='admin') }}</span>
+            {% elseif integration.status == constant('App\\Module\\Admin\\DTO\\IntegrationStatusDTO::STATUS_INCOMPLETE') %}
+                <span class="settings-badge settings-badge-warning">{{ 'settings.status.incomplete'|trans(domain='admin') }}</span>
+            {% else %}
+                <span class="settings-badge settings-badge-muted">{{ 'settings.status.disabled'|trans(domain='admin') }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% if integration.status != constant('App\\Module\\Admin\\DTO\\IntegrationStatusDTO::STATUS_DISABLED') and integration.missingVars is not empty %}
+        <div class="settings-status-row">
+            <div class="settings-status-label">{{ 'settings.status.missing_vars'|trans(domain='admin') }}</div>
+            <div class="settings-status-value">
+                {% for var in integration.missingVars %}
+                    <code>{{ var }}</code>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
 {% block main %}
     <div class="row justify-content-center">
         <div class="col-lg-10 col-xl-8">
@@ -19,17 +48,68 @@
                     <p class="settings-card-desc">{{ 'settings.integrations.slack.desc'|trans(domain='admin') }}</p>
                 </div>
                 <div class="settings-card-body">
+                    <h6 class="settings-card-subtitle">{{ 'settings.integrations.slack_notifications.title'|trans(domain='admin') }}</h6>
+                    <p class="settings-card-desc">{{ 'settings.notifications.slack.desc'|trans(domain='admin') }}</p>
                     <div class="settings-status-list">
+                        {{ _self.integration_status('settings.notifications.slack.workspace'|trans(domain='admin'), slack_notifications) }}
                         <div class="settings-status-row">
-                            <div class="settings-status-label">{{ 'settings.status.label'|trans(domain='admin') }}</div>
+                            <div class="settings-status-label">{{ 'settings.notifications.slack.signing_secret'|trans(domain='admin') }}</div>
                             <div class="settings-status-value">
-                                {% if slack_connected %}
-                                    <span class="settings-badge settings-badge-success">{{ 'settings.status.active'|trans(domain='admin') }}</span>
+                                {% if slack_signing_secret_set %}
+                                    <span class="settings-badge settings-badge-success">{{ 'settings.status.configured'|trans(domain='admin') }}</span>
                                 {% else %}
-                                    <span class="settings-badge settings-badge-muted">{{ 'settings.status.inactive'|trans(domain='admin') }}</span>
+                                    <span class="settings-badge settings-badge-muted">{{ 'settings.status.not_configured'|trans(domain='admin') }}</span>
                                 {% endif %}
                             </div>
                         </div>
+                        <div class="settings-status-row">
+                            <div class="settings-status-label">{{ 'settings.notifications.channels.approval'|trans(domain='admin') }}</div>
+                            <div class="settings-status-value">
+                                {% if slack_approve_channel_set %}
+                                    <span class="settings-badge settings-badge-success">{{ 'settings.status.configured'|trans(domain='admin') }}</span>
+                                {% else %}
+                                    <span class="settings-badge settings-badge-muted">{{ 'settings.status.not_configured'|trans(domain='admin') }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="settings-status-row">
+                            <div class="settings-status-label">{{ 'settings.notifications.channels.weekly_digest'|trans(domain='admin') }}</div>
+                            <div class="settings-status-value">
+                                {% if slack_digest_channel_set %}
+                                    <span class="settings-badge settings-badge-success">{{ 'settings.status.configured'|trans(domain='admin') }}</span>
+                                {% else %}
+                                    <span class="settings-badge settings-badge-muted">{{ 'settings.status.not_configured'|trans(domain='admin') }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="settings-card-subtitle" style="margin-top: 24px;">{{ 'settings.integrations.slack_status_sync.title'|trans(domain='admin') }}</h6>
+                    <p class="settings-card-desc">{{ 'settings.integrations.slack_status_sync.desc'|trans(domain='admin') }}</p>
+                    <div class="settings-status-list">
+                        {{ _self.integration_status('settings.status.label'|trans(domain='admin'), slack_status_sync) }}
+                    </div>
+
+                    {% if slack_status_sync.status == constant('App\\Module\\Admin\\DTO\\IntegrationStatusDTO::STATUS_NEEDS_AUTH') %}
+                        <div style="margin-top: 12px;">
+                            <a class="btn btn-primary" href="{{ path('app_api_slack_status_sync_authorize') }}">
+                                {{ 'slack_status_sync.action.authorize'|trans(domain='admin') }}
+                            </a>
+                        </div>
+                    {% elseif slack_status_sync.status == constant('App\\Module\\Admin\\DTO\\IntegrationStatusDTO::STATUS_ACTIVE') %}
+                        <div style="margin-top: 12px;">
+                            <form method="POST" action="{{ path('app_api_slack_status_sync_revoke') }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('slack_status_sync_revoke') }}" />
+                                <button type="submit" class="btn btn-danger">
+                                    {{ 'slack_status_sync.action.revoke'|trans(domain='admin') }}
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                    <div style="margin-top: 16px; padding: 12px 16px; background-color: var(--primary-subtle); border-left: 3px solid var(--primary); border-radius: var(--radius-md); font-size: 13px; color: var(--text-secondary);">
+                        <i data-lucide="info" style="width: 14px; height: 14px; display: inline-block; vertical-align: -2px; margin-right: 4px; color: var(--primary);"></i>
+                        {{ 'settings.notifications.env_hint'|trans(domain='admin') }}
                     </div>
                 </div>
             </div>

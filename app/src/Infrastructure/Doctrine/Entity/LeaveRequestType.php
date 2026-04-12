@@ -20,6 +20,7 @@ class LeaveRequestType
         public string $textColor,
         public string $icon,
         public ?int $sort = null,
+        public ?string $slackStatusEmoji = null,
     ) {
         $this->initializeTimestamps();
     }

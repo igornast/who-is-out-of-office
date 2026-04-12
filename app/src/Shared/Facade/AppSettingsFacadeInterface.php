@@ -20,6 +20,8 @@ interface AppSettingsFacadeInterface
 
     public function skipWeekendHolidays(): bool;
 
+    public function isSlackStatusSyncEnabled(): bool;
+
     public function getAllSettings(): AppSettingsDTO;
 
     public function updateAllSettings(AppSettingsDTO $settingsDTO): void;

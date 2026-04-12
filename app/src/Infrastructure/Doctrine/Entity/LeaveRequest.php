@@ -21,6 +21,7 @@ class LeaveRequest
         public \DateTimeImmutable $endDate,
         public int $workDays = 0,
         public ?bool $isAutoApproved = false,
+        public bool $isExternalStatusSynced = false,
         public ?string $comment = null,
         public ?User $approvedBy = null,
     ) {
