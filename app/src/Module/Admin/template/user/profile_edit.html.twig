@@ -223,6 +223,16 @@
                         </div>
                     </div>
 
+                    {% if slack_connected and slack_admin_token_present %}
+                        <div class="field-checkbox form-group" style="margin-top: 12px;">
+                            <div class="checkbox-large">
+                                {{ form_widget(form.slackStatusSyncEnabled) }}
+                                {{ form_label(form.slackStatusSyncEnabled) }}
+                            </div>
+                            <div class="form-text">{{ form_help(form.slackStatusSyncEnabled) }}</div>
+                        </div>
+                    {% endif %}
+
                     <div class="connected-service-row">
                         <div class="connected-service-icon">
                             <i data-lucide="calendar"></i>

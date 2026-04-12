@@ -9,5 +9,10 @@
         </one-to-one>
 
         <field name="slackMemberId" column="slack_member_id" length="100" unique="true" />
+        <field name="slackStatusSyncEnabled" column="slack_status_sync_enabled" type="boolean">
+            <options>
+                <option name="default">1</option>
+            </options>
+        </field>
     </entity>
 </doctrine-mapping>

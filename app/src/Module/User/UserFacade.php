@@ -16,6 +16,7 @@ use App\Module\User\UseCase\Command\CreatePasswordResetTokenCommandHandler;
 use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
 use App\Module\User\UseCase\Command\ResetPasswordCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
+use App\Module\User\UseCase\Command\UpdateSlackStatusSyncPreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
@@ -60,6 +61,7 @@ final class UserFacade implements UserFacadeInterface
         private readonly CleanupExpiredPasswordResetTokensCommandHandler $cleanupExpiredPasswordResetTokensHandler,
         private readonly GetPasswordResetTokenQueryHandler $getPasswordResetTokenHandler,
         private readonly GetAllActiveUsersQueryHandler $getAllActiveUsersHandler,
+        private readonly UpdateSlackStatusSyncPreferenceCommandHandler $updateSlackStatusSyncPreferenceHandler,
     ) {
     }
 
@@ -159,6 +161,11 @@ final class UserFacade implements UserFacadeInterface
     public function disconnectSlack(string $userId): void
     {
         $this->disconnectSlackHandler->handle($userId);
+    }
+
+    public function updateSlackStatusSyncPreference(string $userId, bool $enabled): bool
+    {
+        return $this->updateSlackStatusSyncPreferenceHandler->handle($userId, $enabled);
     }
 
     public function deleteOldProfileImage(?string $currentProfileImageUrl): void

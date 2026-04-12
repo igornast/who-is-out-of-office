@@ -12,6 +12,7 @@ class UserSlackIntegration
     public function __construct(
         public User $user,
         public string $slackMemberId,
+        public bool $slackStatusSyncEnabled = true,
     ) {
     }
 }

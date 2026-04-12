@@ -44,6 +44,11 @@ class AppSettingsFormType extends AbstractType
                 'label' => 'crud.app_settings.field.skip_weekend_holidays',
                 'help' => 'crud.app_settings.field.skip_weekend_holidays_help',
                 'required' => false,
+            ])
+            ->add('slackStatusSyncEnabled', CheckboxType::class, [
+                'label' => 'crud.app_settings.field.slack_status_sync_enabled',
+                'help' => 'crud.app_settings.field.slack_status_sync_enabled_help',
+                'required' => false,
             ]);
     }
 

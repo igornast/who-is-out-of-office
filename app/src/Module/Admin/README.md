@@ -29,7 +29,6 @@ Admin/
 │   ├── HolidayCalendarImportController.php
 │   ├── IntegrationSettingsController.php
 │   ├── LoginController.php
-│   ├── NotificationSettingsController.php
 │   ├── TeamMembersCrudController.php
 │   └── UserCrudController.php
 ├── DTO/                                # Form data models
@@ -114,8 +113,7 @@ Admin/
 | `AppSettingsController` | `/app/settings` | `ROLE_ADMIN` | Application-wide settings (auto-approve, allowances) |
 | `AppearanceSettingsController` | `/app/settings/appearance` | `ROLE_USER` | Theme and palette preferences |
 | `AccountSecurityController` | `/app/settings/account-security` | `ROLE_USER` | Password change |
-| `NotificationSettingsController` | `/app/settings/notifications` | `ROLE_ADMIN` | Slack integration status (read-only) |
-| `IntegrationSettingsController` | `/app/settings/integrations` | `ROLE_ADMIN` | Integration status overview (read-only) |
+| `IntegrationSettingsController` | `/app/settings/integrations` | `ROLE_ADMIN` | Integration status, Slack notifications and status sync management |
 | `HolidayCalendarCrudController` | CRUD `/settings/public-holidays` | `ROLE_ADMIN` | Public holiday calendar management |
 | `HolidayCalendarImportController` | `/app/settings/public-holidays/import` | `ROLE_ADMIN` | Import holidays from Date Nager API |
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Module\LeaveRequest;
 
+use App\Module\LeaveRequest\UseCase\Command\MarkExternalStatusSyncedCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\RemoveLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\SaveLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestCommandHandler;
@@ -12,6 +13,8 @@ use App\Module\LeaveRequest\UseCase\Query\CountAbsencesThisWeekQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetAllLeaveTypesQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAllPendingRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountOnLeaveTodayQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\FindApprovedActiveNotSyncedQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\FindSyncedNeedingClearQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\FindOnLeaveTodayQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetDailyAbsenceSummaryQueryHandler;
@@ -60,6 +63,9 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly CountAllRequestsQueryHandler $countAllRequestsHandler,
         private readonly UserFacadeInterface $userFacade,
         private readonly GetAllLeaveTypesQueryHandler $getAllLeaveTypesHandler,
+        private readonly FindApprovedActiveNotSyncedQueryHandler $findApprovedActiveNotSyncedHandler,
+        private readonly FindSyncedNeedingClearQueryHandler $findSyncedNeedingClearHandler,
+        private readonly MarkExternalStatusSyncedCommandHandler $markExternalStatusSyncedHandler,
     ) {
     }
 
@@ -224,5 +230,26 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function getAllLeaveTypes(): array
     {
         return $this->getAllLeaveTypesHandler->handle();
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findApprovedActiveNotSynced(): array
+    {
+        return $this->findApprovedActiveNotSyncedHandler->handle();
+    }
+
+    /**
+     * @return LeaveRequestDTO[]
+     */
+    public function findSyncedNeedingClear(): array
+    {
+        return $this->findSyncedNeedingClearHandler->handle();
+    }
+
+    public function markExternalStatusSynced(string $leaveRequestId, bool $synced): void
+    {
+        $this->markExternalStatusSyncedHandler->handle($leaveRequestId, $synced);
     }
 }

@@ -23,6 +23,7 @@ class AppSettingsDTOFixture implements FixtureInterface
             'minNoticeDays' => 3,
             'maxConsecutiveDays' => 10,
             'skipWeekendHolidays' => false,
+            'slackStatusSyncEnabled' => false,
         ];
     }
 }

@@ -6,12 +6,17 @@ use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
 use App\Infrastructure\Slack\SlackFacade;
 use App\Infrastructure\Slack\UseCase\Command\NotifyNewLeaveRequestCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\NotifyUserLeaveRequestStatusChangeCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\RevokeSlackAdminTokenCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\SendChangeConfirmationToAbsenceChannelCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\StoreSlackAdminTokenCommandHandler;
+use App\Infrastructure\Slack\UseCase\Command\SyncSlackStatusesCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\UpdateAutoApprovedSlackNotificationCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\UpdateLeaveRequestWithInteractiveNotificationCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\WeeklyDigestNotificationCommandHandler;
+use App\Infrastructure\Slack\UseCase\Query\GetSlackAdminTokenQueryHandler;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestDTOFixture;
+use App\Tests\_fixtures\Shared\DTO\Slack\SlackAdminTokenDTOFixture;
 
 beforeEach(function (): void {
     $this->notifyNewLeaveRequestHandler = mock(NotifyNewLeaveRequestCommandHandler::class);
@@ -20,6 +25,10 @@ beforeEach(function (): void {
     $this->notifyUserLeaveRequestStatusChanged = mock(NotifyUserLeaveRequestStatusChangeCommandHandler::class);
     $this->weeklyNotificationHandler = mock(WeeklyDigestNotificationCommandHandler::class);
     $this->updateAutoApprovedSlackNotificationHandler = mock(UpdateAutoApprovedSlackNotificationCommandHandler::class);
+    $this->syncSlackStatusesHandler = mock(SyncSlackStatusesCommandHandler::class);
+    $this->storeSlackAdminTokenHandler = mock(StoreSlackAdminTokenCommandHandler::class);
+    $this->revokeSlackAdminTokenHandler = mock(RevokeSlackAdminTokenCommandHandler::class);
+    $this->getSlackAdminTokenHandler = mock(GetSlackAdminTokenQueryHandler::class);
 
     $this->facade = new SlackFacade(
         notifyNewLeaveRequestHandler: $this->notifyNewLeaveRequestHandler,
@@ -28,6 +37,10 @@ beforeEach(function (): void {
         notifyUserLeaveRequestStatusChanged: $this->notifyUserLeaveRequestStatusChanged,
         weeklyNotificationHandler: $this->weeklyNotificationHandler,
         updateAutoApprovedSlackNotificationHandler: $this->updateAutoApprovedSlackNotificationHandler,
+        syncSlackStatusesHandler: $this->syncSlackStatusesHandler,
+        storeSlackAdminTokenHandler: $this->storeSlackAdminTokenHandler,
+        revokeSlackAdminTokenHandler: $this->revokeSlackAdminTokenHandler,
+        getSlackAdminTokenHandler: $this->getSlackAdminTokenHandler,
     );
 });
 
@@ -132,4 +145,29 @@ it('delegates updateLeaveRequestNotificationAsAutoApproved to handler', function
         ->with($dto);
 
     $this->facade->updateLeaveRequestNotificationAsAutoApproved($dto);
+});
+
+it('delegates syncStatuses to the handler', function () {
+    $this->syncSlackStatusesHandler->expects('handle')->once();
+    $this->facade->syncStatuses();
+});
+
+it('delegates storeAdminToken to the handler', function () {
+    $this->storeSlackAdminTokenHandler
+        ->expects('handle')
+        ->once()
+        ->with('code', 'https://app.test/cb');
+    $this->facade->storeAdminToken('code', 'https://app.test/cb');
+});
+
+it('delegates revokeAdminToken to the handler', function () {
+    $this->revokeSlackAdminTokenHandler->expects('handle')->once();
+    $this->facade->revokeAdminToken();
+});
+
+it('delegates getAdminToken to the query handler', function () {
+    $dto = SlackAdminTokenDTOFixture::create();
+    $this->getSlackAdminTokenHandler->expects('handle')->once()->andReturn($dto);
+
+    expect($this->facade->getAdminToken())->toBe($dto);
 });

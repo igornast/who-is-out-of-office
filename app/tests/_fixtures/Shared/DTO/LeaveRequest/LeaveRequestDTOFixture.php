@@ -35,6 +35,7 @@ class LeaveRequestDTOFixture implements FixtureInterface
             'endDate' => \DateTimeImmutable::createFromMutable($endDate),
             'user' => UserDTOFixture::create(),
             'approvedBy' => $faker->randomElement([null, UserDTOFixture::create(['roles' => [RoleEnum::Manager->value]])]),
+            'isExternalStatusSynced' => false,
             'comment' => $faker->sentence(),
             'createdAt' => new \DateTimeImmutable(),
         ];

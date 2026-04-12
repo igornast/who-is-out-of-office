@@ -10,6 +10,11 @@
         <field name="workDays" type="integer" column="work_days" />
         <field name="comment" column="comment" nullable="true" />
         <field name="isAutoApproved" type="boolean" column="is_auto_approved" />
+        <field name="isExternalStatusSynced" type="boolean" column="is_external_status_synced">
+            <options>
+                <option name="default">0</option>
+            </options>
+        </field>
         <field name="startDate" type="datetime_immutable" column="start_date" />
         <field name="endDate" type="datetime_immutable" column="end_date" />
 

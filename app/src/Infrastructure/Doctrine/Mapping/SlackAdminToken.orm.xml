@@ -1,0 +1,19 @@
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Infrastructure\Doctrine\Entity\SlackAdminToken" table="slack_admin_token">
+        <id name="id" type="uuid" column="id" />
+
+        <field name="encryptedToken" column="encrypted_token" type="text" />
+        <field name="slackUserId" column="slack_user_id" length="50" />
+
+        <field name="createdAt" column="created_at" type="datetime_immutable"/>
+        <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="preUpdate" method="updateTimestamp" />
+        </lifecycle-callbacks>
+    </entity>
+</doctrine-mapping>

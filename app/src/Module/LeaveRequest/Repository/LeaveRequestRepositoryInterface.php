@@ -84,6 +84,22 @@ interface LeaveRequestRepositoryInterface
      */
     public function countAllRequests(?array $userIds = null): int;
 
+    /**
+     * Approved leaves that are currently active (startDate <= today, endDate >= today) and not yet synced.
+     *
+     * @return LeaveRequestDTO[]
+     */
+    public function findApprovedActiveNotSynced(): array;
+
+    /**
+     * Leaves that were synced but have ended or are no longer approved.
+     *
+     * @return LeaveRequestDTO[]
+     */
+    public function findSyncedNeedingClear(): array;
+
+    public function markExternalStatusSynced(string $leaveRequestId, bool $synced): void;
+
     public function beginTransaction(): void;
 
     public function commit(): void;

@@ -81,6 +81,11 @@ class UserProfileType extends AbstractType
                 'required' => false,
                 'help' => 'crud.user_profile.field.is_email_notifications_enabled_help',
             ])
+            ->add('slackStatusSyncEnabled', CheckboxType::class, [
+                'label' => 'crud.user_profile.slack_status_sync.label',
+                'required' => false,
+                'help' => 'crud.user_profile.slack_status_sync.help',
+            ])
             ->add('profileImageFile', FileType::class, [
                 'label' => false,
                 'required' => false,

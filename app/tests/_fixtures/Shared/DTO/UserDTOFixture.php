@@ -43,6 +43,7 @@ class UserDTOFixture implements FixtureInterface
             'absenceBalanceResetDay' => new \DateTimeImmutable(date('Y').'-01-01'),
             'managerId' => null,
             'icalHashSalt' => null,
+            'slackStatusSyncEnabled' => true,
         ];
     }
 }

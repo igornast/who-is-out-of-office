@@ -12,4 +12,5 @@ enum AppSettingsEnum: string
     case MIN_NOTICE_DAYS = 'leave_request.min_notice_days';
     case MAX_CONSECUTIVE_DAYS = 'leave_request.max_consecutive_days';
     case SKIP_WEEKEND_HOLIDAYS = 'notification.skip_weekend_holidays';
+    case SLACK_STATUS_SYNC_ENABLED = 'slack.status_sync_enabled';
 }

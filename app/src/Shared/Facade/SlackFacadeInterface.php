@@ -6,6 +6,7 @@ namespace App\Shared\Facade;
 
 use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
+use App\Shared\DTO\Slack\SlackAdminTokenDTO;
 
 interface SlackFacadeInterface
 {
@@ -18,4 +19,12 @@ interface SlackFacadeInterface
     public function sendWeeklyDigestNotification(): void;
 
     public function updateLeaveRequestNotificationAsAutoApproved(LeaveRequestDTO $leaveRequestDTO): void;
+
+    public function syncStatuses(): void;
+
+    public function storeAdminToken(string $code, string $redirectUri): void;
+
+    public function revokeAdminToken(): void;
+
+    public function getAdminToken(): ?SlackAdminTokenDTO;
 }

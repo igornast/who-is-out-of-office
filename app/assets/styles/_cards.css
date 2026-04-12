@@ -302,6 +302,11 @@ body.ea .panel-body {
     color: var(--success);
 }
 
+.settings-badge-warning {
+    background-color: #fef3cd;
+    color: #856404;
+}
+
 .settings-badge-muted {
     background-color: var(--app-surface-sunken);
     color: var(--text-tertiary);

@@ -131,6 +131,7 @@ class DashboardController extends AbstractDashboardController
             yield MenuItem::linkToRoute('menu.items.app_settings', 'fa fa-gear', 'app_settings');
             yield MenuItem::linkToCrud('menu.items.leave_request_types', 'fa fa-calendar-day', LeaveRequestType::class);
             yield MenuItem::linkToRoute('menu.items.public_holidays', 'fa fa-calendar', 'app_dashboard_app_settings_holidays_index');
+
         }
 
         yield MenuItem::section('menu.section.account');

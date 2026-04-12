@@ -148,6 +148,42 @@ it('throws exception when skip weekend holidays is not bool', function () {
     $this->facade->skipWeekendHolidays();
 })->throws(InvalidAppSettingTypeException::class);
 
+it('returns true when slack status sync is enabled', function () {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::SLACK_STATUS_SYNC_ENABLED)
+        ->andReturn(true);
+
+    expect($this->facade->isSlackStatusSyncEnabled())->toBeTrue();
+});
+
+it('returns false when slack status sync value is null (backward compatible)', function () {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::SLACK_STATUS_SYNC_ENABLED)
+        ->andReturn(null);
+
+    expect($this->facade->isSlackStatusSyncEnabled())->toBeFalse();
+});
+
+it('returns false when slack status sync is disabled', function () {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::SLACK_STATUS_SYNC_ENABLED)
+        ->andReturn(false);
+
+    expect($this->facade->isSlackStatusSyncEnabled())->toBeFalse();
+});
+
+it('throws exception when slack status sync is not bool', function () {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::SLACK_STATUS_SYNC_ENABLED)
+        ->andReturn('yes');
+
+    $this->facade->isSlackStatusSyncEnabled();
+})->throws(InvalidAppSettingTypeException::class);
+
 it('delegates getAllSettings to handler', function () {
     $settingsDTO = AppSettingsDTOFixture::create();
 
