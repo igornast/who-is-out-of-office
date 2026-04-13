@@ -7,7 +7,9 @@ namespace App\Infrastructure\Security;
 use App\Module\Settings\Exception\AppSettingsDisabledException;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
+#[Lazy]
 class SlackTokenEncryptor
 {
     private readonly ?string $key;
