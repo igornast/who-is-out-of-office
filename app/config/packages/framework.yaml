@@ -3,7 +3,7 @@ framework:
     property_access: { enabled: true }
     session:
         handler_id: 'Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler'
-        cookie-samesite: strict
+        cookie_samesite: lax
         cookie_lifetime: 604800 # 7 days
         gc_maxlifetime: 604800
 
