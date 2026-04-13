@@ -39,10 +39,14 @@ class UpdateSlackMemberIdController extends AbstractController
 
         $this->userFacade->updateSlackMemberId($user->id->toString(), $slackMemberId);
 
+        $statusSyncEnabled = $request->request->getBoolean('slack_status_sync_enabled', true);
+        $this->userFacade->updateSlackStatusSyncPreference($user->id->toString(), $statusSyncEnabled);
+
         return new JsonResponse([
             'success' => true,
             'connected' => true,
             'memberId' => $slackMemberId,
+            'statusSyncEnabled' => $statusSyncEnabled,
         ]);
     }
 

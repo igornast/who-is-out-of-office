@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\UserProfileSettingsController;
+use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\HolidayFacadeInterface;
-use App\Shared\Facade\SlackFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\Ical\IcalSubscriptionUrlGenerator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,8 +34,8 @@ beforeEach(function (): void {
     $this->translator->allows('trans')->andReturnUsing(fn (string $id) => $id);
     $this->holidayFacade = mock(HolidayFacadeInterface::class);
     $this->holidayFacade->allows('getSubdivisionsGroupedByCalendar')->andReturn([]);
-    $this->slackFacade = mock(SlackFacadeInterface::class);
-    $this->slackFacade->allows('getAdminToken')->andReturn(null);
+    $this->appSettingsFacade = mock(AppSettingsFacadeInterface::class);
+    $this->appSettingsFacade->allows('isSlackStatusSyncEnabled')->andReturn(false);
 
     $this->user = new User(
         id: Uuid::uuid4(),
@@ -93,7 +93,7 @@ beforeEach(function (): void {
         em: $this->em,
         userFacade: $this->userFacade,
         holidayFacade: $this->holidayFacade,
-        slackFacade: $this->slackFacade,
+        appSettingsFacade: $this->appSettingsFacade,
         icalSubscriptionUrlGenerator: $this->icalUrlGenerator,
         translator: $this->translator,
     );
@@ -111,7 +111,6 @@ it('maps isEmailNotificationsEnabled from DTO to entity on form submit', functio
 
     $this->em->expects('persist')->once();
     $this->em->expects('flush')->once();
-    $this->userFacade->allows('updateSlackStatusSyncPreference');
 
     ($this->controller)(Request::create('/app/user/profile', 'POST'));
 
@@ -129,31 +128,10 @@ it('maps subdivisionCode from DTO to entity on form submit', function (): void {
 
     $this->em->expects('persist')->once();
     $this->em->expects('flush')->once();
-    $this->userFacade->allows('updateSlackStatusSyncPreference');
 
     expect($this->user->subdivisionCode)->toBeNull();
 
     ($this->controller)(Request::create('/app/user/profile', 'POST'));
 
     expect($this->user->subdivisionCode)->toBe('DE-BY');
-});
-
-it('calls updateSlackStatusSyncPreference via facade on form submit', function (): void {
-    $this->form->allows('handleRequest')->andReturnUsing(function () {
-        $this->capturedDto->slackStatusSyncEnabled = true;
-
-        return $this->form;
-    });
-    $this->form->allows('isSubmitted')->andReturn(true);
-    $this->form->allows('isValid')->andReturn(true);
-
-    $this->em->allows('persist');
-    $this->em->allows('flush');
-
-    $this->userFacade
-        ->expects('updateSlackStatusSyncPreference')
-        ->once()
-        ->with($this->user->id->toString(), true);
-
-    ($this->controller)(Request::create('/app/user/profile', 'POST'));
 });

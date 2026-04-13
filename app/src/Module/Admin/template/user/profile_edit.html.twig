@@ -189,7 +189,20 @@
                     <h3 class="settings-card-title">{{ 'crud.user_profile.connected_services.title'|trans(domain='admin') }}</h3>
                 </div>
                 <div class="settings-card-body">
-                    <div class="connected-service-row" id="slack">
+                    <div class="connected-service-row"
+                         data-controller="slack-config"
+                         data-slack-config-update-url-value="{{ path('app_api_slack_update') }}"
+                         data-slack-config-disconnect-url-value="{{ path('app_api_slack_disconnect') }}"
+                         data-slack-config-csrf-update-value="{{ csrf_token('slack_update') }}"
+                         data-slack-config-csrf-disconnect-value="{{ csrf_token('slack_disconnect') }}"
+                         data-slack-config-member-id-value="{{ slack_member_id ?? '' }}"
+                         data-slack-config-status-sync-enabled-value="{{ slack_status_sync_enabled ? 'true' : 'false' }}"
+                         data-slack-config-feature-enabled-value="{{ slack_status_sync_feature_enabled ? 'true' : 'false' }}"
+                         data-slack-config-label-saving-value="{{ 'crud.user_profile.connected_services.slack.modal_saving'|trans(domain: 'admin') }}"
+                         data-slack-config-label-save-value="{{ 'crud.user_profile.connected_services.slack.modal_save'|trans(domain: 'admin') }}"
+                         data-slack-config-label-connected-value="{{ 'crud.user_profile.connected_services.slack.connected'|trans(domain: 'admin') }}"
+                         data-slack-config-label-member-id-value="{{ 'crud.user_profile.connected_services.slack.member_id'|trans(domain: 'admin') }}"
+                         data-slack-config-label-not-connected-value="{{ 'crud.user_profile.connected_services.slack.not_connected'|trans(domain: 'admin') }}">
                         <div class="connected-service-icon">
                             <i data-lucide="message-square"></i>
                         </div>
@@ -197,7 +210,7 @@
                             <div class="connected-service-name">{{ 'crud.user_profile.connected_services.slack.title'|trans(domain='admin') }}</div>
                             <div class="connected-service-desc">{{ 'crud.user_profile.connected_services.slack.description'|trans(domain='admin') }}</div>
                         </div>
-                        <div class="connected-service-status" id="slack-status">
+                        <div class="connected-service-status" data-slack-config-target="status">
                             {% if slack_connected %}
                                 <span class="connected-service-badge connected-service-badge-success">
                                     <i data-lucide="check-circle-2"></i>
@@ -211,27 +224,13 @@
                             {% endif %}
                         </div>
                         <div class="connected-service-action">
-                            <button class="btn btn-outline btn-sm" id="slack-configure-btn" type="button"
-                                    data-update-url="{{ path('app_api_slack_update') }}"
-                                    data-disconnect-url="{{ path('app_api_slack_disconnect') }}"
-                                    data-csrf-update="{{ csrf_token('slack_update') }}"
-                                    data-csrf-disconnect="{{ csrf_token('slack_disconnect') }}"
-                                    data-member-id="{{ slack_member_id ?? '' }}">
+                            <button class="btn btn-outline btn-sm" type="button"
+                                    data-action="click->slack-config#open">
                                 <i data-lucide="settings"></i>
                                 {{ 'crud.user_profile.connected_services.slack.configure'|trans(domain='admin') }}
                             </button>
                         </div>
                     </div>
-
-                    {% if slack_connected and slack_admin_token_present %}
-                        <div class="field-checkbox form-group" style="margin-top: 12px;">
-                            <div class="checkbox-large">
-                                {{ form_widget(form.slackStatusSyncEnabled) }}
-                                {{ form_label(form.slackStatusSyncEnabled) }}
-                            </div>
-                            <div class="form-text">{{ form_help(form.slackStatusSyncEnabled) }}</div>
-                        </div>
-                    {% endif %}
 
                     <div class="connected-service-row">
                         <div class="connected-service-icon">
@@ -282,6 +281,13 @@
                         <label for="slack-member-id-input" class="form-label">{{ 'crud.user_profile.connected_services.slack.modal_field_label'|trans(domain: 'admin') }}</label>
                         <input type="text" class="form-control" id="slack-member-id-input" placeholder="U0123456789">
                         <div class="form-text">{{ 'crud.user_profile.connected_services.slack.modal_field_help'|trans(domain: 'admin') }}</div>
+                    </div>
+                    <div class="mb-0" id="slack-status-sync-wrapper" style="display: none; border-top: 1px solid var(--border-light); padding-top: 16px; margin-top: 16px;">
+                        <div class="checkbox-large">
+                            <input type="checkbox" id="slack-status-sync-checkbox">
+                            <label for="slack-status-sync-checkbox">{{ 'crud.user_profile.slack_status_sync.label'|trans(domain: 'admin') }}</label>
+                        </div>
+                        <div class="form-text" style="margin-top: 4px;">{{ 'crud.user_profile.slack_status_sync.help'|trans(domain: 'admin') }}</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -419,81 +425,6 @@
                         copyBtn.innerHTML = originalHtml;
                         if (typeof lucide !== 'undefined') { lucide.createIcons(); }
                     }, 2000);
-                });
-            }
-
-            var slackConfigureBtn = document.getElementById('slack-configure-btn');
-            var slackModal = document.getElementById('slackConfigModal');
-            var slackMemberIdInput = document.getElementById('slack-member-id-input');
-            var slackSaveBtn = document.getElementById('slackSaveBtn');
-            var slackDisconnectBtn = document.getElementById('slackDisconnectBtn');
-            var slackStatus = document.getElementById('slack-status');
-
-            if (slackConfigureBtn && slackModal) {
-                var bsSlackModal = new bootstrap.Modal(slackModal);
-
-                slackConfigureBtn.addEventListener('click', function() {
-                    var memberId = slackConfigureBtn.dataset.memberId;
-                    slackMemberIdInput.value = memberId;
-                    slackDisconnectBtn.style.display = memberId ? '' : 'none';
-                    bsSlackModal.show();
-                });
-
-                slackSaveBtn.addEventListener('click', function() {
-                    var memberId = slackMemberIdInput.value.trim();
-                    if (!memberId) return;
-
-                    var url = slackConfigureBtn.dataset.updateUrl;
-                    var csrfToken = slackConfigureBtn.dataset.csrfUpdate;
-
-                    slackSaveBtn.disabled = true;
-                    slackSaveBtn.textContent = '{{ "crud.user_profile.connected_services.slack.modal_saving"|trans(domain: "admin") }}';
-
-                    var formData = new FormData();
-                    formData.append('_token', csrfToken);
-                    formData.append('slack_member_id', memberId);
-
-                    fetch(url, { method: 'POST', body: formData })
-                        .then(function(response) { return response.json(); })
-                        .then(function(data) {
-                            if (data.success) {
-                                slackConfigureBtn.dataset.memberId = data.memberId;
-                                slackStatus.innerHTML = '<span class="connected-service-badge connected-service-badge-success"><i data-lucide="check-circle-2"></i> {{ "crud.user_profile.connected_services.slack.connected"|trans(domain: "admin") }}</span>' +
-                                    '<span class="connected-service-meta">{{ "crud.user_profile.connected_services.slack.member_id"|trans(domain: "admin") }}'.replace('%id%', data.memberId) + '</span>';
-                                if (typeof lucide !== 'undefined') { lucide.createIcons(); }
-                                bsSlackModal.hide();
-                            }
-                            slackSaveBtn.disabled = false;
-                            slackSaveBtn.textContent = '{{ "crud.user_profile.connected_services.slack.modal_save"|trans(domain: "admin") }}';
-                        })
-                        .catch(function() {
-                            slackSaveBtn.disabled = false;
-                            slackSaveBtn.textContent = '{{ "crud.user_profile.connected_services.slack.modal_save"|trans(domain: "admin") }}';
-                        });
-                });
-
-                slackDisconnectBtn.addEventListener('click', function() {
-                    var url = slackConfigureBtn.dataset.disconnectUrl;
-                    var csrfToken = slackConfigureBtn.dataset.csrfDisconnect;
-
-                    slackDisconnectBtn.disabled = true;
-
-                    var formData = new FormData();
-                    formData.append('_token', csrfToken);
-
-                    fetch(url, { method: 'POST', body: formData })
-                        .then(function(response) { return response.json(); })
-                        .then(function(data) {
-                            if (data.success) {
-                                slackConfigureBtn.dataset.memberId = '';
-                                slackStatus.innerHTML = '<span class="connected-service-badge connected-service-badge-muted">{{ "crud.user_profile.connected_services.slack.not_connected"|trans(domain: "admin") }}</span>';
-                                bsSlackModal.hide();
-                            }
-                            slackDisconnectBtn.disabled = false;
-                        })
-                        .catch(function() {
-                            slackDisconnectBtn.disabled = false;
-                        });
                 });
             }
 

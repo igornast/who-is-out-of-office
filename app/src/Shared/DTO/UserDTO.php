@@ -90,6 +90,7 @@ class UserDTO
             isActive: (bool) $data['is_active'],
             createdAt: \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $data['created_at']),
             profileImageUrl: $data['profile_image_url'],
+            subdivisionCode: $data['subdivision_code'] ?? null,
             hasCelebrateWorkAnniversary: (bool) ($data['celebrate_work_anniversary'] ?? false),
             isEmailNotificationsEnabled: (bool) ($data['is_email_notifications_enabled'] ?? true),
             birthDate: isset($data['birth_date']) ? \DateTimeImmutable::createFromFormat('Y-m-d', $data['birth_date']) : null,
@@ -99,7 +100,6 @@ class UserDTO
             themePreference: $data['theme_preference'] ?? 'auto',
             palettePreference: $data['palette_preference'] ?? 'teal',
             icalHashSalt: $data['ical_hash_salt'] ?? null,
-            subdivisionCode: $data['subdivision_code'] ?? null,
             slackStatusSyncEnabled: (bool) ($data['slack_status_sync_enabled'] ?? true),
         );
     }
