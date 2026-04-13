@@ -42,7 +42,7 @@ it('adds all expected fields with correct types', function (): void {
     $formType->configureOptions($resolver);
     $formType->buildForm($builder, $resolver->resolve());
 
-    expect($fields)->toHaveCount(13)
+    expect($fields)->toHaveCount(12)
         ->and($fields['firstName']['type'])->toBe(TextType::class)
         ->and($fields['lastName']['type'])->toBe(TextType::class)
         ->and($fields['workingDays']['type'])->toBe(ChoiceType::class)
@@ -53,7 +53,6 @@ it('adds all expected fields with correct types', function (): void {
         ->and($fields['absenceBalanceResetDay']['type'])->toBe(DateType::class)
         ->and($fields['hasCelebrateWorkAnniversary']['type'])->toBe(CheckboxType::class)
         ->and($fields['isEmailNotificationsEnabled']['type'])->toBe(CheckboxType::class)
-        ->and($fields['slackStatusSyncEnabled']['type'])->toBe(CheckboxType::class)
         ->and($fields['profileImageFile']['type'])->toBe(FileType::class)
         ->and($fields['removeProfileImage']['type'])->toBe(HiddenType::class);
 });

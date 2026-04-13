@@ -315,6 +315,13 @@ crud:
             save_changes: Save Changes
         flash:
             updated: Profile updated successfully!
+        slack_status_sync:
+            label: "Auto-set my Slack status when I'm on leave"
+            help: "When enabled and your admin has connected status sync, your Slack status will be set automatically the day your leave starts and cleared the morning after it ends."
+            flash:
+                enabled: 'Slack status auto-sync enabled for your account.'
+                disabled: 'Slack status auto-sync disabled for your account.'
+                not_connected: 'Connect your Slack account before changing this preference.'
         connected_services:
             title: Connected Services
             slack:
@@ -401,6 +408,8 @@ crud:
             new: Add a new type
         sort:
             help: 'Controls display order. Lower numbers appear first. Leave empty for no preference.'
+        slack_status_emoji: 'Slack status emoji'
+        slack_status_emoji.help: 'Slack emoji code with colons, e.g. :palm_tree: — used for auto-synced status when a user is on this leave type. Leave blank to use :calendar:.'
 
     app_settings:
         source_filename: The app settings source file
@@ -411,8 +420,8 @@ crud:
             leave_request_desc: Configure automatic approval and delay settings for leave requests.
             leave_defaults: Leave Defaults & Limits
             leave_defaults_desc: Set company-wide defaults for leave allowance and request constraints.
-            notification: Notification Settings
-            notification_desc: Configure how notifications behave for Slack digests and other channels.
+            slack: Slack Integration
+            slack_desc: Configure Slack notifications and status auto-sync for users on leave.
         field:
             auto_approve: Auto Approve
             auto_approve_delay: Auto Approve Delay (minutes)
@@ -425,6 +434,8 @@ crud:
             max_consecutive_days_help: Maximum number of consecutive days allowed per leave request (0 = unlimited)
             skip_weekend_holidays: Skip weekend public holidays
             skip_weekend_holidays_help: When enabled, public holidays falling on Saturday or Sunday will not appear in Slack weekly digest notifications
+            slack_status_sync_enabled: Enable Slack status auto-sync
+            slack_status_sync_enabled_help: When enabled, users' Slack statuses will be automatically set when they are on approved leave and cleared when the leave ends. Requires a paid Slack workspace and an authorized admin token.
         action:
             save: Save Changes
 
@@ -436,6 +447,10 @@ settings:
         configured: Configured
         active: Active
         inactive: Inactive
+        incomplete: Incomplete Configuration
+        needs_auth: Needs Authorization
+        disabled: Disabled
+        missing_vars: "Missing variables:"
     notifications:
         title: Notifications
         env_hint: Notification settings are configured via environment variables. Contact your system administrator to make changes.
@@ -453,7 +468,12 @@ settings:
         title: Integrations
         slack:
             title: Slack
-            desc: Team notifications for leave requests, approvals, and weekly digests.
+            desc: Team notifications, approvals, weekly digests, and automatic status sync.
+        slack_notifications:
+            title: Notifications
+        slack_status_sync:
+            title: Status Sync
+            desc: Automatically set and clear Slack statuses when users are on approved leave. Requires a paid Slack workspace.
         calendar:
             title: Calendar Subscription (iCal)
             desc: Users can subscribe to team absences in their preferred calendar app via iCal feeds.
@@ -481,6 +501,61 @@ settings:
             password_changed: Your password has been updated successfully.
         action:
             update_password: Update Password
+    two_factor:
+        info:
+            already_enabled: Two-factor authentication is already enabled on your account.
+        setup:
+            title: Set Up Two-Factor Authentication
+            step1:
+                title: "Step 1: Scan QR Code"
+                desc: Scan this QR code with your authenticator app (Google Authenticator, Authy, 1Password, etc.)
+                manual_entry: "Can't scan? Enter this key manually:"
+                copy_key: Copy
+                copied: Copied!
+            step2:
+                title: "Step 2: Verify"
+                desc: Enter your current password and the 6-digit code from your authenticator app to confirm setup.
+            field:
+                current_password: Current Password
+                verification_code: Verification Code
+            error:
+                invalid_code: The verification code is invalid. Make sure you scanned the correct QR code and try again.
+                invalid_password: The current password is incorrect.
+            action:
+                verify_and_enable: Verify & Enable 2FA
+                cancel: Cancel
+        recovery_codes:
+            title: Recovery Codes
+            save_title: Save Your Recovery Codes
+            save_desc: These codes can be used to access your account if you lose your authenticator device. Each code can only be used once.
+            warning: Store these codes in a safe place. You will not be able to see them again.
+            action:
+                done: I've Saved My Codes
+        status:
+            title: Two-Factor Authentication
+            enabled: Enabled
+            disabled: Disabled
+            desc_enabled: Your account is protected with two-factor authentication.
+            desc_disabled: Add an extra layer of security to your account by requiring a code from your authenticator app during login.
+            disabled_success: Two-factor authentication has been disabled.
+        action:
+            enable: Enable 2FA
+            disable: Disable 2FA
+            regenerate_codes: Regenerate Recovery Codes
+        disable:
+            title: Disable Two-Factor Authentication
+            desc: Enter your current password and a code from your authenticator app to disable 2FA.
+            field:
+                password: Current Password
+                totp_code: Authenticator Code
+            error:
+                invalid_password: The password is incorrect.
+                invalid_code: The authenticator code is invalid.
+            action:
+                confirm_disable: Disable 2FA
+                cancel: Cancel
+        regenerate:
+            confirm: Are you sure? This will invalidate all existing recovery codes.
     appearance:
         title: Appearance
         theme:
@@ -576,3 +651,40 @@ subdivision:
     GB-WLS: Wales
     # Italy (only Trentino-South Tyrol has 1 regional holiday)
     IT-32: Trentino-South Tyrol
+
+two_factor_auth:
+    page_title: "Who's OOO — Verify Identity"
+    title: Two-Factor Authentication
+    desc: Enter the 6-digit code from your authenticator app.
+    field:
+        code: Authentication Code
+    error:
+        invalid_code: The code you entered is invalid or expired. Please try again.
+        too_many_attempts: Too many attempts. Please try again later.
+    action:
+        verify: Verify
+        use_recovery_code: Use a recovery code instead
+        cancel_login: Cancel and return to login
+
+error:
+    invalid_csrf_token: Invalid CSRF token.
+
+csrf:
+    invalid: 'Invalid CSRF token.'
+
+slack_status_sync:
+    page:
+        title: 'Slack status auto-sync'
+    card:
+        title: 'Slack status auto-sync'
+        desc: "Automatically set an employee's Slack status (text + emoji) the day their approved leave starts, and clear it the day after it ends. Requires a paid Slack workspace."
+    authorized_by: 'Authorized Slack user'
+    connected_at: 'Connected at'
+    action:
+        authorize: 'Authorize status sync'
+        revoke: 'Revoke authorization'
+    oauth:
+        connected: 'Slack status auto-sync is now active.'
+        revoked: 'Slack status auto-sync has been disabled.'
+        invalid_state: 'The Slack OAuth state did not match. Please try again.'
+        failed: 'Slack authorization failed: %reason%'
