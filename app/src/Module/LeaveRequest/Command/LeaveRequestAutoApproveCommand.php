@@ -17,7 +17,7 @@ use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 
 #[
     AsCommand(name: 'leave-request:auto-approve'),
-    AsPeriodicTask(frequency: '1 minute')
+    AsPeriodicTask(frequency: '5 minute')
 ]
 class LeaveRequestAutoApproveCommand
 {
@@ -35,7 +35,7 @@ class LeaveRequestAutoApproveCommand
             return Command::SUCCESS;
         }
 
-        $this->logger->debug('[LEAVE-REQUEST][AUTO]: Leave request auto approve run.');
+        $this->logger->info('[LEAVE-REQUEST][AUTO]: Leave request auto approve run.');
 
         $createdBefore = new \DateTimeImmutable()->modify(sprintf('-%d seconds', $this->appSettingsFacade->autoApproveDelay() * 60));
 
@@ -53,7 +53,7 @@ class LeaveRequestAutoApproveCommand
             );
         }
 
-        $this->logger->debug(sprintf('[LEAVE-REQUEST][AUTO]: Auto approve done. Approved %s requests.', count($leaveRequestDTOs)));
+        $this->logger->info(sprintf('[LEAVE-REQUEST][AUTO]: Auto approve done. Approved %s requests.', count($leaveRequestDTOs)));
 
         return Command::SUCCESS;
     }

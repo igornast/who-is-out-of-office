@@ -370,13 +370,17 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         $today = new \DateTimeImmutable('today');
 
         $qb = $this->createQueryBuilder('lr');
-        $qb->where('lr.status = :approved')
+        $qb->join('lr.user', 'u')
+            ->leftJoin('u.slackIntegration', 'si')
+            ->where('lr.status = :approved')
             ->andWhere('lr.startDate <= :today')
             ->andWhere('lr.endDate >= :today')
             ->andWhere('lr.isExternalStatusSynced = :notSynced')
+            ->andWhere('si.slackStatusSyncEnabled = :syncEnabled')
             ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
             ->setParameter('today', $today)
             ->setParameter('notSynced', false)
+            ->setParameter('syncEnabled', true)
             ->orderBy('lr.startDate', 'ASC');
 
         /** @var LeaveRequest[] $items */
@@ -393,14 +397,18 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         $today = new \DateTimeImmutable('today');
 
         $qb = $this->createQueryBuilder('lr');
-        $qb->where('lr.isExternalStatusSynced = :synced')
+        $qb->join('lr.user', 'u')
+            ->leftJoin('u.slackIntegration', 'si')
+            ->where('lr.isExternalStatusSynced = :synced')
             ->andWhere($qb->expr()->orX(
                 'lr.endDate < :today',
-                'lr.status != :approved'
+                'lr.status != :approved',
+                'si.slackStatusSyncEnabled = :syncDisabled'
             ))
             ->setParameter('synced', true)
             ->setParameter('today', $today)
             ->setParameter('approved', LeaveRequestStatusEnum::Approved->value)
+            ->setParameter('syncDisabled', false)
             ->orderBy('lr.endDate', 'ASC');
 
         /** @var LeaveRequest[] $items */

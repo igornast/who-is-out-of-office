@@ -384,6 +384,24 @@ public function __construct(
 
 - **Deduplicate cross-controller logic into a service** — when multiple controllers repeat the same multi-step operation, extract it into a dedicated service with a single-call API. Inject the service instead of duplicating dependencies (e.g., env vars, URL generators) across controllers.
 
+### Logging Convention
+
+Use `Psr\Log\LoggerInterface` in commands and handlers. Log messages use a `[MODULE][ACTION]` prefix:
+
+```php
+// info — normal operations: start, completion, counts
+$this->logger->info('[LEAVE-REQUEST][AUTO]: Leave request auto approve run.');
+$this->logger->info(sprintf('[LEAVE-REQUEST][AUTO]: Auto approve done. Approved %s requests.', count($items)));
+
+// error — failures in catch blocks, with context array
+$this->logger->error('Failed to set slack status', [
+    'leave_request_id' => $leaveRequest->id->toString(),
+    'exception' => $e->getMessage(),
+]);
+```
+
+**Note**: Production monolog uses `fingers_crossed` with `action_level: error` — info logs are buffered and only flushed to stderr when an error occurs in the same process.
+
 ### Code Documentation Standards
 
 - **No comments**: Code should be self-documenting through clear naming and structure

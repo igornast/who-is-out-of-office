@@ -21,7 +21,7 @@ class SyncHolidayCalendarsCommand
 
     public function __invoke(): int
     {
-        $currentYear = (int) (new \DateTimeImmutable())->format('Y');
+        $currentYear = (int) new \DateTimeImmutable()->format('Y');
 
         $this->holidayFacade->syncAllActiveCalendars($currentYear);
 

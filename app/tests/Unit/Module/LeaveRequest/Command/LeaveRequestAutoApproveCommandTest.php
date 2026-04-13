@@ -35,7 +35,7 @@ it('returns success without processing when auto approve is disabled', function 
         ->andReturn(false);
 
     $this->logger
-        ->expects('debug')
+        ->expects('info')
         ->never();
 
     $this->leaveRequestFacade
@@ -62,7 +62,7 @@ it('returns success when auto approve is enabled but no pending requests', funct
         ->andReturn($autoApproveDelay);
 
     $this->logger
-        ->expects('debug')
+        ->expects('info')
         ->with('[LEAVE-REQUEST][AUTO]: Leave request auto approve run.')
         ->once();
 
@@ -73,7 +73,7 @@ it('returns success when auto approve is enabled but no pending requests', funct
         ->andReturn([]);
 
     $this->logger
-        ->expects('debug')
+        ->expects('info')
         ->with('[LEAVE-REQUEST][AUTO]: Auto approve done. Approved 0 requests.')
         ->once();
 
@@ -118,7 +118,7 @@ it('approves pending leave requests and dispatches messages', function () {
         ->andReturn($autoApproveDelay);
 
     $this->logger
-        ->expects('debug')
+        ->expects('info')
         ->with('[LEAVE-REQUEST][AUTO]: Leave request auto approve run.')
         ->once();
 
@@ -138,7 +138,7 @@ it('approves pending leave requests and dispatches messages', function () {
         ->twice()->andReturn(new Envelope(new LeaveRequestAutoApprovedMessage('test-id')));
 
     $this->logger
-        ->expects('debug')
+        ->expects('info')
         ->with('[LEAVE-REQUEST][AUTO]: Auto approve done. Approved 2 requests.')
         ->once();
 
@@ -168,7 +168,7 @@ it('approves single pending leave request with correct message id', function () 
         ->andReturn($autoApproveDelay);
 
     $this->logger
-        ->expects('debug')
+        ->expects('info')
         ->twice();
 
     $this->leaveRequestFacade

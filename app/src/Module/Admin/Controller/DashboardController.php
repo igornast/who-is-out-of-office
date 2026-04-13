@@ -75,7 +75,7 @@ class DashboardController extends AbstractDashboardController
             'slack_integration' => $user->slackIntegration,
             'leave_balances' => $this->leaveRequestFacade->getLeaveBalancesPerType(
                 $userId,
-                $user->absenceBalanceResetDay
+                $user->absenceBalanceResetDay->modify('-1 year')
             ),
         ];
 

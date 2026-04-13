@@ -11,7 +11,7 @@ use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 
 #[
     AsCommand(name: 'slack:sync-statuses', description: 'Sync Slack statuses for users starting or ending leave'),
-    AsPeriodicTask(frequency: '30 minutes'),
+    AsPeriodicTask(frequency: '20 minutes'),
 ]
 class SlackStatusSyncCommand
 {
