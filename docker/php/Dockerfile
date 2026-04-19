@@ -16,7 +16,12 @@ RUN apt-get clean && apt-get update && apt-get install -y --fix-missing --no-ins
     bash \
     apt-file \
     libxml2-dev \
-    libpq-dev
+    libpq-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 
 RUN docker-php-ext-install \
     zip \
@@ -25,7 +30,8 @@ RUN docker-php-ext-install \
     soap \
     gettext \
     bcmath \
-    intl
+    intl \
+    gd
 
 RUN rm -rf /var/cache/apk/* && rm -rf /tmp/* && rm -rf /var/lib/apt/lists/*
 RUN curl --insecure https://getcomposer.org/composer.phar -o /usr/bin/composer && chmod +x /usr/bin/composer

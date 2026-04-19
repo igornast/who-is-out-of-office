@@ -37,6 +37,7 @@ class UserDTO
         public string $palettePreference = 'teal',
         public ?string $icalHashSalt = null,
         public bool $slackStatusSyncEnabled = true,
+        public bool $isTwoFactorEnabled = false,
     ) {
     }
 
@@ -73,6 +74,7 @@ class UserDTO
             palettePreference: $user->palettePreference,
             icalHashSalt: $user->icalHashSalt,
             slackStatusSyncEnabled: $user->slackIntegration?->slackStatusSyncEnabled ?? true,
+            isTwoFactorEnabled: $user->isTwoFactorEnabled,
         );
     }
 
@@ -101,6 +103,7 @@ class UserDTO
             palettePreference: $data['palette_preference'] ?? 'teal',
             icalHashSalt: $data['ical_hash_salt'] ?? null,
             slackStatusSyncEnabled: (bool) ($data['slack_status_sync_enabled'] ?? true),
+            isTwoFactorEnabled: (bool) ($data['is_two_factor_enabled'] ?? false),
         );
     }
 }

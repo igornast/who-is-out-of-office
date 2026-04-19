@@ -36,6 +36,7 @@ class UserDTOFixture implements FixtureInterface
             'password' => $faker->password(),
             'profileImageUrl' => null,
             'slackMemberId' => null,
+            'slackStatusSyncEnabled' => true,
             'calendarCountryCode' => $faker->countryCode(),
             'subdivisionCode' => null,
             'birthDate' => \DateTimeImmutable::createFromMutable($faker->dateTimeThisDecade()),
@@ -44,6 +45,7 @@ class UserDTOFixture implements FixtureInterface
             'managerId' => null,
             'icalHashSalt' => null,
             'slackStatusSyncEnabled' => true,
+            'isTwoFactorEnabled' => false,
         ];
     }
 }

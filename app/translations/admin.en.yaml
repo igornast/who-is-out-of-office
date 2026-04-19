@@ -529,6 +529,9 @@ settings:
             save_title: Save Your Recovery Codes
             save_desc: These codes can be used to access your account if you lose your authenticator device. Each code can only be used once.
             warning: Store these codes in a safe place. You will not be able to see them again.
+            manage_title: Recovery Codes
+            manage_desc: Generate a fresh set of recovery codes. Enter your current password to confirm — your existing codes will stop working immediately.
+            password_label: Current password
             action:
                 done: I've Saved My Codes
         status:
@@ -556,6 +559,10 @@ settings:
                 cancel: Cancel
         regenerate:
             confirm: Are you sure? This will invalidate all existing recovery codes.
+            confirm_title: Regenerate recovery codes?
+            confirm_body: This will invalidate all your existing recovery codes immediately. Any codes you've saved or printed will stop working. Make sure you're ready to store the new ones.
+            confirm_action: Regenerate codes
+            cancel: Cancel
     appearance:
         title: Appearance
         theme:

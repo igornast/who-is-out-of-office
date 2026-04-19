@@ -56,12 +56,15 @@ jobs:
 
             - name: Install Dependencies
               run: composer install --no-progress --optimize-autoloader --working-dir=app
+              env:
+                  TOTP_ENCRYPTION_KEY: ${{ secrets.TOTP_ENCRYPTION_KEY_CI }}
 
             - name: Run Tests
               run: composer run test-ci --working-dir=app
               env:
                   DATABASE_URL: 'mysql://root:@127.0.0.1:${{ job.services.mysql.ports[3306] }}/ooo_db_test?serverVersion=8.4&charset=utf8mb4'
                   APP_ENV: 'test'
+                  TOTP_ENCRYPTION_KEY: ${{ secrets.TOTP_ENCRYPTION_KEY_CI }}
 
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v5

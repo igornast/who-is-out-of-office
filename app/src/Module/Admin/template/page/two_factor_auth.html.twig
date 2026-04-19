@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{{ 'two_factor_auth.page_title'|trans(domain='admin') }}</title>
+    <link rel="shortcut icon" href="{{ asset('image/icons/icon_pride.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('styles/_tokens-light.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_tokens-dark.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_palette-sage.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_palette-sunset.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/_palette-lavender.css') }}">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--app-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.25s ease;
+        }
+
+        .tfa-container { width: 100%; max-width: 400px; padding: 20px; }
+
+        .tfa-logo { text-align: center; margin-bottom: 32px; }
+        .tfa-logo h1 { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.3px; }
+        .tfa-logo h1 span { color: var(--primary); }
+
+        .tfa-card {
+            background: var(--app-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .tfa-card h2 { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; text-align: center; }
+        .tfa-card .tfa-desc { font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 24px; line-height: 1.5; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+
+        .form-control {
+            width: 100%; height: 44px; padding: 0 12px;
+            font-family: var(--font-body); font-size: 18px; letter-spacing: 4px; text-align: center;
+            color: var(--text-primary); background: var(--app-surface-sunken);
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-control:focus { border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
+        .form-control::placeholder { color: var(--text-muted); letter-spacing: 2px; font-size: 14px; }
+
+        .btn-verify {
+            width: 100%; height: 42px; font-family: var(--font-body); font-size: 14px; font-weight: 500;
+            color: var(--cta-text); background: var(--cta); border: none; border-radius: var(--radius-md);
+            cursor: pointer; transition: background-color 0.15s ease; margin-top: 4px;
+        }
+        .btn-verify:hover { background: var(--cta-hover); }
+        .btn-verify:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+
+        .alert-error {
+            background: var(--danger-subtle); color: var(--danger);
+            border: 1px solid var(--danger); border-radius: var(--radius-md);
+            padding: 10px 14px; font-size: 13px; margin-bottom: 20px;
+        }
+
+        .tfa-toggle { text-align: center; margin-top: 16px; }
+        .tfa-toggle a { font-size: 13px; color: var(--text-tertiary); text-decoration: none; }
+        .tfa-toggle a:hover { color: var(--primary); }
+
+        .tfa-logout { text-align: center; margin-top: 12px; }
+        .tfa-logout a { font-size: 12px; color: var(--text-muted); text-decoration: none; }
+
+        html.dark body { background: var(--app-bg); }
+        html.dark .tfa-card { background: var(--app-surface); border-color: var(--border-light); }
+        html.dark .form-control { background: var(--app-surface-sunken); border-color: var(--border); color: var(--text-primary); }
+    </style>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('whosooo-theme');
+            var isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark', 'ea-dark-scheme');
+                document.documentElement.dataset.bsTheme = 'dark';
+                document.documentElement.style.colorScheme = 'dark';
+            } else {
+                document.documentElement.style.colorScheme = 'light';
+            }
+            var palette = localStorage.getItem('whosooo-palette') || 'teal';
+            if (['teal','sage','sunset','lavender'].indexOf(palette) === -1) palette = 'teal';
+            if (palette !== 'teal') document.documentElement.dataset.palette = palette;
+        })();
+    </script>
+</head>
+<body>
+    <div class="tfa-container">
+        <div class="tfa-logo">
+            <h1>Who's <span>OOO</span></h1>
+        </div>
+
+        <div class="tfa-card">
+            <h2>{{ 'two_factor_auth.title'|trans(domain='admin') }}</h2>
+            <p class="tfa-desc">{{ 'two_factor_auth.desc'|trans(domain='admin') }}</p>
+
+            {% if error %}
+                <div class="alert-error">
+                    {{ 'two_factor_auth.error.invalid_code'|trans(domain='admin') }}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{{ path('2fa_login_check') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('two_factor') }}">
+
+                <div class="form-group">
+                    <label class="form-label" for="auth_code">{{ 'two_factor_auth.field.code'|trans(domain='admin') }}</label>
+                    <input type="text" id="auth_code" name="_auth_code" class="form-control"
+                           required autofocus autocomplete="one-time-code" inputmode="numeric"
+                           maxlength="9" placeholder="000000"
+                           pattern="[a-z0-9\-]{6,9}">
+                </div>
+
+                <button type="submit" class="btn-verify">{{ 'two_factor_auth.action.verify'|trans(domain='admin') }}</button>
+            </form>
+
+            <div class="tfa-toggle">
+                <a href="#" onclick="document.getElementById('auth_code').placeholder = 'xxxx-xxxx'; document.getElementById('auth_code').setAttribute('inputmode', 'text'); this.parentElement.style.display = 'none'; return false;">
+                    {{ 'two_factor_auth.action.use_recovery_code'|trans(domain='admin') }}
+                </a>
+            </div>
+
+            <div class="tfa-logout">
+                <a href="{{ path('_logout_main') }}">{{ 'two_factor_auth.action.cancel_login'|trans(domain='admin') }}</a>
+            </div>
+        </div>
+    </div>
+    {{ importmap('app') }}
+</body>
+</html>

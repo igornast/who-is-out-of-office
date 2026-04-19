@@ -46,6 +46,81 @@
                 </div>
             </div>
 
+            <div class="settings-card" style="margin-top: 20px;">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'settings.two_factor.status.title'|trans(domain='admin') }}</h3>
+                </div>
+                <div class="settings-card-body">
+                    {% if user.isTwoFactorEnabled %}
+                        <div class="d-flex align-items-center mb-3">
+                            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success); margin-right: 8px;"></span>
+                            <span style="font-weight: 500; color: var(--text-primary);">{{ 'settings.two_factor.status.enabled'|trans(domain='admin') }}</span>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 0;">
+                            {{ 'settings.two_factor.status.desc_enabled'|trans(domain='admin') }}
+                        </p>
+                    {% else %}
+                        <div class="d-flex align-items-center mb-3">
+                            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); margin-right: 8px;"></span>
+                            <span style="font-weight: 500; color: var(--text-primary);">{{ 'settings.two_factor.status.disabled'|trans(domain='admin') }}</span>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 0;">
+                            {{ 'settings.two_factor.status.desc_disabled'|trans(domain='admin') }}
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="settings-card-footer">
+                    {% if user.isTwoFactorEnabled %}
+                        <a href="{{ path('app_two_factor_disable') }}" class="btn btn-danger">{{ 'settings.two_factor.action.disable'|trans(domain='admin') }}</a>
+                    {% else %}
+                        <a href="{{ path('app_two_factor_setup') }}" class="btn btn-primary">{{ 'settings.two_factor.action.enable'|trans(domain='admin') }}</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user.isTwoFactorEnabled %}
+                <div class="settings-card" style="margin-top: 20px;">
+                    <div class="settings-card-header">
+                        <h3 class="settings-card-title">{{ 'settings.two_factor.recovery_codes.manage_title'|trans(domain='admin') }}</h3>
+                        <p class="settings-card-desc">{{ 'settings.two_factor.recovery_codes.manage_desc'|trans(domain='admin') }}</p>
+                    </div>
+                    <form method="post" action="{{ path('app_two_factor_regenerate_codes') }}" id="regenerateCodesForm">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('regenerate_backup_codes') }}">
+                        <div class="settings-card-body">
+                            <div class="field-text form-group mb-0">
+                                <div class="form-widget">
+                                    <label for="regenerate_codes_password" class="form-label" style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: var(--text-primary);">
+                                        {{ 'settings.two_factor.recovery_codes.password_label'|trans(domain='admin') }}
+                                    </label>
+                                    <input type="password" id="regenerate_codes_password" name="_password" required autocomplete="current-password" class="form-control" style="max-width: 320px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-card-footer">
+                            <button type="button" id="regenerateCodesTrigger" class="btn btn-secondary">{{ 'settings.two_factor.action.regenerate_codes'|trans(domain='admin') }}</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal fade" id="regenerateCodesConfirmModal" tabindex="-1" aria-labelledby="regenerateCodesConfirmModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="regenerateCodesConfirmModalLabel">{{ 'settings.two_factor.regenerate.confirm_title'|trans(domain='admin') }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'settings.two_factor.regenerate.cancel'|trans(domain='admin') }}"></button>
+                            </div>
+                            <div class="modal-body">
+                                {{ 'settings.two_factor.regenerate.confirm_body'|trans(domain='admin') }}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'settings.two_factor.regenerate.cancel'|trans(domain='admin') }}</button>
+                                <button type="button" class="btn btn-danger" id="regenerateCodesConfirmBtn">{{ 'settings.two_factor.regenerate.confirm_action'|trans(domain='admin') }}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
             {{ form_start(form) }}
             <div class="settings-card" style="margin-top: 20px;">
                 <div class="settings-card-header">
@@ -77,4 +152,41 @@
             {{ form_end(form) }}
         </div>
     </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    {% if user.isTwoFactorEnabled %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var form = document.getElementById('regenerateCodesForm');
+                var trigger = document.getElementById('regenerateCodesTrigger');
+                var modalEl = document.getElementById('regenerateCodesConfirmModal');
+                var confirmBtn = document.getElementById('regenerateCodesConfirmBtn');
+                var passwordInput = document.getElementById('regenerate_codes_password');
+
+                if (!form || !trigger || !modalEl || !confirmBtn) {
+                    return;
+                }
+
+                var bsModal = new bootstrap.Modal(modalEl);
+
+                trigger.addEventListener('click', function() {
+                    if (!form.reportValidity()) {
+                        return;
+                    }
+                    bsModal.show();
+                });
+
+                confirmBtn.addEventListener('click', function() {
+                    bsModal.hide();
+                    form.requestSubmit();
+                });
+
+                modalEl.addEventListener('shown.bs.modal', function() {
+                    confirmBtn.focus();
+                });
+            });
+        </script>
+    {% endif %}
 {% endblock %}

@@ -1,0 +1,51 @@
+{% extends '@AppAdmin/layout.html.twig' %}
+
+{% block page_title %}{{ 'settings.two_factor.disable.title'|trans(domain='admin') }}{% endblock %}
+
+{% block content_header %}
+    <div class="content-header-title">
+        <h1 class="title" style="font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);">
+            {{ 'settings.two_factor.disable.title'|trans(domain='admin') }}
+        </h1>
+    </div>
+{% endblock %}
+
+{% block main %}
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }}" style="margin-bottom: 16px; border-radius: var(--radius-md); font-size: 13px;">
+                        {{ message|trans(domain='admin') }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {{ form_start(form) }}
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'settings.two_factor.disable.title'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'settings.two_factor.disable.desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="field-text form-group mb-3">
+                        <div class="form-widget">
+                            {{ form_row(form.password, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="field-text form-group mb-0">
+                        <div class="form-widget">
+                            {{ form_row(form.totpCode, {'attr': {'class': 'form-control', 'style': 'max-width: 200px;'}}) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-card-footer">
+                    {{ form_errors(form) }}
+                    <button class="btn btn-danger">{{ 'settings.two_factor.disable.action.confirm_disable'|trans(domain='admin') }}</button>
+                    <a href="{{ path('app_settings_account_security') }}" class="btn btn-secondary" style="margin-left: 8px;">{{ 'settings.two_factor.disable.action.cancel'|trans(domain='admin') }}</a>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
