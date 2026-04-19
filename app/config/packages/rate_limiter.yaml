@@ -1,0 +1,6 @@
+framework:
+    rate_limiter:
+        two_factor_login:
+            policy: fixed_window
+            limit: 5
+            interval: '15 minutes'

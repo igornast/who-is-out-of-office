@@ -6,6 +6,9 @@ use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
 use App\Module\User\UseCase\Command\CleanupExpiredPasswordResetTokensCommandHandler;
+use App\Module\User\UseCase\Command\DisableTwoFactorCommandHandler;
+use App\Module\User\UseCase\Command\EnableTwoFactorCommandHandler;
+use App\Module\User\UseCase\Command\RegenerateBackupCodesCommandHandler;
 use App\Module\User\UseCase\Command\CreatePasswordResetTokenCommandHandler;
 use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
@@ -57,6 +60,9 @@ beforeEach(function (): void {
     $this->getPasswordResetTokenHandler = mock(GetPasswordResetTokenQueryHandler::class);
     $this->getAllActiveUsersHandler = mock(GetAllActiveUsersQueryHandler::class);
     $this->updateSlackStatusSyncPreferenceHandler = mock(UpdateSlackStatusSyncPreferenceCommandHandler::class);
+    $this->enableTwoFactorHandler = mock(EnableTwoFactorCommandHandler::class);
+    $this->disableTwoFactorHandler = mock(DisableTwoFactorCommandHandler::class);
+    $this->regenerateBackupCodesHandler = mock(RegenerateBackupCodesCommandHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -82,6 +88,9 @@ beforeEach(function (): void {
         getPasswordResetTokenHandler: $this->getPasswordResetTokenHandler,
         getAllActiveUsersHandler: $this->getAllActiveUsersHandler,
         updateSlackStatusSyncPreferenceHandler: $this->updateSlackStatusSyncPreferenceHandler,
+        enableTwoFactorHandler: $this->enableTwoFactorHandler,
+        disableTwoFactorHandler: $this->disableTwoFactorHandler,
+        regenerateBackupCodesHandler: $this->regenerateBackupCodesHandler,
     );
 });
 
@@ -345,4 +354,70 @@ it('delegates updateSlackStatusSyncPreference to handler', function () {
     $result = $this->facade->updateSlackStatusSyncPreference('user-1', true);
 
     expect($result)->toBeTrue();
+});
+
+it('delegates enableTwoFactor to handler', function (): void {
+    $this->enableTwoFactorHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', 'TOTP_SECRET')
+        ->andReturn(['code1', 'code2']);
+
+    $result = $this->facade->enableTwoFactor('user-1', 'TOTP_SECRET');
+
+    expect($result)->toBe(['code1', 'code2']);
+});
+
+it('delegates disableTwoFactor to handler', function (): void {
+    $this->disableTwoFactorHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1');
+
+    $this->facade->disableTwoFactor('user-1');
+});
+
+it('delegates regenerateBackupCodes to handler', function (): void {
+    $this->regenerateBackupCodesHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1')
+        ->andReturn(['code1', 'code2']);
+
+    $result = $this->facade->regenerateBackupCodes('user-1');
+
+    expect($result)->toBe(['code1', 'code2']);
+});
+
+it('returns true when user has 2FA enabled', function (): void {
+    $userDto = UserDTOFixture::create(['id' => 'user-1', 'isTwoFactorEnabled' => true]);
+    $this->getUserByIdQueryHandler
+        ->expects('handle')
+        ->with('user-1')
+        ->andReturn($userDto);
+
+    expect($this->facade->isTwoFactorEnabled('user-1'))->toBeTrue();
+});
+
+it('returns false when user has 2FA disabled', function (): void {
+    $userDto = UserDTOFixture::create(['id' => 'user-1', 'isTwoFactorEnabled' => false]);
+    $this->getUserByIdQueryHandler
+        ->expects('handle')
+        ->with('user-1')
+        ->andReturn($userDto);
+
+    expect($this->facade->isTwoFactorEnabled('user-1'))->toBeFalse();
+});
+
+it('delegates getAllActiveUsers to handler', function (): void {
+    $expectedUsers = [UserDTOFixture::create(), UserDTOFixture::create()];
+
+    $this->getAllActiveUsersHandler
+        ->expects('handle')
+        ->once()
+        ->andReturn($expectedUsers);
+
+    $result = $this->facade->getAllActiveUsers();
+
+    expect($result)->toBe($expectedUsers);
 });

@@ -80,4 +80,18 @@ interface UserFacadeInterface
      * @return UserDTO[]
      */
     public function getAllActiveUsers(): array;
+
+    /**
+     * @return string[] Plain-text recovery codes (shown to user once)
+     */
+    public function enableTwoFactor(string $userId, string $plainTotpSecret): array;
+
+    public function disableTwoFactor(string $userId): void;
+
+    /**
+     * @return string[] Plain-text recovery codes (shown to user once)
+     */
+    public function regenerateBackupCodes(string $userId): array;
+
+    public function isTwoFactorEnabled(string $userId): bool;
 }

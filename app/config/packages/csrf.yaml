@@ -9,3 +9,5 @@ framework:
             - submit
             - authenticate
             - logout
+            - two_factor
+            - regenerate_backup_codes

@@ -57,4 +57,16 @@ interface UserRepositoryInterface
     public function removeSlackIntegration(string $userId): void;
 
     public function updateSlackStatusSyncEnabled(string $userId, bool $enabled): bool;
+
+    /**
+     * @param string[] $hashedBackupCodes
+     */
+    public function enableTwoFactor(string $userId, string $encryptedSecret, array $hashedBackupCodes): void;
+
+    public function disableTwoFactor(string $userId): void;
+
+    /**
+     * @param string[] $hashedBackupCodes
+     */
+    public function updateBackupCodes(string $userId, array $hashedBackupCodes): void;
 }

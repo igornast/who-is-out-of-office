@@ -314,6 +314,22 @@ SLACK_AR_HR_DIGEST_CHANNEL_ID=
 - External API for fetching public holidays by country
 - Integrated through `DateNagerFacade` and `DateNagerClient`
 
+#### Two-Factor Authentication (2FA)
+- Built on `scheb/2fa-bundle` with TOTP + backup codes (user opt-in)
+- TOTP secret stored **encrypted at rest** via `TotpSecretEncryptor` (libsodium AEAD — `sodium_crypto_secretbox`)
+- `EncryptedTotpAuthenticator` decorates `scheb_two_factor.security.totp_authenticator` and decrypts the secret just-in-time; `User::eraseCredentials()` clears the plaintext after auth
+- Backup codes: 8-char codes (31-char alphabet), hashed with Argon2id via `BackupCodeHasher` (`NativePasswordHasher`), verified with `password_verify`
+- Firewall rule: `^/2fa` requires `IS_AUTHENTICATED_2FA_IN_PROGRESS`; `default_target_path: /app/dashboard` + `always_use_default_target_path: true` (no open redirect)
+- All privileged actions (setup, disable, regenerate codes) require password re-auth; disable additionally requires a valid TOTP code
+- Rate limiting on setup/disable/login keyed by user id or identifier (see `config/packages/rate_limiter.yaml` and `TwoFactorRateLimitSubscriber`)
+- CSRF token IDs added in `csrf.yaml`: `two_factor`, `regenerate_backup_codes`
+- Controllers in `Module/Admin/Controller/TwoFactor*Controller.php`; crypto primitives in `Infrastructure/Security/`
+
+Environment variables required:
+```
+TOTP_ENCRYPTION_KEY=    # 32-byte key, base64-encoded (`openssl rand -base64 32`); service refuses to boot if missing/invalid
+```
+
 ## Testing Standards
 
 - **PHPStan**: Level 8 enforcement
@@ -751,6 +767,20 @@ When adding new fields to the User entity/DTO, you **must** also add explicit ma
 ### UserDTO::fromArray() Null Safety
 
 Raw SQL queries use `UserDTO::fromArray()`. When adding fields, handle cases where the column may not exist in older data or test fixtures that build arrays manually (use `isset()` check or provide defaults).
+
+### Doctrine Migrations on Live Data (MySQL 8)
+
+The app runs live with existing data, so migrations must be backfill-safe. Key rules when adding columns to non-empty tables:
+
+- **`JSON NOT NULL` has no implicit default on MySQL** — `ALTER TABLE ... ADD col JSON NOT NULL` will fail with `ERROR 1364: Field doesn't have a default value`. Use the 3-step pattern:
+  ```sql
+  ALTER TABLE t ADD col JSON NULL;
+  UPDATE t SET col = '[]' WHERE col IS NULL;
+  ALTER TABLE t MODIFY col JSON NOT NULL;
+  ```
+- **Always add an explicit `DEFAULT`** on new `NOT NULL` columns (e.g. `TINYINT(1) NOT NULL DEFAULT 0`) rather than relying on MySQL's implicit defaults.
+- **Nullable new columns** (`DEFAULT NULL`) are always safe.
+- **New required env vars** introduced by a feature: document them in CLAUDE.md next to the feature, and ensure services fail loudly on missing config rather than silently using weak defaults.
 
 ## Important Notes
 

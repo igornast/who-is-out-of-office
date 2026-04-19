@@ -327,4 +327,50 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
 
         return UserDTO::fromEntity($user);
     }
+
+    /**
+     * @param string[] $hashedBackupCodes
+     */
+    public function enableTwoFactor(string $userId, string $encryptedSecret, array $hashedBackupCodes): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->totpSecret = $encryptedSecret;
+        $user->isTwoFactorEnabled = true;
+        $user->backupCodes = $hashedBackupCodes;
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
+    public function disableTwoFactor(string $userId): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->totpSecret = null;
+        $user->isTwoFactorEnabled = false;
+        $user->backupCodes = [];
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
+    /**
+     * @param string[] $hashedBackupCodes
+     */
+    public function updateBackupCodes(string $userId, array $hashedBackupCodes): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->backupCodes = $hashedBackupCodes;
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
 }

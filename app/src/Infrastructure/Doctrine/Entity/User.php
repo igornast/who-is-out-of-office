@@ -10,11 +10,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
+use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[UniqueEntity('email')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface, BackupCodeInterface
 {
     use TimestampableTrait;
 
@@ -22,6 +26,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param array<int, string>                 $roles
      * @param Collection<int, LeaveRequest>|null $leaveRequests
      * @param int[]                              $workingDays
+     * @param string[]                           $backupCodes
      */
     public function __construct(
         public UuidInterface $id,
@@ -48,9 +53,64 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         public string $palettePreference = 'teal',
         public ?string $icalHashSalt = null,
         public ?self $manager = null,
+        public ?string $totpSecret = null,
+        public bool $isTwoFactorEnabled = false,
+        public array $backupCodes = [],
         public ?Collection $leaveRequests = new ArrayCollection(),
     ) {
         $this->initializeTimestamps();
+    }
+
+    private ?string $decryptedTotpSecret = null;
+
+    public function setDecryptedTotpSecret(?string $secret): void
+    {
+        $this->decryptedTotpSecret = $secret;
+    }
+
+    public function isTotpAuthenticationEnabled(): bool
+    {
+        return $this->isTwoFactorEnabled && null !== $this->totpSecret;
+    }
+
+    public function getTotpAuthenticationUsername(): string
+    {
+        return $this->email;
+    }
+
+    public function getTotpAuthenticationConfiguration(): ?TotpConfigurationInterface
+    {
+        if (null === $this->decryptedTotpSecret) {
+            return null;
+        }
+
+        return new TotpConfiguration(
+            $this->decryptedTotpSecret,
+            TotpConfiguration::ALGORITHM_SHA1,
+            30,
+            6,
+        );
+    }
+
+    public function isBackupCode(string $code): bool
+    {
+        foreach ($this->backupCodes as $hashedCode) {
+            if (password_verify($code, $hashedCode)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function invalidateBackupCode(string $code): void
+    {
+        $this->backupCodes = array_values(
+            array_filter(
+                $this->backupCodes,
+                fn (string $hashedCode): bool => !password_verify($code, $hashedCode),
+            ),
+        );
     }
 
     public function getRoles(): array
@@ -61,6 +121,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         $this->plainPassword = null;
+        $this->decryptedTotpSecret = null;
     }
 
     public function getUserIdentifier(): string

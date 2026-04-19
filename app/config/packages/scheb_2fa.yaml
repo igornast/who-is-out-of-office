@@ -1,0 +1,17 @@
+scheb_two_factor:
+    security_tokens:
+        - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+        - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken
+
+    backup_codes:
+        enabled: true
+
+    totp:
+        enabled: true
+        issuer: "Who's OOO"
+        server_name: "Who's OOO"
+        leeway: 0
+        parameters:
+            digits: 6
+            period: 30
+            algorithm: sha1

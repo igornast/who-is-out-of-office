@@ -1,0 +1,95 @@
+{% extends '@AppAdmin/layout.html.twig' %}
+
+{% block page_title %}{{ 'settings.two_factor.setup.title'|trans(domain='admin') }}{% endblock %}
+
+{% block content_header %}
+    <div class="content-header-title">
+        <h1 class="title" style="font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary);">
+            {{ 'settings.two_factor.setup.title'|trans(domain='admin') }}
+        </h1>
+    </div>
+{% endblock %}
+
+{% block main %}
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }}" style="margin-bottom: 16px; border-radius: var(--radius-md); font-size: 13px;">
+                        {{ message|trans(domain='admin') }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'settings.two_factor.setup.step1.title'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'settings.two_factor.setup.step1.desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body" style="text-align: center;">
+                    <div style="margin-bottom: 16px;">
+                        <img src="{{ qrCodeDataUri }}" alt="QR Code" style="border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+                    </div>
+                    <div style="margin-bottom: 8px; font-size: 12px; color: var(--text-tertiary);">
+                        {{ 'settings.two_factor.setup.step1.manual_entry'|trans(domain='admin') }}
+                    </div>
+                    <div style="display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 8px 12px; background: var(--app-surface-sunken); border-radius: var(--radius-md);">
+                        <code id="two-fa-secret" style="font-family: monospace; font-size: 14px; letter-spacing: 2px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ secret }}</code>
+                        <button type="button" id="two-fa-copy" style="flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 11px; font-weight: 500; font-family: var(--font-body); color: var(--primary); background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s ease;" title="{{ 'settings.two_factor.setup.step1.copy_key'|trans(domain='admin') }}">
+                            <i data-lucide="copy" style="width: 12px; height: 12px;"></i>
+                            {{ 'settings.two_factor.setup.step1.copy_key'|trans(domain='admin') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {{ form_start(form) }}
+            <div class="settings-card" style="margin-top: 20px;">
+                <div class="settings-card-header">
+                    <h3 class="settings-card-title">{{ 'settings.two_factor.setup.step2.title'|trans(domain='admin') }}</h3>
+                    <p class="settings-card-desc">{{ 'settings.two_factor.setup.step2.desc'|trans(domain='admin') }}</p>
+                </div>
+                <div class="settings-card-body">
+                    <div class="field-text form-group mb-3">
+                        <div class="form-widget">
+                            {{ form_row(form.currentPassword, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="field-text form-group mb-0">
+                        <div class="form-widget">
+                            {{ form_row(form.verificationCode, {'attr': {'class': 'form-control', 'style': 'max-width: 200px; text-align: center; font-size: 18px; letter-spacing: 4px;'}}) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-card-footer">
+                    {{ form_errors(form) }}
+                    <button class="btn btn-primary">{{ 'settings.two_factor.setup.action.verify_and_enable'|trans(domain='admin') }}</button>
+                    <a href="{{ path('app_settings_account_security') }}" class="btn btn-secondary" style="margin-left: 8px;">{{ 'settings.two_factor.setup.action.cancel'|trans(domain='admin') }}</a>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            var copyBtn = document.getElementById('two-fa-copy');
+            var secretEl = document.getElementById('two-fa-secret');
+            if (!copyBtn || !secretEl) return;
+
+            copyBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(secretEl.textContent.trim());
+                var originalHtml = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i data-lucide="check" style="width:12px;height:12px;"></i> {{ "settings.two_factor.setup.step1.copied"|trans(domain="admin") }}';
+                if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+                setTimeout(function() {
+                    copyBtn.innerHTML = originalHtml;
+                    if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+                }, 2000);
+            });
+        });
+    </script>
+{% endblock %}

@@ -9,7 +9,10 @@ use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
+use App\Module\User\UseCase\Command\DisableTwoFactorCommandHandler;
 use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
+use App\Module\User\UseCase\Command\EnableTwoFactorCommandHandler;
+use App\Module\User\UseCase\Command\RegenerateBackupCodesCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
 use App\Module\User\UseCase\Command\CleanupExpiredPasswordResetTokensCommandHandler;
 use App\Module\User\UseCase\Command\CreatePasswordResetTokenCommandHandler;
@@ -62,6 +65,9 @@ final class UserFacade implements UserFacadeInterface
         private readonly GetPasswordResetTokenQueryHandler $getPasswordResetTokenHandler,
         private readonly GetAllActiveUsersQueryHandler $getAllActiveUsersHandler,
         private readonly UpdateSlackStatusSyncPreferenceCommandHandler $updateSlackStatusSyncPreferenceHandler,
+        private readonly EnableTwoFactorCommandHandler $enableTwoFactorHandler,
+        private readonly DisableTwoFactorCommandHandler $disableTwoFactorHandler,
+        private readonly RegenerateBackupCodesCommandHandler $regenerateBackupCodesHandler,
     ) {
     }
 
@@ -199,5 +205,27 @@ final class UserFacade implements UserFacadeInterface
     public function getAllActiveUsers(): array
     {
         return $this->getAllActiveUsersHandler->handle();
+    }
+
+    public function enableTwoFactor(string $userId, string $plainTotpSecret): array
+    {
+        return $this->enableTwoFactorHandler->handle($userId, $plainTotpSecret);
+    }
+
+    public function disableTwoFactor(string $userId): void
+    {
+        $this->disableTwoFactorHandler->handle($userId);
+    }
+
+    public function regenerateBackupCodes(string $userId): array
+    {
+        return $this->regenerateBackupCodesHandler->handle($userId);
+    }
+
+    public function isTwoFactorEnabled(string $userId): bool
+    {
+        $user = $this->getUserByIdQueryHandler->handle($userId);
+
+        return null !== $user && $user->isTwoFactorEnabled;
     }
 }
