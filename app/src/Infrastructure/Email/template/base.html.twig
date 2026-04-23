@@ -77,7 +77,7 @@
                                             {% if company_name is defined and company_name %}
                                                 <strong>{{ company_name }}</strong><br>
                                             {% endif %}
-                                            {{ 'email.base.powered_by'|trans }}
+                                            {{ 'email.base.powered_by'|trans({'%brand%': '<a href="https://www.whoisooo.app" target="_blank" style="color: #3D9B8F; text-decoration: none; font-weight: 600;">Who\'s OOO</a>'})|raw }}
                                         </p>
                                         <p style="margin: 12px 0 0 0; color: #8A9E9E; font-size: 11px;">
                                             &copy; {{ 'now'|date('Y') }} {{ 'email.base.rights'|trans }}

@@ -205,3 +205,21 @@ it('delegates updateAllSettings to handler', function () {
 
     $this->facade->updateAllSettings($settingsDTO);
 });
+
+it('returns organization name', function () {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::ORGANIZATION_NAME)
+        ->andReturn('Acme Inc.');
+
+    expect($this->facade->organizationName())->toBe('Acme Inc.');
+});
+
+it('throws exception when organization name is not string', function () {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::ORGANIZATION_NAME)
+        ->andReturn(42);
+
+    $this->facade->organizationName();
+})->throws(InvalidAppSettingTypeException::class);

@@ -24,6 +24,7 @@ class AppSettingsDTOFixture implements FixtureInterface
             'maxConsecutiveDays' => 10,
             'skipWeekendHolidays' => false,
             'slackStatusSyncEnabled' => false,
+            'organizationName' => 'Acme Inc.',
         ];
     }
 }

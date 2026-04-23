@@ -8,3 +8,5 @@ notification:
     skip_weekend_holidays: false
 slack:
     status_sync_enabled: false
+organization:
+    name: "Your Organization"

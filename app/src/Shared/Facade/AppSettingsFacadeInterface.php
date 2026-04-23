@@ -22,6 +22,8 @@ interface AppSettingsFacadeInterface
 
     public function isSlackStatusSyncEnabled(): bool;
 
+    public function organizationName(): string;
+
     public function getAllSettings(): AppSettingsDTO;
 
     public function updateAllSettings(AppSettingsDTO $settingsDTO): void;
