@@ -19,6 +19,9 @@ it('creates from array with all keys present', function (): void {
         'slack' => [
             'status_sync_enabled' => true,
         ],
+        'organization' => [
+            'name' => 'Acme Inc.',
+        ],
     ];
 
     $dto = AppSettingsDTO::fromArray($data);
@@ -29,7 +32,8 @@ it('creates from array with all keys present', function (): void {
         ->and($dto->minNoticeDays)->toBe(3)
         ->and($dto->maxConsecutiveDays)->toBe(10)
         ->and($dto->skipWeekendHolidays)->toBeTrue()
-        ->and($dto->slackStatusSyncEnabled)->toBeTrue();
+        ->and($dto->slackStatusSyncEnabled)->toBeTrue()
+        ->and($dto->organizationName)->toBe('Acme Inc.');
 });
 
 it('falls back to false when slack.status_sync_enabled is missing (backward compatible)', function (): void {
@@ -49,7 +53,8 @@ it('falls back to false when slack.status_sync_enabled is missing (backward comp
     $dto = AppSettingsDTO::fromArray($data);
 
     expect($dto->slackStatusSyncEnabled)->toBeFalse()
-        ->and($dto->skipWeekendHolidays)->toBeFalse();
+        ->and($dto->skipWeekendHolidays)->toBeFalse()
+        ->and($dto->organizationName)->toBe('');
 });
 
 it('round-trips through toArray and fromArray', function (): void {
@@ -61,6 +66,7 @@ it('round-trips through toArray and fromArray', function (): void {
         maxConsecutiveDays: 15,
         skipWeekendHolidays: true,
         slackStatusSyncEnabled: true,
+        organizationName: 'Acme Inc.',
     );
 
     $restored = AppSettingsDTO::fromArray($dto->toArray());
@@ -71,7 +77,8 @@ it('round-trips through toArray and fromArray', function (): void {
         ->and($restored->minNoticeDays)->toBe($dto->minNoticeDays)
         ->and($restored->maxConsecutiveDays)->toBe($dto->maxConsecutiveDays)
         ->and($restored->skipWeekendHolidays)->toBe($dto->skipWeekendHolidays)
-        ->and($restored->slackStatusSyncEnabled)->toBe($dto->slackStatusSyncEnabled);
+        ->and($restored->slackStatusSyncEnabled)->toBe($dto->slackStatusSyncEnabled)
+        ->and($restored->organizationName)->toBe($dto->organizationName);
 });
 
 it('serializes slackStatusSyncEnabled to the correct nested key', function (): void {
@@ -83,6 +90,7 @@ it('serializes slackStatusSyncEnabled to the correct nested key', function (): v
         maxConsecutiveDays: 0,
         skipWeekendHolidays: false,
         slackStatusSyncEnabled: true,
+        organizationName: 'Acme Inc.',
     );
 
     $array = $dto->toArray();

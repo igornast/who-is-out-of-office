@@ -8,6 +8,7 @@ use App\Shared\DTO\Settings\AppSettingsDTO;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -49,6 +50,11 @@ class AppSettingsFormType extends AbstractType
                 'label' => 'crud.app_settings.field.slack_status_sync_enabled',
                 'help' => 'crud.app_settings.field.slack_status_sync_enabled_help',
                 'required' => false,
+            ])
+            ->add('organizationName', TextType::class, [
+                'label' => 'crud.app_settings.field.organization_name',
+                'help' => 'crud.app_settings.field.organization_name_help',
+                'required' => true,
             ]);
     }
 

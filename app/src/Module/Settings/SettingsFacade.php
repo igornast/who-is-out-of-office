@@ -107,6 +107,17 @@ final class SettingsFacade implements AppSettingsFacadeInterface
         return $value;
     }
 
+    public function organizationName(): string
+    {
+        $value = $this->appSettingValueHandler->handle(AppSettingsEnum::ORGANIZATION_NAME);
+
+        if (!is_string($value)) {
+            throw new InvalidAppSettingTypeException(expected: 'string', settingsEnum: AppSettingsEnum::ORGANIZATION_NAME);
+        }
+
+        return $value;
+    }
+
     public function getAllSettings(): AppSettingsDTO
     {
         return $this->getAllAppSettingsQueryHandler->handle();

@@ -5,7 +5,7 @@ email:
     base:
         title: "Who's OOO"
         preheader: "Who's OOO - Leave Management"
-        powered_by: "Powered by Who's OOO"
+        powered_by: "Powered by %brand%"
         rights: "All rights reserved."
     common:
         leave_type: "Leave Type"

@@ -6,6 +6,7 @@ use App\Module\Admin\Form\AppSettingsFormType;
 use App\Shared\DTO\Settings\AppSettingsDTO;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -37,14 +38,15 @@ it('adds all expected fields with correct types', function (): void {
     $formType->configureOptions($resolver);
     $formType->buildForm($builder, $resolver->resolve());
 
-    expect($fields)->toHaveCount(7)
+    expect($fields)->toHaveCount(8)
         ->and($fields['autoApprove']['type'])->toBe(CheckboxType::class)
         ->and($fields['autoApproveDelay']['type'])->toBe(IntegerType::class)
         ->and($fields['defaultAnnualAllowance']['type'])->toBe(IntegerType::class)
         ->and($fields['minNoticeDays']['type'])->toBe(IntegerType::class)
         ->and($fields['maxConsecutiveDays']['type'])->toBe(IntegerType::class)
         ->and($fields['skipWeekendHolidays']['type'])->toBe(CheckboxType::class)
-        ->and($fields['slackStatusSyncEnabled']['type'])->toBe(CheckboxType::class);
+        ->and($fields['slackStatusSyncEnabled']['type'])->toBe(CheckboxType::class)
+        ->and($fields['organizationName']['type'])->toBe(TextType::class);
 });
 
 it('checkbox fields are not required', function (): void {
@@ -89,5 +91,6 @@ it('integer fields are required', function (): void {
     expect($fields['autoApproveDelay']['required'])->toBeTrue()
         ->and($fields['defaultAnnualAllowance']['required'])->toBeTrue()
         ->and($fields['minNoticeDays']['required'])->toBeTrue()
-        ->and($fields['maxConsecutiveDays']['required'])->toBeTrue();
+        ->and($fields['maxConsecutiveDays']['required'])->toBeTrue()
+        ->and($fields['organizationName']['required'])->toBeTrue();
 });
