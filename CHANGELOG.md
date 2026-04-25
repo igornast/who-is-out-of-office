@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.2.0] — 2026-04-25
+
+### Added
+
+- Add organization name ([642ce00](https://github.com/igornast/who-is-out-of-office/commit/642ce00b1dda0b2e64696c42c5f5fcea1c98ae43))
+- Add 2factor authentication ([b912821](https://github.com/igornast/who-is-out-of-office/commit/b912821639164f4abe29b71e514dabe0e21fb2c8))
+- Minor improvements ([325e754](https://github.com/igornast/who-is-out-of-office/commit/325e754c3cb64bf8a9ad49aacbe1e85e2fba0c1e))
+- Mark encryptor lazy service ([e10c8ce](https://github.com/igornast/who-is-out-of-office/commit/e10c8ce4e5813c0912a49ae66ba0cc15757f873c))
+- Slack-status-sync ([b2b72d1](https://github.com/igornast/who-is-out-of-office/commit/b2b72d16eb55efdb31cd51f6bf0e44d0e57ce94c))
+- Leave request types sorting, and request calendar improvements ([def47e9](https://github.com/igornast/who-is-out-of-office/commit/def47e9c9bb86a0e5429fb41a4b7b0dd63e71dcd))
+
+### Fixed
+
+- Allow lax cookie ([8e23c6d](https://github.com/igornast/who-is-out-of-office/commit/8e23c6d719bda55ce27e640a30e2782f27927e94))
+- Slack status sync switch ([86b467a](https://github.com/igornast/who-is-out-of-office/commit/86b467ac17894eb5cbb0cf7fb1f4a5297e1aec99))
+- Add missing .env placeholders ([7730fec](https://github.com/igornast/who-is-out-of-office/commit/7730fecbfa8ea2b339d14db1ae1d0a6e65ef9bd3))
+- Mailpit docker configuration ([73eaf07](https://github.com/igornast/who-is-out-of-office/commit/73eaf07a3ceabecaefd1ee4f3745a7219c7aa3ec))
+
+
+[0.2.0]: https://github.com/igornast/who-is-out-of-office/releases/tag/v0.2.0
+
 ## [0.1.0] — 2026-04-08
 
 The first public release of **Who's Out of Office** — a self-hosted staff leave
