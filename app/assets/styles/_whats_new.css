@@ -1,0 +1,107 @@
+.whats-new-page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 0;
+}
+
+.whats-new-page-header h1 {
+    font-family: var(--font-display, var(--font-body));
+    font-size: var(--text-2xl);
+    color: var(--text-primary);
+    margin-bottom: 24px;
+}
+
+.whats-new-section {
+    margin-bottom: 32px;
+}
+
+.whats-new-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-lg);
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.whats-new-section-title i {
+    width: 20px;
+    height: 20px;
+    color: var(--primary);
+}
+
+.whats-new-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.whats-new-item {
+    background: var(--app-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.whats-new-item:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.whats-new-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+}
+
+.whats-new-badge-new {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: var(--primary-subtle);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.whats-new-item-title {
+    font-size: var(--text-lg);
+    color: var(--text-primary);
+    margin: 0 0 6px;
+}
+
+.whats-new-item-summary {
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+    line-height: 1.5;
+}
+
+.whats-new-item-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--primary);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.whats-new-item-link:hover {
+    text-decoration: underline;
+}
+
+.whats-new-item-link i {
+    width: 14px;
+    height: 14px;
+}
+
+.whats-new-empty {
+    margin-top: 16px;
+}

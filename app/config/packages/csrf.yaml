@@ -11,3 +11,4 @@ framework:
             - logout
             - two_factor
             - regenerate_backup_codes
+            - mark_feed_as_read

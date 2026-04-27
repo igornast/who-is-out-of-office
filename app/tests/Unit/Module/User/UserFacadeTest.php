@@ -19,6 +19,7 @@ use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackStatusSyncPreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
+use App\Module\User\UseCase\Command\UpdateUserFeedLastSeenAtCommandHandler;
 use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
@@ -63,6 +64,7 @@ beforeEach(function (): void {
     $this->enableTwoFactorHandler = mock(EnableTwoFactorCommandHandler::class);
     $this->disableTwoFactorHandler = mock(DisableTwoFactorCommandHandler::class);
     $this->regenerateBackupCodesHandler = mock(RegenerateBackupCodesCommandHandler::class);
+    $this->updateUserFeedLastSeenAtHandler = mock(UpdateUserFeedLastSeenAtCommandHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -91,6 +93,7 @@ beforeEach(function (): void {
         enableTwoFactorHandler: $this->enableTwoFactorHandler,
         disableTwoFactorHandler: $this->disableTwoFactorHandler,
         regenerateBackupCodesHandler: $this->regenerateBackupCodesHandler,
+        updateUserFeedLastSeenAtHandler: $this->updateUserFeedLastSeenAtHandler,
     );
 });
 
@@ -420,4 +423,15 @@ it('delegates getAllActiveUsers to handler', function (): void {
     $result = $this->facade->getAllActiveUsers();
 
     expect($result)->toBe($expectedUsers);
+});
+
+it('delegates updateFeedLastSeenAt to handler', function (): void {
+    $seenAt = new DateTimeImmutable('2026-05-01 12:00:00');
+
+    $this->updateUserFeedLastSeenAtHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', $seenAt);
+
+    $this->facade->updateFeedLastSeenAt('user-1', $seenAt);
 });

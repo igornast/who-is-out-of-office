@@ -21,6 +21,7 @@ use App\Module\User\UseCase\Command\ResetPasswordCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackStatusSyncPreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
+use App\Module\User\UseCase\Command\UpdateUserFeedLastSeenAtCommandHandler;
 use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
@@ -68,6 +69,7 @@ final class UserFacade implements UserFacadeInterface
         private readonly EnableTwoFactorCommandHandler $enableTwoFactorHandler,
         private readonly DisableTwoFactorCommandHandler $disableTwoFactorHandler,
         private readonly RegenerateBackupCodesCommandHandler $regenerateBackupCodesHandler,
+        private readonly UpdateUserFeedLastSeenAtCommandHandler $updateUserFeedLastSeenAtHandler,
     ) {
     }
 
@@ -227,5 +229,10 @@ final class UserFacade implements UserFacadeInterface
         $user = $this->getUserByIdQueryHandler->handle($userId);
 
         return null !== $user && $user->isTwoFactorEnabled;
+    }
+
+    public function updateFeedLastSeenAt(string $userId, \DateTimeImmutable $seenAt): void
+    {
+        $this->updateUserFeedLastSeenAtHandler->handle($userId, $seenAt);
     }
 }

@@ -272,6 +272,32 @@ The application uses Symfony events for cross-cutting concerns:
 - Users can set a `subdivisionCode` to filter holidays to their region
 - Workday calculation respects subdivision: global holidays always apply, regional only when matching
 
+#### Feed Module
+
+The feed publisher at `whoisooo.app/api/feed.json` is a first-party source owned by the same team — treat the payload as trusted first-party content.
+
+- Pulls a JSON Feed v1.1 (with `_content_type` extension) from `whoisooo.app/api/feed.json` every 6 hours via `app:feed:sync` cron (`AsCronTask('0 */6 * * *')`)
+- Caches items in `feed_item` table; idempotent upserts keyed by `external_id`
+- Topbar bell shows unread count per user; unread = items published after `user.feed_last_seen_at` (falls back to `user.created_at` for never-visited users)
+- `/app/whats-new` page renders blog / changelog / announcements grouped, marks-as-read on visit
+- Sidebar footer link to homepage uses UTM parameters (`utm_source=app&utm_medium=sidebar`)
+- All in-app reach into the module goes through `FeedFacadeInterface`
+- Custom (non-EasyAdmin CRUD) route `app_whats_new` is registered in `AdminContextForCustomRoutesSubscriber::CUSTOM_ROUTES` so the layout's EasyAdmin context loads correctly
+
+Environment variables required:
+```
+WHOISOOO_HOMEPAGE_URL=https://whoisooo.app
+WHOISOOO_FEED_URL=https://whoisooo.app/api/feed.json
+WHOISOOO_FEED_TIMEOUT_SECONDS=5
+```
+
+Notes:
+- `FeedClient` swallows transport / decode errors and returns `[]` so a remote outage does not page the cron command. Existing cached items continue to serve.
+- `WHOISOOO_FEED_URL` MUST use the `https://` scheme **in `prod`** — `FeedClient` rejects non-`https` URLs only when `APP_ENV=prod` (so local/dev can point at an `http://` container on a shared Docker network). Redirects are refused in all envs (`max_redirects: 0`).
+- `FeedExtension` (`feed_unread_count()` Twig function) memoizes the count per request.
+- The custom Twig namespace `@AppFeed` is registered in `config/packages/twig.yaml` and points to `src/Module/Feed/template/`.
+- The Twig global `whoisooo_homepage_url` is sourced from the `WHOISOOO_HOMEPAGE_URL` env var.
+
 ### Infrastructure Layer
 
 #### Email Integration

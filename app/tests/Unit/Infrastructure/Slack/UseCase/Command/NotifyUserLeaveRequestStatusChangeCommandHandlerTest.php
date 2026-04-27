@@ -66,7 +66,7 @@ it('sends slack notification to user with approved by information', function () 
                 ->and($blocks[2]['fields'][0]['type'])->toBe('mrkdwn')
                 ->and($blocks[2]['fields'][0]['text'])->toBe(sprintf('*Type:* %s', $leaveRequestDTO->leaveType->name))
                 ->and($blocks[2]['fields'][1]['type'])->toBe('mrkdwn')
-                ->and($blocks[2]['fields'][1]['text'])->toBe(sprintf('*Staus:* %s', $leaveRequestDTO->status->name))
+                ->and($blocks[2]['fields'][1]['text'])->toBe(sprintf('*Status:* %s', $leaveRequestDTO->status->name))
                 ->and($blocks[3]['type'])->toBe('section')
                 ->and($blocks[3]['fields'][0]['type'])->toBe('mrkdwn')
                 ->and($blocks[3]['fields'][0]['text'])->toBe(sprintf(
@@ -131,7 +131,7 @@ it('sends slack notification to user without approved by information', function 
                 ->and($blocks[2]['fields'][0]['type'])->toBe('mrkdwn')
                 ->and($blocks[2]['fields'][0]['text'])->toBe(sprintf('*Type:* %s', $leaveRequestDTO->leaveType->name))
                 ->and($blocks[2]['fields'][1]['type'])->toBe('mrkdwn')
-                ->and($blocks[2]['fields'][1]['text'])->toBe(sprintf('*Staus:* %s', $leaveRequestDTO->status->name))
+                ->and($blocks[2]['fields'][1]['text'])->toBe(sprintf('*Status:* %s', $leaveRequestDTO->status->name))
                 ->and($blocks[3]['type'])->toBe('section')
                 ->and($blocks[3]['fields'][0]['type'])->toBe('mrkdwn')
                 ->and($blocks[3]['fields'][0]['text'])->toBe(sprintf(
@@ -211,7 +211,7 @@ it('sends slack notification with auto approved text when request is auto approv
                 ->and($blocks[2]['fields'][0]['type'])->toBe('mrkdwn')
                 ->and($blocks[2]['fields'][0]['text'])->toBe(sprintf('*Type:* %s', $leaveRequestDTO->leaveType->name))
                 ->and($blocks[2]['fields'][1]['type'])->toBe('mrkdwn')
-                ->and($blocks[2]['fields'][1]['text'])->toBe(sprintf('*Staus:* %s', $leaveRequestDTO->status->name))
+                ->and($blocks[2]['fields'][1]['text'])->toBe(sprintf('*Status:* %s', $leaveRequestDTO->status->name))
                 ->and($blocks[3]['type'])->toBe('section')
                 ->and($blocks[3]['fields'][0]['type'])->toBe('mrkdwn')
                 ->and($blocks[3]['fields'][0]['text'])->toBe(sprintf(

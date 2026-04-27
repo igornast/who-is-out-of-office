@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Infrastructure\Doctrine\Entity\FeedItem" table="feed_item">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="externalId" column="external_id" length="191" unique="true"/>
+        <field name="title" column="title" length="500"/>
+        <field name="url" column="url" length="1000"/>
+        <field name="summary" column="summary" type="text" nullable="true"/>
+        <field name="contentType" column="content_type" type="string" length="32" enum-type="App\Shared\Enum\FeedItemTypeEnum"/>
+        <field name="publishedAt" column="published_at" type="datetime_immutable">
+            <options>
+                <option name="comment">UTC</option>
+            </options>
+        </field>
+        <field name="fetchedAt" column="fetched_at" type="datetime_immutable"/>
+
+        <field name="createdAt" column="created_at" type="datetime_immutable"/>
+        <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
+
+        <indexes>
+            <index name="idx_feed_item_published_at" columns="published_at"/>
+        </indexes>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="preUpdate" method="updateTimestamp"/>
+        </lifecycle-callbacks>
+    </entity>
+</doctrine-mapping>

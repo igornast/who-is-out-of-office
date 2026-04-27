@@ -160,32 +160,41 @@
 
         <div class="ooo-sidebar-footer">
             {% set _user = app.user %}
-            <div class="ooo-sidebar-avatar">
-                {% if _user.profileImageUrl %}
-                    {% if _user.profileImageUrl starts with 'http://' or _user.profileImageUrl starts with 'https://' %}
-                        <img src="{{ _user.profileImageUrl }}" alt="">
+            <a class="ooo-sidebar-footer-link"
+               href="{{ whoisooo_homepage_url.sidebarUrl }}"
+               target="_blank" rel="noopener noreferrer"
+               title="{{ 'sidebar.visit_homepage'|trans(domain: 'admin') }}">
+                <i data-lucide="tree-palm"></i>
+                <span class="ooo-sidebar-label">{{ 'sidebar.visit_homepage'|trans(domain: 'admin') }}</span>
+            </a>
+            <div class="ooo-sidebar-footer-user">
+                <div class="ooo-sidebar-avatar">
+                    {% if _user.profileImageUrl %}
+                        {% if _user.profileImageUrl starts with 'http://' or _user.profileImageUrl starts with 'https://' %}
+                            <img src="{{ _user.profileImageUrl }}" alt="">
+                        {% else %}
+                            <img src="/{{ profile_images_base_path }}/{{ _user.profileImageUrl }}" alt="">
+                        {% endif %}
                     {% else %}
-                        <img src="/{{ profile_images_base_path }}/{{ _user.profileImageUrl }}" alt="">
+                        {{ _user.firstName|first }}{{ _user.lastName|first }}
                     {% endif %}
-                {% else %}
-                    {{ _user.firstName|first }}{{ _user.lastName|first }}
-                {% endif %}
-            </div>
-            <div class="ooo-sidebar-user-info">
-                <div class="ooo-sidebar-user-name">{{ _user.firstName }} {{ _user.lastName }}</div>
-                <div class="ooo-sidebar-user-role">
-                    {% import '@AppAdmin/component/_role_badge.html.twig' as role %}
-                    {{ role.roleBadge('role-badge role-badge-sm') }}
                 </div>
+                <div class="ooo-sidebar-user-info">
+                    <div class="ooo-sidebar-user-name">{{ _user.firstName }} {{ _user.lastName }}</div>
+                    <div class="ooo-sidebar-user-role">
+                        {% import '@AppAdmin/component/_role_badge.html.twig' as role %}
+                        {{ role.roleBadge('role-badge role-badge-sm') }}
+                    </div>
+                </div>
+                <button class="ooo-theme-toggle"
+                        data-controller="theme-toggle"
+                        data-action="click->theme-toggle#toggle"
+                        title="{{ 'sidebar.theme_toggle'|trans(domain: 'admin') }}"
+                        aria-label="{{ 'sidebar.theme_toggle'|trans(domain: 'admin') }}">
+                    <i data-lucide="moon" class="icon-moon"></i>
+                    <i data-lucide="sun" class="icon-sun"></i>
+                </button>
             </div>
-            <button class="ooo-theme-toggle"
-                    data-controller="theme-toggle"
-                    data-action="click->theme-toggle#toggle"
-                    title="{{ 'sidebar.theme_toggle'|trans(domain: 'admin') }}"
-                    aria-label="{{ 'sidebar.theme_toggle'|trans(domain: 'admin') }}">
-                <i data-lucide="moon" class="icon-moon"></i>
-                <i data-lucide="sun" class="icon-sun"></i>
-            </button>
         </div>
     </div>
 {% endblock %}
@@ -200,6 +209,17 @@
         </button>
         <a class="btn-quick-add" href="{{ url('app_dashboard_requests_new') }}">
             <i data-lucide="plus"></i>
+        </a>
+        <a class="topbar-feed-bell {{ app.request.attributes.get('_route') == 'app_whats_new' ? 'active' }}"
+           href="{{ path('app_whats_new') }}"
+           aria-label="{{ 'topbar.whats_new'|trans(domain: 'admin') }}"
+           title="{{ 'topbar.whats_new'|trans(domain: 'admin') }}">
+            <i data-lucide="bell"></i>
+            {% set _unread_count = feed_unread_count() %}
+            {% if _unread_count > 0 %}
+                {% set _badge_label = _unread_count > 99 ? '99+' : _unread_count %}
+                <span class="topbar-feed-bell-badge" aria-live="polite" aria-label="{{ 'topbar.unread_notifications'|trans({'%count%': _badge_label}, 'admin') }}">{{ _badge_label }}</span>
+            {% endif %}
         </a>
         <div class="avatar-dropdown-wrapper"
              data-controller="avatar-dropdown"
