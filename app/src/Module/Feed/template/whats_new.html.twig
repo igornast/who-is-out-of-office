@@ -1,0 +1,67 @@
+{% extends '@AppAdmin/layout.html.twig' %}
+
+{% block content_title %}{{ 'whats_new.title'|trans(domain: 'admin') }}{% endblock %}
+
+{% block main %}
+    <form data-controller="mark-feed-as-read"
+          method="POST"
+          action="{{ path('app_whats_new_mark_read') }}"
+          class="d-none"
+          aria-hidden="true">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('mark_feed_as_read') }}">
+    </form>
+    <div class="whats-new-page">
+        <header class="whats-new-page-header">
+            <h1>{{ 'whats_new.title'|trans(domain: 'admin') }}</h1>
+        </header>
+
+        {% set _is_empty = grouped.blog is empty and grouped.changelog is empty and grouped.announcement is empty %}
+        {% if _is_empty %}
+            <div class="alert alert-info whats-new-empty">
+                {{ 'whats_new.empty'|trans(domain: 'admin') }}
+            </div>
+        {% else %}
+            {% set sections = [
+                {key: 'blog',         title_key: 'whats_new.section.blog',          icon: 'newspaper'},
+                {key: 'changelog',    title_key: 'whats_new.section.changelog',     icon: 'sparkles'},
+                {key: 'announcement', title_key: 'whats_new.section.announcements', icon: 'megaphone'}
+            ] %}
+
+            {% for section in sections %}
+                {% set items = grouped[section.key] %}
+                {% if items|length > 0 %}
+                    <section class="whats-new-section">
+                        <h2 class="whats-new-section-title">
+                            <i data-lucide="{{ section.icon }}"></i>
+                            {{ section.title_key|trans(domain: 'admin') }}
+                        </h2>
+                        <ul class="whats-new-list">
+                            {% for item in items %}
+                                <li class="whats-new-item">
+                                    <div class="whats-new-item-meta">
+                                        <span class="whats-new-item-date">
+                                            {{ 'whats_new.published_on'|trans({'%date%': item.publishedAt|date('M d, Y')}, 'admin') }}
+                                        </span>
+                                        {% if item.publishedAt > previous_seen_at %}
+                                            <span class="whats-new-badge-new">{{ 'whats_new.new_badge'|trans(domain: 'admin') }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <h3 class="whats-new-item-title">{{ item.title }}</h3>
+                                    {% if item.summary %}
+                                        <p class="whats-new-item-summary">{{ item.summary }}</p>
+                                    {% endif %}
+                                    <a class="whats-new-item-link"
+                                       href="{{ item.url }}"
+                                       target="_blank" rel="noopener noreferrer">
+                                        {{ 'whats_new.read_more'|trans(domain: 'admin') }}
+                                        <i data-lucide="arrow-up-right"></i>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,46 @@
+body.ea .main-content .content-top .topbar-feed-bell {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    background: transparent;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+body.ea .main-content .content-top .topbar-feed-bell:hover,
+body.ea .main-content .content-top .topbar-feed-bell:focus-visible {
+    background: var(--app-bg-alt);
+    color: var(--text-primary);
+}
+
+body.ea .main-content .content-top .topbar-feed-bell.active {
+    color: var(--primary);
+    background: var(--primary-subtle);
+}
+
+body.ea .main-content .content-top .topbar-feed-bell i {
+    width: 20px;
+    height: 20px;
+}
+
+body.ea .main-content .content-top .topbar-feed-bell-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+    box-shadow: 0 0 0 2px var(--app-surface);
+}

@@ -9,6 +9,7 @@ describe('Module Independence', function () {
             'App\Module\Holiday',
             'App\Module\LeaveRequest',
             'App\Module\Settings',
+            'App\Module\Feed',
         ]);
 
     arch('User module should not depend on other modules directly')
@@ -18,6 +19,7 @@ describe('Module Independence', function () {
             'App\Module\Holiday',
             'App\Module\LeaveRequest',
             'App\Module\Settings',
+            'App\Module\Feed',
         ]);
 
     arch('LeaveRequest module should not depend on other modules directly')
@@ -27,6 +29,7 @@ describe('Module Independence', function () {
             'App\Module\User',
             'App\Module\Holiday',
             'App\Module\Settings',
+            'App\Module\Feed',
         ]);
 
     arch('Holiday module should not depend on other modules directly')
@@ -36,6 +39,7 @@ describe('Module Independence', function () {
             'App\Module\User',
             'App\Module\LeaveRequest',
             'App\Module\Settings',
+            'App\Module\Feed',
         ]);
 
     arch('Settings module should not depend on other modules directly')
@@ -45,6 +49,17 @@ describe('Module Independence', function () {
             'App\Module\User',
             'App\Module\LeaveRequest',
             'App\Module\Holiday',
+            'App\Module\Feed',
+        ]);
+
+    arch('Feed module should not depend on other modules directly')
+        ->expect('App\Module\Feed')
+        ->not->toUse([
+            'App\Module\Admin',
+            'App\Module\Holiday',
+            'App\Module\LeaveRequest',
+            'App\Module\Settings',
+            'App\Module\User',
         ]);
 });
 
@@ -88,5 +103,10 @@ describe('Facade Pattern Enforcement', function () {
     arch('DateNager facade should implement interface and be final')
         ->expect('App\Infrastructure\DataNager\DateNagerFacade')
         ->toImplement('App\Shared\Facade\DateNagerInterface')
+        ->toBeFinal();
+
+    arch('Feed facade should implement interface and be final')
+        ->expect('App\Module\Feed\FeedFacade')
+        ->toImplement('App\Shared\Facade\FeedFacadeInterface')
         ->toBeFinal();
 });

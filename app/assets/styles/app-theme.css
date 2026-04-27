@@ -19,3 +19,6 @@
 @import './_crud-overrides.css';
 @import './_avatar-dropdown.css';
 @import './_responsive.css';
+@import './_topbar_feed_bell.css';
+@import './_sidebar_footer_link.css';
+@import './_whats_new.css';

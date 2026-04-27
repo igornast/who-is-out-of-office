@@ -94,4 +94,6 @@ interface UserFacadeInterface
     public function regenerateBackupCodes(string $userId): array;
 
     public function isTwoFactorEnabled(string $userId): bool;
+
+    public function updateFeedLastSeenAt(string $userId, \DateTimeImmutable $seenAt): void;
 }

@@ -52,6 +52,8 @@ interface UserRepositoryInterface
 
     public function updateIcalHashSalt(string $userId, string $salt): void;
 
+    public function updateFeedLastSeenAt(string $userId, \DateTimeImmutable $seenAt): void;
+
     public function updateSlackMemberId(string $userId, string $slackMemberId): void;
 
     public function removeSlackIntegration(string $userId): void;

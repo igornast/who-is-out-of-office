@@ -3,9 +3,11 @@ twig:
     paths:
         'src/Module/Admin/template': 'AppAdmin'
         'src/Module/User/template': 'AppUser'
+        'src/Module/Feed/template': 'AppFeed'
         'src/Infrastructure/Email/template': 'AppEmail'
     globals:
         profile_images_base_path: '%profile_images_base_path%'
+        whoisooo_homepage_url: '@App\Infrastructure\WhoIsOoo\HomepageUrlProvider'
     form_themes:
         - 'forms/form_theme.html.twig'
 when@test:

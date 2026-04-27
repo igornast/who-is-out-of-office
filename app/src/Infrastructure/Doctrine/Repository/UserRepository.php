@@ -245,6 +245,18 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return array_map(fn (User $user) => UserDTO::fromEntity($user), $users);
     }
 
+    public function updateFeedLastSeenAt(string $userId, \DateTimeImmutable $seenAt): void
+    {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->feedLastSeenAt = $seenAt;
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+    }
+
     public function updateIcalHashSalt(string $userId, string $salt): void
     {
         /** @var User $user */

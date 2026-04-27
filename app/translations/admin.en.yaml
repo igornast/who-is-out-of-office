@@ -26,7 +26,12 @@ menu:
         settings: Settings
         account: Account
 
+topbar:
+    whats_new: What's new
+    unread_notifications: '%count% unread'
+
 sidebar:
+    visit_homepage: Visit whoisooo.app
     section:
         my_leave: My Leave
         my_team: My Team
@@ -664,7 +669,7 @@ subdivision:
     IT-32: Trentino-South Tyrol
 
 two_factor_auth:
-    page_title: "Who's OOO — Verify Identity"
+    page_title: "Who's OOO | Verify Identity"
     title: Two-Factor Authentication
     desc: Enter the 6-digit code from your authenticator app.
     field:
@@ -699,3 +704,14 @@ slack_status_sync:
         revoked: 'Slack status auto-sync has been disabled.'
         invalid_state: 'The Slack OAuth state did not match. Please try again.'
         failed: 'Slack authorization failed: %reason%'
+
+whats_new:
+    title: What's new
+    section:
+        blog: From the blog
+        changelog: Product updates
+        announcements: Announcements
+    empty: Nothing new yet, pls check back soon.
+    new_badge: New
+    read_more: Read more
+    published_on: 'Published %date%'

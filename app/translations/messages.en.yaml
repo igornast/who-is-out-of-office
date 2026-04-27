@@ -62,7 +62,7 @@ email:
             preheader: "Your leave request has been declined and requires a response"
             heading: "Leave Request Declined"
             greeting: "Hi %name%,"
-            body: "Your leave request has been declined by %rejected_by%. We understand this may be disappointing—please feel free to discuss alternative dates with your manager."
+            body: "Your leave request has been declined by %rejected_by%. Please discuss alternative dates with your manager."
             default_rejected_by: "your manager"
             status: "Declined"
             declined_by_label: "Declined By"
@@ -78,7 +78,7 @@ email:
             button: "View Dashboard"
 
 welcome:
-    page_title: "Who's OOO — Open Source Leave Management"
+    page_title: "Who's OOO | Open Source Leave Management"
     tagline: "Open source leave management for teams that value simplicity."
     cta_signin: "Sign in to your account"
     cta_dashboard: "Go to Dashboard"
@@ -92,7 +92,7 @@ welcome:
     footer_website: "Project website"
     footer_github: "GitHub"
     footer_docs: "Documentation"
-    footer_version: "Who's OOO — Open source leave management"
+    footer_version: "Who's OOO | Open source leave management"
 
 login:
     forgot_password: Forgot your password?

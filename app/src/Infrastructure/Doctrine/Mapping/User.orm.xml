@@ -28,6 +28,7 @@
         <field name="palettePreference" column="palette_preference" length="10"/>
         <field name="icalHashSalt" column="ical_hash_salt" type="string" length="64" nullable="true"/>
         <field name="subdivisionCode" column="subdivision_code" type="string" length="10" nullable="true"/>
+        <field name="feedLastSeenAt" column="feed_last_seen_at" type="datetime_immutable" nullable="true"/>
 
         <field name="totpSecret" column="totp_secret" type="text" nullable="true"/>
         <field name="isTwoFactorEnabled" column="is_two_factor_enabled" type="boolean"/>

@@ -25,6 +25,8 @@ class AdminContextForCustomRoutesSubscriber implements EventSubscriberInterface
         'app_two_factor_setup',
         'app_two_factor_recovery_codes',
         'app_two_factor_disable',
+        'app_whats_new',
+        'app_whats_new_mark_read',
     ];
 
     public function __construct(

@@ -1,7 +1,9 @@
 .idea
 .claude/
 .DS_Store
+docker-compose.override.yml
+docker-compose.local.yml
 
 /app/public/uploads/profile_images/*
 !/app/public/uploads/profile_images/.gitkeep
-/.agentforge/
+/.shiki/

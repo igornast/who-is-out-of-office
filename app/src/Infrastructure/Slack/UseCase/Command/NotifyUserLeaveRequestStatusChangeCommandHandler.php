@@ -53,7 +53,7 @@ class NotifyUserLeaveRequestStatusChangeCommandHandler
                         [
                             'type' => 'mrkdwn',
                             'text' => sprintf(
-                                '*Staus:* %s',
+                                '*Status:* %s',
                                 $leaveRequestDTO->status->name,
                             ),
                         ],
