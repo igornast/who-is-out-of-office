@@ -26,6 +26,10 @@ class InvitationController extends AbstractController
 
     public function __invoke(string $token, Request $request): Response
     {
+        if (null !== $this->getUser()) {
+            return $this->redirectToRoute('app_dashboard');
+        }
+
         $invitationDTO = $this->invitationRepository->findOneByToken($token);
 
         if (!$invitationDTO instanceof InvitationDTO) {

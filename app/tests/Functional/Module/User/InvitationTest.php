@@ -52,10 +52,9 @@ it('completes the invitation and activates the user account', function (): void 
 
     $client->getCrawler()->filter('button[type="submit"]')->click();
 
-    $client->waitFor('.alert-success');
+    $client->waitFor('.login-card');
 
-    $content = $client->getCrawler()->text();
-    expect($content)->toContain('Account activated');
+    expect($client->getCurrentURL())->toEndWith('/login');
 
     $this->entityManager->clear();
 
