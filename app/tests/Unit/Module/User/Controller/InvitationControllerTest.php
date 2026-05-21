@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 beforeEach(function (): void {
     $this->invitationRepository = mock(InvitationRepositoryInterface::class);
@@ -44,6 +45,9 @@ beforeEach(function (): void {
     $twig = mock(Twig\Environment::class);
     $twig->allows('render')->andReturn('<html></html>');
 
+    $this->tokenStorage = mock(TokenStorageInterface::class);
+    $this->tokenStorage->allows('getToken')->andReturn(null);
+
     $container = mock(ContainerInterface::class);
     $container->allows('has')->with('serializer')->andReturn(false);
     $container->allows('has')->andReturn(true);
@@ -51,6 +55,7 @@ beforeEach(function (): void {
     $container->allows('get')->with('router')->andReturn($urlGenerator);
     $container->allows('get')->with('request_stack')->andReturn($requestStack);
     $container->allows('get')->with('twig')->andReturn($twig);
+    $container->allows('get')->with('security.token_storage')->andReturn($this->tokenStorage);
 
     $this->controller = new InvitationController(
         invitationRepository: $this->invitationRepository,
