@@ -115,3 +115,11 @@ it('withQuery() returns the url unchanged when params are empty', function (): v
 
     expect($provider->withQuery([]))->toBe('https://whoisooo.app/?a=1');
 });
+
+it('withQuery() returns the original url unchanged when parse_url() fails on a malformed input', function (): void {
+    $malformed = 'http://:80';
+    $provider = new HomepageUrlProvider($malformed);
+
+    expect(parse_url($malformed))->toBeFalse()
+        ->and($provider->withQuery(['utm_source' => 'app']))->toBe($malformed);
+});
