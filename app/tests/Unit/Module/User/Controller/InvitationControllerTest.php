@@ -18,7 +18,9 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 beforeEach(function (): void {
     $this->invitationRepository = mock(InvitationRepositoryInterface::class);
@@ -88,6 +90,38 @@ it('renders invitation form on GET request', function (): void {
     $response = ($this->controller)('some-token', Request::create('/invitation/some-token'));
 
     expect($response->getStatusCode())->toBe(200);
+});
+
+it('redirects an already-authenticated user to the dashboard without touching the invitation', function (): void {
+    $authenticatedUser = mock(UserInterface::class);
+    $token = mock(TokenInterface::class);
+    $token->allows('getUser')->andReturn($authenticatedUser);
+
+    $tokenStorage = mock(TokenStorageInterface::class);
+    $tokenStorage->expects('getToken')->andReturn($token);
+
+    $urlGenerator = mock(UrlGeneratorInterface::class);
+    $urlGenerator->expects('generate')->with('app_dashboard', [], 1)->andReturn('/app/dashboard');
+
+    $container = mock(ContainerInterface::class);
+    $container->allows('has')->with('serializer')->andReturn(false);
+    $container->allows('has')->andReturn(true);
+    $container->allows('get')->with('router')->andReturn($urlGenerator);
+    $container->allows('get')->with('security.token_storage')->andReturn($tokenStorage);
+
+    $this->invitationRepository->expects('findOneByToken')->never();
+    $this->userFacade->expects('acceptUserInvitation')->never();
+
+    $controller = new InvitationController(
+        invitationRepository: $this->invitationRepository,
+        userFacade: $this->userFacade,
+    );
+    $controller->setContainer($container);
+
+    $response = ($controller)('some-token', Request::create('/invitation/some-token'));
+
+    expect($response->getStatusCode())->toBe(302)
+        ->and($response->headers->get('Location'))->toBe('/app/dashboard');
 });
 
 it('accepts invitation and redirects to dashboard after valid form submission', function (): void {
