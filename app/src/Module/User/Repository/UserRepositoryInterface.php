@@ -46,6 +46,21 @@ interface UserRepositoryInterface
      */
     public function findByManagerId(string $managerId): array;
 
+    /**
+     * @return UserDTO[]
+     */
+    public function findTeammatesOf(string $userId): array;
+
+    /**
+     * @param list<string>|null $teamMemberIds
+     * @param list<string>|null $holidayCalendarIds
+     */
+    public function updateCalendarSubscriptionConfig(
+        string $userId,
+        ?array $teamMemberIds,
+        ?array $holidayCalendarIds,
+    ): void;
+
     public function updateThemePreference(string $userId, string $theme, string $palette): void;
 
     public function updatePassword(string $userId, string $hashedPassword): void;

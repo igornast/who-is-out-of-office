@@ -8,12 +8,15 @@ use App\Module\Holiday\UseCase\Command\SyncAllActiveCalendarsCommandHandler;
 use App\Module\Holiday\UseCase\Command\SyncCalendarCommandHandler;
 use App\Module\Holiday\UseCase\Command\ToggleCalendarActiveCommandHandler;
 use App\Module\Holiday\UseCase\Command\UpsertHolidayCalendarCommandHandler;
+use App\Module\Holiday\UseCase\Query\GetActiveCalendarsForCountryCodesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetAllCalendarsQueryHandler;
+use App\Module\Holiday\UseCase\Query\GetHolidaysForCalendarsBetweenQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayCalendarForCountryQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysForCountryBetweenDatesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetSubdivisionsGroupedByCalendarQueryHandler;
 use App\Tests\_fixtures\Shared\DTO\Holiday\PublicHolidayCalendarDTOFixture;
+use App\Tests\_fixtures\Shared\DTO\Holiday\PublicHolidayDTOFixture;
 use Ramsey\Uuid\Uuid;
 
 beforeEach(function (): void {
@@ -27,6 +30,8 @@ beforeEach(function (): void {
     $this->syncAllActiveCalendarsHandler = mock(SyncAllActiveCalendarsCommandHandler::class);
     $this->deleteCalendarHandler = mock(DeleteCalendarCommandHandler::class);
     $this->subdivisionsHandler = mock(GetSubdivisionsGroupedByCalendarQueryHandler::class);
+    $this->activeCalendarsHandler = mock(GetActiveCalendarsForCountryCodesQueryHandler::class);
+    $this->holidaysForCalendarsHandler = mock(GetHolidaysForCalendarsBetweenQueryHandler::class);
 
     $this->facade = new HolidayFacade(
         upsertHandler: $this->upsertHandler,
@@ -39,6 +44,8 @@ beforeEach(function (): void {
         syncAllActiveCalendarsHandler: $this->syncAllActiveCalendarsHandler,
         deleteCalendarHandler: $this->deleteCalendarHandler,
         subdivisionsHandler: $this->subdivisionsHandler,
+        activeCalendarsHandler: $this->activeCalendarsHandler,
+        holidaysForCalendarsHandler: $this->holidaysForCalendarsHandler,
     );
 });
 
@@ -180,4 +187,38 @@ it('calls handler to get subdivisions grouped by calendar', function () {
     $result = $this->facade->getSubdivisionsGroupedByCalendar();
 
     expect($result)->toBe($expected);
+});
+
+it('calls handler to get active calendars for country codes', function () {
+    $countryCodes = ['US', 'DE'];
+    $calendar1 = PublicHolidayCalendarDTOFixture::create(['countryCode' => 'US']);
+    $calendar2 = PublicHolidayCalendarDTOFixture::create(['countryCode' => 'DE']);
+
+    $this->activeCalendarsHandler
+        ->expects('handle')
+        ->once()
+        ->with($countryCodes)
+        ->andReturn([$calendar1, $calendar2]);
+
+    $result = $this->facade->getActiveCalendarsForCountryCodes($countryCodes);
+
+    expect($result)->toBe([$calendar1, $calendar2]);
+});
+
+it('calls handler to get holidays for calendars between dates', function () {
+    $calendarIds = [Uuid::uuid4()->toString(), Uuid::uuid4()->toString()];
+    $startDate = new DateTimeImmutable('2025-01-01');
+    $endDate = new DateTimeImmutable('2025-12-31');
+    $holiday1 = PublicHolidayDTOFixture::create();
+    $holiday2 = PublicHolidayDTOFixture::create();
+
+    $this->holidaysForCalendarsHandler
+        ->expects('handle')
+        ->once()
+        ->with($calendarIds, $startDate, $endDate)
+        ->andReturn([$holiday1, $holiday2]);
+
+    $result = $this->facade->getHolidaysForCalendarsBetween($calendarIds, $startDate, $endDate);
+
+    expect($result)->toBe([$holiday1, $holiday2]);
 });

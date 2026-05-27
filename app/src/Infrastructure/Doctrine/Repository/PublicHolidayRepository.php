@@ -98,6 +98,42 @@ SQL;
     }
 
     /**
+     * @param list<string> $calendarIds
+     *
+     * @return PublicHolidayDTO[]
+     */
+    public function findBetweenDatesForCalendarIds(array $calendarIds, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        if ([] === $calendarIds) {
+            return [];
+        }
+
+        $sql = <<<'SQL'
+            SELECT h.id, h.date, h.description, h.is_global, h.counties, hc.country_code
+            FROM holiday h
+            INNER JOIN holiday_calendar hc ON h.holiday_calendar_id = hc.id
+            WHERE h.date BETWEEN :startDate AND :endDate
+              AND hc.id IN (:calendarIds)
+            ORDER BY h.date ASC
+        SQL;
+
+        $conn = $this->getEntityManager()->getConnection();
+        $rows = $conn->executeQuery(
+            $sql,
+            [
+                'startDate' => $startDate->format('Y-m-d'),
+                'endDate' => $endDate->format('Y-m-d'),
+                'calendarIds' => array_values(array_unique($calendarIds)),
+            ],
+            [
+                'calendarIds' => \Doctrine\DBAL\ArrayParameterType::STRING,
+            ],
+        )->fetchAllAssociative();
+
+        return array_map(fn (array $row) => PublicHolidayDTO::fromArray($row), $rows);
+    }
+
+    /**
      * @return array<string, string[]>
      */
     public function findDistinctSubdivisionsGroupedByCalendar(): array

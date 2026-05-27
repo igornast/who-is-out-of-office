@@ -46,6 +46,8 @@ class UserDTOFixture implements FixtureInterface
             'icalHashSalt' => null,
             'isTwoFactorEnabled' => false,
             'feedLastSeenAt' => null,
+            'calendarSubscriptionTeamMemberIds' => null,
+            'calendarSubscriptionHolidayCalendarIds' => null,
         ];
     }
 }

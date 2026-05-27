@@ -79,6 +79,9 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->birthDate = $userDTO->birthDate;
         $user->absenceBalanceResetDay = $userDTO->absenceBalanceResetDay;
 
+        $user->calendarSubscriptionTeamMemberIds = $userDTO->calendarSubscriptionTeamMemberIds;
+        $user->calendarSubscriptionHolidayCalendarIds = $userDTO->calendarSubscriptionHolidayCalendarIds;
+
         if (null !== $userDTO->password) {
             $user->password = $userDTO->password;
         }
@@ -243,6 +246,63 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $users = $this->findBy(['manager' => $managerId, 'isActive' => true]);
 
         return array_map(fn (User $user) => UserDTO::fromEntity($user), $users);
+    }
+
+    /**
+     * @return UserDTO[]
+     */
+    public function findTeammatesOf(string $userId): array
+    {
+        $em = $this->getEntityManager();
+        $conn = $em->getConnection();
+
+        $sql = <<<'SQL'
+            SELECT DISTINCT u.*, hc.country_code AS calendar_country_code
+            FROM user u
+            LEFT JOIN holiday_calendar hc ON u.holiday_calendar_id = hc.id
+            WHERE u.is_active = 1
+              AND u.id != :userId
+              AND (
+                    u.id = (SELECT manager_id FROM user WHERE id = :userId)
+                 OR u.manager_id = :userId
+                 OR (
+                    u.manager_id IS NOT NULL
+                    AND u.manager_id = (SELECT manager_id FROM user WHERE id = :userId)
+                 )
+              )
+            ORDER BY u.first_name ASC, u.last_name ASC
+        SQL;
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':userId', $userId);
+        $rows = $stmt->executeQuery()->fetchAllAssociative();
+
+        $userDTOs = [];
+        foreach ($rows as $row) {
+            $userDTOs[] = UserDTO::fromArray($row);
+        }
+
+        return $userDTOs;
+    }
+
+    /**
+     * @param list<string>|null $teamMemberIds
+     * @param list<string>|null $holidayCalendarIds
+     */
+    public function updateCalendarSubscriptionConfig(
+        string $userId,
+        ?array $teamMemberIds,
+        ?array $holidayCalendarIds,
+    ): void {
+        /** @var User $user */
+        $user = $this->find($userId);
+
+        $user->calendarSubscriptionTeamMemberIds = $teamMemberIds;
+        $user->calendarSubscriptionHolidayCalendarIds = $holidayCalendarIds;
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
     }
 
     public function updateFeedLastSeenAt(string $userId, \DateTimeImmutable $seenAt): void

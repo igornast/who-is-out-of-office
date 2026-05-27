@@ -10,6 +10,8 @@ class UserDTO
 {
     /**
      * @param array<int, string> $roles
+     * @param list<string>|null  $calendarSubscriptionTeamMemberIds
+     * @param list<string>|null  $calendarSubscriptionHolidayCalendarIds
      */
     public function __construct(
         public string $id,
@@ -39,6 +41,8 @@ class UserDTO
         public ?string $icalHashSalt = null,
         public bool $slackStatusSyncEnabled = true,
         public bool $isTwoFactorEnabled = false,
+        public ?array $calendarSubscriptionTeamMemberIds = null,
+        public ?array $calendarSubscriptionHolidayCalendarIds = null,
     ) {
     }
 
@@ -77,6 +81,8 @@ class UserDTO
             icalHashSalt: $user->icalHashSalt,
             slackStatusSyncEnabled: $user->slackIntegration?->slackStatusSyncEnabled ?? true,
             isTwoFactorEnabled: $user->isTwoFactorEnabled,
+            calendarSubscriptionTeamMemberIds: $user->calendarSubscriptionTeamMemberIds,
+            calendarSubscriptionHolidayCalendarIds: $user->calendarSubscriptionHolidayCalendarIds,
         );
     }
 
@@ -104,9 +110,16 @@ class UserDTO
             managerId: $data['manager_id'] ?? null,
             themePreference: $data['theme_preference'] ?? 'auto',
             palettePreference: $data['palette_preference'] ?? 'teal',
+            calendarCountryCode: $data['calendar_country_code'] ?? null,
             icalHashSalt: $data['ical_hash_salt'] ?? null,
             slackStatusSyncEnabled: (bool) ($data['slack_status_sync_enabled'] ?? true),
             isTwoFactorEnabled: (bool) ($data['is_two_factor_enabled'] ?? false),
+            calendarSubscriptionTeamMemberIds: isset($data['calendar_subscription_team_member_ids']) && is_string($data['calendar_subscription_team_member_ids'])
+                ? json_decode($data['calendar_subscription_team_member_ids'], true, flags: JSON_THROW_ON_ERROR)
+                : ($data['calendar_subscription_team_member_ids'] ?? null),
+            calendarSubscriptionHolidayCalendarIds: isset($data['calendar_subscription_holiday_calendar_ids']) && is_string($data['calendar_subscription_holiday_calendar_ids'])
+                ? json_decode($data['calendar_subscription_holiday_calendar_ids'], true, flags: JSON_THROW_ON_ERROR)
+                : ($data['calendar_subscription_holiday_calendar_ids'] ?? null),
         );
     }
 }

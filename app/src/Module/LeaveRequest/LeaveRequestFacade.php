@@ -27,6 +27,7 @@ use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetPendingLeaveRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetRecentLeaveRequestsQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUsersBetweenQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
 use App\Shared\DTO\Dashboard\DashboardStatsDTO;
 use App\Shared\DTO\Dashboard\LeaveBalanceDTO;
@@ -66,6 +67,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly FindApprovedActiveNotSyncedQueryHandler $findApprovedActiveNotSyncedHandler,
         private readonly FindSyncedNeedingClearQueryHandler $findSyncedNeedingClearHandler,
         private readonly MarkExternalStatusSyncedCommandHandler $markExternalStatusSyncedHandler,
+        private readonly GetLeaveRequestsForUsersBetweenQueryHandler $forUsersBetweenHandler,
     ) {
     }
 
@@ -251,5 +253,16 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
     public function markExternalStatusSynced(string $leaveRequestId, bool $synced): void
     {
         $this->markExternalStatusSyncedHandler->handle($leaveRequestId, $synced);
+    }
+
+    /**
+     * @param list<string>                 $userIds
+     * @param list<LeaveRequestStatusEnum> $statuses
+     *
+     * @return LeaveRequestDTO[]
+     */
+    public function getLeaveRequestsForUsersBetween(array $userIds, array $statuses, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        return $this->forUsersBetweenHandler->handle($userIds, $statuses, $startDate, $endDate);
     }
 }

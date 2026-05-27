@@ -7,6 +7,7 @@ namespace App\Module\User;
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
+use App\Module\User\UseCase\Command\UpdateCalendarSubscriptionConfigCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
 use App\Module\User\UseCase\Command\DisableTwoFactorCommandHandler;
@@ -23,6 +24,7 @@ use App\Module\User\UseCase\Command\UpdateSlackStatusSyncPreferenceCommandHandle
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateUserFeedLastSeenAtCommandHandler;
 use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
+use App\Module\User\UseCase\Query\GetCalendarSubscriptionConfigQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
@@ -32,6 +34,7 @@ use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDatesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
+use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\PasswordResetTokenDTO;
 use App\Shared\DTO\UserDTO;
@@ -70,6 +73,8 @@ final class UserFacade implements UserFacadeInterface
         private readonly DisableTwoFactorCommandHandler $disableTwoFactorHandler,
         private readonly RegenerateBackupCodesCommandHandler $regenerateBackupCodesHandler,
         private readonly UpdateUserFeedLastSeenAtCommandHandler $updateUserFeedLastSeenAtHandler,
+        private readonly GetCalendarSubscriptionConfigQueryHandler $getCalendarSubscriptionConfigHandler,
+        private readonly UpdateCalendarSubscriptionConfigCommandHandler $updateCalendarSubscriptionConfigHandler,
     ) {
     }
 
@@ -159,6 +164,20 @@ final class UserFacade implements UserFacadeInterface
     public function regenerateCalendarSubscription(string $userId): void
     {
         $this->regenerateCalendarSubscriptionHandler->handle($userId);
+    }
+
+    public function getCalendarSubscriptionConfig(string $userId): CalendarSubscriptionConfigDTO
+    {
+        return $this->getCalendarSubscriptionConfigHandler->handle($userId);
+    }
+
+    /**
+     * @param list<string>|null $teamMemberIds
+     * @param list<string>|null $holidayCalendarIds
+     */
+    public function updateCalendarSubscriptionConfig(string $userId, ?array $teamMemberIds, ?array $holidayCalendarIds): void
+    {
+        $this->updateCalendarSubscriptionConfigHandler->handle($userId, $teamMemberIds, $holidayCalendarIds);
     }
 
     public function updateSlackMemberId(string $userId, string $slackMemberId): void

@@ -26,6 +26,7 @@ use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUserQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveTypeQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetPendingLeaveRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetRecentLeaveRequestsQueryHandler;
+use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUsersBetweenQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Tests\_fixtures\Shared\DTO\Dashboard\DashboardStatsDTOFixture;
@@ -62,6 +63,7 @@ beforeEach(function (): void {
     $this->findApprovedActiveNotSyncedHandler = mock(FindApprovedActiveNotSyncedQueryHandler::class);
     $this->findSyncedNeedingClearHandler = mock(FindSyncedNeedingClearQueryHandler::class);
     $this->markExternalStatusSyncedHandler = mock(MarkExternalStatusSyncedCommandHandler::class);
+    $this->forUsersBetweenHandler = mock(GetLeaveRequestsForUsersBetweenQueryHandler::class);
 
     $this->facade = new LeaveRequestFacade(
         getCalculateWorkDaysHandler: $this->calculateWorkDaysHandler,
@@ -89,6 +91,7 @@ beforeEach(function (): void {
         findApprovedActiveNotSyncedHandler: $this->findApprovedActiveNotSyncedHandler,
         findSyncedNeedingClearHandler: $this->findSyncedNeedingClearHandler,
         markExternalStatusSyncedHandler: $this->markExternalStatusSyncedHandler,
+        forUsersBetweenHandler: $this->forUsersBetweenHandler,
     );
 });
 
@@ -442,4 +445,20 @@ it('delegates markExternalStatusSynced to handler', function () {
         ->with('lr-1', true);
 
     $this->facade->markExternalStatusSynced('lr-1', true);
+});
+
+it('delegates getLeaveRequestsForUsersBetween to handler', function () {
+    $userIds = ['user-1', 'user-2'];
+    $statuses = [LeaveRequestStatusEnum::Approved];
+    $start = new DateTimeImmutable('2025-03-01');
+    $end = new DateTimeImmutable('2025-03-31');
+    $expected = [LeaveRequestDTOFixture::create()];
+
+    $this->forUsersBetweenHandler
+        ->expects('handle')
+        ->once()
+        ->with($userIds, $statuses, $start, $end)
+        ->andReturn($expected);
+
+    expect($this->facade->getLeaveRequestsForUsersBetween($userIds, $statuses, $start, $end))->toBe($expected);
 });

@@ -417,6 +417,35 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         return array_map(fn (LeaveRequest $lr) => LeaveRequestDTO::fromEntity($lr), $items);
     }
 
+    /**
+     * @param list<string>                 $userIds
+     * @param list<LeaveRequestStatusEnum> $statuses
+     *
+     * @return LeaveRequestDTO[]
+     */
+    public function findForUsersBetweenDates(array $userIds, array $statuses, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        if ([] === $userIds || [] === $statuses) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('lr');
+        /** @var LeaveRequest[] $items */
+        $items = $qb->where('lr.status IN (:statuses)')
+            ->andWhere('lr.startDate <= :end')
+            ->andWhere('lr.endDate   >= :start')
+            ->andWhere('IDENTITY(lr.user) IN (:userIds)')
+            ->setParameter('statuses', $statuses)
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate)
+            ->setParameter('userIds', $userIds)
+            ->orderBy('lr.startDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn (LeaveRequest $lr) => LeaveRequestDTO::fromEntity($lr), $items);
+    }
+
     public function markExternalStatusSynced(string $leaveRequestId, bool $synced): void
     {
         /** @var ?LeaveRequest $leaveRequest */
