@@ -113,7 +113,7 @@ class FeedClient implements FeedClientInterface
         if ('http' !== $lowerScheme && 'https' !== $lowerScheme) {
             $this->logger->error('[FEED][FETCH]: Skipping invalid feed item.', [
                 'reason' => 'bad_url',
-                'external_id' => $item['id'] ?? null,
+                'external_id' => $item['id'],
             ]);
 
             return false;
@@ -124,7 +124,7 @@ class FeedClient implements FeedClientInterface
         } catch (\Exception) {
             $this->logger->error('[FEED][FETCH]: Skipping invalid feed item.', [
                 'reason' => 'bad_date',
-                'external_id' => $item['id'] ?? null,
+                'external_id' => $item['id'],
             ]);
 
             return false;

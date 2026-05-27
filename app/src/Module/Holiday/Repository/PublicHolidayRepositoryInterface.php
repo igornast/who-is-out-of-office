@@ -23,4 +23,11 @@ interface PublicHolidayRepositoryInterface
      * @return array<string, string[]> Map of calendar ID to sorted subdivision codes
      */
     public function findDistinctSubdivisionsGroupedByCalendar(): array;
+
+    /**
+     * @param list<string> $calendarIds
+     *
+     * @return PublicHolidayDTO[]
+     */
+    public function findBetweenDatesForCalendarIds(array $calendarIds, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
 }

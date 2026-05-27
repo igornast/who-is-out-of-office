@@ -27,6 +27,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
      * @param Collection<int, LeaveRequest>|null $leaveRequests
      * @param int[]                              $workingDays
      * @param string[]                           $backupCodes
+     * @param list<string>|null                  $calendarSubscriptionTeamMemberIds
+     * @param list<string>|null                  $calendarSubscriptionHolidayCalendarIds
      */
     public function __construct(
         public UuidInterface $id,
@@ -58,6 +60,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         public ?HolidayCalendar $holidayCalendar = null,
         public ?self $manager = null,
         public ?Collection $leaveRequests = new ArrayCollection(),
+        public ?array $calendarSubscriptionTeamMemberIds = null,
+        public ?array $calendarSubscriptionHolidayCalendarIds = null,
     ) {
         $this->initializeTimestamps();
     }

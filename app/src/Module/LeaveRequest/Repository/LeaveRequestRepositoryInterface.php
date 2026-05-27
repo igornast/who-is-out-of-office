@@ -100,6 +100,14 @@ interface LeaveRequestRepositoryInterface
 
     public function markExternalStatusSynced(string $leaveRequestId, bool $synced): void;
 
+    /**
+     * @param list<string>                 $userIds
+     * @param list<LeaveRequestStatusEnum> $statuses
+     *
+     * @return LeaveRequestDTO[]
+     */
+    public function findForUsersBetweenDates(array $userIds, array $statuses, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
+
     public function beginTransaction(): void;
 
     public function commit(): void;

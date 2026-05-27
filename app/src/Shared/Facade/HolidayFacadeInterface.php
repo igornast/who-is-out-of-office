@@ -41,4 +41,18 @@ interface HolidayFacadeInterface
      * @return array<string, string[]> Map of calendar ID to sorted subdivision codes
      */
     public function getSubdivisionsGroupedByCalendar(): array;
+
+    /**
+     * @param list<string> $countryCodes
+     *
+     * @return PublicHolidayCalendarDTO[]
+     */
+    public function getActiveCalendarsForCountryCodes(array $countryCodes): array;
+
+    /**
+     * @param list<string> $calendarIds
+     *
+     * @return PublicHolidayDTO[]
+     */
+    public function getHolidaysForCalendarsBetween(array $calendarIds, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
 }

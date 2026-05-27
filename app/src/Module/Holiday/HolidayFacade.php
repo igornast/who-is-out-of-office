@@ -9,7 +9,9 @@ use App\Module\Holiday\UseCase\Command\SyncAllActiveCalendarsCommandHandler;
 use App\Module\Holiday\UseCase\Command\SyncCalendarCommandHandler;
 use App\Module\Holiday\UseCase\Command\ToggleCalendarActiveCommandHandler;
 use App\Module\Holiday\UseCase\Command\UpsertHolidayCalendarCommandHandler;
+use App\Module\Holiday\UseCase\Query\GetActiveCalendarsForCountryCodesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetAllCalendarsQueryHandler;
+use App\Module\Holiday\UseCase\Query\GetHolidaysForCalendarsBetweenQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayCalendarForCountryQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysForCountryBetweenDatesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler;
@@ -32,6 +34,8 @@ final class HolidayFacade implements HolidayFacadeInterface
         private readonly SyncAllActiveCalendarsCommandHandler $syncAllActiveCalendarsHandler,
         private readonly DeleteCalendarCommandHandler $deleteCalendarHandler,
         private readonly GetSubdivisionsGroupedByCalendarQueryHandler $subdivisionsHandler,
+        private readonly GetActiveCalendarsForCountryCodesQueryHandler $activeCalendarsHandler,
+        private readonly GetHolidaysForCalendarsBetweenQueryHandler $holidaysForCalendarsHandler,
     ) {
     }
 
@@ -95,5 +99,25 @@ final class HolidayFacade implements HolidayFacadeInterface
     public function getSubdivisionsGroupedByCalendar(): array
     {
         return $this->subdivisionsHandler->handle();
+    }
+
+    /**
+     * @param list<string> $countryCodes
+     *
+     * @return PublicHolidayCalendarDTO[]
+     */
+    public function getActiveCalendarsForCountryCodes(array $countryCodes): array
+    {
+        return $this->activeCalendarsHandler->handle($countryCodes);
+    }
+
+    /**
+     * @param list<string> $calendarIds
+     *
+     * @return PublicHolidayDTO[]
+     */
+    public function getHolidaysForCalendarsBetween(array $calendarIds, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        return $this->holidaysForCalendarsHandler->handle($calendarIds, $startDate, $endDate);
     }
 }

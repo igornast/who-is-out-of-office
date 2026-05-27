@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\Facade;
 
 use App\Module\User\DTO\UserInvitationRequestDTO;
+use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\PasswordResetTokenDTO;
 use App\Shared\DTO\UserDTO;
@@ -59,6 +60,14 @@ interface UserFacadeInterface
     public function changePassword(string $userId, string $plainPassword, PasswordAuthenticatedUserInterface $user): void;
 
     public function regenerateCalendarSubscription(string $userId): void;
+
+    public function getCalendarSubscriptionConfig(string $userId): CalendarSubscriptionConfigDTO;
+
+    /**
+     * @param list<string>|null $teamMemberIds
+     * @param list<string>|null $holidayCalendarIds
+     */
+    public function updateCalendarSubscriptionConfig(string $userId, ?array $teamMemberIds, ?array $holidayCalendarIds): void;
 
     public function updateSlackMemberId(string $userId, string $slackMemberId): void;
 

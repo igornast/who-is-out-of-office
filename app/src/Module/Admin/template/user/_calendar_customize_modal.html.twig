@@ -1,0 +1,219 @@
+<div class="modal fade" id="calendarCustomizeModal" tabindex="-1" aria-labelledby="calendarCustomizeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calendarCustomizeModalLabel">
+                    {{ 'calendar.customize.modal.title'|trans(domain: 'admin') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">{{ 'calendar.customize.modal.hint'|trans(domain: 'admin') }}</p>
+
+                <div id="calendarCustomizeLoading" class="text-muted small">…</div>
+                <div id="calendarCustomizeError" class="alert alert-danger d-none"></div>
+                <div id="calendarCustomizeSuccess" class="alert alert-success d-none"></div>
+
+                <div id="calendarCustomizeSections" class="d-none">
+                    <section class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">{{ 'calendar.customize.section.team'|trans(domain: 'admin') }}</h6>
+                            <button type="button" class="btn btn-link btn-sm p-0" data-section="team" data-action="reset-auto">
+                                {{ 'calendar.customize.reset_to_auto'|trans(domain: 'admin') }}
+                            </button>
+                        </div>
+                        <div id="calendarCustomizeTeamList"></div>
+                        <p id="calendarCustomizeTeamEmpty" class="text-muted small d-none">
+                            {{ 'calendar.customize.team.empty_hint'|trans(domain: 'admin') }}
+                        </p>
+                    </section>
+
+                    <section>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">{{ 'calendar.customize.section.holidays'|trans(domain: 'admin') }}</h6>
+                            <button type="button" class="btn btn-link btn-sm p-0" data-section="holidays" data-action="reset-auto">
+                                {{ 'calendar.customize.reset_to_auto'|trans(domain: 'admin') }}
+                            </button>
+                        </div>
+                        <div id="calendarCustomizeHolidayList"></div>
+                        <p id="calendarCustomizeHolidayEmpty" class="text-muted small d-none">
+                            {{ 'calendar.customize.holidays.empty_hint'|trans(domain: 'admin') }}
+                        </p>
+                    </section>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {{ 'calendar.customize.action.cancel'|trans(domain: 'admin') }}
+                </button>
+                <button type="button" class="btn btn-primary" id="calendarCustomizeSaveBtn" disabled>
+                    {{ 'calendar.customize.action.save'|trans(domain: 'admin') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    (() => {
+        const modal = document.getElementById('calendarCustomizeModal');
+        if (!modal) return;
+
+        const getUrl = '{{ path('app_api_calendar_customize_get') }}';
+        const postUrl = '{{ path('app_api_calendar_customize_save') }}';
+        const csrfPlaceholder = '{{ csrf_token('calendar_customize') }}';
+        const staleSuffix = {{ ('calendar.customize.stale_suffix'|trans(domain: 'admin'))|json_encode|raw }};
+        const errorText = {{ ('calendar.customize.save_error'|trans(domain: 'admin'))|json_encode|raw }};
+        const successText = {{ ('calendar.customize.save_success'|trans(domain: 'admin'))|json_encode|raw }};
+
+        const loading = modal.querySelector('#calendarCustomizeLoading');
+        const errorEl = modal.querySelector('#calendarCustomizeError');
+        const successEl = modal.querySelector('#calendarCustomizeSuccess');
+        const sections = modal.querySelector('#calendarCustomizeSections');
+        const teamList = modal.querySelector('#calendarCustomizeTeamList');
+        const teamEmpty = modal.querySelector('#calendarCustomizeTeamEmpty');
+        const holidayList = modal.querySelector('#calendarCustomizeHolidayList');
+        const holidayEmpty = modal.querySelector('#calendarCustomizeHolidayEmpty');
+        const saveBtn = modal.querySelector('#calendarCustomizeSaveBtn');
+
+        const state = {
+            teamMemberIdsAuto: true,
+            holidayCalendarIdsAuto: true,
+            candidates: { team: [], holidays: [] },
+            selected: { team: null, holidays: null },
+        };
+
+        function renderCheckboxes(container, items, key) {
+            container.innerHTML = '';
+            const knownIds = new Set(items.map((i) => i.id));
+            const storedIds = state.selected[key];
+            const auto = key === 'team' ? state.teamMemberIdsAuto : state.holidayCalendarIdsAuto;
+
+            const stales = (storedIds || []).filter((id) => !knownIds.has(id));
+            const rows = [
+                ...items.map((i) => ({ id: i.id, label: i.label, stale: false })),
+                ...stales.map((id) => ({ id: id, label: id + ' ' + staleSuffix, stale: true })),
+            ];
+
+            rows.forEach((item) => {
+                const inputId = 'calCust-' + key + '-' + item.id;
+                const checked = auto ? !item.stale : (storedIds || []).includes(item.id);
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'checkbox-large';
+
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.id = inputId;
+                input.value = item.id;
+                input.checked = checked;
+                input.addEventListener('change', () => {
+                    if (key === 'team') state.teamMemberIdsAuto = false;
+                    else state.holidayCalendarIdsAuto = false;
+                });
+
+                const label = document.createElement('label');
+                label.htmlFor = inputId;
+                label.textContent = item.label;
+
+                wrapper.appendChild(input);
+                wrapper.appendChild(label);
+                container.appendChild(wrapper);
+            });
+        }
+
+        function render() {
+            sections.classList.remove('d-none');
+            loading.classList.add('d-none');
+            saveBtn.disabled = false;
+
+            const teamItems = state.candidates.team.map((t) => ({ id: t.id, label: t.name + ' (' + t.email + ')' }));
+            renderCheckboxes(teamList, teamItems, 'team');
+            teamEmpty.classList.toggle('d-none', teamItems.length > 0);
+
+            const holidayItems = state.candidates.holidays.map((h) => ({ id: h.id, label: h.countryName + ' (' + h.countryCode + ')' }));
+            renderCheckboxes(holidayList, holidayItems, 'holidays');
+            holidayEmpty.classList.toggle('d-none', holidayItems.length > 0);
+        }
+
+        async function load() {
+            loading.classList.remove('d-none');
+            sections.classList.add('d-none');
+            errorEl.classList.add('d-none');
+            successEl.classList.add('d-none');
+            saveBtn.disabled = true;
+
+            try {
+                const res = await fetch(getUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } });
+                if (!res.ok) throw new Error('load failed');
+                const data = await res.json();
+
+                state.candidates.team = data.candidateTeamMembers || [];
+                state.candidates.holidays = data.candidateHolidayCalendars || [];
+                state.selected.team = data.selectedTeamMemberIds;
+                state.selected.holidays = data.selectedHolidayCalendarIds;
+                state.teamMemberIdsAuto = data.selectedTeamMemberIds === null;
+                state.holidayCalendarIdsAuto = data.selectedHolidayCalendarIds === null;
+
+                render();
+            } catch (e) {
+                loading.classList.add('d-none');
+                errorEl.classList.remove('d-none');
+                errorEl.textContent = errorText;
+            }
+        }
+
+        modal.querySelectorAll('[data-action="reset-auto"]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const section = btn.dataset.section;
+                if (section === 'team') {
+                    state.teamMemberIdsAuto = true;
+                    state.selected.team = null;
+                } else {
+                    state.holidayCalendarIdsAuto = true;
+                    state.selected.holidays = null;
+                }
+                render();
+            });
+        });
+
+        saveBtn.addEventListener('click', async () => {
+            saveBtn.disabled = true;
+            errorEl.classList.add('d-none');
+
+            const teamIds = Array.from(teamList.querySelectorAll('input[type=checkbox]:checked')).map((i) => i.value);
+            const holidayIds = Array.from(holidayList.querySelectorAll('input[type=checkbox]:checked')).map((i) => i.value);
+
+            const payload = {
+                _token: window.AppCsrf.rotateStatelessCsrfToken(csrfPlaceholder),
+                teamMemberIds: teamIds,
+                holidayCalendarIds: holidayIds,
+                teamMemberIdsAuto: state.teamMemberIdsAuto,
+                holidayCalendarIdsAuto: state.holidayCalendarIdsAuto,
+            };
+
+            try {
+                const res = await fetch(postUrl, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                if (!res.ok) throw new Error('save failed');
+                successEl.textContent = successText;
+                successEl.classList.remove('d-none');
+                window.setTimeout(() => {
+                    successEl.classList.add('d-none');
+                    const inst = bootstrap.Modal.getInstance(modal);
+                    if (inst) inst.hide();
+                }, 900);
+            } catch (e) {
+                errorEl.classList.remove('d-none');
+                errorEl.textContent = errorText;
+                saveBtn.disabled = false;
+            }
+        });
+
+        modal.addEventListener('show.bs.modal', load);
+    })();
+</script>

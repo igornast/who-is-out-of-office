@@ -15,15 +15,18 @@ use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler
 use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\ResetPasswordCommandHandler;
+use App\Module\User\UseCase\Command\UpdateCalendarSubscriptionConfigCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackStatusSyncPreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateUserFeedLastSeenAtCommandHandler;
 use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
+use App\Module\User\UseCase\Query\GetCalendarSubscriptionConfigQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
@@ -65,6 +68,8 @@ beforeEach(function (): void {
     $this->disableTwoFactorHandler = mock(DisableTwoFactorCommandHandler::class);
     $this->regenerateBackupCodesHandler = mock(RegenerateBackupCodesCommandHandler::class);
     $this->updateUserFeedLastSeenAtHandler = mock(UpdateUserFeedLastSeenAtCommandHandler::class);
+    $this->getCalendarSubscriptionConfigHandler = mock(GetCalendarSubscriptionConfigQueryHandler::class);
+    $this->updateCalendarSubscriptionConfigHandler = mock(UpdateCalendarSubscriptionConfigCommandHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -94,6 +99,8 @@ beforeEach(function (): void {
         disableTwoFactorHandler: $this->disableTwoFactorHandler,
         regenerateBackupCodesHandler: $this->regenerateBackupCodesHandler,
         updateUserFeedLastSeenAtHandler: $this->updateUserFeedLastSeenAtHandler,
+        getCalendarSubscriptionConfigHandler: $this->getCalendarSubscriptionConfigHandler,
+        updateCalendarSubscriptionConfigHandler: $this->updateCalendarSubscriptionConfigHandler,
     );
 });
 
@@ -434,4 +441,35 @@ it('delegates updateFeedLastSeenAt to handler', function (): void {
         ->with('user-1', $seenAt);
 
     $this->facade->updateFeedLastSeenAt('user-1', $seenAt);
+});
+
+it('delegates getCalendarSubscriptionConfig to handler', function (): void {
+    $config = new CalendarSubscriptionConfigDTO(
+        candidateTeamMembers: [],
+        candidateHolidayCalendars: [],
+        selectedTeamMemberIds: null,
+        selectedHolidayCalendarIds: null,
+    );
+
+    $this->getCalendarSubscriptionConfigHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1')
+        ->andReturn($config);
+
+    $result = $this->facade->getCalendarSubscriptionConfig('user-1');
+
+    expect($result)->toBe($config);
+});
+
+it('delegates updateCalendarSubscriptionConfig to handler', function (): void {
+    $teamMemberIds = ['member-1', 'member-2'];
+    $holidayCalendarIds = ['cal-1'];
+
+    $this->updateCalendarSubscriptionConfigHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', $teamMemberIds, $holidayCalendarIds);
+
+    $this->facade->updateCalendarSubscriptionConfig('user-1', $teamMemberIds, $holidayCalendarIds);
 });

@@ -127,4 +127,12 @@ interface LeaveRequestFacadeInterface
     public function findSyncedNeedingClear(): array;
 
     public function markExternalStatusSynced(string $leaveRequestId, bool $synced): void;
+
+    /**
+     * @param list<string>                 $userIds
+     * @param list<LeaveRequestStatusEnum> $statuses
+     *
+     * @return LeaveRequestDTO[]
+     */
+    public function getLeaveRequestsForUsersBetween(array $userIds, array $statuses, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array;
 }

@@ -24,4 +24,11 @@ interface PublicHolidayCalendarRepositoryInterface
     public function hasAssignedUsers(string $calendarId): bool;
 
     public function deleteHolidaysForYear(string $calendarId, int $year): void;
+
+    /**
+     * @param list<string> $countryCodes
+     *
+     * @return PublicHolidayCalendarDTO[]
+     */
+    public function findActiveByCountryCodes(array $countryCodes): array;
 }

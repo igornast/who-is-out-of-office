@@ -131,4 +131,27 @@ class PublicHolidayCalendarRepository extends ServiceEntityRepository implements
             ->setParameter('endDate', $endDate)
             ->execute();
     }
+
+    /**
+     * @param list<string> $countryCodes
+     *
+     * @return PublicHolidayCalendarDTO[]
+     */
+    public function findActiveByCountryCodes(array $countryCodes): array
+    {
+        if ([] === $countryCodes) {
+            return [];
+        }
+
+        $items = $this->createQueryBuilder('c')
+            ->where('c.isActive = :active')
+            ->andWhere('c.countryCode IN (:codes)')
+            ->setParameter('active', true)
+            ->setParameter('codes', array_values(array_unique($countryCodes)))
+            ->orderBy('c.countryName', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn (HolidayCalendar $c) => PublicHolidayCalendarDTO::fromEntity($c), $items);
+    }
 }
