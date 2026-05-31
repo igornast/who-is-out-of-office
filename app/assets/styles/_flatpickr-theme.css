@@ -236,6 +236,20 @@ html.dark .flatpickr-day.nextMonthDay.inRange {
     opacity: 0.5;
 }
 
+/* public holiday indicator */
+.flatpickr-holiday-dot {
+    position: absolute;
+    top: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--danger);
+    pointer-events: auto;
+    z-index: 2;
+}
+
 /* leave tooltip */
 .flatpickr-leave-tooltip {
     position: fixed;

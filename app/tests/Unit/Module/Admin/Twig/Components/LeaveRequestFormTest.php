@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Infrastructure\Doctrine\Entity\HolidayCalendar;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Twig\Components\LeaveRequestForm;
+use App\Shared\DTO\Holiday\PublicHolidayDTO;
 use App\Shared\Facade\AppSettingsFacadeInterface;
+use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestTypeDTOFixture;
 use Psr\Container\ContainerInterface;
@@ -30,6 +33,8 @@ beforeEach(function (): void {
 
     $this->leaveRequestFacade = mock(LeaveRequestFacadeInterface::class);
     $this->leaveRequestFacade->shouldReceive('getLeaveRequestsForUser')->andReturn([])->byDefault();
+    $this->holidayFacade = mock(HolidayFacadeInterface::class);
+    $this->holidayFacade->shouldReceive('getHolidayDaysForCountryBetweenDates')->andReturn([])->byDefault();
     $this->appSettingsFacade = mock(AppSettingsFacadeInterface::class);
     $this->translator = mock(TranslatorInterface::class);
     $this->translator->allows('trans')->andReturnUsing(fn (string $id) => $id);
@@ -61,6 +66,7 @@ beforeEach(function (): void {
     $this->component = new LeaveRequestForm(
         translator: $this->translator,
         leaveRequestFacade: $this->leaveRequestFacade,
+        holidayFacade: $this->holidayFacade,
     );
     $this->component->setContainer($container);
     $this->component->leaveType = $this->balanceLeaveType->id->toString();
@@ -314,4 +320,45 @@ it('returns empty array when user has no active leave requests', function (): vo
     $result = $this->component->getExistingLeaves();
 
     expect($result)->toBe([]);
+});
+
+it('returns empty public holidays array when user has no holiday calendar', function (): void {
+    $this->holidayFacade->shouldNotReceive('getHolidayDaysForCountryBetweenDates');
+
+    $result = $this->component->getPublicHolidays();
+
+    expect($result)->toBe([]);
+});
+
+it('returns mapped public holidays for the user country and subdivision', function (): void {
+    $this->user->holidayCalendar = new HolidayCalendar(
+        id: Uuid::uuid4(),
+        countryCode: 'DE',
+        countryName: 'Germany',
+    );
+    $this->user->subdivisionCode = 'DE-BY';
+
+    $holiday = new PublicHolidayDTO(
+        id: Uuid::uuid4()->toString(),
+        description: 'Christmas Day',
+        countryCode: 'DE',
+        date: new DateTimeImmutable('2026-12-25'),
+    );
+
+    $this->holidayFacade->allows('getHolidayDaysForCountryBetweenDates')
+        ->with(
+            Mockery::type(DateTimeImmutable::class),
+            Mockery::type(DateTimeImmutable::class),
+            'DE',
+            'DE-BY',
+        )
+        ->andReturn([$holiday]);
+
+    $result = $this->component->getPublicHolidays();
+
+    expect($result)->toHaveCount(1)
+        ->and($result[0])->toMatchArray([
+            'date' => '2026-12-25',
+            'description' => 'Christmas Day',
+        ]);
 });

@@ -12,6 +12,7 @@ menu:
         app_settings: App Settings
         profile: Profile Settings
         calendar: Calendar
+        organization_chart: 'Organization Chart'
         absence_requests: Absence Requests
         public_holidays: Public Holidays
         team_leave_requests: Team Leave Requests
@@ -197,10 +198,14 @@ calendar:
             team: Team members
             holidays: Holiday calendars
         reset_to_auto: Reset to auto
+        auto: Auto
+        custom: Custom
         team:
             empty_hint: You're not on a team yet, so there are no teammates to include.
+            auto_note: Following your team automatically. Edit anything to switch to Custom.
         holidays:
             empty_hint: No holiday calendars are available for you or your teammates' countries yet.
+            auto_note: Following your country's holidays automatically.
         action:
             save: Save
             cancel: Cancel

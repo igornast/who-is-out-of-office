@@ -8,7 +8,8 @@
     </div>
     <div class="field-text form-group mb-3">
         <div data-controller="flatpickr-inline"
-             data-flatpickr-inline-existing-leaves-value="{{ this.existingLeaves|json_encode|e('html_attr') }}">
+             data-flatpickr-inline-existing-leaves-value="{{ this.existingLeaves|json_encode|e('html_attr') }}"
+             data-flatpickr-inline-public-holidays-value="{{ this.publicHolidays|json_encode|e('html_attr') }}">
             {{ form_label(form.dateRange) }}
             {{ form_widget(form.dateRange, {
                 'attr': {

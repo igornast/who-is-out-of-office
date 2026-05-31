@@ -3,13 +3,14 @@ import flatpickr from 'flatpickr';
 
 export default class extends Controller {
   static targets = ['input', 'calendar'];
-  static values = { existingLeaves: Array };
+  static values = { existingLeaves: Array, publicHolidays: Array };
 
   #boundHideTooltip = null;
 
   connect() {
     const now = new Date();
     this.leaveMap = this.#buildLeaveMap();
+    this.holidayMap = this.#buildHolidayMap();
     this.activeTooltip = null;
 
     this.flatpickrInstance = flatpickr(this.inputTarget, {
@@ -25,6 +26,7 @@ export default class extends Controller {
       },
       onDayCreate: (_dObj, _dStr, _fp, dayElem) => {
         this.#markLeaveDay(dayElem);
+        this.#markHoliday(dayElem);
       },
     });
 
@@ -40,6 +42,11 @@ export default class extends Controller {
 
   existingLeavesValueChanged() {
     this.leaveMap = this.#buildLeaveMap();
+    this.flatpickrInstance?.redraw();
+  }
+
+  publicHolidaysValueChanged() {
+    this.holidayMap = this.#buildHolidayMap();
     this.flatpickrInstance?.redraw();
   }
 
@@ -72,6 +79,19 @@ export default class extends Controller {
         map.get(key).push({ ...leave, position });
         current.setDate(current.getDate() + 1);
       }
+    }
+
+    return map;
+  }
+
+  #buildHolidayMap() {
+    const map = new Map();
+
+    for (const holiday of this.publicHolidaysValue) {
+      if (!map.has(holiday.date)) {
+        map.set(holiday.date, []);
+      }
+      map.get(holiday.date).push(holiday.description);
     }
 
     return map;
@@ -131,7 +151,7 @@ export default class extends Controller {
     }
 
     bar.addEventListener('mouseenter', (e) => {
-      this.#showTooltip(e, uniqueTypes);
+      this.#showTooltip(e, uniqueTypes.map((t) => ({ color: t.color, label: t.type })));
     });
     bar.addEventListener('mouseleave', () => {
       this.#hideTooltip();
@@ -140,22 +160,43 @@ export default class extends Controller {
     dayElem.appendChild(bar);
   }
 
-  #showTooltip(event, types) {
+  #markHoliday(dayElem) {
+    const key = this.#formatDate(dayElem.dateObj);
+    const descriptions = this.holidayMap.get(key);
+
+    if (!descriptions) return;
+
+    const dot = document.createElement('span');
+    dot.classList.add('flatpickr-holiday-dot');
+
+    const rows = descriptions.map((description) => ({ color: 'var(--danger)', label: description }));
+
+    dot.addEventListener('mouseenter', (e) => {
+      this.#showTooltip(e, rows);
+    });
+    dot.addEventListener('mouseleave', () => {
+      this.#hideTooltip();
+    });
+
+    dayElem.appendChild(dot);
+  }
+
+  #showTooltip(event, rows) {
     this.#hideTooltip();
 
     const tooltip = document.createElement('div');
     tooltip.classList.add('flatpickr-leave-tooltip');
 
-    for (const t of types) {
+    for (const r of rows) {
       const row = document.createElement('div');
       row.classList.add('flatpickr-leave-tooltip__row');
 
       const swatch = document.createElement('span');
       swatch.classList.add('flatpickr-leave-tooltip__swatch');
-      swatch.style.backgroundColor = t.color;
+      swatch.style.backgroundColor = r.color;
 
       const label = document.createElement('span');
-      label.textContent = t.type;
+      label.textContent = r.label;
 
       row.appendChild(swatch);
       row.appendChild(label);
