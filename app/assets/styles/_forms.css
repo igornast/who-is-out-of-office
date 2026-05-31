@@ -101,9 +101,14 @@ body.ea .form-group:last-child {
     margin: 20px 0;
 }
 
-body.ea .form-check-input,
-body.ea .form-check-input:checked {
+body.ea .form-check-input {
     accent-color: var(--primary);
+}
+
+body.ea .form-check-input:checked,
+body.ea .form-check-input[type="checkbox"]:indeterminate {
+    background-color: var(--primary);
+    border-color: var(--primary);
 }
 
 body.ea .form-check-input:focus {

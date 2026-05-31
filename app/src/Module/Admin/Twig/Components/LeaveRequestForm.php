@@ -7,9 +7,11 @@ namespace App\Module\Admin\Twig\Components;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\DTO\NewLeaveRequestDTO;
 use App\Module\Admin\Form\NewLeaveRequestFormType;
+use App\Shared\DTO\Holiday\PublicHolidayDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
+use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,6 +40,7 @@ class LeaveRequestForm extends AbstractController
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly LeaveRequestFacadeInterface $leaveRequestFacade,
+        private readonly HolidayFacadeInterface $holidayFacade,
     ) {
     }
 
@@ -63,6 +66,39 @@ class LeaveRequestForm extends AbstractController
                 'status' => $lr->status->value,
             ],
             $leaveRequests,
+        );
+    }
+
+    /**
+     * @return array<int, array{date: string, description: string}>
+     */
+    public function getPublicHolidays(): array
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $countryCode = $user->holidayCalendar?->countryCode;
+        if (null === $countryCode) {
+            return [];
+        }
+
+        $currentYear = (int) new \DateTimeImmutable()->format('Y');
+        $startDate = new \DateTimeImmutable(sprintf('%d-01-01', $currentYear - 1));
+        $endDate = new \DateTimeImmutable(sprintf('%d-12-31', $currentYear + 1));
+
+        $holidays = $this->holidayFacade->getHolidayDaysForCountryBetweenDates(
+            $startDate,
+            $endDate,
+            $countryCode,
+            $user->subdivisionCode,
+        );
+
+        return array_map(
+            fn (PublicHolidayDTO $holiday) => [
+                'date' => $holiday->date->format('Y-m-d'),
+                'description' => $holiday->description,
+            ],
+            $holidays,
         );
     }
 
