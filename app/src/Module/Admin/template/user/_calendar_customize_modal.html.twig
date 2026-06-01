@@ -1,29 +1,28 @@
 <style>
-    .cal-cust-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
-    .cal-cust-row .cal-cust-name { flex: 1 1 auto; }
-    .cal-cust-row .cal-cust-email { color: var(--text-muted); }
-    .cal-cust-chev {
-        width: 18px; height: 18px;
-        display: inline-flex; align-items: center; justify-content: center;
-        background: none; border: 0; padding: 0;
-        color: var(--text-muted); cursor: pointer;
-        transition: transform .15s ease;
-    }
-    .cal-cust-chev.is-open { transform: rotate(90deg); color: var(--text-primary); }
-    .cal-cust-chev.is-spacer { visibility: hidden; cursor: default; }
-    .cal-cust-children {
-        margin-left: 26px; padding: 6px 10px;
-        border-left: 2px solid var(--border);
-        border-radius: 6px;
-    }
-    .cal-cust-children .cal-cust-hint { color: var(--text-muted); font-size: 12px; margin-bottom: 6px; }
-    .cal-cust-myteam-head .cal-cust-name { font-weight: 600; }
-    .cal-cust-badge {
-        font-size: 10.5px; padding: 2px 7px; border-radius: 999px;
-        background: var(--app-bg-alt); color: var(--text-muted);
-        border: 1px solid var(--border);
-        letter-spacing: .04em; text-transform: uppercase; font-weight: 600;
-    }
+    #calendarCustomizeModal .cc-section { margin-bottom: 1.25rem; }
+    #calendarCustomizeModal .cc-sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    #calendarCustomizeModal .cc-sec-head h6 { margin: 0; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-tertiary); font-weight: 700; }
+    #calendarCustomizeModal .cc-seg { display: inline-flex; background: var(--app-surface-sunken); border: 1px solid var(--border-light); border-radius: var(--radius-full); padding: 2px; }
+    #calendarCustomizeModal .cc-seg button { border: 0; background: none; font-size: 11px; font-weight: 600; padding: 3px 13px; border-radius: var(--radius-full); color: var(--text-tertiary); cursor: pointer; }
+    #calendarCustomizeModal .cc-seg button.is-on { background: var(--app-surface); color: var(--primary); box-shadow: var(--shadow-md); }
+    #calendarCustomizeModal .cc-auto-note { display: flex; align-items: center; gap: 8px; background: var(--primary-subtle); color: var(--primary-hover); font-size: 11.5px; padding: 8px 11px; border-radius: var(--radius-md); margin-bottom: 8px; }
+    #calendarCustomizeModal .cc-row { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: var(--radius-md); }
+    #calendarCustomizeModal .cc-row:hover { background: var(--app-surface-sunken); }
+    #calendarCustomizeModal .cc-chev { width: 14px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: 0; color: var(--text-muted); cursor: pointer; }
+    #calendarCustomizeModal .cc-chev.is-spacer { visibility: hidden; cursor: default; }
+    #calendarCustomizeModal .cc-chev svg { transition: transform .15s ease; }
+    #calendarCustomizeModal .cc-chev.is-open svg { transform: rotate(90deg); color: var(--text-secondary); }
+    #calendarCustomizeModal .cc-avatar.avatar-img,
+    #calendarCustomizeModal .cc-avatar.avatar-placeholder { width: 28px; height: 28px; font-size: 11px; flex: 0 0 auto; }
+    #calendarCustomizeModal .cc-row-sm .cc-avatar.avatar-img,
+    #calendarCustomizeModal .cc-row-sm .cc-avatar.avatar-placeholder { width: 24px; height: 24px; font-size: 10px; }
+    #calendarCustomizeModal .cc-name { flex: 1 1 auto; font-size: 13px; font-weight: 600; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #calendarCustomizeModal .cc-name small { font-weight: 400; color: var(--text-muted); }
+    #calendarCustomizeModal .cc-badge { font-size: 9.5px; padding: 2px 8px; border-radius: var(--radius-full); background: var(--pending-subtle); color: var(--pending); letter-spacing: .04em; text-transform: uppercase; font-weight: 700; border: 1px solid var(--border-light); flex: 0 0 auto; }
+    #calendarCustomizeModal .cc-kids { margin: 2px 0 8px 32px; border-left: 2px solid var(--primary-subtle); padding: 6px 0 4px 12px; }
+    #calendarCustomizeModal .cc-khint { font-size: 11px; color: var(--text-muted); margin: 0 0 8px 6px; }
+    #calendarCustomizeModal .cc-master { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: var(--radius-md); background: var(--primary-subtle); margin-bottom: 4px; cursor: pointer; }
+    #calendarCustomizeModal .cc-master .cc-name { font-size: 12.5px; color: var(--primary-hover); white-space: normal; font-weight: 600; }
 </style>
 
 <div class="modal fade" id="calendarCustomizeModal" tabindex="-1" aria-labelledby="calendarCustomizeModalLabel" aria-hidden="true">
@@ -43,12 +42,16 @@
                 <div id="calendarCustomizeSuccess" class="alert alert-success d-none"></div>
 
                 <div id="calendarCustomizeSections" class="d-none">
-                    <section class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">{{ 'calendar.customize.section.team'|trans(domain: 'admin') }}</h6>
-                            <button type="button" class="btn btn-link btn-sm p-0" data-section="team" data-action="reset-auto">
-                                {{ 'calendar.customize.reset_to_auto'|trans(domain: 'admin') }}
-                            </button>
+                    <section class="cc-section">
+                        <div class="cc-sec-head">
+                            <h6>{{ 'calendar.customize.section.team'|trans(domain: 'admin') }}</h6>
+                            <div class="cc-seg" role="group">
+                                <button type="button" data-section="team" data-mode="auto">{{ 'calendar.customize.auto'|trans(domain: 'admin') }}</button>
+                                <button type="button" data-section="team" data-mode="custom">{{ 'calendar.customize.custom'|trans(domain: 'admin') }}</button>
+                            </div>
+                        </div>
+                        <div id="calendarCustomizeTeamNote" class="cc-auto-note">
+                            {{ 'calendar.customize.team.auto_note'|trans(domain: 'admin') }}
                         </div>
                         <div id="calendarCustomizeTeamList"></div>
                         <p id="calendarCustomizeTeamEmpty" class="text-muted small d-none">
@@ -56,12 +59,16 @@
                         </p>
                     </section>
 
-                    <section>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">{{ 'calendar.customize.section.holidays'|trans(domain: 'admin') }}</h6>
-                            <button type="button" class="btn btn-link btn-sm p-0" data-section="holidays" data-action="reset-auto">
-                                {{ 'calendar.customize.reset_to_auto'|trans(domain: 'admin') }}
-                            </button>
+                    <section class="cc-section">
+                        <div class="cc-sec-head">
+                            <h6>{{ 'calendar.customize.section.holidays'|trans(domain: 'admin') }}</h6>
+                            <div class="cc-seg" role="group">
+                                <button type="button" data-section="holidays" data-mode="auto">{{ 'calendar.customize.auto'|trans(domain: 'admin') }}</button>
+                                <button type="button" data-section="holidays" data-mode="custom">{{ 'calendar.customize.custom'|trans(domain: 'admin') }}</button>
+                            </div>
+                        </div>
+                        <div id="calendarCustomizeHolidayNote" class="cc-auto-note">
+                            {{ 'calendar.customize.holidays.auto_note'|trans(domain: 'admin') }}
                         </div>
                         <div id="calendarCustomizeHolidayList"></div>
                         <p id="calendarCustomizeHolidayEmpty" class="text-muted small d-none">
@@ -100,22 +107,11 @@
         const sections = modal.querySelector('#calendarCustomizeSections');
         const teamList = modal.querySelector('#calendarCustomizeTeamList');
         const teamEmpty = modal.querySelector('#calendarCustomizeTeamEmpty');
+        const teamNote = modal.querySelector('#calendarCustomizeTeamNote');
         const holidayList = modal.querySelector('#calendarCustomizeHolidayList');
         const holidayEmpty = modal.querySelector('#calendarCustomizeHolidayEmpty');
+        const holidayNote = modal.querySelector('#calendarCustomizeHolidayNote');
         const saveBtn = modal.querySelector('#calendarCustomizeSaveBtn');
-
-        const state = {
-            teamMemberIdsAuto: true,
-            holidayCalendarIdsAuto: true,
-            candidates: { team: [], holidays: [] },
-            topLevelTeamIds: [],
-            myTeamIds: [],
-            myTeamExpanded: true,
-            byId: new Map(),
-            selected: { team: null, holidays: null },
-            expanded: new Set(),
-            includeReports: new Set(),
-        };
 
         const t = {
             managerBadge: {{ ('calendar.customize.manager_badge'|trans(domain: 'admin'))|json_encode|raw }},
@@ -128,12 +124,25 @@
             myTeamLabel: {{ ('calendar.customize.my_team_label'|trans(domain: 'admin'))|json_encode|raw }},
         };
 
-        const CHEV_SVG = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">'
-            + '<path d="M3 1 L7 5 L3 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        const CHEV = '<svg width="9" height="9" viewBox="0 0 10 10" aria-hidden="true">'
+            + '<path d="M3 1 L7 5 L3 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-        function firstName(full) {
-            return (full || '').split(' ')[0];
-        }
+        const state = {
+            teamAuto: true,
+            holidayAuto: true,
+            candidates: { team: [], holidays: [] },
+            byId: new Map(),
+            topLevelTeamIds: [],
+            myTeamIds: [],
+            teamSelected: new Set(),
+            holidaySelected: new Set(),
+            teamStale: [],
+            holidayStale: [],
+            expanded: new Set(),
+            myTeamExpanded: true,
+        };
+
+        function firstName(full) { return (full || '').split(' ')[0]; }
 
         function escapeHtml(s) {
             return (s == null ? '' : String(s))
@@ -142,194 +151,243 @@
         }
 
         function formatTemplate(tpl, vars) {
-            return tpl.replace(/%(\w+)%/g, (_, k) => escapeHtml(vars[k] ?? ''));
+            return tpl.replace(/%(\w+)%/g, (_, k) => escapeHtml(vars[k] == null ? '' : vars[k]));
         }
 
-        function teamRowHtml(candidate, knownIds, storedIds, auto) {
-            const isStale = false;
-            const checked = auto
-                ? (state.topLevelTeamIds.includes(candidate.id))
-                : (storedIds || []).includes(candidate.id);
+        function avatarHtml(candidate) {
+            if (candidate.avatarUrl) {
+                return '<img class="avatar-img cc-avatar" src="' + escapeHtml(candidate.avatarUrl) + '" alt="">';
+            }
+            const idx = ((Number(candidate.colorIndex) % 6) + 6) % 6;
+            return '<span class="avatar-placeholder cc-avatar avatar-color-' + idx + '">'
+                + '<span class="avatar-placeholder-text">' + escapeHtml(candidate.initials) + '</span></span>';
+        }
 
-            const inputId = 'calCust-team-' + candidate.id;
-            const chevron = candidate.isManager
-                ? '<button type="button" class="cal-cust-chev ' + (state.expanded.has(candidate.id) ? 'is-open' : '') + '"'
+        function teamRowHtml(candidate, asReport) {
+            const checked = state.teamSelected.has(candidate.id);
+            const inputId = 'cc-team-' + candidate.id;
+            const isMgr = candidate.isManager && !asReport;
+            const isOpen = state.expanded.has(candidate.id);
+
+            const chevron = isMgr
+                ? '<button type="button" class="cc-chev ' + (isOpen ? 'is-open' : '') + '"'
                     + ' data-action="toggle-expand" data-id="' + escapeHtml(candidate.id) + '"'
-                    + ' aria-expanded="' + (state.expanded.has(candidate.id) ? 'true' : 'false') + '"'
-                    + ' aria-label="' + escapeHtml(state.expanded.has(candidate.id) ? t.collapse : t.expand) + '">'
-                    + CHEV_SVG + '</button>'
-                : '<span class="cal-cust-chev is-spacer">' + CHEV_SVG + '</span>';
+                    + ' aria-expanded="' + (isOpen ? 'true' : 'false') + '"'
+                    + ' aria-label="' + escapeHtml(isOpen ? t.collapse : t.expand) + '">' + CHEV + '</button>'
+                : '<span class="cc-chev is-spacer">' + CHEV + '</span>';
 
-            const badge = candidate.isManager
-                ? '<span class="cal-cust-badge">' + escapeHtml(t.managerBadge) + '</span>'
-                : '';
+            const badge = isMgr ? '<span class="cc-badge">' + escapeHtml(t.managerBadge) + '</span>' : '';
 
-            const expanded = candidate.isManager && state.expanded.has(candidate.id)
-                ? childrenPanelHtml(candidate)
-                : '';
+            let html = '<div class="cc-row' + (asReport ? ' cc-row-sm' : '') + '">'
+                + chevron
+                + '<input type="checkbox" id="' + inputId + '" data-action="toggle-member" data-id="' + escapeHtml(candidate.id) + '"' + (checked ? ' checked' : '') + '>'
+                + avatarHtml(candidate)
+                + '<label for="' + inputId + '" class="cc-name">' + escapeHtml(candidate.name) + ' <small>' + escapeHtml(candidate.email) + '</small></label>'
+                + badge
+                + '</div>';
 
-            return ''
-                + '<div class="cal-cust-row">'
-                +   chevron
-                +   '<input type="checkbox" id="' + inputId + '" data-team-id="' + escapeHtml(candidate.id) + '"'
-                +     (checked ? ' checked' : '') + '>'
-                +   '<label for="' + inputId + '" class="cal-cust-name">'
-                +     escapeHtml(candidate.name)
-                +     ' <span class="cal-cust-email">(' + escapeHtml(candidate.email) + ')</span>'
-                +   '</label>'
-                +   badge
-                + '</div>'
-                + expanded;
+            if (isMgr && isOpen) {
+                html += managerTrayHtml(candidate);
+            }
+            return html;
         }
 
-        function childrenPanelHtml(manager) {
-            const reportCandidates = manager.reportIds
-                .map((id) => state.byId.get(id))
-                .filter(Boolean);
-            const count = reportCandidates.length;
-            const peopleWord = (count === 1) ? t.personSingular : t.personPlural;
+        function managerTrayHtml(manager) {
+            const reports = manager.reportIds.map((id) => state.byId.get(id)).filter(Boolean);
+            const count = reports.length;
+            const peopleWord = count === 1 ? t.personSingular : t.personPlural;
             const hint = formatTemplate(t.includeHint, { name: firstName(manager.name), count: count, people: peopleWord });
             const includeLabel = formatTemplate(t.includeLabel, { name: firstName(manager.name), count: count });
-            const toggleChecked = state.includeReports.has(manager.id);
-            const toggleId = 'calCust-include-' + manager.id;
+            const allOn = count > 0 && reports.every((r) => state.teamSelected.has(r.id));
+            const masterId = 'cc-include-' + manager.id;
 
-            const childRows = reportCandidates
-                .map((c) => teamRowHtml(c, null, state.selected.team, state.teamMemberIdsAuto))
-                .join('');
-
-            return ''
-                + '<div class="cal-cust-children">'
-                +   '<div class="cal-cust-hint">' + hint + '</div>'
-                +   '<div class="cal-cust-row">'
-                +     '<input type="checkbox" id="' + toggleId + '"'
-                +       ' data-action="toggle-include-reports" data-id="' + escapeHtml(manager.id) + '"'
-                +       (toggleChecked ? ' checked' : '') + '>'
-                +     '<label for="' + toggleId + '" class="cal-cust-name">' + includeLabel + '</label>'
-                +   '</div>'
-                +   childRows
+            return '<div class="cc-kids">'
+                + '<p class="cc-khint">' + hint + '</p>'
+                + '<label class="cc-master">'
+                +   '<input type="checkbox" id="' + masterId + '" data-action="toggle-include-all" data-id="' + escapeHtml(manager.id) + '"' + (allOn ? ' checked' : '') + '>'
+                +   '<span class="cc-name">' + includeLabel + '</span>'
+                + '</label>'
+                + reports.map((r) => teamRowHtml(r, true)).join('')
                 + '</div>';
         }
 
         function myTeamGroupHtml() {
-            const reportCandidates = state.myTeamIds
-                .map((id) => state.byId.get(id))
-                .filter(Boolean);
-            const count = reportCandidates.length;
+            const reports = state.myTeamIds.map((id) => state.byId.get(id)).filter(Boolean);
+            const count = reports.length;
             const label = formatTemplate(t.myTeamLabel, { count: count });
-            const expanded = state.myTeamExpanded;
+            const allOn = count > 0 && reports.every((r) => state.teamSelected.has(r.id));
+            const isOpen = state.myTeamExpanded;
 
-            const chevron = '<button type="button" class="cal-cust-chev ' + (expanded ? 'is-open' : '') + '"'
-                + ' data-action="toggle-my-team-expand"'
-                + ' aria-expanded="' + (expanded ? 'true' : 'false') + '"'
-                + ' aria-label="' + escapeHtml(expanded ? t.collapse : t.expand) + '">'
-                + CHEV_SVG + '</button>';
-
-            const childRows = reportCandidates
-                .map((c) => teamRowHtml(c, null, state.selected.team, state.teamMemberIdsAuto))
-                .join('');
-
-            return ''
-                + '<div class="cal-cust-row cal-cust-myteam-head">'
-                +   chevron
-                +   '<input type="checkbox" id="calCust-myteam-parent" data-my-team-parent>'
-                +   '<label for="calCust-myteam-parent" class="cal-cust-name">' + escapeHtml(label) + '</label>'
+            return '<div class="cc-master cc-myteam-head">'
+                + '<button type="button" class="cc-chev ' + (isOpen ? 'is-open' : '') + '"'
+                +   ' data-action="toggle-my-team-expand"'
+                +   ' aria-expanded="' + (isOpen ? 'true' : 'false') + '"'
+                +   ' aria-label="' + escapeHtml(isOpen ? t.collapse : t.expand) + '">' + CHEV + '</button>'
+                + '<input type="checkbox" id="cc-my-team-all" data-action="toggle-my-team-all"' + (allOn ? ' checked' : '') + '>'
+                + '<label for="cc-my-team-all" class="cc-name">' + escapeHtml(label) + '</label>'
                 + '</div>'
-                + '<div class="cal-cust-children' + (expanded ? '' : ' d-none') + '" id="calCust-myteam-children">'
-                +   childRows
+                + '<div class="cc-kids' + (isOpen ? '' : ' d-none') + '" id="calendarCustomizeMyTeamChildren">'
+                +   reports.map((r) => teamRowHtml(r, true)).join('')
                 + '</div>';
         }
 
-        function syncMyTeamParent() {
-            const parent = teamList.querySelector('input[data-my-team-parent]');
-            if (!parent) return;
+        function staleRowsHtml(staleIds) {
+            return staleIds.map((id) => ''
+                + '<div class="cc-row">'
+                +   '<span class="cc-chev is-spacer">' + CHEV + '</span>'
+                +   '<input type="checkbox" checked disabled>'
+                +   '<span class="cc-name">' + escapeHtml(id) + ' ' + escapeHtml(staleSuffix) + '</span>'
+                + '</div>').join('');
+        }
 
-            const total = state.myTeamIds.length;
-            let checkedCount = 0;
-            state.myTeamIds.forEach((id) => {
-                const cb = teamList.querySelector('input[data-team-id="' + id + '"]');
-                if (cb && cb.checked) checkedCount++;
+        function reportSelectionState(reportIds) {
+            const reports = reportIds.map((id) => state.byId.get(id)).filter(Boolean);
+            const selected = reports.filter((r) => state.teamSelected.has(r.id)).length;
+            return { total: reports.length, selected: selected };
+        }
+
+        function applyIndeterminate() {
+            const myTeamMaster = modal.querySelector('#cc-my-team-all');
+            if (myTeamMaster) {
+                const s = reportSelectionState(state.myTeamIds);
+                myTeamMaster.indeterminate = s.selected > 0 && s.selected < s.total;
+            }
+
+            state.expanded.forEach((managerId) => {
+                const manager = state.byId.get(managerId);
+                if (!manager) return;
+                const master = modal.querySelector('#cc-include-' + CSS.escape(managerId));
+                if (!master) return;
+                const s = reportSelectionState(manager.reportIds);
+                master.indeterminate = s.selected > 0 && s.selected < s.total;
             });
-
-            parent.checked = total > 0 && checkedCount === total;
-            parent.indeterminate = checkedCount > 0 && checkedCount < total;
         }
 
         function renderTeam() {
-            teamList.innerHTML = '';
-            const known = state.candidates.team;
-            const myTeamIdSet = new Set(state.myTeamIds);
-            const topLevelFlat = known.filter((c) => state.topLevelTeamIds.includes(c.id) && !myTeamIdSet.has(c.id));
-            const knownIds = new Set(known.map((c) => c.id));
-            const stales = (state.selected.team || []).filter((id) => !knownIds.has(id));
+            const myTeamSet = new Set(state.myTeamIds);
+            const topLevelFlat = state.candidates.team.filter(
+                (c) => state.topLevelTeamIds.includes(c.id) && !myTeamSet.has(c.id),
+            );
 
-            let html = topLevelFlat.map((c) => teamRowHtml(c, knownIds, state.selected.team, state.teamMemberIdsAuto)).join('');
-
+            let html = topLevelFlat.map((c) => teamRowHtml(c, false)).join('');
             if (state.myTeamIds.length > 0) {
                 html += myTeamGroupHtml();
             }
-
-            html += stales.map((id) => ''
-                + '<div class="cal-cust-row">'
-                +   '<span class="cal-cust-chev is-spacer">' + CHEV_SVG + '</span>'
-                +   '<input type="checkbox" id="calCust-team-' + id + '" data-team-id="' + escapeHtml(id) + '" checked disabled>'
-                +   '<label for="calCust-team-' + id + '" class="cal-cust-name">' + escapeHtml(id) + ' ' + escapeHtml(staleSuffix) + '</label>'
-                + '</div>').join('');
+            html += staleRowsHtml(state.teamStale);
 
             teamList.innerHTML = html;
-            teamEmpty.classList.toggle('d-none', topLevelFlat.length > 0 || state.myTeamIds.length > 0);
-            syncMyTeamParent();
+            const isEmpty = 0 === topLevelFlat.length && 0 === state.myTeamIds.length && 0 === state.teamStale.length;
+            teamEmpty.classList.toggle('d-none', !isEmpty);
+            applyIndeterminate();
         }
 
-        function renderCheckboxes(container, items, key) {
-            container.innerHTML = '';
-            const knownIds = new Set(items.map((i) => i.id));
-            const storedIds = state.selected[key];
-            const auto = key === 'team' ? state.teamMemberIdsAuto : state.holidayCalendarIdsAuto;
+        function renderHolidays() {
+            const items = state.candidates.holidays;
+            holidayList.innerHTML = items.map((h) => {
+                const inputId = 'cc-hol-' + h.id;
+                const checked = state.holidaySelected.has(h.id);
+                return '<div class="cc-row">'
+                    + '<input type="checkbox" id="' + inputId + '" data-action="toggle-holiday" data-id="' + escapeHtml(h.id) + '"' + (checked ? ' checked' : '') + '>'
+                    + '<label for="' + inputId + '" class="cc-name">' + escapeHtml(h.countryName) + ' <small>' + escapeHtml(h.countryCode) + '</small></label>'
+                    + '</div>';
+            }).join('') + staleRowsHtml(state.holidayStale);
 
-            const stales = (storedIds || []).filter((id) => !knownIds.has(id));
-            const rows = [
-                ...items.map((i) => ({ id: i.id, label: i.label, stale: false })),
-                ...stales.map((id) => ({ id: id, label: id + ' ' + staleSuffix, stale: true })),
-            ];
+            const isEmpty = 0 === items.length && 0 === state.holidayStale.length;
+            holidayEmpty.classList.toggle('d-none', !isEmpty);
+        }
 
-            rows.forEach((item) => {
-                const inputId = 'calCust-' + key + '-' + item.id;
-                const checked = auto ? !item.stale : (storedIds || []).includes(item.id);
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'checkbox-large';
-
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.id = inputId;
-                input.value = item.id;
-                input.checked = checked;
-                input.addEventListener('change', () => {
-                    if (key === 'team') state.teamMemberIdsAuto = false;
-                    else state.holidayCalendarIdsAuto = false;
-                });
-
-                const label = document.createElement('label');
-                label.htmlFor = inputId;
-                label.textContent = item.label;
-
-                wrapper.appendChild(input);
-                wrapper.appendChild(label);
-                container.appendChild(wrapper);
+        function renderSegments() {
+            modal.querySelectorAll('.cc-seg button').forEach((btn) => {
+                const auto = 'team' === btn.dataset.section ? state.teamAuto : state.holidayAuto;
+                const wantOn = ('auto' === btn.dataset.mode) === auto;
+                btn.classList.toggle('is-on', wantOn);
             });
+            teamNote.style.display = state.teamAuto ? '' : 'none';
+            holidayNote.style.display = state.holidayAuto ? '' : 'none';
         }
 
         function render() {
             sections.classList.remove('d-none');
             loading.classList.add('d-none');
             saveBtn.disabled = false;
-
+            renderSegments();
             renderTeam();
-
-            const holidayItems = state.candidates.holidays.map((h) => ({ id: h.id, label: h.countryName + ' (' + h.countryCode + ')' }));
-            renderCheckboxes(holidayList, holidayItems, 'holidays');
-            holidayEmpty.classList.toggle('d-none', holidayItems.length > 0);
+            renderHolidays();
         }
+
+        function setTeamMember(id, on) {
+            if (on) state.teamSelected.add(id); else state.teamSelected.delete(id);
+        }
+
+        function defaultTeamSelection() { return new Set(state.topLevelTeamIds); }
+        function defaultHolidaySelection() { return new Set(state.candidates.holidays.map((h) => h.id)); }
+
+        teamList.addEventListener('click', (evt) => {
+            const expandBtn = evt.target instanceof Element ? evt.target.closest('[data-action="toggle-expand"]') : null;
+            if (expandBtn) {
+                const id = expandBtn.dataset.id;
+                if (state.expanded.has(id)) state.expanded.delete(id); else state.expanded.add(id);
+                renderTeam();
+                return;
+            }
+            const myTeamBtn = evt.target instanceof Element ? evt.target.closest('[data-action="toggle-my-team-expand"]') : null;
+            if (myTeamBtn) {
+                state.myTeamExpanded = !state.myTeamExpanded;
+                renderTeam();
+            }
+        });
+
+        teamList.addEventListener('change', (evt) => {
+            const cb = evt.target;
+            if (!(cb instanceof HTMLInputElement) || 'checkbox' !== cb.type) return;
+            const action = cb.dataset.action;
+
+            if ('toggle-member' === action) {
+                setTeamMember(cb.dataset.id, cb.checked);
+                state.teamAuto = false;
+            } else if ('toggle-include-all' === action) {
+                const mgr = state.byId.get(cb.dataset.id);
+                if (mgr) mgr.reportIds.forEach((rid) => setTeamMember(rid, cb.checked));
+                state.teamAuto = false;
+            } else if ('toggle-my-team-all' === action) {
+                state.myTeamIds.forEach((rid) => setTeamMember(rid, cb.checked));
+                state.teamAuto = false;
+            } else {
+                return;
+            }
+
+            renderSegments();
+            renderTeam();
+        });
+
+        holidayList.addEventListener('change', (evt) => {
+            const cb = evt.target;
+            if (!(cb instanceof HTMLInputElement) || 'toggle-holiday' !== cb.dataset.action) return;
+            if (cb.checked) state.holidaySelected.add(cb.dataset.id); else state.holidaySelected.delete(cb.dataset.id);
+            state.holidayAuto = false;
+            renderSegments();
+        });
+
+        modal.querySelectorAll('.cc-seg button').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const toAuto = 'auto' === btn.dataset.mode;
+                if ('team' === btn.dataset.section) {
+                    state.teamAuto = toAuto;
+                    if (toAuto) {
+                        state.teamSelected = defaultTeamSelection();
+                        state.expanded = new Set();
+                        state.myTeamExpanded = true;
+                    }
+                    renderSegments();
+                    renderTeam();
+                } else {
+                    state.holidayAuto = toAuto;
+                    if (toAuto) state.holidaySelected = defaultHolidaySelection();
+                    renderSegments();
+                    renderHolidays();
+                }
+            });
+        });
 
         async function load() {
             loading.classList.remove('d-none');
@@ -347,14 +405,31 @@
                 state.candidates.holidays = data.candidateHolidayCalendars || [];
                 state.topLevelTeamIds = data.topLevelTeamMemberIds || [];
                 state.myTeamIds = data.myTeamMemberIds || [];
-                state.myTeamExpanded = true;
                 state.byId = new Map(state.candidates.team.map((c) => [c.id, c]));
-                state.selected.team = data.selectedTeamMemberIds;
-                state.selected.holidays = data.selectedHolidayCalendarIds;
-                state.teamMemberIdsAuto = data.selectedTeamMemberIds === null;
-                state.holidayCalendarIdsAuto = data.selectedHolidayCalendarIds === null;
                 state.expanded = new Set();
-                state.includeReports = new Set();
+                state.myTeamExpanded = true;
+
+                const teamKnown = new Set(state.candidates.team.map((c) => c.id));
+                if (null === data.selectedTeamMemberIds) {
+                    state.teamAuto = true;
+                    state.teamSelected = defaultTeamSelection();
+                    state.teamStale = [];
+                } else {
+                    state.teamAuto = false;
+                    state.teamSelected = new Set((data.selectedTeamMemberIds || []).filter((id) => teamKnown.has(id)));
+                    state.teamStale = (data.selectedTeamMemberIds || []).filter((id) => !teamKnown.has(id));
+                }
+
+                const holKnown = new Set(state.candidates.holidays.map((h) => h.id));
+                if (null === data.selectedHolidayCalendarIds) {
+                    state.holidayAuto = true;
+                    state.holidaySelected = defaultHolidaySelection();
+                    state.holidayStale = [];
+                } else {
+                    state.holidayAuto = false;
+                    state.holidaySelected = new Set((data.selectedHolidayCalendarIds || []).filter((id) => holKnown.has(id)));
+                    state.holidayStale = (data.selectedHolidayCalendarIds || []).filter((id) => !holKnown.has(id));
+                }
 
                 render();
             } catch (e) {
@@ -364,94 +439,16 @@
             }
         }
 
-        modal.querySelectorAll('[data-action="reset-auto"]').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const section = btn.dataset.section;
-                if (section === 'team') {
-                    state.teamMemberIdsAuto = true;
-                    state.selected.team = null;
-                    state.expanded = new Set();
-                    state.includeReports = new Set();
-                    state.myTeamExpanded = true;
-                } else {
-                    state.holidayCalendarIdsAuto = true;
-                    state.selected.holidays = null;
-                }
-                render();
-            });
-        });
-
-        teamList.addEventListener('click', (evt) => {
-            const target = evt.target instanceof Element ? evt.target.closest('[data-action]') : null;
-            if (!target) return;
-            const action = target.dataset.action;
-            const id = target.dataset.id;
-            if (action === 'toggle-my-team-expand') {
-                state.myTeamExpanded = !state.myTeamExpanded;
-                const childrenEl = teamList.querySelector('#calCust-myteam-children');
-                if (childrenEl) childrenEl.classList.toggle('d-none', !state.myTeamExpanded);
-                target.classList.toggle('is-open', state.myTeamExpanded);
-                target.setAttribute('aria-expanded', state.myTeamExpanded ? 'true' : 'false');
-                target.setAttribute('aria-label', state.myTeamExpanded ? t.collapse : t.expand);
-                return;
-            }
-            if (action === 'toggle-expand') {
-                if (state.expanded.has(id)) state.expanded.delete(id);
-                else state.expanded.add(id);
-                renderTeam();
-                return;
-            }
-            if (action === 'toggle-include-reports') {
-                const cb = target;
-                if (cb.checked) state.includeReports.add(id);
-                else state.includeReports.delete(id);
-                state.teamMemberIdsAuto = false;
-            }
-        });
-
-        teamList.addEventListener('change', (evt) => {
-            const cb = evt.target;
-            if (!(cb instanceof HTMLInputElement) || cb.type !== 'checkbox') return;
-
-            if (cb.hasAttribute('data-my-team-parent')) {
-                state.myTeamIds.forEach((id) => {
-                    const child = teamList.querySelector('input[data-team-id="' + id + '"]');
-                    if (child) child.checked = cb.checked;
-                });
-                cb.indeterminate = false;
-                state.teamMemberIdsAuto = false;
-                return;
-            }
-
-            if (!cb.dataset.teamId) return;
-            state.teamMemberIdsAuto = false;
-            if (state.myTeamIds.includes(cb.dataset.teamId)) {
-                syncMyTeamParent();
-            }
-        });
-
         saveBtn.addEventListener('click', async () => {
             saveBtn.disabled = true;
             errorEl.classList.add('d-none');
 
-            const finalTeamIds = new Set();
-            teamList.querySelectorAll('input[type=checkbox][data-team-id]:checked').forEach((i) => {
-                finalTeamIds.add(i.dataset.teamId);
-            });
-            for (const managerId of state.includeReports) {
-                const mgr = state.byId.get(managerId);
-                if (!mgr) continue;
-                mgr.reportIds.forEach((rid) => finalTeamIds.add(rid));
-            }
-            const teamIds = Array.from(finalTeamIds);
-            const holidayIds = Array.from(holidayList.querySelectorAll('input[type=checkbox]:checked')).map((i) => i.value);
-
             const payload = {
                 _token: window.AppCsrf.rotateStatelessCsrfToken(csrfPlaceholder),
-                teamMemberIds: teamIds,
-                holidayCalendarIds: holidayIds,
-                teamMemberIdsAuto: state.teamMemberIdsAuto,
-                holidayCalendarIdsAuto: state.holidayCalendarIdsAuto,
+                teamMemberIds: [...state.teamSelected, ...state.teamStale],
+                holidayCalendarIds: [...state.holidaySelected, ...state.holidayStale],
+                teamMemberIdsAuto: state.teamAuto,
+                holidayCalendarIdsAuto: state.holidayAuto,
             };
 
             try {
