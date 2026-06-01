@@ -48,9 +48,16 @@ class GetCalendarSubscriptionConfigQueryHandler
             $usersById[$u->id] = $u;
         }
 
+        $descendantIds = [];
+        foreach ($descendants as $u) {
+            $descendantIds[$u->id] = true;
+        }
+
         $reportsByManager = [];
         foreach ($usersById as $u) {
-            if (null !== $u->managerId && isset($usersById[$u->managerId])) {
+            if (null !== $u->managerId
+                && isset($usersById[$u->managerId], $descendantIds[$u->managerId])
+            ) {
                 $reportsByManager[$u->managerId][] = $u->id;
             }
         }
@@ -72,10 +79,18 @@ class GetCalendarSubscriptionConfigQueryHandler
 
         $topLevelIds = array_values(array_unique(array_map(fn (UserDTO $u) => $u->id, $teammates)));
 
+        $myTeamMemberIds = array_values(
+            array_map(
+                fn (UserDTO $u) => $u->id,
+                array_filter($teammates, fn (UserDTO $u) => $u->managerId === $userId),
+            ),
+        );
+
         return new CalendarSubscriptionConfigDTO(
             candidateTeamMembers: $candidates,
             candidateHolidayCalendars: array_values($calendars),
             topLevelTeamMemberIds: $topLevelIds,
+            myTeamMemberIds: $myTeamMemberIds,
             selectedTeamMemberIds: $user->calendarSubscriptionTeamMemberIds,
             selectedHolidayCalendarIds: $user->calendarSubscriptionHolidayCalendarIds,
         );

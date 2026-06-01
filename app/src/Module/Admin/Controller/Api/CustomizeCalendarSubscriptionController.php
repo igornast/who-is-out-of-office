@@ -55,6 +55,7 @@ class CustomizeCalendarSubscriptionController extends AbstractController
                 $config->candidateHolidayCalendars,
             ),
             'topLevelTeamMemberIds' => $config->topLevelTeamMemberIds,
+            'myTeamMemberIds' => $config->myTeamMemberIds,
             'selectedTeamMemberIds' => $config->selectedTeamMemberIds,
             'selectedHolidayCalendarIds' => $config->selectedHolidayCalendarIds,
         ]);

@@ -73,8 +73,10 @@ it('GET resolves avatarUrl, initials and colorIndex for candidates', function ()
 });
 
 it('GET payload includes isManager, reportIds, and topLevelTeamMemberIds', function (): void {
-    $userThree = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@whoisooo.app']);
-    $this->client->loginUser($userThree);
+    // Log in as the admin (user_1) who sits ABOVE the manager (user_2 Petra).
+    // Only a user above a manager should see that manager as expandable.
+    $admin = $this->em->getRepository(User::class)->findOneBy(['email' => 'admin@whoisooo.app']);
+    $this->client->loginUser($admin);
 
     $this->client->request('GET', '/app/api/user/calendar/customize');
 
@@ -97,6 +99,23 @@ it('GET payload includes isManager, reportIds, and topLevelTeamMemberIds', funct
         fn (array $c): bool => true === $c['isManager'] && [] !== $c['reportIds'],
     );
     expect($managers)->not->toBeEmpty();
+});
+
+it('does not expose the manager as expandable to their own team member', function (): void {
+    // user_3 (John Doe) is a regular member of Petra's team. Petra is his manager,
+    // not his descendant, so she must NOT appear as an expandable manager.
+    $member = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@whoisooo.app']);
+    $this->client->loginUser($member);
+
+    $this->client->request('GET', '/app/api/user/calendar/customize');
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200);
+    $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+
+    foreach ($data['candidateTeamMembers'] as $member) {
+        expect($member['isManager'])->toBeFalse()
+            ->and($member['reportIds'])->toBe([]);
+    }
 });
 
 it('POST without CSRF token returns 403', function (): void {
@@ -253,4 +272,56 @@ it('POST auto=false with a valid candidate team member id persists that id', fun
 
     expect($refreshed->calendarSubscriptionTeamMemberIds)->toBe([$firstMemberId]);
     expect($refreshed->calendarSubscriptionHolidayCalendarIds)->toBe([]);
+});
+
+it('GET as manager returns the four direct reports in myTeamMemberIds, all also top-level', function (): void {
+    $this->client->loginUser($this->user);
+
+    $this->client->request('GET', '/app/api/user/calendar/customize');
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200);
+    $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+
+    expect($data)->toHaveKey('myTeamMemberIds');
+    expect($data['myTeamMemberIds'])->toHaveCount(4);
+
+    foreach ($data['myTeamMemberIds'] as $id) {
+        expect($data['topLevelTeamMemberIds'])->toContain($id);
+    }
+});
+
+it('GET as admin includes the sub-manager Petra in myTeamMemberIds with isManager and reportIds', function (): void {
+    $admin = $this->em->getRepository(User::class)->findOneBy(['email' => 'admin@whoisooo.app']);
+    $this->client->loginUser($admin);
+
+    $this->client->request('GET', '/app/api/user/calendar/customize');
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200);
+    $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+
+    $petra = null;
+    foreach ($data['candidateTeamMembers'] as $member) {
+        if ('manager@whoisooo.app' === $member['email']) {
+            $petra = $member;
+            break;
+        }
+    }
+
+    expect($petra)->not->toBeNull()
+        ->and($data['myTeamMemberIds'])->toContain($petra['id'])
+        ->and($petra['isManager'])->toBeTrue()
+        ->and($petra['reportIds'])->not->toBeEmpty();
+});
+
+it('GET as a plain member returns an empty myTeamMemberIds', function (): void {
+    $member = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@whoisooo.app']);
+    $this->client->loginUser($member);
+
+    $this->client->request('GET', '/app/api/user/calendar/customize');
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200);
+    $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+
+    expect($data)->toHaveKey('myTeamMemberIds');
+    expect($data['myTeamMemberIds'])->toBe([]);
 });

@@ -214,6 +214,7 @@ calendar:
         save_error: Could not save preferences. Please try again.
         stale_suffix: (no longer matches your team)
         manager_badge: Manager
+        my_team_label: "My team (%count%)"
         expand_reports: "Show direct reports"
         collapse_reports: "Hide direct reports"
         include_reports_label: "Include %name%'s direct reports (%count%)"

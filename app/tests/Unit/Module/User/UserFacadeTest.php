@@ -451,6 +451,7 @@ it('delegates getCalendarSubscriptionConfig to handler', function (): void {
         candidateTeamMembers: [],
         candidateHolidayCalendars: [],
         topLevelTeamMemberIds: [],
+        myTeamMemberIds: [],
         selectedTeamMemberIds: null,
         selectedHolidayCalendarIds: null,
     );

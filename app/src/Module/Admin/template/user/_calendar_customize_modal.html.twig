@@ -17,6 +17,7 @@
         border-radius: 6px;
     }
     .cal-cust-children .cal-cust-hint { color: var(--text-muted); font-size: 12px; margin-bottom: 6px; }
+    .cal-cust-myteam-head .cal-cust-name { font-weight: 600; }
     .cal-cust-badge {
         font-size: 10.5px; padding: 2px 7px; border-radius: 999px;
         background: var(--app-bg-alt); color: var(--text-muted);
@@ -108,6 +109,8 @@
             holidayCalendarIdsAuto: true,
             candidates: { team: [], holidays: [] },
             topLevelTeamIds: [],
+            myTeamIds: [],
+            myTeamExpanded: true,
             byId: new Map(),
             selected: { team: null, holidays: null },
             expanded: new Set(),
@@ -122,6 +125,7 @@
             includeHint: {{ ('calendar.customize.include_reports_hint'|trans(domain: 'admin'))|json_encode|raw }},
             personSingular: {{ ('calendar.customize.people_singular'|trans(domain: 'admin'))|json_encode|raw }},
             personPlural: {{ ('calendar.customize.people_plural'|trans(domain: 'admin'))|json_encode|raw }},
+            myTeamLabel: {{ ('calendar.customize.my_team_label'|trans(domain: 'admin'))|json_encode|raw }},
         };
 
         const CHEV_SVG = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">'
@@ -206,23 +210,74 @@
                 + '</div>';
         }
 
+        function myTeamGroupHtml() {
+            const reportCandidates = state.myTeamIds
+                .map((id) => state.byId.get(id))
+                .filter(Boolean);
+            const count = reportCandidates.length;
+            const label = formatTemplate(t.myTeamLabel, { count: count });
+            const expanded = state.myTeamExpanded;
+
+            const chevron = '<button type="button" class="cal-cust-chev ' + (expanded ? 'is-open' : '') + '"'
+                + ' data-action="toggle-my-team-expand"'
+                + ' aria-expanded="' + (expanded ? 'true' : 'false') + '"'
+                + ' aria-label="' + escapeHtml(expanded ? t.collapse : t.expand) + '">'
+                + CHEV_SVG + '</button>';
+
+            const childRows = reportCandidates
+                .map((c) => teamRowHtml(c, null, state.selected.team, state.teamMemberIdsAuto))
+                .join('');
+
+            return ''
+                + '<div class="cal-cust-row cal-cust-myteam-head">'
+                +   chevron
+                +   '<input type="checkbox" id="calCust-myteam-parent" data-my-team-parent>'
+                +   '<label for="calCust-myteam-parent" class="cal-cust-name">' + escapeHtml(label) + '</label>'
+                + '</div>'
+                + '<div class="cal-cust-children' + (expanded ? '' : ' d-none') + '" id="calCust-myteam-children">'
+                +   childRows
+                + '</div>';
+        }
+
+        function syncMyTeamParent() {
+            const parent = teamList.querySelector('input[data-my-team-parent]');
+            if (!parent) return;
+
+            const total = state.myTeamIds.length;
+            let checkedCount = 0;
+            state.myTeamIds.forEach((id) => {
+                const cb = teamList.querySelector('input[data-team-id="' + id + '"]');
+                if (cb && cb.checked) checkedCount++;
+            });
+
+            parent.checked = total > 0 && checkedCount === total;
+            parent.indeterminate = checkedCount > 0 && checkedCount < total;
+        }
+
         function renderTeam() {
             teamList.innerHTML = '';
             const known = state.candidates.team;
-            const topLevel = known.filter((c) => state.topLevelTeamIds.includes(c.id));
+            const myTeamIdSet = new Set(state.myTeamIds);
+            const topLevelFlat = known.filter((c) => state.topLevelTeamIds.includes(c.id) && !myTeamIdSet.has(c.id));
             const knownIds = new Set(known.map((c) => c.id));
             const stales = (state.selected.team || []).filter((id) => !knownIds.has(id));
 
-            const html = topLevel.map((c) => teamRowHtml(c, knownIds, state.selected.team, state.teamMemberIdsAuto)).join('')
-                + stales.map((id) => ''
-                    + '<div class="cal-cust-row">'
-                    +   '<span class="cal-cust-chev is-spacer">' + CHEV_SVG + '</span>'
-                    +   '<input type="checkbox" id="calCust-team-' + id + '" data-team-id="' + escapeHtml(id) + '" checked disabled>'
-                    +   '<label for="calCust-team-' + id + '" class="cal-cust-name">' + escapeHtml(id) + ' ' + escapeHtml(staleSuffix) + '</label>'
-                    + '</div>').join('');
+            let html = topLevelFlat.map((c) => teamRowHtml(c, knownIds, state.selected.team, state.teamMemberIdsAuto)).join('');
+
+            if (state.myTeamIds.length > 0) {
+                html += myTeamGroupHtml();
+            }
+
+            html += stales.map((id) => ''
+                + '<div class="cal-cust-row">'
+                +   '<span class="cal-cust-chev is-spacer">' + CHEV_SVG + '</span>'
+                +   '<input type="checkbox" id="calCust-team-' + id + '" data-team-id="' + escapeHtml(id) + '" checked disabled>'
+                +   '<label for="calCust-team-' + id + '" class="cal-cust-name">' + escapeHtml(id) + ' ' + escapeHtml(staleSuffix) + '</label>'
+                + '</div>').join('');
 
             teamList.innerHTML = html;
-            teamEmpty.classList.toggle('d-none', topLevel.length > 0);
+            teamEmpty.classList.toggle('d-none', topLevelFlat.length > 0 || state.myTeamIds.length > 0);
+            syncMyTeamParent();
         }
 
         function renderCheckboxes(container, items, key) {
@@ -291,6 +346,8 @@
                 state.candidates.team = data.candidateTeamMembers || [];
                 state.candidates.holidays = data.candidateHolidayCalendars || [];
                 state.topLevelTeamIds = data.topLevelTeamMemberIds || [];
+                state.myTeamIds = data.myTeamMemberIds || [];
+                state.myTeamExpanded = true;
                 state.byId = new Map(state.candidates.team.map((c) => [c.id, c]));
                 state.selected.team = data.selectedTeamMemberIds;
                 state.selected.holidays = data.selectedHolidayCalendarIds;
@@ -315,6 +372,7 @@
                     state.selected.team = null;
                     state.expanded = new Set();
                     state.includeReports = new Set();
+                    state.myTeamExpanded = true;
                 } else {
                     state.holidayCalendarIdsAuto = true;
                     state.selected.holidays = null;
@@ -328,6 +386,15 @@
             if (!target) return;
             const action = target.dataset.action;
             const id = target.dataset.id;
+            if (action === 'toggle-my-team-expand') {
+                state.myTeamExpanded = !state.myTeamExpanded;
+                const childrenEl = teamList.querySelector('#calCust-myteam-children');
+                if (childrenEl) childrenEl.classList.toggle('d-none', !state.myTeamExpanded);
+                target.classList.toggle('is-open', state.myTeamExpanded);
+                target.setAttribute('aria-expanded', state.myTeamExpanded ? 'true' : 'false');
+                target.setAttribute('aria-label', state.myTeamExpanded ? t.collapse : t.expand);
+                return;
+            }
             if (action === 'toggle-expand') {
                 if (state.expanded.has(id)) state.expanded.delete(id);
                 else state.expanded.add(id);
@@ -345,8 +412,22 @@
         teamList.addEventListener('change', (evt) => {
             const cb = evt.target;
             if (!(cb instanceof HTMLInputElement) || cb.type !== 'checkbox') return;
+
+            if (cb.hasAttribute('data-my-team-parent')) {
+                state.myTeamIds.forEach((id) => {
+                    const child = teamList.querySelector('input[data-team-id="' + id + '"]');
+                    if (child) child.checked = cb.checked;
+                });
+                cb.indeterminate = false;
+                state.teamMemberIdsAuto = false;
+                return;
+            }
+
             if (!cb.dataset.teamId) return;
             state.teamMemberIdsAuto = false;
+            if (state.myTeamIds.includes(cb.dataset.teamId)) {
+                syncMyTeamParent();
+            }
         });
 
         saveBtn.addEventListener('click', async () => {
