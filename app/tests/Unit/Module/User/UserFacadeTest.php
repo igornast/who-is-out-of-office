@@ -30,6 +30,7 @@ use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
+use App\Module\User\UseCase\Query\GetOrganizationTreeQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDatesQueryHandler;
@@ -70,6 +71,7 @@ beforeEach(function (): void {
     $this->updateUserFeedLastSeenAtHandler = mock(UpdateUserFeedLastSeenAtCommandHandler::class);
     $this->getCalendarSubscriptionConfigHandler = mock(GetCalendarSubscriptionConfigQueryHandler::class);
     $this->updateCalendarSubscriptionConfigHandler = mock(UpdateCalendarSubscriptionConfigCommandHandler::class);
+    $this->getOrganizationTreeHandler = mock(GetOrganizationTreeQueryHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -101,6 +103,7 @@ beforeEach(function (): void {
         updateUserFeedLastSeenAtHandler: $this->updateUserFeedLastSeenAtHandler,
         getCalendarSubscriptionConfigHandler: $this->getCalendarSubscriptionConfigHandler,
         updateCalendarSubscriptionConfigHandler: $this->updateCalendarSubscriptionConfigHandler,
+        getOrganizationTreeHandler: $this->getOrganizationTreeHandler,
     );
 });
 
@@ -447,6 +450,7 @@ it('delegates getCalendarSubscriptionConfig to handler', function (): void {
     $config = new CalendarSubscriptionConfigDTO(
         candidateTeamMembers: [],
         candidateHolidayCalendars: [],
+        topLevelTeamMemberIds: [],
         selectedTeamMemberIds: null,
         selectedHolidayCalendarIds: null,
     );

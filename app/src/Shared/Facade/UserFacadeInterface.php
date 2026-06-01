@@ -7,6 +7,7 @@ namespace App\Shared\Facade;
 use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\DTO\InvitationDTO;
+use App\Shared\DTO\OrganizationNodeDTO;
 use App\Shared\DTO\PasswordResetTokenDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\PaletteEnum;
@@ -89,6 +90,11 @@ interface UserFacadeInterface
      * @return UserDTO[]
      */
     public function getAllActiveUsers(): array;
+
+    /**
+     * @return list<OrganizationNodeDTO>
+     */
+    public function getOrganizationTree(): array;
 
     /**
      * @return string[] Plain-text recovery codes (shown to user once)

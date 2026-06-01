@@ -1,3 +1,30 @@
+<style>
+    .cal-cust-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+    .cal-cust-row .cal-cust-name { flex: 1 1 auto; }
+    .cal-cust-row .cal-cust-email { color: var(--text-muted); }
+    .cal-cust-chev {
+        width: 18px; height: 18px;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: none; border: 0; padding: 0;
+        color: var(--text-muted); cursor: pointer;
+        transition: transform .15s ease;
+    }
+    .cal-cust-chev.is-open { transform: rotate(90deg); color: var(--text-primary); }
+    .cal-cust-chev.is-spacer { visibility: hidden; cursor: default; }
+    .cal-cust-children {
+        margin-left: 26px; padding: 6px 10px;
+        border-left: 2px solid var(--border);
+        border-radius: 6px;
+    }
+    .cal-cust-children .cal-cust-hint { color: var(--text-muted); font-size: 12px; margin-bottom: 6px; }
+    .cal-cust-badge {
+        font-size: 10.5px; padding: 2px 7px; border-radius: 999px;
+        background: var(--app-bg-alt); color: var(--text-muted);
+        border: 1px solid var(--border);
+        letter-spacing: .04em; text-transform: uppercase; font-weight: 600;
+    }
+</style>
+
 <div class="modal fade" id="calendarCustomizeModal" tabindex="-1" aria-labelledby="calendarCustomizeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
@@ -80,8 +107,123 @@
             teamMemberIdsAuto: true,
             holidayCalendarIdsAuto: true,
             candidates: { team: [], holidays: [] },
+            topLevelTeamIds: [],
+            byId: new Map(),
             selected: { team: null, holidays: null },
+            expanded: new Set(),
+            includeReports: new Set(),
         };
+
+        const t = {
+            managerBadge: {{ ('calendar.customize.manager_badge'|trans(domain: 'admin'))|json_encode|raw }},
+            expand: {{ ('calendar.customize.expand_reports'|trans(domain: 'admin'))|json_encode|raw }},
+            collapse: {{ ('calendar.customize.collapse_reports'|trans(domain: 'admin'))|json_encode|raw }},
+            includeLabel: {{ ('calendar.customize.include_reports_label'|trans(domain: 'admin'))|json_encode|raw }},
+            includeHint: {{ ('calendar.customize.include_reports_hint'|trans(domain: 'admin'))|json_encode|raw }},
+            personSingular: {{ ('calendar.customize.people_singular'|trans(domain: 'admin'))|json_encode|raw }},
+            personPlural: {{ ('calendar.customize.people_plural'|trans(domain: 'admin'))|json_encode|raw }},
+        };
+
+        const CHEV_SVG = '<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">'
+            + '<path d="M3 1 L7 5 L3 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+        function firstName(full) {
+            return (full || '').split(' ')[0];
+        }
+
+        function escapeHtml(s) {
+            return (s == null ? '' : String(s))
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function formatTemplate(tpl, vars) {
+            return tpl.replace(/%(\w+)%/g, (_, k) => escapeHtml(vars[k] ?? ''));
+        }
+
+        function teamRowHtml(candidate, knownIds, storedIds, auto) {
+            const isStale = false;
+            const checked = auto
+                ? (state.topLevelTeamIds.includes(candidate.id))
+                : (storedIds || []).includes(candidate.id);
+
+            const inputId = 'calCust-team-' + candidate.id;
+            const chevron = candidate.isManager
+                ? '<button type="button" class="cal-cust-chev ' + (state.expanded.has(candidate.id) ? 'is-open' : '') + '"'
+                    + ' data-action="toggle-expand" data-id="' + escapeHtml(candidate.id) + '"'
+                    + ' aria-expanded="' + (state.expanded.has(candidate.id) ? 'true' : 'false') + '"'
+                    + ' aria-label="' + escapeHtml(state.expanded.has(candidate.id) ? t.collapse : t.expand) + '">'
+                    + CHEV_SVG + '</button>'
+                : '<span class="cal-cust-chev is-spacer">' + CHEV_SVG + '</span>';
+
+            const badge = candidate.isManager
+                ? '<span class="cal-cust-badge">' + escapeHtml(t.managerBadge) + '</span>'
+                : '';
+
+            const expanded = candidate.isManager && state.expanded.has(candidate.id)
+                ? childrenPanelHtml(candidate)
+                : '';
+
+            return ''
+                + '<div class="cal-cust-row">'
+                +   chevron
+                +   '<input type="checkbox" id="' + inputId + '" data-team-id="' + escapeHtml(candidate.id) + '"'
+                +     (checked ? ' checked' : '') + '>'
+                +   '<label for="' + inputId + '" class="cal-cust-name">'
+                +     escapeHtml(candidate.name)
+                +     ' <span class="cal-cust-email">(' + escapeHtml(candidate.email) + ')</span>'
+                +   '</label>'
+                +   badge
+                + '</div>'
+                + expanded;
+        }
+
+        function childrenPanelHtml(manager) {
+            const reportCandidates = manager.reportIds
+                .map((id) => state.byId.get(id))
+                .filter(Boolean);
+            const count = reportCandidates.length;
+            const peopleWord = (count === 1) ? t.personSingular : t.personPlural;
+            const hint = formatTemplate(t.includeHint, { name: firstName(manager.name), count: count, people: peopleWord });
+            const includeLabel = formatTemplate(t.includeLabel, { name: firstName(manager.name), count: count });
+            const toggleChecked = state.includeReports.has(manager.id);
+            const toggleId = 'calCust-include-' + manager.id;
+
+            const childRows = reportCandidates
+                .map((c) => teamRowHtml(c, null, state.selected.team, state.teamMemberIdsAuto))
+                .join('');
+
+            return ''
+                + '<div class="cal-cust-children">'
+                +   '<div class="cal-cust-hint">' + hint + '</div>'
+                +   '<div class="cal-cust-row">'
+                +     '<input type="checkbox" id="' + toggleId + '"'
+                +       ' data-action="toggle-include-reports" data-id="' + escapeHtml(manager.id) + '"'
+                +       (toggleChecked ? ' checked' : '') + '>'
+                +     '<label for="' + toggleId + '" class="cal-cust-name">' + includeLabel + '</label>'
+                +   '</div>'
+                +   childRows
+                + '</div>';
+        }
+
+        function renderTeam() {
+            teamList.innerHTML = '';
+            const known = state.candidates.team;
+            const topLevel = known.filter((c) => state.topLevelTeamIds.includes(c.id));
+            const knownIds = new Set(known.map((c) => c.id));
+            const stales = (state.selected.team || []).filter((id) => !knownIds.has(id));
+
+            const html = topLevel.map((c) => teamRowHtml(c, knownIds, state.selected.team, state.teamMemberIdsAuto)).join('')
+                + stales.map((id) => ''
+                    + '<div class="cal-cust-row">'
+                    +   '<span class="cal-cust-chev is-spacer">' + CHEV_SVG + '</span>'
+                    +   '<input type="checkbox" id="calCust-team-' + id + '" data-team-id="' + escapeHtml(id) + '" checked disabled>'
+                    +   '<label for="calCust-team-' + id + '" class="cal-cust-name">' + escapeHtml(id) + ' ' + escapeHtml(staleSuffix) + '</label>'
+                    + '</div>').join('');
+
+            teamList.innerHTML = html;
+            teamEmpty.classList.toggle('d-none', topLevel.length > 0);
+        }
 
         function renderCheckboxes(container, items, key) {
             container.innerHTML = '';
@@ -127,9 +269,7 @@
             loading.classList.add('d-none');
             saveBtn.disabled = false;
 
-            const teamItems = state.candidates.team.map((t) => ({ id: t.id, label: t.name + ' (' + t.email + ')' }));
-            renderCheckboxes(teamList, teamItems, 'team');
-            teamEmpty.classList.toggle('d-none', teamItems.length > 0);
+            renderTeam();
 
             const holidayItems = state.candidates.holidays.map((h) => ({ id: h.id, label: h.countryName + ' (' + h.countryCode + ')' }));
             renderCheckboxes(holidayList, holidayItems, 'holidays');
@@ -150,10 +290,14 @@
 
                 state.candidates.team = data.candidateTeamMembers || [];
                 state.candidates.holidays = data.candidateHolidayCalendars || [];
+                state.topLevelTeamIds = data.topLevelTeamMemberIds || [];
+                state.byId = new Map(state.candidates.team.map((c) => [c.id, c]));
                 state.selected.team = data.selectedTeamMemberIds;
                 state.selected.holidays = data.selectedHolidayCalendarIds;
                 state.teamMemberIdsAuto = data.selectedTeamMemberIds === null;
                 state.holidayCalendarIdsAuto = data.selectedHolidayCalendarIds === null;
+                state.expanded = new Set();
+                state.includeReports = new Set();
 
                 render();
             } catch (e) {
@@ -169,6 +313,8 @@
                 if (section === 'team') {
                     state.teamMemberIdsAuto = true;
                     state.selected.team = null;
+                    state.expanded = new Set();
+                    state.includeReports = new Set();
                 } else {
                     state.holidayCalendarIdsAuto = true;
                     state.selected.holidays = null;
@@ -177,11 +323,46 @@
             });
         });
 
+        teamList.addEventListener('click', (evt) => {
+            const target = evt.target instanceof Element ? evt.target.closest('[data-action]') : null;
+            if (!target) return;
+            const action = target.dataset.action;
+            const id = target.dataset.id;
+            if (action === 'toggle-expand') {
+                if (state.expanded.has(id)) state.expanded.delete(id);
+                else state.expanded.add(id);
+                renderTeam();
+                return;
+            }
+            if (action === 'toggle-include-reports') {
+                const cb = target;
+                if (cb.checked) state.includeReports.add(id);
+                else state.includeReports.delete(id);
+                state.teamMemberIdsAuto = false;
+            }
+        });
+
+        teamList.addEventListener('change', (evt) => {
+            const cb = evt.target;
+            if (!(cb instanceof HTMLInputElement) || cb.type !== 'checkbox') return;
+            if (!cb.dataset.teamId) return;
+            state.teamMemberIdsAuto = false;
+        });
+
         saveBtn.addEventListener('click', async () => {
             saveBtn.disabled = true;
             errorEl.classList.add('d-none');
 
-            const teamIds = Array.from(teamList.querySelectorAll('input[type=checkbox]:checked')).map((i) => i.value);
+            const finalTeamIds = new Set();
+            teamList.querySelectorAll('input[type=checkbox][data-team-id]:checked').forEach((i) => {
+                finalTeamIds.add(i.dataset.teamId);
+            });
+            for (const managerId of state.includeReports) {
+                const mgr = state.byId.get(managerId);
+                if (!mgr) continue;
+                mgr.reportIds.forEach((rid) => finalTeamIds.add(rid));
+            }
+            const teamIds = Array.from(finalTeamIds);
             const holidayIds = Array.from(holidayList.querySelectorAll('input[type=checkbox]:checked')).map((i) => i.value);
 
             const payload = {

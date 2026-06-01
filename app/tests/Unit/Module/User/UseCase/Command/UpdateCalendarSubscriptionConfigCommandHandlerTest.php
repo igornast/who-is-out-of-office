@@ -5,9 +5,9 @@ declare(strict_types=1);
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Module\User\UseCase\Command\UpdateCalendarSubscriptionConfigCommandHandler;
 use App\Module\User\UseCase\Query\GetCalendarSubscriptionConfigQueryHandler;
+use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionCandidateDTO;
 use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\DTO\Holiday\PublicHolidayCalendarDTO;
-use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Ramsey\Uuid\Uuid;
 
 beforeEach(function (): void {
@@ -32,7 +32,15 @@ it('filters team-member ids that are not in the candidate set', function (): voi
     $userId = Uuid::uuid4()->toString();
     $validId = Uuid::uuid4()->toString();
     $invalidId = Uuid::uuid4()->toString();
-    $candidate = UserDTOFixture::create(['id' => $validId]);
+    $candidate = new CalendarSubscriptionCandidateDTO(
+        id: $validId,
+        name: 'Test User',
+        email: 'test@example.com',
+        initials: 'TU',
+        colorIndex: 0,
+        isManager: false,
+        reportIds: [],
+    );
 
     $this->configHandler
         ->shouldReceive('handle')
@@ -40,6 +48,7 @@ it('filters team-member ids that are not in the candidate set', function (): voi
         ->andReturn(new CalendarSubscriptionConfigDTO(
             candidateTeamMembers: [$candidate],
             candidateHolidayCalendars: [],
+            topLevelTeamMemberIds: [$validId],
             selectedTeamMemberIds: null,
             selectedHolidayCalendarIds: null,
         ));
@@ -64,6 +73,7 @@ it('filters holiday calendar ids that are not in the candidate set', function ()
         ->andReturn(new CalendarSubscriptionConfigDTO(
             candidateTeamMembers: [],
             candidateHolidayCalendars: [$validCalendar],
+            topLevelTeamMemberIds: [],
             selectedTeamMemberIds: null,
             selectedHolidayCalendarIds: null,
         ));
@@ -82,7 +92,7 @@ it('persists empty arrays explicitly', function (): void {
     $this->configHandler
         ->shouldReceive('handle')
         ->with($userId)
-        ->andReturn(new CalendarSubscriptionConfigDTO([], [], null, null));
+        ->andReturn(new CalendarSubscriptionConfigDTO([], [], [], null, null));
 
     $this->userRepository
         ->shouldReceive('updateCalendarSubscriptionConfig')

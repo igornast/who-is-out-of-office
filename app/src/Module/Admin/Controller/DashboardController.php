@@ -123,8 +123,10 @@ class DashboardController extends AbstractDashboardController
                 ->setPermission(RoleEnum::Manager->value);
         }
 
+        yield MenuItem::section('menu.section.organization');
+        yield MenuItem::linkToRoute('menu.organization_chart', 'bi bi-diagram-3', 'app_organization_chart');
+
         if ($this->isAdmin()) {
-            yield MenuItem::section('menu.section.organization')->setPermission(RoleEnum::Admin->value);
             yield MenuItem::linkToCrud('menu.items.my_team', 'fa fa-user', User::class);
 
             yield MenuItem::section('menu.section.settings')->setPermission(RoleEnum::Admin->value);

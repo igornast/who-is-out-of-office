@@ -99,8 +99,14 @@
                 </a>
             {% endif %}
 
+            <div class="ooo-sidebar-section-label">{{ 'sidebar.section.organization'|trans(domain: 'admin') }}</div>
+            <a class="ooo-sidebar-item {{ _current_route == 'app_organization_chart' ? 'active' }}"
+               href="{{ path('app_organization_chart') }}"
+               title="{{ 'menu.items.organization_chart'|trans(domain: 'admin') }}">
+                <i data-lucide="network"></i>
+                <span class="ooo-sidebar-label">{{ 'menu.items.organization_chart'|trans(domain: 'admin') }}</span>
+            </a>
             {% if is_granted('ROLE_ADMIN') %}
-                <div class="ooo-sidebar-section-label">{{ 'sidebar.section.organization'|trans(domain: 'admin') }}</div>
                 <a class="ooo-sidebar-item {{ _current_crud == 'App\\Module\\Admin\\Controller\\UserCrudController' ? 'active' }}"
                    href="{{ ea_url().setController('App\\Module\\Admin\\Controller\\UserCrudController').setAction('index') }}"
                    title="{{ 'menu.items.my_team'|trans(domain: 'admin') }}">

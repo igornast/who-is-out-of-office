@@ -6,8 +6,8 @@ namespace App\Infrastructure\Ical\Controller;
 
 use App\Infrastructure\Ical\Service\CalendarRequestVerifier;
 use App\Infrastructure\Ical\Service\IcalCalendarBuilder;
+use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionCandidateDTO;
 use App\Shared\DTO\Holiday\PublicHolidayCalendarDTO;
-use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\HolidayFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
@@ -43,7 +43,7 @@ class CalendarExportController extends AbstractController
         $config = $this->userFacade->getCalendarSubscriptionConfig($userId);
 
         $teamMemberIds = $config->selectedTeamMemberIds
-            ?? array_map(fn (UserDTO $u) => $u->id, $config->candidateTeamMembers);
+            ?? array_map(fn (CalendarSubscriptionCandidateDTO $c) => $c->id, $config->candidateTeamMembers);
 
         $holidayCalendarIds = $config->selectedHolidayCalendarIds
             ?? array_map(fn (PublicHolidayCalendarDTO $c) => $c->id->toString(), $config->candidateHolidayCalendars);

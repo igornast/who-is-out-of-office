@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Module\Admin\Controller\Api;
 
 use App\Infrastructure\Doctrine\Entity\User;
+use App\Module\Admin\Service\CalendarAvatarUrlResolver;
+use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionCandidateDTO;
 use App\Shared\DTO\Holiday\PublicHolidayCalendarDTO;
-use App\Shared\DTO\UserDTO;
 use App\Shared\Facade\UserFacadeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,6 +23,7 @@ class CustomizeCalendarSubscriptionController extends AbstractController
 {
     public function __construct(
         private readonly UserFacadeInterface $userFacade,
+        private readonly CalendarAvatarUrlResolver $avatarUrlResolver,
     ) {
     }
 
@@ -32,10 +34,15 @@ class CustomizeCalendarSubscriptionController extends AbstractController
 
         return new JsonResponse([
             'candidateTeamMembers' => array_map(
-                fn (UserDTO $u) => [
-                    'id' => $u->id,
-                    'name' => $u->getFullName(),
-                    'email' => $u->email,
+                fn (CalendarSubscriptionCandidateDTO $c) => [
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'email' => $c->email,
+                    'isManager' => $c->isManager,
+                    'reportIds' => $c->reportIds,
+                    'avatarUrl' => $this->avatarUrlResolver->resolve($c->profileImageUrl),
+                    'initials' => $c->initials,
+                    'colorIndex' => $c->colorIndex,
                 ],
                 $config->candidateTeamMembers,
             ),
@@ -47,6 +54,7 @@ class CustomizeCalendarSubscriptionController extends AbstractController
                 ],
                 $config->candidateHolidayCalendars,
             ),
+            'topLevelTeamMemberIds' => $config->topLevelTeamMemberIds,
             'selectedTeamMemberIds' => $config->selectedTeamMemberIds,
             'selectedHolidayCalendarIds' => $config->selectedHolidayCalendarIds,
         ]);

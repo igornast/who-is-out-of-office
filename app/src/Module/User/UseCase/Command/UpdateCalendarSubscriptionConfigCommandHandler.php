@@ -6,8 +6,8 @@ namespace App\Module\User\UseCase\Command;
 
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Module\User\UseCase\Query\GetCalendarSubscriptionConfigQueryHandler;
+use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionCandidateDTO;
 use App\Shared\DTO\Holiday\PublicHolidayCalendarDTO;
-use App\Shared\DTO\UserDTO;
 
 class UpdateCalendarSubscriptionConfigCommandHandler
 {
@@ -31,7 +31,7 @@ class UpdateCalendarSubscriptionConfigCommandHandler
 
         $config = $this->configHandler->handle($userId);
 
-        $allowedTeamIds = array_map(fn (UserDTO $u) => $u->id, $config->candidateTeamMembers);
+        $allowedTeamIds = array_map(fn (CalendarSubscriptionCandidateDTO $c) => $c->id, $config->candidateTeamMembers);
         $allowedCalendarIds = array_map(fn (PublicHolidayCalendarDTO $c) => $c->id->toString(), $config->candidateHolidayCalendars);
 
         $filteredTeam = null === $teamMemberIds
