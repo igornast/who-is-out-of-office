@@ -55,7 +55,7 @@ it('returns ical calendar response with correct headers when request is valid', 
     $this->calendarRequestVerifier->expects('isValid')->andReturn(true);
     $this->userFacade->expects('getCalendarSubscriptionConfig')
         ->with('user-id')
-        ->andReturn(new CalendarSubscriptionConfigDTO([], [], [], null, null));
+        ->andReturn(new CalendarSubscriptionConfigDTO([], [], [], [], null, null));
     $this->leaveRequestFacade->expects('getLeaveRequestsForUsersBetween')
         ->withArgs(fn (array $userIds, array $statuses, DateTimeImmutable $start, DateTimeImmutable $end) => ['user-id'] === $userIds
             && [LeaveRequestStatusEnum::Approved] === $statuses)
@@ -79,7 +79,7 @@ it('fetches holidays when the config selects holiday calendars', function (): vo
     $this->calendarRequestVerifier->expects('isValid')->andReturn(true);
     $this->userFacade->expects('getCalendarSubscriptionConfig')
         ->with('user-id')
-        ->andReturn(new CalendarSubscriptionConfigDTO([], [], [], null, ['cal-1']));
+        ->andReturn(new CalendarSubscriptionConfigDTO([], [], [], [], null, ['cal-1']));
     $this->leaveRequestFacade->expects('getLeaveRequestsForUsersBetween')->andReturn([]);
     $this->holidayFacade->expects('getHolidaysForCalendarsBetween')
         ->with(['cal-1'], Mockery::type(DateTimeImmutable::class), Mockery::type(DateTimeImmutable::class))

@@ -49,6 +49,7 @@ it('filters team-member ids that are not in the candidate set', function (): voi
             candidateTeamMembers: [$candidate],
             candidateHolidayCalendars: [],
             topLevelTeamMemberIds: [$validId],
+            myTeamMemberIds: [],
             selectedTeamMemberIds: null,
             selectedHolidayCalendarIds: null,
         ));
@@ -74,6 +75,7 @@ it('filters holiday calendar ids that are not in the candidate set', function ()
             candidateTeamMembers: [],
             candidateHolidayCalendars: [$validCalendar],
             topLevelTeamMemberIds: [],
+            myTeamMemberIds: [],
             selectedTeamMemberIds: null,
             selectedHolidayCalendarIds: null,
         ));
@@ -92,7 +94,7 @@ it('persists empty arrays explicitly', function (): void {
     $this->configHandler
         ->shouldReceive('handle')
         ->with($userId)
-        ->andReturn(new CalendarSubscriptionConfigDTO([], [], [], null, null));
+        ->andReturn(new CalendarSubscriptionConfigDTO([], [], [], [], null, null));
 
     $this->userRepository
         ->shouldReceive('updateCalendarSubscriptionConfig')
