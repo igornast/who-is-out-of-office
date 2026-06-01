@@ -1,0 +1,90 @@
+{% extends '@AppAdmin/layout.html.twig' %}
+
+{% import "@AppAdmin/dashboard/component/_user_avatar.html.twig" as avatar %}
+
+{% block content_title %}{{ 'menu.organization_chart'|trans(domain: 'admin') }}{% endblock %}
+
+{% macro renderNode(node) %}
+    {% import _self as self %}
+    {% set userDto = node.user %}
+    {% set roles = userDto.roles %}
+    {% if 'ROLE_ADMIN' in roles %}
+        {% set roleKey = 'admin' %}
+        {% set roleBadgeClass = 'org-badge-admin' %}
+    {% elseif 'ROLE_MANAGER' in roles %}
+        {% set roleKey = 'manager' %}
+        {% set roleBadgeClass = 'org-badge-manager' %}
+    {% else %}
+        {% set roleKey = 'user' %}
+        {% set roleBadgeClass = 'org-badge-user' %}
+    {% endif %}
+
+    <li class="org-node{% if node.children is not empty %} org-node--has-children{% endif %}">
+        <div class="org-node-content">
+            <div class="org-node-avatar">
+                {{ avatar.userDtoAvatar(userDto) }}
+            </div>
+            <div class="org-node-info">
+                <span class="org-node-name">{{ userDto.getFullName() }}</span>
+                <span class="org-badge {{ roleBadgeClass }}">
+                    {{ ('organization_chart.role.' ~ roleKey)|trans(domain: 'admin') }}
+                </span>
+            </div>
+            {% if node.children is not empty %}
+                <button class="org-toggle"
+                        type="button"
+                        aria-expanded="true"
+                        title="{{ 'organization_chart.toggle'|trans(domain: 'admin') }}"
+                        aria-label="{{ 'organization_chart.toggle'|trans(domain: 'admin') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+            {% endif %}
+        </div>
+        {% if node.children is not empty %}
+            <ul class="org-children">
+                {% for child in node.children %}
+                    {{ self.renderNode(child) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endmacro %}
+
+{% block main %}
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">{{ 'organization_chart.title'|trans(domain: 'admin') }}</span>
+        </div>
+        <div class="card-body card-body-padded">
+            {% if tree is empty %}
+                <div class="empty-state-text">{{ 'organization_chart.empty'|trans(domain: 'admin') }}</div>
+            {% else %}
+                <ul class="org-tree">
+                    {% for node in tree %}
+                        {{ _self.renderNode(node) }}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        var tree = document.querySelector('.org-tree');
+        if (tree) {
+            tree.addEventListener('click', function (e) {
+                var btn = e.target.closest('.org-toggle');
+                if (!btn) return;
+                var node = btn.closest('.org-node');
+                var children = node.querySelector(':scope > .org-children');
+                if (!children) return;
+                var expanded = btn.getAttribute('aria-expanded') === 'true';
+                btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                children.hidden = expanded;
+            });
+        }
+    </script>
+{% endblock %}

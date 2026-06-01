@@ -28,6 +28,7 @@ use App\Module\User\UseCase\Query\GetCalendarSubscriptionConfigQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
 use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
+use App\Module\User\UseCase\Query\GetOrganizationTreeQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUserBySlackMemberIdQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDatesQueryHandler;
@@ -36,6 +37,7 @@ use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHand
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
 use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\DTO\InvitationDTO;
+use App\Shared\DTO\OrganizationNodeDTO;
 use App\Shared\DTO\PasswordResetTokenDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\PaletteEnum;
@@ -68,6 +70,7 @@ final class UserFacade implements UserFacadeInterface
         private readonly CleanupExpiredPasswordResetTokensCommandHandler $cleanupExpiredPasswordResetTokensHandler,
         private readonly GetPasswordResetTokenQueryHandler $getPasswordResetTokenHandler,
         private readonly GetAllActiveUsersQueryHandler $getAllActiveUsersHandler,
+        private readonly GetOrganizationTreeQueryHandler $getOrganizationTreeHandler,
         private readonly UpdateSlackStatusSyncPreferenceCommandHandler $updateSlackStatusSyncPreferenceHandler,
         private readonly EnableTwoFactorCommandHandler $enableTwoFactorHandler,
         private readonly DisableTwoFactorCommandHandler $disableTwoFactorHandler,
@@ -226,6 +229,14 @@ final class UserFacade implements UserFacadeInterface
     public function getAllActiveUsers(): array
     {
         return $this->getAllActiveUsersHandler->handle();
+    }
+
+    /**
+     * @return list<OrganizationNodeDTO>
+     */
+    public function getOrganizationTree(): array
+    {
+        return $this->getOrganizationTreeHandler->handle();
     }
 
     public function enableTwoFactor(string $userId, string $plainTotpSecret): array

@@ -17,6 +17,7 @@ class AdminContextForCustomRoutesSubscriber implements EventSubscriberInterface
     private const array CUSTOM_ROUTES = [
         'app_user_profile',
         'app_calendar_view',
+        'app_organization_chart',
         'app_settings',
         'app_settings_integrations',
         'app_settings_account_security',

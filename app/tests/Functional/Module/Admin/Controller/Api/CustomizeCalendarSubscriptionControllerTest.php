@@ -35,6 +35,7 @@ it('GET returns payload shape with non-empty candidateTeamMembers having id/name
 
     expect($data)->toHaveKey('candidateTeamMembers')
         ->toHaveKey('candidateHolidayCalendars')
+        ->toHaveKey('topLevelTeamMemberIds')
         ->toHaveKey('selectedTeamMemberIds')
         ->toHaveKey('selectedHolidayCalendarIds');
 
@@ -43,8 +44,59 @@ it('GET returns payload shape with non-empty candidateTeamMembers having id/name
     foreach ($data['candidateTeamMembers'] as $member) {
         expect($member)->toHaveKey('id')
             ->toHaveKey('name')
-            ->toHaveKey('email');
+            ->toHaveKey('email')
+            ->toHaveKey('isManager')
+            ->toHaveKey('reportIds')
+            ->toHaveKey('avatarUrl')
+            ->toHaveKey('initials')
+            ->toHaveKey('colorIndex');
     }
+});
+
+it('GET resolves avatarUrl, initials and colorIndex for candidates', function (): void {
+    $this->client->loginUser($this->user);
+    $this->client->request('GET', '/app/api/user/calendar/customize');
+
+    $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+
+    foreach ($data['candidateTeamMembers'] as $member) {
+        expect($member['initials'])->toBeString()
+            ->and(strlen($member['initials']))->toBeGreaterThan(0)
+            ->and($member['colorIndex'])->toBeInt()
+            ->and($member['colorIndex'])->toBeGreaterThanOrEqual(0)
+            ->and($member['colorIndex'])->toBeLessThan(6);
+
+        if (null !== $member['avatarUrl']) {
+            expect($member['avatarUrl'])->toStartWith('http');
+        }
+    }
+});
+
+it('GET payload includes isManager, reportIds, and topLevelTeamMemberIds', function (): void {
+    $userThree = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@whoisooo.app']);
+    $this->client->loginUser($userThree);
+
+    $this->client->request('GET', '/app/api/user/calendar/customize');
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200);
+    $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+
+    expect($data)->toHaveKey('candidateTeamMembers')
+        ->toHaveKey('topLevelTeamMemberIds');
+
+    foreach ($data['candidateTeamMembers'] as $member) {
+        expect($member)->toHaveKey('id')
+            ->toHaveKey('name')
+            ->toHaveKey('email')
+            ->toHaveKey('isManager')
+            ->toHaveKey('reportIds');
+    }
+
+    $managers = array_filter(
+        $data['candidateTeamMembers'],
+        fn (array $c): bool => true === $c['isManager'] && [] !== $c['reportIds'],
+    );
+    expect($managers)->not->toBeEmpty();
 });
 
 it('POST without CSRF token returns 403', function (): void {

@@ -47,6 +47,14 @@ interface UserRepositoryInterface
     public function findByManagerId(string $managerId): array;
 
     /**
+     * Returns every active user reachable by recursively walking manager_id downward
+     * from $userId. Does NOT include $userId itself. Ordered by first_name, last_name.
+     *
+     * @return UserDTO[]
+     */
+    public function findManagementDescendants(string $userId): array;
+
+    /**
      * @return UserDTO[]
      */
     public function findTeammatesOf(string $userId): array;

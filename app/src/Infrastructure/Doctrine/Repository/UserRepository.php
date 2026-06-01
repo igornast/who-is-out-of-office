@@ -286,6 +286,43 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
     }
 
     /**
+     * @return UserDTO[]
+     */
+    public function findManagementDescendants(string $userId): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = <<<'SQL'
+            WITH RECURSIVE descendants AS (
+                SELECT u.id
+                FROM user u
+                WHERE u.manager_id = :rootId AND u.is_active = 1
+                UNION
+                SELECT u.id
+                FROM user u
+                INNER JOIN descendants d ON u.manager_id = d.id
+                WHERE u.is_active = 1
+            )
+            SELECT u.*, hc.country_code AS calendar_country_code
+            FROM user u
+            LEFT JOIN holiday_calendar hc ON u.holiday_calendar_id = hc.id
+            WHERE u.id IN (SELECT id FROM descendants)
+            ORDER BY u.first_name ASC, u.last_name ASC
+        SQL;
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':rootId', $userId);
+        $rows = $stmt->executeQuery()->fetchAllAssociative();
+
+        $userDTOs = [];
+        foreach ($rows as $row) {
+            $userDTOs[] = UserDTO::fromArray($row);
+        }
+
+        return $userDTOs;
+    }
+
+    /**
      * @param list<string>|null $teamMemberIds
      * @param list<string>|null $holidayCalendarIds
      */

@@ -28,6 +28,7 @@ it('builds candidates from teammates and own + teammate country codes', function
 
     $this->userRepository->shouldReceive('findOneById')->with($userId)->andReturn($user);
     $this->userRepository->shouldReceive('findTeammatesOf')->with($userId)->andReturn([$teammate1, $teammate2]);
+    $this->userRepository->shouldReceive('findManagementDescendants')->with($userId)->andReturn([]);
     $this->holidayFacade
         ->shouldReceive('getActiveCalendarsForCountryCodes')
         ->withArgs(function (array $codes): bool {
@@ -43,6 +44,8 @@ it('builds candidates from teammates and own + teammate country codes', function
     $config = $this->handler->handle($userId);
 
     expect($config->candidateTeamMembers)->toHaveCount(2)
+        ->and($config->candidateTeamMembers[0])->toBeInstanceOf(App\Shared\DTO\CalendarSubscription\CalendarSubscriptionCandidateDTO::class)
+        ->and($config->topLevelTeamMemberIds)->toEqualCanonicalizing([$teammate1->id, $teammate2->id])
         ->and($config->candidateHolidayCalendars)->toHaveCount(2)
         ->and($config->selectedTeamMemberIds)->toBeNull()
         ->and($config->selectedHolidayCalendarIds)->toBeNull();
@@ -59,12 +62,14 @@ it('returns stored selections as-is when non-null', function (): void {
 
     $this->userRepository->shouldReceive('findOneById')->with($userId)->andReturn($user);
     $this->userRepository->shouldReceive('findTeammatesOf')->with($userId)->andReturn([]);
+    $this->userRepository->shouldReceive('findManagementDescendants')->with($userId)->andReturn([]);
     $this->holidayFacade->shouldReceive('getActiveCalendarsForCountryCodes')->andReturn([]);
 
     $config = $this->handler->handle($userId);
 
     expect($config->selectedTeamMemberIds)->toEqual(['abc', 'def'])
-        ->and($config->selectedHolidayCalendarIds)->toEqual([]);
+        ->and($config->selectedHolidayCalendarIds)->toEqual([])
+        ->and($config->topLevelTeamMemberIds)->toBe([]);
 });
 
 it('filters null country codes before asking holiday facade', function (): void {
@@ -73,6 +78,7 @@ it('filters null country codes before asking holiday facade', function (): void 
 
     $this->userRepository->shouldReceive('findOneById')->with($userId)->andReturn($user);
     $this->userRepository->shouldReceive('findTeammatesOf')->with($userId)->andReturn([]);
+    $this->userRepository->shouldReceive('findManagementDescendants')->with($userId)->andReturn([]);
     $this->holidayFacade
         ->shouldReceive('getActiveCalendarsForCountryCodes')
         ->with([])
@@ -90,4 +96,41 @@ it('throws when user is not found', function (): void {
 
     expect(fn () => $this->handler->handle($userId))
         ->toThrow(RuntimeException::class, sprintf('User %s not found', $userId));
+});
+
+it('populates avatar fields (initials, colorIndex, raw profileImageUrl) on candidates', function (): void {
+    $userId = Uuid::uuid4()->toString();
+    $user = UserDTOFixture::create(['id' => $userId, 'calendarCountryCode' => 'DE']);
+
+    // 'Ada' . 'Lovelace' = 11 chars → 11 % 6 = 5 ; initials 'AL'
+    $withImage = UserDTOFixture::create([
+        'firstName' => 'Ada',
+        'lastName' => 'Lovelace',
+        'profileImageUrl' => 'https://cdn.example/ada.png',
+    ]);
+    // 'Bo' . 'Li' = 4 chars → 4 % 6 = 4 ; initials 'BL' ; no image
+    $noImage = UserDTOFixture::create([
+        'firstName' => 'Bo',
+        'lastName' => 'Li',
+        'profileImageUrl' => null,
+    ]);
+
+    $this->userRepository->shouldReceive('findOneById')->with($userId)->andReturn($user);
+    $this->userRepository->shouldReceive('findTeammatesOf')->with($userId)->andReturn([$withImage, $noImage]);
+    $this->userRepository->shouldReceive('findManagementDescendants')->with($userId)->andReturn([]);
+    $this->holidayFacade->shouldReceive('getActiveCalendarsForCountryCodes')->andReturn([]);
+
+    $config = $this->handler->handle($userId);
+
+    $byId = [];
+    foreach ($config->candidateTeamMembers as $c) {
+        $byId[$c->id] = $c;
+    }
+
+    expect($byId[$withImage->id]->initials)->toBe('AL')
+        ->and($byId[$withImage->id]->colorIndex)->toBe(5)
+        ->and($byId[$withImage->id]->profileImageUrl)->toBe('https://cdn.example/ada.png')
+        ->and($byId[$noImage->id]->initials)->toBe('BL')
+        ->and($byId[$noImage->id]->colorIndex)->toBe(4)
+        ->and($byId[$noImage->id]->profileImageUrl)->toBeNull();
 });

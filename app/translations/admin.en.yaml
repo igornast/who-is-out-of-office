@@ -4,6 +4,7 @@ role:
     user: 'User'
 
 menu:
+    organization_chart: 'Organization Chart'
     items:
         logout: Logout
         dashboard: Dashboard
@@ -212,6 +213,13 @@ calendar:
         save_success: Subscription preferences updated.
         save_error: Could not save preferences. Please try again.
         stale_suffix: (no longer matches your team)
+        manager_badge: Manager
+        expand_reports: "Show direct reports"
+        collapse_reports: "Hide direct reports"
+        include_reports_label: "Include %name%'s direct reports (%count%)"
+        include_reports_hint: "%name% manages %count% %people%."
+        people_singular: person
+        people_plural: people
     filter:
         leave_type: Leave Type
         status: Status
@@ -739,3 +747,12 @@ whats_new:
     new_badge: New
     read_more: Read more
     published_on: 'Published %date%'
+
+organization_chart:
+    title: 'Organization Chart'
+    empty: 'No users to display yet.'
+    toggle: 'Toggle children'
+    role:
+        admin: 'Admin'
+        manager: 'Manager'
+        user: 'Employee'
