@@ -83,3 +83,34 @@ it('renders an admin badge for the admin user', function (): void {
 
     expect($crawler->filter('.org-badge-admin')->count())->toBeGreaterThan(0);
 });
+
+it('keeps the root expanded but collapses deeper managers by default', function (): void {
+    $client = static::createClient();
+    $client->loginUser($this->adminUser);
+    $crawler = $client->request('GET', '/app/organization-chart');
+
+    $rootHasChildren = $crawler->filter('.org-tree > .org-node.org-node--has-children');
+    expect($rootHasChildren->count())->toBeGreaterThan(0);
+    foreach ($rootHasChildren as $node) {
+        expect($node->getAttribute('class'))->not->toContain('is-collapsed');
+    }
+
+    $collapsedNestedNames = $crawler
+        ->filter('.org-children .org-node--has-children.is-collapsed .org-node-name')
+        ->each(fn ($n) => $n->text());
+    expect($collapsedNestedNames)->toContain('Petra Schmidt');
+});
+
+it('marks the root toggle expanded and a nested collapsed toggle not expanded', function (): void {
+    $client = static::createClient();
+    $client->loginUser($this->adminUser);
+    $crawler = $client->request('GET', '/app/organization-chart');
+
+    $rootToggle = $crawler->filter('.org-tree > .org-node > .org-node-content > .org-toggle')->first();
+    expect($rootToggle->attr('aria-expanded'))->toBe('true');
+
+    $nestedToggle = $crawler
+        ->filter('.org-children .org-node--has-children.is-collapsed > .org-node-content > .org-toggle')
+        ->first();
+    expect($nestedToggle->attr('aria-expanded'))->toBe('false');
+});

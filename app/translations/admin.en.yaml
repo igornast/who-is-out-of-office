@@ -752,6 +752,9 @@ organization_chart:
     title: 'Organization Chart'
     empty: 'No users to display yet.'
     toggle: 'Toggle children'
+    collapse: 'Collapse'
+    expand_all: 'Expand all'
+    first_level: 'First level only'
     role:
         admin: 'Admin'
         manager: 'Manager'
