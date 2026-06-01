@@ -4,7 +4,7 @@
 
 {% block content_title %}{{ 'menu.organization_chart'|trans(domain: 'admin') }}{% endblock %}
 
-{% macro renderNode(node) %}
+{% macro renderNode(node, depth) %}
     {% import _self as self %}
     {% set userDto = node.user %}
     {% set roles = userDto.roles %}
@@ -18,8 +18,10 @@
         {% set roleKey = 'user' %}
         {% set roleBadgeClass = 'org-badge-user' %}
     {% endif %}
+    {% set hasChildren = node.children is not empty %}
+    {% set isCollapsed = hasChildren and depth > 0 %}
 
-    <li class="org-node{% if node.children is not empty %} org-node--has-children{% endif %}">
+    <li class="org-node{% if hasChildren %} org-node--has-children{% endif %}{% if isCollapsed %} is-collapsed{% endif %}">
         <div class="org-node-content">
             <div class="org-node-avatar">
                 {{ avatar.userDtoAvatar(userDto) }}
@@ -30,24 +32,35 @@
                     {{ ('organization_chart.role.' ~ roleKey)|trans(domain: 'admin') }}
                 </span>
             </div>
-            {% if node.children is not empty %}
+            {% if hasChildren %}
                 <button class="org-toggle"
                         type="button"
-                        aria-expanded="true"
-                        title="{{ 'organization_chart.toggle'|trans(domain: 'admin') }}"
-                        aria-label="{{ 'organization_chart.toggle'|trans(domain: 'admin') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2"
-                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <polyline points="6 9 12 15 18 9"/>
-                    </svg>
+                        aria-expanded="{{ isCollapsed ? 'false' : 'true' }}"
+                        aria-label="{{ 'organization_chart.toggle'|trans(domain: 'admin') }}"
+                        data-action="org-chart#toggle">
+                    <span class="org-toggle__collapsed">
+                        +{{ node.children|length }}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2.4"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </span>
+                    <span class="org-toggle__expanded">
+                        {{ 'organization_chart.collapse'|trans(domain: 'admin') }}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2.4"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="18 15 12 9 6 15"/>
+                        </svg>
+                    </span>
                 </button>
             {% endif %}
         </div>
-        {% if node.children is not empty %}
+        {% if hasChildren %}
             <ul class="org-children">
                 {% for child in node.children %}
-                    {{ self.renderNode(child) }}
+                    {{ self.renderNode(child, depth + 1) }}
                 {% endfor %}
             </ul>
         {% endif %}
@@ -59,32 +72,26 @@
         <div class="card-header">
             <span class="card-title">{{ 'organization_chart.title'|trans(domain: 'admin') }}</span>
         </div>
-        <div class="card-body card-body-padded">
+        <div class="card-body" data-controller="org-chart">
             {% if tree is empty %}
                 <div class="empty-state-text">{{ 'organization_chart.empty'|trans(domain: 'admin') }}</div>
             {% else %}
-                <ul class="org-tree">
-                    {% for node in tree %}
-                        {{ _self.renderNode(node) }}
-                    {% endfor %}
-                </ul>
+                <div class="org-controls">
+                    <button type="button" class="org-control" data-action="org-chart#expandAll">
+                        {{ 'organization_chart.expand_all'|trans(domain: 'admin') }}
+                    </button>
+                    <button type="button" class="org-control" data-action="org-chart#firstLevel">
+                        {{ 'organization_chart.first_level'|trans(domain: 'admin') }}
+                    </button>
+                </div>
+                <div class="org-canvas">
+                    <ul class="org-tree" data-org-chart-target="tree">
+                        {% for node in tree %}
+                            {{ _self.renderNode(node, 0) }}
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endif %}
         </div>
     </div>
-
-    <script>
-        var tree = document.querySelector('.org-tree');
-        if (tree) {
-            tree.addEventListener('click', function (e) {
-                var btn = e.target.closest('.org-toggle');
-                if (!btn) return;
-                var node = btn.closest('.org-node');
-                var children = node.querySelector(':scope > .org-children');
-                if (!children) return;
-                var expanded = btn.getAttribute('aria-expanded') === 'true';
-                btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-                children.hidden = expanded;
-            });
-        }
-    </script>
 {% endblock %}
