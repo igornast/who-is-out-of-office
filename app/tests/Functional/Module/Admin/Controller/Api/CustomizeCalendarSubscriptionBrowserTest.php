@@ -134,3 +134,93 @@ it('drives the My team master checkbox with indeterminate state, then collapses 
     ));
     expect($uncheckedStaysUnchecked)->toBeTrue();
 });
+
+it('lets an admin expand a sub-manager inside My team and include that sub-team, persisted across reload', function (): void {
+    // Hans Mueller (admin@whoisooo.app) manages Petra, who herself manages four reports.
+    // Petra's row inside "My team" must be expandable so Hans can opt her sub-team into his feed.
+    $client = createPantherClient();
+    loginUserWithLoginForm($client, 'admin@whoisooo.app', '123');
+
+    $client->request('GET', '/app/user/profile');
+    $client->waitFor('button[data-bs-target="#calendarCustomizeModal"]');
+    $client->executeScript("document.querySelector('button[data-bs-target=\"#calendarCustomizeModal\"]').click();");
+    $client->waitForVisibility('#calendarCustomizeSections');
+
+    // Exactly one sub-manager (Petra) is expandable inside the My team group.
+    $client->wait(5)->until(static fn (): bool => (bool) $client->executeScript(
+        "return !!document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-expand\"]');"
+    ));
+    $expandableCount = (int) $client->executeScript(
+        "return document.querySelectorAll('#calendarCustomizeMyTeamChildren [data-action=\"toggle-expand\"]').length;"
+    );
+    expect($expandableCount)->toBe(1);
+
+    // Expand the sub-manager -> her direct reports appear in a tray with an include-all master.
+    $client->executeScript("document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-expand\"]').click();");
+    $client->wait(5)->until(static fn (): bool => (bool) $client->executeScript(
+        "return !!document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]');"
+    ));
+
+    $subReportTotal = (int) $client->executeScript(
+        "const m = document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]');"
+        ."return m.closest('.cc-kids').querySelectorAll('input[data-action=\"toggle-member\"]').length;"
+    );
+    expect($subReportTotal)->toBe(4);
+
+    // Auto = your own team only, so the sub-team (grandchildren) starts unselected.
+    $subCheckedBefore = (int) $client->executeScript(
+        "const m = document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]');"
+        ."return m.closest('.cc-kids').querySelectorAll('input[data-action=\"toggle-member\"]:checked').length;"
+    );
+    expect($subCheckedBefore)->toBe(0);
+
+    // Include the whole sub-team via the master.
+    $client->executeScript(
+        "const m = document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]'); if (!m.checked) { m.click(); }"
+    );
+    $client->wait(5)->until(static fn (): bool => (int) $client->executeScript(
+        "const m = document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]');"
+        ."return m.closest('.cc-kids').querySelectorAll('input[data-action=\"toggle-member\"]:checked').length;"
+    ) === $subReportTotal);
+
+    $client->executeScript("document.getElementById('calendarCustomizeSaveBtn').click();");
+    $client->wait(10)->until(static fn (): bool => (bool) $client->executeScript(
+        "return !document.getElementById('calendarCustomizeSuccess').classList.contains('d-none');"
+    ));
+
+    // Reopen from a fresh load and re-expand: the sub-team selection persisted.
+    $client->request('GET', '/app/user/profile');
+    $client->waitFor('button[data-bs-target="#calendarCustomizeModal"]');
+    $client->executeScript("document.querySelector('button[data-bs-target=\"#calendarCustomizeModal\"]').click();");
+    $client->waitForVisibility('#calendarCustomizeSections');
+    $client->wait(5)->until(static fn (): bool => (bool) $client->executeScript(
+        "return !!document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-expand\"]');"
+    ));
+    $client->executeScript("document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-expand\"]').click();");
+    $client->wait(5)->until(static fn (): bool => (bool) $client->executeScript(
+        "return !!document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]');"
+    ));
+
+    $subCheckedAfter = (int) $client->executeScript(
+        "const m = document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]');"
+        ."return m.closest('.cc-kids').querySelectorAll('input[data-action=\"toggle-member\"]:checked').length;"
+    );
+    expect($subCheckedAfter)->toBe(4);
+});
+
+it('does not expose any expandable sub-manager to a regular team member', function (): void {
+    // John Doe (user@whoisooo.app) is a plain member of Petra's team: he must never be able to
+    // drill into anyone's reports (the server never marks his candidates as managers).
+    $client = createPantherClient();
+    loginUserWithLoginForm($client, 'user@whoisooo.app', '123');
+
+    $client->request('GET', '/app/user/profile');
+    $client->waitFor('button[data-bs-target="#calendarCustomizeModal"]');
+    $client->executeScript("document.querySelector('button[data-bs-target=\"#calendarCustomizeModal\"]').click();");
+    $client->waitForVisibility('#calendarCustomizeSections');
+
+    $expandable = (int) $client->executeScript(
+        "return document.querySelectorAll('#calendarCustomizeTeamList [data-action=\"toggle-expand\"]').length;"
+    );
+    expect($expandable)->toBe(0);
+});
