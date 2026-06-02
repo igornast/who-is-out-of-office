@@ -62,7 +62,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable("1992-03-22"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2022-06-15"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
-            manager: '@user_2'
+            manager: '@user_12'
     user_4:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -80,7 +80,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable((new DateTime("+8 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+8 days"))->modify("-3 years")->format("Y-m-d H:i:s")))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
-            manager: '@user_2'
+            manager: '@user_12'
     user_5:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -98,7 +98,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable("1990-11-03"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2020-03-16"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
-            manager: '@user_2'
+            manager: '@user_12'
     user_6:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -116,7 +116,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable((new DateTime("+15 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable("2019-01-07"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
-            manager: '@user_2'
+            manager: '@user_13'
     user_7:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -135,7 +135,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable("1995-08-28"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2023-02-01"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
-            manager: '@user_1'
+            manager: '@user_15'
     user_8:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -153,7 +153,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable("1993-12-14"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2018-04-23"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
-            manager: '@user_1'
+            manager: '@user_15'
     user_9:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -171,7 +171,7 @@ App\Infrastructure\Doctrine\Entity\User:
             birthDate: '<(new \DateTimeImmutable("1987-05-10"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2024-11-04"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
-            manager: '@user_1'
+            manager: '@user_13'
     user_10:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -188,6 +188,188 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable("1991-09-18"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2017-08-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_17'
+    user_11:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Robert'
+            lastName: 'Fischer'
+            email: 'robert.fischer@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_MANAGER']
+            annualLeaveAllowance: 30
+            currentLeaveBalance: 27
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            holidayCalendar: '@holiday_calendar_de'
+            subdivisionCode: 'DE-BY'
+            birthDate: '<(new \DateTimeImmutable("1981-02-09"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2019-05-02"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
+    user_12:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Elena'
+            lastName: 'Novak'
+            email: 'elena.novak@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_MANAGER']
+            annualLeaveAllowance: 28
+            currentLeaveBalance: 23
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            holidayCalendar: '@holiday_calendar_de'
+            birthDate: '<(new \DateTimeImmutable("1986-07-30"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2020-10-12"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_2'
+    user_13:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'David'
+            lastName: 'Kim'
+            email: 'david.kim@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_MANAGER']
+            annualLeaveAllowance: 28
+            currentLeaveBalance: 24
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
+            holidayCalendar: '@holiday_calendar_nl'
+            birthDate: '<(new \DateTimeImmutable("1989-04-17"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2021-03-08"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_2'
+    user_14:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Nina'
+            lastName: 'Costa'
+            email: 'nina.costa@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 20
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+            holidayCalendar: '@holiday_calendar_nl'
+            birthDate: '<(new \DateTimeImmutable((new DateTime("+12 days"))->format("Y-m-d")))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2023-07-19"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_13'
+    user_15:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Sara'
+            lastName: 'Lindqvist'
+            email: 'sara.lindqvist@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_MANAGER']
+            annualLeaveAllowance: 28
+            currentLeaveBalance: 25
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            holidayCalendar: '@holiday_calendar_fr'
+            birthDate: '<(new \DateTimeImmutable("1984-10-25"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2019-11-18"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_11'
+    user_16:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Omar'
+            lastName: 'Haddad'
+            email: 'omar.haddad@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 21
+            isActive: true
+            hasCelebrateWorkAnniversary: false
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            holidayCalendar: '@holiday_calendar_fr'
+            birthDate: '<(new \DateTimeImmutable("1994-01-12"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2024-02-26"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_15'
+    user_17:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Mia'
+            lastName: 'Andersen'
+            email: 'mia.andersen@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_MANAGER']
+            annualLeaveAllowance: 28
+            currentLeaveBalance: 26
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
+            holidayCalendar: '@holiday_calendar_nl'
+            birthDate: '<(new \DateTimeImmutable("1983-09-06"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2020-01-20"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_11'
+    user_18:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Felix'
+            lastName: 'Braun'
+            email: 'felix.braun@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 23
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+            holidayCalendar: '@holiday_calendar_de'
+            subdivisionCode: 'DE-BY'
+            birthDate: '<(new \DateTimeImmutable("1996-06-21"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2024-09-09"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_17'
+    user_19:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Mei'
+            lastName: 'Chen'
+            email: 'mei.chen@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 22
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            holidayCalendar: '@holiday_calendar_fr'
+            birthDate: '<(new \DateTimeImmutable("1993-11-08"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2023-04-03"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
+    user_20:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Kwame'
+            lastName: 'Mensah'
+            email: 'kwame.mensah@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 24
+            isActive: true
+            hasCelebrateWorkAnniversary: true
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            holidayCalendar: '@holiday_calendar_nl'
+            birthDate: '<(new \DateTimeImmutable("1990-07-19"))>'
+            contractStartedAt: '<(new \DateTimeImmutable("2022-10-17"))>'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
             manager: '@user_1'
 
