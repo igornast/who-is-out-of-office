@@ -166,17 +166,23 @@
         function teamRowHtml(candidate, asReport) {
             const checked = state.teamSelected.has(candidate.id);
             const inputId = 'cc-team-' + candidate.id;
-            const isMgr = candidate.isManager && !asReport;
+            // A manager is expandable wherever it appears — even nested inside another
+            // team's tray — so a viewer above it (admin / its manager) can opt that
+            // sub-team into their own feed. The server only sets isManager/reportIds for
+            // candidates the current user actually sits above, so this stays correctly gated.
+            const isExpandableManager = candidate.isManager
+                && Array.isArray(candidate.reportIds)
+                && candidate.reportIds.length > 0;
             const isOpen = state.expanded.has(candidate.id);
 
-            const chevron = isMgr
+            const chevron = isExpandableManager
                 ? '<button type="button" class="cc-chev ' + (isOpen ? 'is-open' : '') + '"'
                     + ' data-action="toggle-expand" data-id="' + escapeHtml(candidate.id) + '"'
                     + ' aria-expanded="' + (isOpen ? 'true' : 'false') + '"'
                     + ' aria-label="' + escapeHtml(isOpen ? t.collapse : t.expand) + '">' + CHEV + '</button>'
                 : '<span class="cc-chev is-spacer">' + CHEV + '</span>';
 
-            const badge = isMgr ? '<span class="cc-badge">' + escapeHtml(t.managerBadge) + '</span>' : '';
+            const badge = isExpandableManager ? '<span class="cc-badge">' + escapeHtml(t.managerBadge) + '</span>' : '';
 
             let html = '<div class="cc-row' + (asReport ? ' cc-row-sm' : '') + '">'
                 + chevron
@@ -186,7 +192,7 @@
                 + badge
                 + '</div>';
 
-            if (isMgr && isOpen) {
+            if (isExpandableManager && isOpen) {
                 html += managerTrayHtml(candidate);
             }
             return html;

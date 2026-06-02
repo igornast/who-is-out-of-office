@@ -27,7 +27,7 @@ class CustomizeCalendarSubscriptionController extends AbstractController
     ) {
     }
 
-    #[Route(methods: ['GET'], name: 'app_api_calendar_customize_get')]
+    #[Route(name: 'app_api_calendar_customize_get', methods: ['GET'])]
     public function get(#[CurrentUser] User $user): JsonResponse
     {
         $config = $this->userFacade->getCalendarSubscriptionConfig($user->id->toString());

@@ -77,14 +77,13 @@ class GetCalendarSubscriptionConfigQueryHandler
             );
         }
 
-        $topLevelIds = array_values(array_unique(array_map(fn (UserDTO $u) => $u->id, $teammates)));
+        $topLevelIds = array_map(fn (UserDTO $u) => $u->id, $teammates)
+                |> array_unique(...)
+                |> array_values(...);
 
-        $myTeamMemberIds = array_values(
-            array_map(
-                fn (UserDTO $u) => $u->id,
-                array_filter($teammates, fn (UserDTO $u) => $u->managerId === $userId),
-            ),
-        );
+        $myTeamMemberIds = array_filter($teammates, fn (UserDTO $u) => $u->managerId === $userId)
+                |> (fn ($x) => array_map(fn (UserDTO $u) => $u->id, $x))
+                |> array_values(...);
 
         return new CalendarSubscriptionConfigDTO(
             candidateTeamMembers: $candidates,

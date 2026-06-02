@@ -325,3 +325,132 @@ it('GET as a plain member returns an empty myTeamMemberIds', function (): void {
     expect($data)->toHaveKey('myTeamMemberIds');
     expect($data['myTeamMemberIds'])->toBe([]);
 });
+
+it('POST as admin persists a sub-manager report id (including a manager\'s team member)', function (): void {
+    // Hans (admin) sits above Petra (a manager). Petra's own reports are descendants of Hans,
+    // so they are valid candidates Hans may opt into his feed. Verify one persists end-to-end.
+    $admin = $this->em->getRepository(User::class)->findOneBy(['email' => 'admin@whoisooo.app']);
+    $this->client->loginUser($admin);
+    $this->client->request('GET', '/app/api/user/calendar/customize');
+    $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+
+    $petra = null;
+    foreach ($data['candidateTeamMembers'] as $candidate) {
+        if ('manager@whoisooo.app' === $candidate['email']) {
+            $petra = $candidate;
+            break;
+        }
+    }
+    expect($petra)->not->toBeNull()
+        ->and($petra['reportIds'])->not->toBeEmpty();
+
+    $subReportId = $petra['reportIds'][0];
+    // The sub-report is a legitimate candidate for the admin (it is a management descendant).
+    expect(array_column($data['candidateTeamMembers'], 'id'))->toContain($subReportId);
+
+    $this->client = static::createClient();
+    $this->em->clear();
+    $freshAdmin = $this->em->getRepository(User::class)->findOneBy(['email' => 'admin@whoisooo.app']);
+    $this->client->loginUser($freshAdmin);
+
+    $this->client->request(
+        'POST',
+        '/app/api/user/calendar/customize',
+        [],
+        [],
+        ['CONTENT_TYPE' => 'application/json', 'HTTP_ORIGIN' => 'http://localhost'],
+        json_encode([
+            '_token' => 'csrf-token',
+            'teamMemberIdsAuto' => false,
+            'holidayCalendarIdsAuto' => true,
+            'teamMemberIds' => [$subReportId],
+            'holidayCalendarIds' => [],
+        ]),
+    );
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200);
+
+    $this->em->clear();
+    $refreshed = $this->em->getRepository(User::class)->findOneBy(['email' => 'admin@whoisooo.app']);
+    expect($refreshed->calendarSubscriptionTeamMemberIds)->toBe([$subReportId]);
+});
+
+it('POST as manager persists exactly their four own report ids', function (): void {
+    $this->client->loginUser($this->user);
+    $this->client->request('GET', '/app/api/user/calendar/customize');
+    $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+
+    $reportIds = $data['myTeamMemberIds'];
+    expect($reportIds)->toHaveCount(4);
+
+    $this->client = static::createClient();
+    $this->em->clear();
+    $freshManager = $this->em->getRepository(User::class)->findOneBy(['email' => 'manager@whoisooo.app']);
+    $this->client->loginUser($freshManager);
+
+    $this->client->request(
+        'POST',
+        '/app/api/user/calendar/customize',
+        [],
+        [],
+        ['CONTENT_TYPE' => 'application/json', 'HTTP_ORIGIN' => 'http://localhost'],
+        json_encode([
+            '_token' => 'csrf-token',
+            'teamMemberIdsAuto' => false,
+            'holidayCalendarIdsAuto' => true,
+            'teamMemberIds' => $reportIds,
+            'holidayCalendarIds' => [],
+        ]),
+    );
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200);
+
+    $this->em->clear();
+    $refreshed = $this->em->getRepository(User::class)->findOneBy(['email' => 'manager@whoisooo.app']);
+
+    $stored = $refreshed->calendarSubscriptionTeamMemberIds;
+    sort($stored);
+    sort($reportIds);
+    expect($stored)->toBe($reportIds);
+});
+
+it('POST as a regular member drops team ids outside their candidate set (server-side allowlist)', function (): void {
+    // A plain member must not be able to store ids the server never offered them — even by
+    // crafting the POST directly. The allowlist keeps the legitimate id and drops the rogue one.
+    $member = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@whoisooo.app']);
+    $this->client->loginUser($member);
+    $this->client->request('GET', '/app/api/user/calendar/customize');
+    $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
+
+    expect($data['candidateTeamMembers'])->not->toBeEmpty();
+    $validId = $data['candidateTeamMembers'][0]['id'];
+
+    $unauthorizedId = '00000000-0000-4000-8000-000000000000';
+    expect(array_column($data['candidateTeamMembers'], 'id'))->not->toContain($unauthorizedId);
+
+    $this->client = static::createClient();
+    $this->em->clear();
+    $freshMember = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@whoisooo.app']);
+    $this->client->loginUser($freshMember);
+
+    $this->client->request(
+        'POST',
+        '/app/api/user/calendar/customize',
+        [],
+        [],
+        ['CONTENT_TYPE' => 'application/json', 'HTTP_ORIGIN' => 'http://localhost'],
+        json_encode([
+            '_token' => 'csrf-token',
+            'teamMemberIdsAuto' => false,
+            'holidayCalendarIdsAuto' => true,
+            'teamMemberIds' => [$validId, $unauthorizedId],
+            'holidayCalendarIds' => [],
+        ]),
+    );
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200);
+
+    $this->em->clear();
+    $refreshed = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@whoisooo.app']);
+    expect($refreshed->calendarSubscriptionTeamMemberIds)->toBe([$validId]);
+});
