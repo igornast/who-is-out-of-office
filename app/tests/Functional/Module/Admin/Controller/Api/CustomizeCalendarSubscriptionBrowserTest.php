@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * Real-browser test for the redesigned "Customize calendar subscription" modal.
  *
- * Logs in as manager@whoisooo.app (Petra Schmidt), whose four direct reports render as
- * a "My team (4)" group with a master select-all checkbox. Drives the Option A redesign:
+ * Logs in as manager@whoisooo.app (Petra Schmidt), whose two direct reports render as
+ * a "My team" group with a master select-all checkbox. Drives the Option A redesign:
  *   - avatars (img or initials placeholder) on team rows,
  *   - the per-section Auto / Custom segmented toggle + its auto note,
  *   - the master <-> reports checkbox (with indeterminate "partial" state),
@@ -14,7 +14,8 @@ declare(strict_types=1);
  *     (verified by reopening the modal from a fresh page load and re-reading the checkboxes).
  *
  * Fixture wiring (src/DataFixtures/fixtures.yaml): user_2 (Petra, manager@whoisooo.app,
- * ROLE_MANAGER) manages user_3..user_6 — exactly four direct reports.
+ * ROLE_MANAGER) directly manages user_12 (Elena Novak) and user_13 (David Kim) —
+ * exactly two direct reports, both ROLE_MANAGER sub-managers.
  */
 beforeEach(function (): void {
     static::bootKernel();
@@ -74,14 +75,14 @@ it('drives the My team master checkbox with indeterminate state, then collapses 
     $client->executeScript("document.querySelector('button[data-bs-target=\"#calendarCustomizeModal\"]').click();");
     $client->waitForVisibility('#calendarCustomizeSections');
 
-    // Petra's four direct reports render as a "My team" group with a master checkbox.
+    // Petra's two direct reports render as a "My team" group with a master checkbox.
     $client->wait(5)->until(static fn (): bool => (bool) $client->executeScript(
         "return !!document.querySelector('[data-action=\"toggle-my-team-all\"]');"
     ));
     $childCount = (int) $client->executeScript(
         "return document.querySelectorAll('#calendarCustomizeMyTeamChildren input[data-action=\"toggle-member\"]').length;"
     );
-    expect($childCount)->toBe(4);
+    expect($childCount)->toBe(2);
 
     // Master forces every report checkbox on; master is then checked and not indeterminate.
     $client->executeScript(
@@ -114,7 +115,7 @@ it('drives the My team master checkbox with indeterminate state, then collapses 
         "return !document.getElementById('calendarCustomizeSuccess').classList.contains('d-none');"
     ));
 
-    // Reopen from a fresh page load: three reports persisted checked, the unchecked one did not.
+    // Reopen from a fresh page load: one report persisted checked, the unchecked one did not.
     $client->request('GET', '/app/user/profile');
     $client->waitFor('button[data-bs-target="#calendarCustomizeModal"]');
     $client->executeScript("document.querySelector('button[data-bs-target=\"#calendarCustomizeModal\"]').click();");
@@ -126,7 +127,7 @@ it('drives the My team master checkbox with indeterminate state, then collapses 
     $checkedAfter = (int) $client->executeScript(
         "return document.querySelectorAll('#calendarCustomizeMyTeamChildren input[data-action=\"toggle-member\"]:checked').length;"
     );
-    expect($checkedAfter)->toBe(3);
+    expect($checkedAfter)->toBe(1);
 
     $uncheckedStaysUnchecked = (bool) $client->executeScript(sprintf(
         "const c = document.querySelector('#calendarCustomizeMyTeamChildren input[data-id=\"%s\"]'); return !!c && !c.checked;",
@@ -136,8 +137,10 @@ it('drives the My team master checkbox with indeterminate state, then collapses 
 });
 
 it('lets an admin expand a sub-manager inside My team and include that sub-team, persisted across reload', function (): void {
-    // Hans Mueller (admin@whoisooo.app) manages Petra, who herself manages four reports.
-    // Petra's row inside "My team" must be expandable so Hans can opt her sub-team into his feed.
+    // Hans Mueller (admin@whoisooo.app) directly manages two sub-managers — Petra (user_2)
+    // and Robert (user_11) — so the My team group exposes two expandable rows. The first by
+    // name order (Kwame, Mei, Petra, Robert) is Petra, who herself manages two sub-managers
+    // (Elena, David), so expanding her reveals a two-member tray with an include-all master.
     $client = createPantherClient();
     loginUserWithLoginForm($client, 'admin@whoisooo.app', '123');
 
@@ -146,16 +149,16 @@ it('lets an admin expand a sub-manager inside My team and include that sub-team,
     $client->executeScript("document.querySelector('button[data-bs-target=\"#calendarCustomizeModal\"]').click();");
     $client->waitForVisibility('#calendarCustomizeSections');
 
-    // Exactly one sub-manager (Petra) is expandable inside the My team group.
+    // Two sub-managers (Petra and Robert) are expandable inside the My team group.
     $client->wait(5)->until(static fn (): bool => (bool) $client->executeScript(
         "return !!document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-expand\"]');"
     ));
     $expandableCount = (int) $client->executeScript(
         "return document.querySelectorAll('#calendarCustomizeMyTeamChildren [data-action=\"toggle-expand\"]').length;"
     );
-    expect($expandableCount)->toBe(1);
+    expect($expandableCount)->toBe(2);
 
-    // Expand the sub-manager -> her direct reports appear in a tray with an include-all master.
+    // Expand the first sub-manager (Petra) -> her direct reports appear in a tray with an include-all master.
     $client->executeScript("document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-expand\"]').click();");
     $client->wait(5)->until(static fn (): bool => (bool) $client->executeScript(
         "return !!document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]');"
@@ -165,7 +168,7 @@ it('lets an admin expand a sub-manager inside My team and include that sub-team,
         "const m = document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]');"
         ."return m.closest('.cc-kids').querySelectorAll('input[data-action=\"toggle-member\"]').length;"
     );
-    expect($subReportTotal)->toBe(4);
+    expect($subReportTotal)->toBe(2);
 
     // Auto = your own team only, so the sub-team (grandchildren) starts unselected.
     $subCheckedBefore = (int) $client->executeScript(
@@ -205,7 +208,7 @@ it('lets an admin expand a sub-manager inside My team and include that sub-team,
         "const m = document.querySelector('#calendarCustomizeMyTeamChildren [data-action=\"toggle-include-all\"]');"
         ."return m.closest('.cc-kids').querySelectorAll('input[data-action=\"toggle-member\"]:checked').length;"
     );
-    expect($subCheckedAfter)->toBe(4);
+    expect($subCheckedAfter)->toBe(2);
 });
 
 it('does not expose any expandable sub-manager to a regular team member', function (): void {

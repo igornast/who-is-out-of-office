@@ -9,8 +9,8 @@ use App\Infrastructure\Doctrine\Entity\User;
  *
  * Fixture setup (from src/DataFixtures/fixtures.yaml):
  *   - user_2 (Petra Schmidt, manager@whoisooo.app): ROLE_MANAGER, holiday_calendar_de
- *     Teammates (have manager=user_2): user_3 (John Doe), user_4 (Sofia Bergström),
- *       user_5 (Marco Rossi), user_6 (Aisha Patel)
+ *     Direct reports (have manager=user_2): user_12 (Elena Novak) and user_13 (David Kim),
+ *       both ROLE_MANAGER sub-managers who in turn manage user_3..user_6 and others.
  *
  * Stateless CSRF pattern (SameOriginCsrfTokenManager):
  *   - Sending HTTP_ORIGIN: http://localhost makes isValidOrigin() return true.
@@ -274,7 +274,7 @@ it('POST auto=false with a valid candidate team member id persists that id', fun
     expect($refreshed->calendarSubscriptionHolidayCalendarIds)->toBe([]);
 });
 
-it('GET as manager returns the four direct reports in myTeamMemberIds, all also top-level', function (): void {
+it('GET as manager returns the two direct reports in myTeamMemberIds, all also top-level', function (): void {
     $this->client->loginUser($this->user);
 
     $this->client->request('GET', '/app/api/user/calendar/customize');
@@ -283,7 +283,7 @@ it('GET as manager returns the four direct reports in myTeamMemberIds, all also 
     $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
 
     expect($data)->toHaveKey('myTeamMemberIds');
-    expect($data['myTeamMemberIds'])->toHaveCount(4);
+    expect($data['myTeamMemberIds'])->toHaveCount(2);
 
     foreach ($data['myTeamMemberIds'] as $id) {
         expect($data['topLevelTeamMemberIds'])->toContain($id);
@@ -375,13 +375,13 @@ it('POST as admin persists a sub-manager report id (including a manager\'s team 
     expect($refreshed->calendarSubscriptionTeamMemberIds)->toBe([$subReportId]);
 });
 
-it('POST as manager persists exactly their four own report ids', function (): void {
+it('POST as manager persists exactly their two own report ids', function (): void {
     $this->client->loginUser($this->user);
     $this->client->request('GET', '/app/api/user/calendar/customize');
     $data = json_decode($this->client->getResponse()->getContent(), true, flags: JSON_THROW_ON_ERROR);
 
     $reportIds = $data['myTeamMemberIds'];
-    expect($reportIds)->toHaveCount(4);
+    expect($reportIds)->toHaveCount(2);
 
     $this->client = static::createClient();
     $this->em->clear();

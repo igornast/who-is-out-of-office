@@ -14,7 +14,8 @@ beforeEach(function (): void {
     $this->em = static::getContainer()->get('doctrine')->getManager();
 
     $this->admin = $this->em->getRepository(User::class)->findOneBy(['email' => 'admin@whoisooo.app']);
-    $this->managerUser = $this->em->getRepository(User::class)->findOneBy(['email' => 'manager@whoisooo.app']);
+    // Elena (user_12) is the direct manager of John Doe (user_3, user@whoisooo.app).
+    $this->managerUser = $this->em->getRepository(User::class)->findOneBy(['email' => 'elena.novak@whoisooo.app']);
     $this->regularUser = $this->em->getRepository(User::class)->findOneBy(['email' => 'user@whoisooo.app']);
     $sickLeaveType = $this->em->getRepository(LeaveRequestType::class)->findOneBy(['name' => 'Sick Leave']);
 
