@@ -186,7 +186,7 @@
 
             let html = '<div class="cc-row' + (asReport ? ' cc-row-sm' : '') + '">'
                 + chevron
-                + '<input type="checkbox" id="' + inputId + '" data-action="toggle-member" data-id="' + escapeHtml(candidate.id) + '"' + (checked ? ' checked' : '') + '>'
+                + '<input type="checkbox" class="form-check-input" id="' + inputId + '" data-action="toggle-member" data-id="' + escapeHtml(candidate.id) + '"' + (checked ? ' checked' : '') + '>'
                 + avatarHtml(candidate)
                 + '<label for="' + inputId + '" class="cc-name">' + escapeHtml(candidate.name) + ' <small>' + escapeHtml(candidate.email) + '</small></label>'
                 + badge
@@ -210,7 +210,7 @@
             return '<div class="cc-kids">'
                 + '<p class="cc-khint">' + hint + '</p>'
                 + '<label class="cc-master">'
-                +   '<input type="checkbox" id="' + masterId + '" data-action="toggle-include-all" data-id="' + escapeHtml(manager.id) + '"' + (allOn ? ' checked' : '') + '>'
+                +   '<input type="checkbox" class="form-check-input" id="' + masterId + '" data-action="toggle-include-all" data-id="' + escapeHtml(manager.id) + '"' + (allOn ? ' checked' : '') + '>'
                 +   '<span class="cc-name">' + includeLabel + '</span>'
                 + '</label>'
                 + reports.map((r) => teamRowHtml(r, true)).join('')
@@ -229,7 +229,7 @@
                 +   ' data-action="toggle-my-team-expand"'
                 +   ' aria-expanded="' + (isOpen ? 'true' : 'false') + '"'
                 +   ' aria-label="' + escapeHtml(isOpen ? t.collapse : t.expand) + '">' + CHEV + '</button>'
-                + '<input type="checkbox" id="cc-my-team-all" data-action="toggle-my-team-all"' + (allOn ? ' checked' : '') + '>'
+                + '<input type="checkbox" class="form-check-input" id="cc-my-team-all" data-action="toggle-my-team-all"' + (allOn ? ' checked' : '') + '>'
                 + '<label for="cc-my-team-all" class="cc-name">' + escapeHtml(label) + '</label>'
                 + '</div>'
                 + '<div class="cc-kids' + (isOpen ? '' : ' d-none') + '" id="calendarCustomizeMyTeamChildren">'
@@ -241,7 +241,7 @@
             return staleIds.map((id) => ''
                 + '<div class="cc-row">'
                 +   '<span class="cc-chev is-spacer">' + CHEV + '</span>'
-                +   '<input type="checkbox" checked disabled>'
+                +   '<input type="checkbox" class="form-check-input" checked disabled>'
                 +   '<span class="cc-name">' + escapeHtml(id) + ' ' + escapeHtml(staleSuffix) + '</span>'
                 + '</div>').join('');
         }
@@ -293,7 +293,7 @@
                 const inputId = 'cc-hol-' + h.id;
                 const checked = state.holidaySelected.has(h.id);
                 return '<div class="cc-row">'
-                    + '<input type="checkbox" id="' + inputId + '" data-action="toggle-holiday" data-id="' + escapeHtml(h.id) + '"' + (checked ? ' checked' : '') + '>'
+                    + '<input type="checkbox" class="form-check-input" id="' + inputId + '" data-action="toggle-holiday" data-id="' + escapeHtml(h.id) + '"' + (checked ? ' checked' : '') + '>'
                     + '<label for="' + inputId + '" class="cc-name">' + escapeHtml(h.countryName) + ' <small>' + escapeHtml(h.countryCode) + '</small></label>'
                     + '</div>';
             }).join('') + staleRowsHtml(state.holidayStale);
