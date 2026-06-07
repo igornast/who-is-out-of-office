@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.3.0] — 2026-06-03
+
+### Added
+
+- Extend fixtures ([9573b8c](https://github.com/igornast/who-is-out-of-office/commit/9573b8cba258fc79b02757065b483bf8708bdb8c))
+- Add more tests for feed customization ([f2b28dc](https://github.com/igornast/who-is-out-of-office/commit/f2b28dc126c035a1657267ad8a486cc3b593c3c0))
+- Improve feed customization modal ([aa72aba](https://github.com/igornast/who-is-out-of-office/commit/aa72aba18eecbccd7e03159925c8174395e66743))
+- Improve feed customization modal ([3988b1e](https://github.com/igornast/who-is-out-of-office/commit/3988b1eda1522e20f60225ff32213b29ba8ab22b))
+- Improve orgnization chart ([3b77a76](https://github.com/igornast/who-is-out-of-office/commit/3b77a76b7bff0e2c93380ac62e3cd2aee86c3989))
+- Feed picker customization and org chart ([34b64b1](https://github.com/igornast/who-is-out-of-office/commit/34b64b1ba16f23ab90cd90ab1a380e428dacaf8b))
+- Add public holidays to leave request calendar ([fbf1f84](https://github.com/igornast/who-is-out-of-office/commit/fbf1f84e63e446c8d677bfcca2a3c06136a5c8b6))
+- Ical integration customization ([b5fb5d0](https://github.com/igornast/who-is-out-of-office/commit/b5fb5d078a379c7ad2e4f9165b5f0e88190098a5))
+- News feed area and homepage link ([09d86e7](https://github.com/igornast/who-is-out-of-office/commit/09d86e7dbfc4fa19ee3aef838b5205522245c491))
+
+### Fixed
+
+- Calendar customization modal checkboxes style ([2ddd19c](https://github.com/igornast/who-is-out-of-office/commit/2ddd19c2473fa7913075e9105e09b90248ac49a6))
+- Fix the invitation confirmation flow and related tests ([db87ff5](https://github.com/igornast/who-is-out-of-office/commit/db87ff546322ba3fe9691741c91b050feada0b1c))
+
+
+[0.3.0]: https://github.com/igornast/who-is-out-of-office/releases/tag/v0.3.0
+
+
 ## [0.2.0] — 2026-04-25
 
 ### Added
