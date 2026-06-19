@@ -15,12 +15,13 @@ A self-hosted staff leave planner built with Symfony 7.4. Manage leave requests,
 **Features:**
 - Leave request workflow with approval/rejection
 - Role-based access — Admin, Manager, Employee
-- Slack integration — in-channel approvals and weekly digest
+- Slack integration — in-channel approvals, weekly digest, and status auto-sync
 - Public holiday calendars with regional subdivision support
 - iCal feed export per user
 - Email notifications
+- Two-factor authentication (TOTP + backup codes)
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 git clone https://github.com/igornast/who-is-out-of-office.git
@@ -34,7 +35,7 @@ The app is available at **`http://localhost/app/dashboard`**.
 
 For full setup details and how to run tests, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## 🛠️ Admin Account
+## Admin Account
 
 The dev fixtures include a default admin account for initial access:
 
@@ -45,13 +46,19 @@ The dev fixtures include a default admin account for initial access:
 > Create your own admin account before going live.
 
 
-## ⚙️ Application Settings
+## Application Settings
 
-The application uses a YAML-based settings system that allows administrators to configure application behavior without code changes.
+The application uses a YAML-based settings system that lets administrators change application behavior without code changes.
 
 **Available Settings:**
-- `auto_approve` - Enable/disable automatic approval of leave requests
-- `auto_approve_delay` - Delay in seconds before automatically approving leave requests
+- `leave_request.auto_approve` - Enable/disable automatic approval of leave requests
+- `leave_request.auto_approve_delay` - Delay in seconds before automatically approving leave requests
+- `leave_request.default_annual_allowance` - Default number of annual leave days for new users
+- `leave_request.min_notice_days` - Minimum days notice required for a leave request (0 = no minimum)
+- `leave_request.max_consecutive_days` - Maximum consecutive days allowed per leave request (0 = unlimited)
+- `notification.skip_weekend_holidays` - Skip public holidays that fall on weekends in notifications
+- `slack.status_sync_enabled` - Enable/disable the Slack status auto-sync feature
+- `organization.name` - Display name of your organization
 
 **Managing Settings:**
 1. Log in with an admin account
@@ -62,7 +69,7 @@ Settings are stored in `app/src/Module/Settings/Config/app_setting.yaml` and can
 
 📖 **[Read the detailed Settings documentation](app/src/Module/Settings/README.md)** for architecture details, adding new settings, and advanced configuration.
 
-## 📅 Public Holiday Import
+## Public Holiday Import
 
 Public holidays can be imported via the admin UI:
 
@@ -76,7 +83,7 @@ Alternatively, use the CLI command:
 php app/bin/console app:holiday:import DE Germany 2025
 ```
 
-## 🗂️ Frontend & Assets
+## Frontend & Assets
 The project uses Symfony AssetMapper and Symfony UX for JavaScript, CSS, and components.
 
 After deployment, compile the assets:
@@ -88,7 +95,7 @@ php app/bin/console asset-map:compile
 Side notes:
 * Assets live in `assets/` and importmap.php. 
 * Remote packages (e.g. Stimulus, UX components) are resolved at compile time. 
-* Do not edit files in `public/assets/` they are generated.
+* Do not edit files in `public/assets/`, they are generated.
 
 For details, see [AssetMapper](https://symfony.com/doc/current/frontend/asset_mapper.html) and [Symfony UX](https://ux.symfony.com).
 
@@ -123,7 +130,7 @@ The app uses two channels to communicate with the company members.
 * SLACK_AR_APPROVE_CHANNEL_ID - channel used for in-slack approval actions. Managers can approve or reject requests
   directly from the slack integration bot.
 * SLACK_AR_HR_DIGEST_CHANNEL_ID - weekly digest with absences and birthdays information.
-* 
+
 ---
 
 ### 3. Verifying Incoming Requests
@@ -135,16 +142,17 @@ For more details on the implementation check `RequestVerifier` class in the slac
 
 ### 4. User‑Specific DMs
 
-Once a user has configured their `slackMemberId`, and enabled the custom app. The bot can send them private updates.
+Once a user has configured their `slackMemberId` and enabled the custom app, the bot can send them private updates.
 
 ---
 
 ### 5. Weekly Digest (Scheduled Task)
 
-You can use weekly digest command to get summaries at a specific point in time. To trigger digestions 
-run the `slack:weekly_digest` command, which you can use in cron and set the schedule to every Monday at 8 am.
+The `slack:weekly_digest` command posts a summary digest. It is scheduled automatically via Symfony
+Scheduler to run every Monday at 8:15 am (`AsCronTask('15 8 * * MON')`), so no manual cron entry is
+required as long as the scheduler worker is running. You can also trigger it on demand:
 
-Example: `0 8 * * MON php bin/console slack:weekly_digest`
+`php bin/console slack:weekly_digest`
 
 The bot will post a summary of:
 
@@ -192,7 +200,7 @@ Automatically set a user's Slack status (emoji + text) when they are on approved
 
 #### How it works
 
-A background command (`slack:sync-statuses`) runs every 30 minutes and:
+A background command (`slack:sync-statuses`) runs every 20 minutes and:
 
 - **Sets** the Slack status for users whose approved leave is currently active and hasn't been synced yet. The status shows the leave type name and end date (e.g. "Vacation until Apr 18") with a configurable emoji.
 - **Clears** the Slack status for users whose leave has ended or is no longer approved (rejected, withdrawn).

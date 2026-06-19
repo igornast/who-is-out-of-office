@@ -50,6 +50,18 @@ Settings/
 |---------|------|-------------|---------|
 | `skip_weekend_holidays` | boolean | Skip public holidays that fall on weekends in notifications | `false` |
 
+### Slack Settings
+
+| Setting | Type | Description | Default |
+|---------|------|-------------|---------|
+| `status_sync_enabled` | boolean | Enable/disable the Slack status auto-sync feature | `false` |
+
+### Organization Settings
+
+| Setting | Type | Description | Default |
+|---------|------|-------------|---------|
+| `name` | string | Display name of your organization | `Your Organization` |
+
 ## Managing Settings
 
 ### Via Web Interface
