@@ -1,0 +1,26 @@
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{% set state = field.formattedValue %}
+{% if state.kind == constant('App\\Module\\Admin\\Service\\AutoApproveColumnState::KIND_COUNTDOWN') %}
+    {% set target = state.target|date('c') %}
+    <span
+        class="auto-approve-countdown"
+        data-controller="auto-approve-countdown"
+        data-auto-approve-countdown-target-value="{{ target }}"
+        data-auto-approve-countdown-approving-value="{{ 'crud.leave_requests.auto_approve_countdown.approving'|trans(domain: 'admin') }}"
+        data-auto-approve-countdown-days-value="{{ 'crud.leave_requests.auto_approve_countdown.unit_days'|trans(domain: 'admin') }}"
+        data-auto-approve-countdown-hours-value="{{ 'crud.leave_requests.auto_approve_countdown.unit_hours'|trans(domain: 'admin') }}"
+        data-auto-approve-countdown-minutes-value="{{ 'crud.leave_requests.auto_approve_countdown.unit_minutes'|trans(domain: 'admin') }}"
+        data-auto-approve-countdown-seconds-value="{{ 'crud.leave_requests.auto_approve_countdown.unit_seconds'|trans(domain: 'admin') }}"
+    >
+        <time datetime="{{ target }}">{{ target|date('M j, Y H:i') }}</time>
+        {% if date(target) < date() %}
+            <span class="auto-approve-countdown__overdue">{{ 'crud.leave_requests.auto_approve_countdown.overdue'|trans(domain: 'admin') }}</span>
+        {% endif %}
+    </span>
+{% elseif state.kind == constant('App\\Module\\Admin\\Service\\AutoApproveColumnState::KIND_AUTO_APPROVED') %}
+    <span class="auto-approve-badge auto-approve-badge--yes">{{ 'crud.leave_requests.auto_approve.yes'|trans(domain: 'admin') }}</span>
+{% elseif state.kind == constant('App\\Module\\Admin\\Service\\AutoApproveColumnState::KIND_MANUALLY_APPROVED') %}
+    <span class="auto-approve-badge auto-approve-badge--no">{{ 'crud.leave_requests.auto_approve.no'|trans(domain: 'admin') }}</span>
+{% else %}
+    <span class="auto-approve-none text-body-secondary">{{ 'crud.leave_requests.auto_approve.none'|trans(domain: 'admin') }}</span>
+{% endif %}

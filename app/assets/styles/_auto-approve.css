@@ -1,0 +1,41 @@
+.auto-approve-countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    background-color: var(--pending-subtle);
+    color: var(--pending);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.auto-approve-countdown__overdue {
+    color: var(--danger);
+    font-weight: var(--weight-bold);
+}
+
+.auto-approve-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.auto-approve-badge--yes {
+    background-color: var(--success-subtle);
+    color: var(--success);
+}
+
+.auto-approve-badge--no {
+    background-color: var(--app-surface-sunken);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}

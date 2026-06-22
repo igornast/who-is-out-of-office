@@ -275,6 +275,21 @@ crud:
         leave_requests:
             new: Add Absence Request
 
+    leave_requests:
+        field:
+            auto_approve: Auto approved
+        auto_approve:
+            yes: Yes
+            no: 'No'
+            none: '—'
+        auto_approve_countdown:
+            approving: Approving shortly…
+            overdue: Overdue — approving shortly…
+            unit_days: d
+            unit_hours: h
+            unit_minutes: m
+            unit_seconds: s
+
     team_leave_requests:
         detail:
             title: Leave Request Details
