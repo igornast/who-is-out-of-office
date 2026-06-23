@@ -8,8 +8,11 @@ use App\Infrastructure\Doctrine\Entity\LeaveRequest;
 use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\AppAbstractCrudController;
+use App\Module\Admin\Service\AutoApproveColumnState;
+use App\Module\Admin\Service\AutoApproveColumnStateResolver;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\RoleEnum;
+use App\Shared\Facade\AppSettingsFacadeInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -21,9 +24,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
@@ -39,6 +42,8 @@ class LeaveRequestCrudController extends AppAbstractCrudController
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
+        private readonly AutoApproveColumnStateResolver $autoApproveColumnStateResolver,
+        private readonly AppSettingsFacadeInterface $appSettingsFacade,
     ) {
     }
 
@@ -146,31 +151,38 @@ class LeaveRequestCrudController extends AppAbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
-            FormField::addColumn(8),
-            FormField::addFieldset('Request absence'),
-            AssociationField::new('user', 'Person')
-                ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName))
-                ->setPermission(RoleEnum::Admin->value),
+        yield FormField::addColumn(8);
+        yield FormField::addFieldset('Request absence');
+        yield AssociationField::new('user', 'Person')
+            ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName))
+            ->setPermission(RoleEnum::Admin->value);
 
-            AssociationField::new('leaveType', 'Type of the absence')
-                ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $requestType->name),
+        yield AssociationField::new('leaveType', 'Type of the absence')
+            ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $requestType->name);
 
-            DateField::new('startDate', 'From')
-                ->setColumns(6),
-            DateField::new('endDate', 'To')
-                ->setColumns(6),
+        yield DateField::new('startDate', 'From')
+            ->setColumns(6);
+        yield DateField::new('endDate', 'To')
+            ->setColumns(6);
 
-            FormField::addColumn(4)->hideWhenCreating(),
-            FormField::addFieldset('Details')->hideWhenCreating(),
-            ChoiceField::new('status')->setChoices(LeaveRequestStatusEnum::cases())->setDisabled()->hideWhenCreating(),
-            NumberField::new('workDays')->setDisabled()->hideWhenCreating(),
-            AssociationField::new('approvedBy')
-                ->formatValue(fn (?User $user): string => null === $user ? '—' : sprintf('%s %s', $user->firstName, $user->lastName))
-                ->setDisabled()->hideWhenCreating(),
-            BooleanField::new('isAutoApproved')->setDisabled()->hideWhenCreating()->renderAsSwitch(false),
-            DateField::new('createdAt')->setDisabled()->hideWhenCreating(),
-        ];
+        yield FormField::addColumn(4)->hideWhenCreating();
+        yield FormField::addFieldset('Details')->hideWhenCreating();
+        yield ChoiceField::new('status')->setChoices(LeaveRequestStatusEnum::cases())->setDisabled()->hideWhenCreating();
+        yield NumberField::new('workDays')->setDisabled()->hideWhenCreating();
+        yield AssociationField::new('approvedBy')
+            ->formatValue(fn (?User $user): string => null === $user ? '—' : sprintf('%s %s', $user->firstName, $user->lastName))
+            ->setDisabled()->hideWhenCreating();
+
+        if ($this->appSettingsFacade->isAutoApprove()) {
+            yield Field::new('autoApprove', 'crud.leave_requests.field.auto_approve')
+                ->setTemplatePath('@AppAdmin/field/auto_approve.html.twig')
+                ->setVirtual(true)
+                ->formatValue(fn (mixed $value, LeaveRequest $leaveRequest): AutoApproveColumnState => $this->autoApproveColumnStateResolver->resolve($leaveRequest))
+                ->setColumns(6)
+                ->hideWhenCreating();
+        }
+
+        yield DateField::new('createdAt')->setDisabled()->hideWhenCreating();
     }
 
     private function shouldDisplayWithdrawAction(): \Closure
