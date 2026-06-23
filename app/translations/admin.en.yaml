@@ -281,10 +281,10 @@ crud:
         auto_approve:
             yes: Yes
             no: 'No'
-            none: '—'
+            none: '-'
         auto_approve_countdown:
-            approving: Approving shortly…
-            overdue: Overdue — approving shortly…
+            approving: Approving shortly
+            overdue: Overdue - approving shortly
             unit_days: d
             unit_hours: h
             unit_minutes: m
