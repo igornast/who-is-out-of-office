@@ -475,6 +475,8 @@ crud:
             leave_defaults_desc: Set company-wide defaults for leave allowance and request constraints.
             slack: Slack Integration
             slack_desc: Configure Slack notifications and status auto-sync for users on leave.
+            weekly_digest: Weekly Digest Schedule
+            weekly_digest_desc: Choose when the Slack weekly digest is sent. Changes apply on the next scheduler tick.
             organization: Organization
             organization_desc: The organization name displayed in email communications and the footer of outbound emails.
         field:
@@ -491,8 +493,23 @@ crud:
             skip_weekend_holidays_help: When enabled, public holidays falling on Saturday or Sunday will not appear in Slack weekly digest notifications
             slack_status_sync_enabled: Enable Slack status auto-sync
             slack_status_sync_enabled_help: When enabled, users' Slack statuses will be automatically set when they are on approved leave and cleared when the leave ends. Requires a paid Slack workspace and an authorized admin token.
+            weekly_digest_day: Send day
+            weekly_digest_day_help: Day of the week the digest is sent
+            weekly_digest_time: Send time
+            weekly_digest_time_help: Local time of day the digest is sent (24h, HH:MM)
+            weekly_digest_time_invalid: Enter a valid 24-hour time in HH:MM format
+            weekly_digest_timezone: Timezone
+            weekly_digest_timezone_help: Timezone used to interpret the send time
             organization_name: Organization Name
             organization_name_help: Displayed in email footers and invitation emails. Keep it short (max 120 characters).
+        day:
+            MON: Monday
+            TUE: Tuesday
+            WED: Wednesday
+            THU: Thursday
+            FRI: Friday
+            SAT: Saturday
+            SUN: Sunday
         action:
             save: Save Changes
 

@@ -223,3 +223,126 @@ it('throws exception when organization name is not string', function () {
 
     $this->facade->organizationName();
 })->throws(InvalidAppSettingTypeException::class);
+
+it('composes the weekly digest cron expression from day and time', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_DAY)
+        ->andReturn('MON');
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIME)
+        ->andReturn('08:15');
+
+    expect($this->facade->weeklyDigestCronExpression())->toBe('15 8 * * MON');
+});
+
+it('returns the weekly digest timezone', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIMEZONE)
+        ->andReturn('Europe/Berlin');
+
+    expect($this->facade->weeklyDigestTimezone())->toBe('Europe/Berlin');
+});
+
+it('throws when weekly digest timezone is not a string', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIMEZONE)
+        ->andReturn(42);
+
+    $this->facade->weeklyDigestTimezone();
+})->throws(InvalidAppSettingTypeException::class);
+
+it('falls back to default day when weekly digest day is missing (backward compatible)', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_DAY)
+        ->andReturn(null);
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIME)
+        ->andReturn('08:15');
+
+    expect($this->facade->weeklyDigestCronExpression())->toBe('15 8 * * MON');
+});
+
+it('falls back to default time when weekly digest time is missing (backward compatible)', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_DAY)
+        ->andReturn('MON');
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIME)
+        ->andReturn(null);
+
+    expect($this->facade->weeklyDigestCronExpression())->toBe('15 8 * * MON');
+});
+
+it('falls back to default day when weekly digest day is an unknown value', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_DAY)
+        ->andReturn('FUNDAY');
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIME)
+        ->andReturn('08:15');
+
+    expect($this->facade->weeklyDigestCronExpression())->toBe('15 8 * * MON');
+});
+
+it('falls back to default time when weekly digest time is malformed', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_DAY)
+        ->andReturn('MON');
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIME)
+        ->andReturn('99:99');
+
+    expect($this->facade->weeklyDigestCronExpression())->toBe('15 8 * * MON');
+});
+
+it('throws when weekly digest day is not a string', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_DAY)
+        ->andReturn(42);
+
+    $this->facade->weeklyDigestCronExpression();
+})->throws(InvalidAppSettingTypeException::class);
+
+it('throws when weekly digest time is not a string', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_DAY)
+        ->andReturn('MON');
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIME)
+        ->andReturn(42);
+
+    $this->facade->weeklyDigestCronExpression();
+})->throws(InvalidAppSettingTypeException::class);
+
+it('falls back to UTC when weekly digest timezone is missing (backward compatible)', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIMEZONE)
+        ->andReturn(null);
+
+    expect($this->facade->weeklyDigestTimezone())->toBe('UTC');
+});
+
+it('falls back to UTC when weekly digest timezone is not a known identifier', function (): void {
+    $this->appSettingValueHandler
+        ->expects('handle')
+        ->with(AppSettingsEnum::WEEKLY_DIGEST_TIMEZONE)
+        ->andReturn('Not/AZone');
+
+    expect($this->facade->weeklyDigestTimezone())->toBe('UTC');
+});

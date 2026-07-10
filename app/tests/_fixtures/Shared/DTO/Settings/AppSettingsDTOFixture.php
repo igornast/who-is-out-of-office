@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\_fixtures\Shared\DTO\Settings;
 
 use App\Shared\DTO\Settings\AppSettingsDTO;
+use App\Shared\Enum\WeeklyDigestDayEnum;
 use App\Tests\_fixtures\FixtureInterface;
 
 class AppSettingsDTOFixture implements FixtureInterface
@@ -25,6 +26,9 @@ class AppSettingsDTOFixture implements FixtureInterface
             'skipWeekendHolidays' => false,
             'slackStatusSyncEnabled' => false,
             'organizationName' => 'Acme Inc.',
+            'weeklyDigestTime' => '08:15',
+            'weeklyDigestTimezone' => 'UTC',
+            'weeklyDigestDay' => WeeklyDigestDayEnum::Monday,
         ];
     }
 }

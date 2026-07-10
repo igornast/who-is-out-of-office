@@ -8,5 +8,8 @@ notification:
     skip_weekend_holidays: false
 slack:
     status_sync_enabled: false
+    weekly_digest_day: MON
+    weekly_digest_time: '08:15'
+    weekly_digest_timezone: UTC
 organization:
     name: "Your Organization"

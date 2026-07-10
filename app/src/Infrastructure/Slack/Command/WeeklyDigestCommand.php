@@ -7,11 +7,9 @@ namespace App\Infrastructure\Slack\Command;
 use App\Shared\Facade\SlackFacadeInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 #[
     AsCommand(name: 'slack:weekly_digest', description: 'Send weekly digest notification'),
-    AsCronTask(expression: '15 8 * * MON'),
 ]
 class WeeklyDigestCommand
 {

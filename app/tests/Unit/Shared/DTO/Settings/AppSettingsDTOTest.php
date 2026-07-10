@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Shared\DTO\Settings\AppSettingsDTO;
+use App\Shared\Enum\WeeklyDigestDayEnum;
+use App\Tests\_fixtures\Shared\DTO\Settings\AppSettingsDTOFixture;
+use Symfony\Component\Validator\Validation;
 
 it('creates from array with all keys present', function (): void {
     $data = [
@@ -96,4 +99,48 @@ it('serializes slackStatusSyncEnabled to the correct nested key', function (): v
     $array = $dto->toArray();
 
     expect($array['slack']['status_sync_enabled'])->toBeTrue();
+});
+
+it('round-trips weekly digest schedule fields through fromArray/toArray', function (): void {
+    $data = [
+        'slack' => [
+            'weekly_digest_day' => 'WED',
+            'weekly_digest_time' => '09:30',
+            'weekly_digest_timezone' => 'Europe/Berlin',
+        ],
+    ];
+
+    $dto = AppSettingsDTO::fromArray($data);
+
+    expect($dto->weeklyDigestTime)->toBe('09:30')
+        ->and($dto->weeklyDigestTimezone)->toBe('Europe/Berlin')
+        ->and($dto->weeklyDigestDay)->toBe(WeeklyDigestDayEnum::Wednesday);
+
+    $out = $dto->toArray();
+    expect($out['slack']['weekly_digest_day'])->toBe('WED')
+        ->and($out['slack']['weekly_digest_time'])->toBe('09:30')
+        ->and($out['slack']['weekly_digest_timezone'])->toBe('Europe/Berlin');
+});
+
+it('defaults weekly digest fields when keys are absent', function (): void {
+    $dto = AppSettingsDTO::fromArray([]);
+
+    expect($dto->weeklyDigestDay)->toBe(WeeklyDigestDayEnum::Monday)
+        ->and($dto->weeklyDigestTime)->toBe('08:15')
+        ->and($dto->weeklyDigestTimezone)->toBe('UTC');
+});
+
+it('rejects an invalid digest time and timezone', function (): void {
+    $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
+
+    $dto = AppSettingsDTOFixture::create([
+        'weeklyDigestTime' => '25:00',
+        'weeklyDigestTimezone' => 'Not/AZone',
+    ]);
+
+    $violations = $validator->validate($dto);
+    $paths = array_map(fn ($v) => $v->getPropertyPath(), iterator_to_array($violations));
+
+    expect($paths)->toContain('weeklyDigestTime')
+        ->and($paths)->toContain('weeklyDigestTimezone');
 });

@@ -148,9 +148,13 @@ Once a user has configured their `slackMemberId` and enabled the custom app, the
 
 ### 5. Weekly Digest (Scheduled Task)
 
-The `slack:weekly_digest` command posts a summary digest. It is scheduled automatically via Symfony
-Scheduler to run every Monday at 8:15 am (`AsCronTask('15 8 * * MON')`), so no manual cron entry is
-required as long as the scheduler worker is running. You can also trigger it on demand:
+The `slack:weekly_digest` command posts a summary digest. Its schedule (day, time,
+timezone) is configured in **Application Settings** and dispatched by a dedicated Symfony
+Scheduler schedule named `weekly_digest`. Production must consume both scheduler transports:
+
+    php bin/console messenger:consume scheduler_default scheduler_weekly_digest
+
+Schedule changes take effect on the next scheduler tick (no restart needed).
 
 `php bin/console slack:weekly_digest`
 
