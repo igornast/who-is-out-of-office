@@ -24,6 +24,10 @@ interface AppSettingsFacadeInterface
 
     public function organizationName(): string;
 
+    public function weeklyDigestCronExpression(): string;
+
+    public function weeklyDigestTimezone(): string;
+
     public function getAllSettings(): AppSettingsDTO;
 
     public function updateAllSettings(AppSettingsDTO $settingsDTO): void;

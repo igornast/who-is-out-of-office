@@ -55,12 +55,49 @@ Settings/
 | Setting | Type | Description | Default |
 |---------|------|-------------|---------|
 | `status_sync_enabled` | boolean | Enable/disable the Slack status auto-sync feature | `false` |
+| `weekly_digest_day` | enum (`WeeklyDigestDayEnum`) | Day of week the digest is sent (`MON`–`SUN`) | `MON` |
+| `weekly_digest_time` | string (`HH:MM`, 24h) | Time of day the digest is sent, interpreted in `weekly_digest_timezone` | `08:15` |
+| `weekly_digest_timezone` | string (IANA tz) | Timezone `weekly_digest_time` is interpreted in | `UTC` |
 
 ### Organization Settings
 
 | Setting | Type | Description | Default |
 |---------|------|-------------|---------|
 | `name` | string | Display name of your organization | `Your Organization` |
+
+### Weekly Digest Schedule
+
+The three `slack.weekly_digest_*` settings drive **when** the Slack weekly digest is sent. They are read live (no cache) on every scheduler tick, so changing them in the admin UI takes effect on the next evaluation — no cache clear or worker restart required.
+
+- `weekly_digest_day` is the backed enum `App\Shared\Enum\WeeklyDigestDayEnum` (`MON`…`SUN`), rendered as a dropdown.
+- `weekly_digest_time` is stored as a 24-hour `HH:MM` string **without seconds** — the canonical format shared by the DTO's `Assert\Regex` (`AppSettingsDTO::WEEKLY_DIGEST_TIME_PATTERN`), the form field, and `SettingsFacade::weeklyDigestCronExpression()` (which does `explode(':', $time)`).
+- `weekly_digest_timezone` is a validated IANA identifier (`Assert\Timezone`); the digest fires at `weekly_digest_time` **in this timezone**.
+
+The facade exposes two derived accessors consumed by the scheduler:
+
+```php
+$cron     = $appSettingsFacade->weeklyDigestCronExpression(); // e.g. "15 8 * * MON"
+$timezone = $appSettingsFacade->weeklyDigestTimezone();       // e.g. "Europe/Berlin"
+```
+
+These feed `App\Infrastructure\Slack\Schedule\DynamicWeeklyDigestTrigger` and
+`WeeklyDigestScheduleProvider` (`#[AsSchedule('weekly_digest')]`). See **Slack Integration →
+Weekly digest scheduling** in the root `CLAUDE.md` for how the Messenger scheduler consumes
+them. To verify the live value the server computes:
+
+```bash
+php bin/console debug:scheduler weekly_digest   # shows the next run date derived from current settings
+```
+
+## Backward Compatibility & Migration Defaults
+
+The app runs live, and a deployed `APP_SETTINGS_FILE` may predate newer settings keys. The module is designed so a partial or older file deserializes safely instead of erroring:
+
+- **`AppSettingsDTO::fromArray()` defaults every key.** Missing keys resolve to a documented default via `getNestedValue($data, $key, $default)` rather than yielding `null` (which would fail the DTO's non-nullable constructor). Canonical defaults live as constants on the DTO: `DEFAULT_ANNUAL_ALLOWANCE`, `DEFAULT_WEEKLY_DIGEST_DAY`, `DEFAULT_WEEKLY_DIGEST_TIME`, `DEFAULT_WEEKLY_DIGEST_TIMEZONE`.
+- **The facade falls back on missing values too.** `weeklyDigestCronExpression()` and `weeklyDigestTimezone()` read path-by-path via `GetAppSettingsValueQueryHandler` (*not* through `fromArray()`), so they apply the same defaults when a key is absent (`null`) instead of throwing `InvalidAppSettingTypeException`. This mirrors the existing `skipWeekendHolidays()` / `isSlackStatusSyncEnabled()` null-guard pattern.
+- **The facade guards invalid stored values.** `weekly_digest_day` is coerced with `WeeklyDigestDayEnum::tryFrom()`, `weekly_digest_time` is re-checked against `WEEKLY_DIGEST_TIME_PATTERN`, and the timezone is validated against `timezone_identifiers_list()` — each falling back to its default. This keeps manual config drift (hand-edited YAML) from producing a malformed cron or a bad timezone reaching `CronExpression`. A genuine type mismatch (e.g. a non-string where a string is expected) still throws.
+
+> **When adding a new setting, always pass a default to `getNestedValue()`** so an older `APP_SETTINGS_FILE` deserializes cleanly after deploy.
 
 ## Managing Settings
 
@@ -92,6 +129,10 @@ public function someMethod(): void
     $noticeDays = $this->appSettingsFacade->minNoticeDays();
     $maxDays = $this->appSettingsFacade->maxConsecutiveDays();
     $skipWeekendHolidays = $this->appSettingsFacade->skipWeekendHolidays();
+
+    // Weekly digest schedule (derived accessors used by the scheduler)
+    $cron = $this->appSettingsFacade->weeklyDigestCronExpression(); // "15 8 * * MON"
+    $timezone = $this->appSettingsFacade->weeklyDigestTimezone();   // "Europe/Berlin"
 
     // Get all settings as DTO
     $settings = $this->appSettingsFacade->getAllSettings();
@@ -189,10 +230,12 @@ public static function fromArray(array $data): self
         minNoticeDays: self::getNestedValue($data, AppSettingsEnum::MIN_NOTICE_DAYS),
         maxConsecutiveDays: self::getNestedValue($data, AppSettingsEnum::MAX_CONSECUTIVE_DAYS),
         skipWeekendHolidays: self::getNestedValue($data, AppSettingsEnum::SKIP_WEEKEND_HOLIDAYS, false),
-        yourNewSetting: self::getNestedValue($data, AppSettingsEnum::YOUR_NEW_SETTING), // Add here
+        yourNewSetting: self::getNestedValue($data, AppSettingsEnum::YOUR_NEW_SETTING, 'default'), // Add here — always pass a default
     );
 }
 ```
+
+> Always provide the third `$default` argument. See [Backward Compatibility & Migration Defaults](#backward-compatibility--migration-defaults) — a deployed settings file may not yet contain your new key.
 
 Update `toArray()` method:
 
@@ -270,6 +313,8 @@ public function buildForm(FormBuilderInterface $builder, array $options): void
         ]);
 }
 ```
+
+> **Time/date string fields:** when using `TimeType`/`DateType` with `'input' => 'string'`, set `'input_format'` to match the string stored in the DTO. The weekly digest stores `HH:MM`, so its field uses `'input_format' => 'H:i'`; the default `'H:i:s'` cannot parse `'08:15'` and throws a `TransformationFailedException` (HTTP 500) when the form loads. Unit tests that mock the form builder won't catch this — the functional (Panther) test that renders `/app/settings` does.
 
 ### 5. Add Translations
 

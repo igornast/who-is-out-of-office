@@ -13,5 +13,8 @@ enum AppSettingsEnum: string
     case MAX_CONSECUTIVE_DAYS = 'leave_request.max_consecutive_days';
     case SKIP_WEEKEND_HOLIDAYS = 'notification.skip_weekend_holidays';
     case SLACK_STATUS_SYNC_ENABLED = 'slack.status_sync_enabled';
+    case WEEKLY_DIGEST_DAY = 'slack.weekly_digest_day';
+    case WEEKLY_DIGEST_TIME = 'slack.weekly_digest_time';
+    case WEEKLY_DIGEST_TIMEZONE = 'slack.weekly_digest_timezone';
     case ORGANIZATION_NAME = 'organization.name';
 }

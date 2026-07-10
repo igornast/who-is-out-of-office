@@ -141,6 +141,16 @@ Run weekly digest (typically scheduled for Mondays at 8am):
 php bin/console slack:weekly_digest
 ```
 
+**Weekly digest scheduling:** day, time, and timezone are configurable in
+`App Settings → Weekly Digest Schedule` (`slack.weekly_digest_day` / `_time` / `_timezone`)
+and run by `App\\Infrastructure\\Slack\\Schedule\\WeeklyDigestScheduleProvider`
+(`#[AsSchedule('weekly_digest')]`) using `DynamicWeeklyDigestTrigger`, which reads settings
+every scheduler tick. Production must run:
+
+```bash
+php bin/console messenger:consume scheduler_default scheduler_weekly_digest
+```
+
 ### Asset Management
 
 The project uses **Symfony AssetMapper** and **Symfony UX** for frontend assets.
