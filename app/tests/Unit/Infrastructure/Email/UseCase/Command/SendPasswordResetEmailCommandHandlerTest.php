@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Infrastructure\Email\UseCase\Command\SendPasswordResetEmailCommandHandler;
+use App\Shared\Enum\AppEnvironmentEnum;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
@@ -143,7 +144,7 @@ it('falls back to the request host in prod when APP_BASE_URL is localhost, and l
         emailFromAddress: 'noreply@whoisooo.app',
         emailFromName: "Who's OOO",
         appBaseUrl: 'http://localhost',
-        environment: 'prod',
+        environment: AppEnvironmentEnum::PROD->value,
         mailer: $this->mailer,
         urlGenerator: $this->urlGenerator,
         translator: $this->translator,
@@ -167,7 +168,7 @@ it('falls back to the request host in prod when APP_BASE_URL has no parsable hos
         emailFromAddress: 'noreply@whoisooo.app',
         emailFromName: "Who's OOO",
         appBaseUrl: $appBaseUrl,
-        environment: 'prod',
+        environment: AppEnvironmentEnum::PROD->value,
         mailer: $this->mailer,
         urlGenerator: $this->urlGenerator,
         translator: $this->translator,
@@ -202,7 +203,7 @@ it('swaps the router context in prod when APP_BASE_URL is a real public host, an
         emailFromAddress: 'noreply@whoisooo.app',
         emailFromName: "Who's OOO",
         appBaseUrl: 'https://leave.example.com',
-        environment: 'prod',
+        environment: AppEnvironmentEnum::PROD->value,
         mailer: $this->mailer,
         urlGenerator: $this->urlGenerator,
         translator: $this->translator,

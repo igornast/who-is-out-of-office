@@ -450,6 +450,24 @@ public function __construct(
 
 - **Deduplicate cross-controller logic into a service** — when multiple controllers repeat the same multi-step operation, extract it into a dedicated service with a single-call API. Inject the service instead of duplicating dependencies (e.g., env vars, URL generators) across controllers.
 
+### Environment Name Comparisons
+
+Never compare `%kernel.environment%` against a raw string — use `App\Shared\Enum\AppEnvironmentEnum`:
+
+```php
+// Bad
+if ('prod' !== $this->environment) {
+    return;
+}
+
+// Good
+if (AppEnvironmentEnum::PROD->value !== $this->environment) {
+    return;
+}
+```
+
+The injected `%kernel.environment%` parameter stays a `string`, so compare against `->value` rather than casting the property to the enum. Exception: `config/bundles.php` keeps its plain `'prod'` key — that map is Flex-managed and read by the kernel before the container boots.
+
 ### Logging Convention
 
 Use `Psr\Log\LoggerInterface` in commands and handlers. Log messages use a `[MODULE][ACTION]` prefix:

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Email\UseCase\Command;
 
+use App\Shared\Enum\AppEnvironmentEnum;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -76,7 +77,7 @@ class SendPasswordResetEmailCommandHandler
 
     private function shouldFallBackToRequestHost(): bool
     {
-        if ('prod' !== $this->environment) {
+        if (AppEnvironmentEnum::PROD->value !== $this->environment) {
             return false;
         }
 

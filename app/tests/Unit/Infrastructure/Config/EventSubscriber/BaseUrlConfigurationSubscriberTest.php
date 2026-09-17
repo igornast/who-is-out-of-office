@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Infrastructure\Config\EventSubscriber\BaseUrlConfigurationSubscriber;
+use App\Shared\Enum\AppEnvironmentEnum;
 use Psr\Log\LoggerInterface;
 
 it('logs an error when prod still points at localhost', function (): void {
@@ -12,14 +13,14 @@ it('logs an error when prod still points at localhost', function (): void {
             && str_contains($message, 'http://localhost')
     );
 
-    new BaseUrlConfigurationSubscriber('http://localhost', 'prod', $logger)->warnAboutLocalBaseUrl();
+    new BaseUrlConfigurationSubscriber('http://localhost', AppEnvironmentEnum::PROD->value, $logger)->warnAboutLocalBaseUrl();
 });
 
 it('stays quiet when prod has a real base URL', function (): void {
     $logger = mock(LoggerInterface::class);
     $logger->expects('error')->never();
 
-    new BaseUrlConfigurationSubscriber('https://leave.example.com', 'prod', $logger)->warnAboutLocalBaseUrl();
+    new BaseUrlConfigurationSubscriber('https://leave.example.com', AppEnvironmentEnum::PROD->value, $logger)->warnAboutLocalBaseUrl();
 });
 
 it('stays quiet outside prod', function (): void {
@@ -35,7 +36,7 @@ it('detects a local host regardless of casing', function (string $baseUrl): void
         fn (string $message): bool => str_contains($message, 'is still')
     );
 
-    new BaseUrlConfigurationSubscriber($baseUrl, 'prod', $logger)->warnAboutLocalBaseUrl();
+    new BaseUrlConfigurationSubscriber($baseUrl, AppEnvironmentEnum::PROD->value, $logger)->warnAboutLocalBaseUrl();
 })->with([
     'upper-case scheme and host' => ['HTTP://LOCALHOST'],
     'mixed-case host' => ['https://LocalHost'],
@@ -50,7 +51,7 @@ it('logs an error when the base URL has no parsable host', function (string $bas
             && str_contains($message, 'no parsable host')
     );
 
-    new BaseUrlConfigurationSubscriber($baseUrl, 'prod', $logger)->warnAboutLocalBaseUrl();
+    new BaseUrlConfigurationSubscriber($baseUrl, AppEnvironmentEnum::PROD->value, $logger)->warnAboutLocalBaseUrl();
 })->with([
     'schemeless host' => ['localhost'],
     'schemeless domain' => ['leave.example.com'],

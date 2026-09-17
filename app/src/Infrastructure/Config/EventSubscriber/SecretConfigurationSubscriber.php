@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Config\EventSubscriber;
 
+use App\Shared\Enum\AppEnvironmentEnum;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -32,7 +33,7 @@ class SecretConfigurationSubscriber implements EventSubscriberInterface
 
     public function warnAboutWeakSecrets(): void
     {
-        if ('prod' !== $this->environment) {
+        if (AppEnvironmentEnum::PROD->value !== $this->environment) {
             return;
         }
 
