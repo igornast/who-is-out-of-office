@@ -51,17 +51,20 @@ ENV APP_ENV=prod
 
 WORKDIR /var/www
 
-COPY app/composer.json app/composer.lock app/symfony.lock app/.env ./
-
-COPY app/composer.json app/composer.lock app/symfony.lock ./
+COPY app/composer.json app/composer.lock app/symfony.lock app/.env app/importmap.php ./
+COPY app/assets assets/
 COPY app/bin bin/
 COPY app/config config/
 COPY app/migrations migrations/
 COPY app/public public/
 COPY app/src src/
+COPY app/templates templates/
+COPY app/translations translations/
 
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-progress --no-interaction && \
     /var/www/bin/console cache:warmup
+
+RUN chmod -R a+rX /var/www
 
 CMD ["start-fpm"]
 

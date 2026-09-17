@@ -180,8 +180,8 @@ body.ea .content-header:has(.welcome-banner) {
 }
 
 .widget-toast {
-    position: absolute;
-    bottom: 16px;
+    position: fixed;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%) translateY(8px);
     padding: 8px 16px;
@@ -191,7 +191,7 @@ body.ea .content-header:has(.welcome-banner) {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease, transform 0.2s ease;
-    z-index: 10;
+    z-index: 1080;
     white-space: nowrap;
 }
 

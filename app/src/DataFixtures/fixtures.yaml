@@ -2,10 +2,16 @@
 
 parameters:
     profileImages:
-        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
-        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
-        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
-        - 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-accent.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-accent-rounded.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alert.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alert-rounded.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alternate.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alternate-rounded.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-colorful.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-colorful-rounded.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-link.png'
+        - 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-link-rounded.png'
 
 
 App\Infrastructure\Doctrine\Entity\User:
@@ -21,7 +27,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 30
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-colorful-rounded.png'
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((new DateTime("+3 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+5 days"))->modify("-5 years")->format("Y-m-d H:i:s")))>'
@@ -38,7 +44,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 25
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-accent-rounded.png'
             holidayCalendar: '@holiday_calendar_de'
             subdivisionCode: 'DE-BY'
             birthDate: '<(new \DateTimeImmutable("1988-06-15"))>'
@@ -57,7 +63,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 24
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-accent.png'
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1992-03-22"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2022-06-15"))>'
@@ -75,7 +81,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 21
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alert.png'
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((new DateTime("+8 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+8 days"))->modify("-3 years")->format("Y-m-d H:i:s")))>'
@@ -93,7 +99,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 18
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-accent-rounded.png'
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable("1990-11-03"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2020-03-16"))>'
@@ -111,7 +117,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 19
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alternate.png'
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((new DateTime("+15 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable("2019-01-07"))>'
@@ -129,7 +135,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 22
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-accent.png'
             holidayCalendar: '@holiday_calendar_de'
             subdivisionCode: 'DE-BY'
             birthDate: '<(new \DateTimeImmutable("1995-08-28"))>'
@@ -148,7 +154,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 16
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alert-rounded.png'
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable("1993-12-14"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2018-04-23"))>'
@@ -166,7 +172,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 20
             isActive: true
             hasCelebrateWorkAnniversary: false
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-colorful.png'
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1987-05-10"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2024-11-04"))>'
@@ -184,7 +190,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 17
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alternate-rounded.png'
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable("1991-09-18"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2017-08-01"))>'
@@ -202,7 +208,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 27
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alert.png'
             holidayCalendar: '@holiday_calendar_de'
             subdivisionCode: 'DE-BY'
             birthDate: '<(new \DateTimeImmutable("1981-02-09"))>'
@@ -221,7 +227,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 23
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-link-rounded.png'
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable("1986-07-30"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2020-10-12"))>'
@@ -239,7 +245,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 24
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-link.png'
             holidayCalendar: '@holiday_calendar_nl'
             birthDate: '<(new \DateTimeImmutable("1989-04-17"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2021-03-08"))>'
@@ -257,7 +263,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 20
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alternate.png'
             holidayCalendar: '@holiday_calendar_nl'
             birthDate: '<(new \DateTimeImmutable((new DateTime("+12 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable("2023-07-19"))>'
@@ -275,7 +281,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 25
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alternate-rounded.png'
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1984-10-25"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2019-11-18"))>'
@@ -293,7 +299,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 21
             isActive: true
             hasCelebrateWorkAnniversary: false
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-colorful-rounded.png'
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1994-01-12"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2024-02-26"))>'
@@ -311,7 +317,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 26
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-link.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-colorful.png'
             holidayCalendar: '@holiday_calendar_nl'
             birthDate: '<(new \DateTimeImmutable("1983-09-06"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2020-01-20"))>'
@@ -329,7 +335,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 23
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-colorful.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-link.png'
             holidayCalendar: '@holiday_calendar_de'
             subdivisionCode: 'DE-BY'
             birthDate: '<(new \DateTimeImmutable("1996-06-21"))>'
@@ -348,7 +354,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 22
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-accent.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-link-rounded.png'
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1993-11-08"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2023-04-03"))>'
@@ -366,7 +372,7 @@ App\Infrastructure\Doctrine\Entity\User:
             currentLeaveBalance: 24
             isActive: true
             hasCelebrateWorkAnniversary: true
-            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/art/refs/heads/main/square-icon/png/fortrabbit-square-mark-alert.png'
+            profileImageUrl: 'https://raw.githubusercontent.com/fortrabbit/design/refs/heads/main/assets/square-icon/png/fortrabbit-square-mark-alert-rounded.png'
             holidayCalendar: '@holiday_calendar_nl'
             birthDate: '<(new \DateTimeImmutable("1990-07-19"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2022-10-17"))>'
@@ -404,6 +410,37 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
             manager: '@user_1'
+
+    invited_user_3:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Invited'
+            lastName: 'User Three'
+            email: 'invited3@whoisooo.app'
+            password: 'not-set'
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 24
+            isActive: false
+            hasCelebrateWorkAnniversary: false
+            holidayCalendar: '@holiday_calendar_fr'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            manager: '@user_1'
+
+    deactivated_user:
+        __construct:
+            id: '<(Ramsey\Uuid\Uuid::uuid4())>'
+            firstName: 'Deactivated'
+            lastName: 'User'
+            email: 'deactivated@whoisooo.app'
+            password: '\$argon2id\$v=19\$m=16,t=2,p=1\$amRoanNkaGl3ZXdl\$BunHINahjQJIGSYMVR4m9A' #123
+            roles: ['ROLE_USER']
+            annualLeaveAllowance: 24
+            currentLeaveBalance: 24
+            isActive: false
+            hasCelebrateWorkAnniversary: false
+            holidayCalendar: '@holiday_calendar_fr'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
 
 App\Infrastructure\Doctrine\Entity\Invitation:
     invitation_1:

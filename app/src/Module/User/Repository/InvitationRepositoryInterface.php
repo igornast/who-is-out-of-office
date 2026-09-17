@@ -12,6 +12,8 @@ interface InvitationRepositoryInterface
 
     public function findOneByUserId(string $id): ?InvitationDTO;
 
+    public function replaceForUser(string $userId, string $token): ?InvitationDTO;
+
     public function remove(InvitationDTO $invitationDTO): void;
 
     /**

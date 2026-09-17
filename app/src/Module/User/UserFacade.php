@@ -13,6 +13,7 @@ use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
 use App\Module\User\UseCase\Command\DisableTwoFactorCommandHandler;
 use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
 use App\Module\User\UseCase\Command\EnableTwoFactorCommandHandler;
+use App\Module\User\UseCase\Command\IssueUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateBackupCodesCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
 use App\Module\User\UseCase\Command\CleanupExpiredPasswordResetTokensCommandHandler;
@@ -35,6 +36,7 @@ use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDatesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
+use App\Module\User\UseCase\Query\HasPendingInvitationQueryHandler;
 use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\OrganizationNodeDTO;
@@ -78,6 +80,8 @@ final class UserFacade implements UserFacadeInterface
         private readonly UpdateUserFeedLastSeenAtCommandHandler $updateUserFeedLastSeenAtHandler,
         private readonly GetCalendarSubscriptionConfigQueryHandler $getCalendarSubscriptionConfigHandler,
         private readonly UpdateCalendarSubscriptionConfigCommandHandler $updateCalendarSubscriptionConfigHandler,
+        private readonly IssueUserInvitationCommandHandler $issueUserInvitationHandler,
+        private readonly HasPendingInvitationQueryHandler $hasPendingInvitationHandler,
     ) {
     }
 
@@ -118,6 +122,16 @@ final class UserFacade implements UserFacadeInterface
     public function acceptUserInvitation(UserInvitationRequestDTO $invitationRequestDTO, InvitationDTO $invitationDTO): void
     {
         $this->acceptInvitationHandler->handle($invitationRequestDTO, $invitationDTO);
+    }
+
+    public function issueUserInvitation(string $userId): ?InvitationDTO
+    {
+        return $this->issueUserInvitationHandler->handle($userId);
+    }
+
+    public function hasPendingInvitation(string $userId): bool
+    {
+        return $this->hasPendingInvitationHandler->handle($userId);
     }
 
     public function getUser(string $userId): ?UserDTO

@@ -76,3 +76,18 @@ it('returns false for signature with wrong secret', function () {
 
     expect($this->verifier->isValid($request))->toBeFalse();
 });
+
+it('returns false when the signing secret is not configured', function () {
+    $verifier = new RequestVerifier(signingSecret: '');
+    $timestamp = (string) time();
+    $body = 'payload=test-body';
+
+    $sigBaseString = sprintf('v0:%s:%s', $timestamp, $body);
+    $signature = 'v0='.hash_hmac('sha256', $sigBaseString, '');
+
+    $request = Request::create('/api/slack', 'POST', content: $body);
+    $request->headers->set('x-slack-request-timestamp', $timestamp);
+    $request->headers->set('x-slack-signature', $signature);
+
+    expect($verifier->isValid($request))->toBeFalse();
+});

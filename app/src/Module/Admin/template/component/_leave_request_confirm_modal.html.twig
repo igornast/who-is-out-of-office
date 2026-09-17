@@ -1,6 +1,4 @@
-<div class="modal fade" id="action-confirm-modal" tabindex="-1"
-     aria-labelledby="action-confirm-modal-label" aria-hidden="true"
-     data-controller="action-confirm"
+<div data-controller="action-confirm"
      data-approve-title="{{ 'leave_request.action.approve_confirm_title'|trans(domain: 'admin') }}"
      data-approve-body="{{ 'leave_request.action.approve_confirm_body'|trans(domain: 'admin') }}"
      data-approve-action="{{ 'leave_request.action.approve_confirm_action'|trans(domain: 'admin') }}"
@@ -12,24 +10,32 @@
      data-withdraw-action="{{ 'leave_request.action.withdraw_confirm_action'|trans(domain: 'admin') }}"
      data-reset-password-title="{{ 'user.action.reset_password_confirm_title'|trans(domain: 'admin') }}"
      data-reset-password-body="{{ 'user.action.reset_password_confirm_body'|trans(domain: 'admin') }}"
-     data-reset-password-action="{{ 'user.action.reset_password_confirm_action'|trans(domain: 'admin') }}">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="action-confirm-modal-label" data-modal="title"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="{{ 'leave_request.action.cancel'|trans(domain: 'admin') }}"></button>
-            </div>
-            <div class="modal-body" data-modal="body"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    {{ 'leave_request.action.cancel'|trans(domain: 'admin') }}
-                </button>
-                <button type="button" class="btn btn-success" data-modal="confirm"
-                        data-action="click->action-confirm#confirm">
-                </button>
+     data-reset-password-action="{{ 'user.action.reset_password_confirm_action'|trans(domain: 'admin') }}"
+     data-resend-invitation-title="{{ 'user.action.resend_invitation_confirm_title'|trans(domain: 'admin') }}"
+     data-resend-invitation-body="{{ 'user.action.resend_invitation_confirm_body'|trans(domain: 'admin') }}"
+     data-resend-invitation-action="{{ 'user.action.resend_invitation_confirm_action'|trans(domain: 'admin') }}">
+    <div class="modal fade" id="action-confirm-modal" tabindex="-1"
+         aria-labelledby="action-confirm-modal-label" aria-hidden="true"
+         data-action-confirm-target="modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="action-confirm-modal-label" data-modal="title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="{{ 'leave_request.action.cancel'|trans(domain: 'admin') }}"></button>
+                </div>
+                <div class="modal-body" data-modal="body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        {{ 'leave_request.action.cancel'|trans(domain: 'admin') }}
+                    </button>
+                    <button type="button" class="btn btn-success" data-modal="confirm"
+                            data-action="click->action-confirm#confirm">
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    <div class="widget-toast" data-action-confirm-target="toast"></div>
+    <div class="widget-toast" role="status" aria-live="polite" aria-atomic="true"
+         data-action-confirm-target="toast"></div>
 </div>

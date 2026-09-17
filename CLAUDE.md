@@ -19,9 +19,11 @@ This is "Who's Out of Office" - an online staff leave planner built with **Symfo
 
 ### Docker Setup
 
-The project runs in Docker with four services:
+The project runs in Docker with six services:
 - **nginx** (port 80): Web server
 - **php**: PHP-FPM with Xdebug support
+- **worker-async**: Consumes the `async` Messenger transport — required for any email to be sent
+- **worker-scheduler**: Consumes `scheduler_default` and `scheduler_weekly_digest` — required for any scheduled job to run
 - **db**: MySQL 8.4 (port 3306)
 - **mailer**: MailPit (port 8025 web UI) — catches all outgoing emails in development
 
@@ -34,6 +36,10 @@ Access the PHP container to run commands:
 ```bash
 docker exec -it app_ooo_php bash
 ```
+
+Production deployments use `docker-compose.prod.yml` (see README) — it builds the `prod`
+image target and runs the same two workers. The default `docker-compose.yml` is
+development-only: its entrypoint drops and recreates the database on every start.
 
 ### Database Credentials
 
@@ -324,6 +330,8 @@ Environment variables required:
 MAILER_DSN=
 EMAIL_FROM_ADDRESS=
 EMAIL_FROM_NAME=
+APP_BASE_URL=          # public base URL, e.g. https://leave.example.com (no trailing slash). Links built in a worker have no request context and use this. Security-sensitive links (password reset) are built from it, even inside an HTTP request, so a forged Host header cannot change them — except in prod when APP_BASE_URL is unset/localhost/unparsable, where the link falls back to the request host and SendPasswordResetEmailCommandHandler logs a `[EMAIL][PASSWORD-RESET]` error. BaseUrlConfigurationSubscriber also logs an error on every console command if prod still points at localhost.
+TRUSTED_HOSTS=         # optional regex of allowed Host headers, e.g. '^leave\.example\.com$'. Empty (default) allows any host.
 ```
 
 #### Slack Integration
@@ -331,7 +339,7 @@ EMAIL_FROM_NAME=
 - **Weekly digest**: Scheduled summary of absences and birthdays
 - **Private DMs**: User-specific notifications when requests are processed
 - **Webhook endpoint**: `/api/slack/interactive-endpoint` handles button clicks
-- **Verification**: Uses `SLACK_SIGNING_SECRET` to verify incoming requests
+- **Verification**: Uses `SLACK_SIGNING_SECRET` to verify incoming requests; `RequestVerifier` rejects every request while it is empty
 
 Environment variables required:
 ```
@@ -345,10 +353,16 @@ SLACK_AR_HR_DIGEST_CHANNEL_ID=
 - Leave requests can be exported as iCalendar feeds
 - Secured with hash-based verification
 - Accessible via `/api/calendar/{userId}/{hash}.ics`
+- `SecretConfigurationSubscriber` logs an error on every console command in prod when `ICAL_SECRET` is shorter than 32 characters. It never throws: rotating the secret invalidates every existing calendar subscription URL, so that is left to the operator.
 
 #### Date Nager Integration
 - External API for fetching public holidays by country
 - Integrated through `DateNagerFacade` and `DateNagerClient`
+
+#### Inactive User Blocking
+- `UserChecker` (`Infrastructure/Security/UserChecker.php`) always rejects login for `isActive=false` users, and `InactiveUserSessionListener` logs out a session whose user became inactive
+- `user.is_active` was added without a backfill, so pre-existing users may be `0` — run the README audit query before upgrading an existing install
+- Never "fix" this with a data migration that sets `is_active = 1`: it would reactivate accounts deactivated on purpose
 
 #### Two-Factor Authentication (2FA)
 - Built on `scheb/2fa-bundle` with TOTP + backup codes (user opt-in)

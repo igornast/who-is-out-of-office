@@ -22,6 +22,10 @@ class RequestVerifier
 
     public function isValid(Request $request): bool
     {
+        if ('' === $this->signingSecret) {
+            return false;
+        }
+
         $timestamp = $request->headers->get(self::HEADER_TIMESTAMP_KEY);
         $signature = $request->headers->get(self::HEADER_SIGNATURE_KEY);
 

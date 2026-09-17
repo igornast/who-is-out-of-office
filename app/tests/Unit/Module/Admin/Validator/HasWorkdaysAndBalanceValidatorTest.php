@@ -198,3 +198,99 @@ it('skips maxConsecutiveDays check when setting is 0', function (): void {
 
     $this->validator->validate(['start' => $startDate, 'end' => $endDate], $this->constraint);
 });
+
+it('throws UnexpectedTypeException when the constraint is not HasWorkdaysAndBalance', function (): void {
+    $this->validator->validate(
+        ['start' => new DateTimeImmutable(), 'end' => new DateTimeImmutable()],
+        new Symfony\Component\Validator\Constraints\NotBlank(),
+    );
+})->throws(Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+
+it('ignores an empty value', function (mixed $value): void {
+    $this->context->expects('buildViolation')->never();
+
+    $this->validator->validate($value, $this->constraint);
+})->with([
+    'null' => [null],
+    'empty string' => [''],
+]);
+
+it('throws UnexpectedValueException when the value is not a date range', function (): void {
+    $this->validator->validate('2026-01-01', $this->constraint);
+})->throws(Symfony\Component\Validator\Exception\UnexpectedValueException::class);
+
+it('throws UnexpectedValueException when the range has no end date', function (): void {
+    $this->validator->validate(['start' => new DateTimeImmutable()], $this->constraint);
+})->throws(Symfony\Component\Validator\Exception\UnexpectedValueException::class);
+
+it('throws AccessDeniedHttpException when nobody is authenticated', function (): void {
+    $security = mock(Security::class);
+    $security->allows('getUser')->andReturn(null);
+
+    $validator = new HasWorkdaysAndBalanceValidator(
+        security: $security,
+        leaveRequestFacade: $this->leaveRequestFacade,
+        appSettingsFacade: $this->appSettingsFacade,
+    );
+    $validator->initialize($this->context);
+
+    $validator->validate(['start' => new DateTimeImmutable(), 'end' => new DateTimeImmutable()], $this->constraint);
+})->throws(Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException::class);
+
+it('adds violation when the range contains no workdays', function (): void {
+    $this->appSettingsFacade->allows('minNoticeDays')->andReturn(0);
+    $this->appSettingsFacade->allows('maxConsecutiveDays')->andReturn(0);
+
+    setupFormContext($this, $this->balanceLeaveType);
+
+    $this->leaveRequestFacade->allows('calculateWorkDays')->andReturn(0);
+
+    $violationBuilder = mock(ConstraintViolationBuilderInterface::class);
+    $violationBuilder->allows('addViolation');
+    $this->context->expects('buildViolation')
+        ->with($this->constraint->noWorkdaysMessage)
+        ->once()
+        ->andReturn($violationBuilder);
+
+    $this->validator->validate(
+        ['start' => new DateTimeImmutable('+1 day'), 'end' => new DateTimeImmutable('+2 days')],
+        $this->constraint,
+    );
+});
+
+it('adds violation when the leave balance is lower than the requested workdays', function (): void {
+    $this->appSettingsFacade->allows('minNoticeDays')->andReturn(0);
+    $this->appSettingsFacade->allows('maxConsecutiveDays')->andReturn(0);
+
+    setupFormContext($this, $this->balanceLeaveType);
+
+    $this->leaveRequestFacade->allows('calculateWorkDays')->andReturn($this->user->currentLeaveBalance + 1);
+
+    $violationBuilder = mock(ConstraintViolationBuilderInterface::class);
+    $violationBuilder->allows('addViolation');
+    $this->context->expects('buildViolation')
+        ->with($this->constraint->notEnoughBalanceMessage)
+        ->once()
+        ->andReturn($violationBuilder);
+
+    $this->validator->validate(
+        ['start' => new DateTimeImmutable('+1 day'), 'end' => new DateTimeImmutable('+40 days')],
+        $this->constraint,
+    );
+});
+
+it('adds no violation when workdays fit within the leave balance', function (): void {
+    $this->appSettingsFacade->allows('minNoticeDays')->andReturn(0);
+    $this->appSettingsFacade->allows('maxConsecutiveDays')->andReturn(0);
+
+    setupFormContext($this, $this->balanceLeaveType);
+
+    $this->leaveRequestFacade->allows('calculateWorkDays')->andReturn($this->user->currentLeaveBalance);
+
+    $this->context->expects('buildViolation')->never();
+
+    $this->validator->validate(
+        ['start' => new DateTimeImmutable('+1 day'), 'end' => new DateTimeImmutable('+30 days')],
+        $this->constraint,
+    );
+});

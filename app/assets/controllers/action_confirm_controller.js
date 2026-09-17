@@ -5,10 +5,11 @@ const ACTION_CONFIG = {
     reject: { confirmClass: 'btn-danger' },
     withdraw: { confirmClass: 'btn-danger' },
     resetPassword: { confirmClass: 'btn-primary' },
+    resendInvitation: { confirmClass: 'btn-primary' },
 };
 
 export default class extends Controller {
-    static targets = ['toast'];
+    static targets = ['toast', 'modal'];
 
     _pendingAction = null;
 
@@ -50,7 +51,7 @@ export default class extends Controller {
         confirmBtn.textContent = action;
         confirmBtn.className = 'btn ' + config.confirmClass;
 
-        bootstrap.Modal.getOrCreateInstance(this.element).show();
+        bootstrap.Modal.getOrCreateInstance(this.modalTarget).show();
     }
 
     confirm() {
@@ -59,7 +60,7 @@ export default class extends Controller {
         const { btn, actionName, url, token, reload } = this._pendingAction;
         const row = btn.closest('[data-lr-row]');
 
-        bootstrap.Modal.getInstance(this.element)?.hide();
+        bootstrap.Modal.getInstance(this.modalTarget)?.hide();
         this._setLoading(btn, row, true);
 
         const headers = { 'Accept': 'application/json' };
@@ -133,7 +134,8 @@ export default class extends Controller {
 
         const toast = this.toastTarget;
         toast.textContent = message;
-        toast.className = 'widget-toast widget-toast--' + type + ' widget-toast--visible';
+        toast.classList.remove('widget-toast--success', 'widget-toast--error');
+        toast.classList.add('widget-toast--' + type, 'widget-toast--visible');
 
         clearTimeout(this._toastTimer);
         this._toastTimer = setTimeout(() => {

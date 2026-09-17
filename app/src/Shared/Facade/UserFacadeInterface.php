@@ -47,6 +47,10 @@ interface UserFacadeInterface
 
     public function acceptUserInvitation(UserInvitationRequestDTO $invitationRequestDTO, InvitationDTO $invitationDTO): void;
 
+    public function issueUserInvitation(string $userId): ?InvitationDTO;
+
+    public function hasPendingInvitation(string $userId): bool;
+
     public function getUser(string $userId): ?UserDTO;
 
     public function resetAbsenceBalance(): void;

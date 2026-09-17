@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Module\Admin\Controller\User\UserActionController;
+use App\Shared\Exception\ConcurrentInvitationException;
 use App\Shared\Facade\EmailFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
+use App\Tests\_fixtures\Shared\DTO\InvitationDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -147,5 +149,87 @@ describe('resetPassword', function (): void {
         expect($response->getStatusCode())->toBe(Response::HTTP_INTERNAL_SERVER_ERROR)
             ->and(json_decode($response->getContent(), true)['success'])->toBeFalse()
             ->and(json_decode($response->getContent(), true)['message'])->toBe('user.action.error.email_failed');
+    });
+});
+
+describe('resendInvitation', function (): void {
+    it('returns 404 when user not found', function (): void {
+        $this->userFacade->expects('getUser')->with('non-existent-id')->andReturn(null);
+
+        $this->controller->resendInvitation(resetPasswordRequest(), 'non-existent-id');
+    })->throws(NotFoundHttpException::class);
+
+    it('returns 422 when the user is already active', function (): void {
+        $userId = Uuid::uuid4()->toString();
+        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => true]);
+
+        $this->userFacade->expects('getUser')->with($userId)->andReturn($userDTO);
+        $this->userFacade->expects('hasPendingInvitation')->never();
+        $this->userFacade->expects('issueUserInvitation')->never();
+
+        $response = $this->controller->resendInvitation(resetPasswordRequest(), $userId);
+
+        expect($response->getStatusCode())->toBe(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->and(json_decode($response->getContent(), true)['success'])->toBeFalse();
+    });
+
+    it('returns 422 when the inactive user has no pending invitation', function (): void {
+        $userId = Uuid::uuid4()->toString();
+        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => false]);
+
+        $this->userFacade->expects('getUser')->with($userId)->andReturn($userDTO);
+        $this->userFacade->expects('hasPendingInvitation')->with($userId)->andReturn(false);
+        $this->userFacade->expects('issueUserInvitation')->never();
+
+        $response = $this->controller->resendInvitation(resetPasswordRequest(), $userId);
+
+        expect($response->getStatusCode())->toBe(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->and(json_decode($response->getContent(), true)['message'])->toBe('user.action.error.user_not_invited');
+    });
+
+    it('returns 422 when the invitation could not be issued', function (): void {
+        $userId = Uuid::uuid4()->toString();
+        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => false]);
+
+        $this->userFacade->expects('getUser')->with($userId)->andReturn($userDTO);
+        $this->userFacade->expects('hasPendingInvitation')->with($userId)->andReturn(true);
+        $this->userFacade->expects('issueUserInvitation')->with($userId)->andReturn(null);
+
+        $response = $this->controller->resendInvitation(resetPasswordRequest(), $userId);
+
+        expect($response->getStatusCode())->toBe(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->and(json_decode($response->getContent(), true)['success'])->toBeFalse();
+    });
+
+    it('dispatches the invitation email and reports success', function (): void {
+        $userId = Uuid::uuid4()->toString();
+        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => false]);
+        $invitationDTO = InvitationDTOFixture::create();
+
+        $this->userFacade->expects('getUser')->with($userId)->andReturn($userDTO);
+        $this->userFacade->expects('hasPendingInvitation')->with($userId)->andReturn(true);
+        $this->userFacade->expects('issueUserInvitation')->with($userId)->andReturn($invitationDTO);
+        $this->emailFacade->expects('sendInvitationEmail')->with($invitationDTO);
+
+        $response = $this->controller->resendInvitation(resetPasswordRequest(), $userId);
+
+        expect($response->getStatusCode())->toBe(Response::HTTP_OK)
+            ->and(json_decode($response->getContent(), true)['success'])->toBeTrue();
+    });
+
+    it('returns 409 when a concurrent resend already issued the invitation', function (): void {
+        $userId = Uuid::uuid4()->toString();
+        $userDTO = UserDTOFixture::create(['id' => $userId, 'isActive' => false]);
+
+        $this->userFacade->expects('getUser')->with($userId)->andReturn($userDTO);
+        $this->userFacade->expects('hasPendingInvitation')->with($userId)->andReturn(true);
+        $this->userFacade->expects('issueUserInvitation')->with($userId)->andThrow(new ConcurrentInvitationException($userId, new RuntimeException('duplicate key')));
+        $this->logger->expects('error')->once();
+
+        $response = $this->controller->resendInvitation(resetPasswordRequest(), $userId);
+
+        expect($response->getStatusCode())->toBe(Response::HTTP_CONFLICT)
+            ->and(json_decode($response->getContent(), true)['success'])->toBeFalse()
+            ->and(json_decode($response->getContent(), true)['message'])->toBe('user.action.error.resend_conflict');
     });
 });
