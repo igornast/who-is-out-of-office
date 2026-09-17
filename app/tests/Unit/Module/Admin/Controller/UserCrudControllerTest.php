@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\UserCrudController;
 use App\Shared\Facade\AppSettingsFacadeInterface;
+use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\RoleTranslator;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -16,6 +17,7 @@ beforeEach(function (): void {
     $this->urlGenerator = mock(UrlGeneratorInterface::class);
     $this->csrfTokenManager = mock(CsrfTokenManagerInterface::class);
     $this->appSettingsFacade = mock(AppSettingsFacadeInterface::class);
+    $this->userFacade = mock(UserFacadeInterface::class);
 });
 
 it('uses defaultAnnualAllowance from settings when creating a new user', function (): void {
@@ -27,6 +29,7 @@ it('uses defaultAnnualAllowance from settings when creating a new user', functio
         urlGenerator: $this->urlGenerator,
         csrfTokenManager: $this->csrfTokenManager,
         appSettingsFacade: $this->appSettingsFacade,
+        userFacade: $this->userFacade,
     );
 
     $user = $controller->createEntity(User::class);

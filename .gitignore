@@ -3,7 +3,10 @@
 .DS_Store
 docker-compose.override.yml
 docker-compose.local.yml
+/.env
 
 /app/public/uploads/profile_images/*
 !/app/public/uploads/profile_images/.gitkeep
 /.shiki/
+/docs/superpowers/
+/.superpowers/

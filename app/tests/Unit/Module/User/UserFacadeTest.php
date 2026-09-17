@@ -8,6 +8,7 @@ use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
 use App\Module\User\UseCase\Command\CleanupExpiredPasswordResetTokensCommandHandler;
 use App\Module\User\UseCase\Command\DisableTwoFactorCommandHandler;
 use App\Module\User\UseCase\Command\EnableTwoFactorCommandHandler;
+use App\Module\User\UseCase\Command\IssueUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateBackupCodesCommandHandler;
 use App\Module\User\UseCase\Command\CreatePasswordResetTokenCommandHandler;
 use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
@@ -37,9 +38,11 @@ use App\Module\User\UseCase\Query\GetUsersWithBirthdaysForDatesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingBirthdaysQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHandler;
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
+use App\Module\User\UseCase\Query\HasPendingInvitationQueryHandler;
 use App\Module\User\UserFacade;
 use App\Tests\_fixtures\Shared\DTO\InvitationDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
+use Ramsey\Uuid\Uuid;
 
 beforeEach(function (): void {
     $this->updateCurrentLeaveBalanceHandler = mock(UpdateCurrentLeaveBalanceCommandHandler::class);
@@ -72,6 +75,8 @@ beforeEach(function (): void {
     $this->getCalendarSubscriptionConfigHandler = mock(GetCalendarSubscriptionConfigQueryHandler::class);
     $this->updateCalendarSubscriptionConfigHandler = mock(UpdateCalendarSubscriptionConfigCommandHandler::class);
     $this->getOrganizationTreeHandler = mock(GetOrganizationTreeQueryHandler::class);
+    $this->issueUserInvitationHandler = mock(IssueUserInvitationCommandHandler::class);
+    $this->hasPendingInvitationHandler = mock(HasPendingInvitationQueryHandler::class);
 
     $this->facade = new UserFacade(
         updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
@@ -104,6 +109,8 @@ beforeEach(function (): void {
         getCalendarSubscriptionConfigHandler: $this->getCalendarSubscriptionConfigHandler,
         updateCalendarSubscriptionConfigHandler: $this->updateCalendarSubscriptionConfigHandler,
         getOrganizationTreeHandler: $this->getOrganizationTreeHandler,
+        issueUserInvitationHandler: $this->issueUserInvitationHandler,
+        hasPendingInvitationHandler: $this->hasPendingInvitationHandler,
     );
 });
 
@@ -477,4 +484,21 @@ it('delegates updateCalendarSubscriptionConfig to handler', function (): void {
         ->with('user-1', $teamMemberIds, $holidayCalendarIds);
 
     $this->facade->updateCalendarSubscriptionConfig('user-1', $teamMemberIds, $holidayCalendarIds);
+});
+
+it('delegates issueUserInvitation to its handler', function (): void {
+    $userId = Uuid::uuid4()->toString();
+    $invitationDTO = InvitationDTOFixture::create();
+
+    $this->issueUserInvitationHandler->expects('handle')->with($userId)->andReturn($invitationDTO);
+
+    expect($this->facade->issueUserInvitation($userId))->toBe($invitationDTO);
+});
+
+it('delegates hasPendingInvitation to its handler', function (): void {
+    $userId = Uuid::uuid4()->toString();
+
+    $this->hasPendingInvitationHandler->expects('handle')->with($userId)->andReturn(true);
+
+    expect($this->facade->hasPendingInvitation($userId))->toBeTrue();
 });

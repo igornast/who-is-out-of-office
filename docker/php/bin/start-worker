@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+cd /var/www
+
+echo "Waiting for the messenger queue table..."
+until php bin/console dbal:run-sql "SELECT 1 FROM messenger_messages LIMIT 1" >/dev/null 2>&1; do
+    sleep 5
+done
+
+echo "Starting messenger worker for: $*"
+
+if [ -n "$WORKER_TIME_LIMIT" ]; then
+    exec php bin/console messenger:consume "$@" --time-limit="$WORKER_TIME_LIMIT" --memory-limit=256M -v
+fi
+
+exec php bin/console messenger:consume "$@" --memory-limit=256M -v

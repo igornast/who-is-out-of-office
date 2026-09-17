@@ -49,12 +49,12 @@ function createPasswordResetToken(EntityManagerInterface $em, string $userEmail)
 
 function loginUserWithLoginForm(Client $client, string $email, string $password): void
 {
-    $crawler = $client->request('GET', '/login');
+    $client->request('GET', '/login');
+    $client->waitForVisibility('#username');
 
-    $loginForm = $crawler->selectButton('Sign in')->form();
+    $loginForm = $client->getCrawler()->selectButton('Sign in')->form();
     $loginForm['_username'] = $email;
     $loginForm['_password'] = $password;
-    //    $client->takeScreenshot('tests/_output/01-login-form.png');
 
     $client->submit($loginForm);
 

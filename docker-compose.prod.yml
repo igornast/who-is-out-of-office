@@ -1,0 +1,97 @@
+name: whoisooo-prod
+
+services:
+    nginx:
+        container_name: whoisooo_prod_nginx
+        build:
+            context: ./
+            dockerfile: docker/nginx/Dockerfile
+            target: prod
+        ports:
+            - "${HTTP_BIND_ADDRESS:+${HTTP_BIND_ADDRESS}:}80:80"
+        environment:
+            PHP_HOST: whoisooo_prod_php
+        volumes:
+            - public_assets:/var/www/public/assets:ro
+            - uploads:/var/www/public/uploads:ro
+        restart: unless-stopped
+        depends_on:
+            - php
+
+    php:
+        container_name: whoisooo_prod_php
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+            target: prod
+        environment:
+            APP_ENV: prod
+        env_file:
+            - ./app/.env.local
+        volumes:
+            - public_assets:/var/www/public/assets
+            - uploads:/var/www/public/uploads
+        restart: unless-stopped
+        depends_on:
+            db:
+                condition: service_healthy
+
+    worker-async:
+        container_name: whoisooo_prod_worker_async
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+            target: prod
+        command: start-worker async
+        environment:
+            APP_ENV: prod
+            WORKER_TIME_LIMIT: 3600
+        env_file:
+            - ./app/.env.local
+        volumes:
+            - uploads:/var/www/public/uploads
+        restart: unless-stopped
+        depends_on:
+            db:
+                condition: service_healthy
+
+    worker-scheduler:
+        container_name: whoisooo_prod_worker_scheduler
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+            target: prod
+        command: start-worker scheduler_default scheduler_weekly_digest
+        environment:
+            APP_ENV: prod
+        env_file:
+            - ./app/.env.local
+        volumes:
+            - uploads:/var/www/public/uploads
+        restart: unless-stopped
+        depends_on:
+            db:
+                condition: service_healthy
+
+    db:
+        image: mysql:8.4.4
+        container_name: whoisooo_prod_db
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        volumes:
+            - mysql_prod:/var/lib/mysql
+        healthcheck:
+            test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u\"$$MYSQL_USER\" -p\"$$MYSQL_PASSWORD\" -e 'SELECT 1' \"$$MYSQL_DATABASE\" > /dev/null 2>&1"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 60s
+        restart: unless-stopped
+
+volumes:
+    mysql_prod:
+    public_assets:
+    uploads:

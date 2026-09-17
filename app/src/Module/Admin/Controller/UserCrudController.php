@@ -8,6 +8,7 @@ use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
 use App\Shared\Enum\RoleEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
+use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Service\RoleTranslator;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -43,6 +44,7 @@ class UserCrudController extends AppAbstractCrudController
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
         private readonly AppSettingsFacadeInterface $appSettingsFacade,
+        private readonly UserFacadeInterface $userFacade,
     ) {
     }
 
@@ -83,13 +85,27 @@ class UserCrudController extends AppAbstractCrudController
             ->addCssClass('btn btn-outline')
             ->displayIf(fn (User $entity) => $this->isAdmin() && $entity->id->toString() !== $this->getUser()->id->toString());
 
+        $resendInvitationAction = Action::new('resendInvitation', 'crud.user.action.resend_invitation')
+            ->linkToUrl(
+                fn (User $entity) => $this->urlGenerator->generate('app_user_resend_invitation', [
+                    'id' => $entity->id,
+                    '_token' => $this->csrfTokenManager->getToken(sprintf('resendInvitation%s', $entity->id))->getValue(),
+                ])
+            )
+            ->setHtmlAttributes(['data-lr-action' => 'resendInvitation'])
+            ->setIcon('icon-send')
+            ->addCssClass('btn btn-outline')
+            ->displayIf(fn (User $entity) => $this->isAdmin() && !$entity->isActive && $this->userFacade->hasPendingInvitation($entity->id->toString()));
+
         return $actions
             ->setPermission(Action::NEW, RoleEnum::Admin->value)
             ->setPermission(Action::DELETE, RoleEnum::Admin->value)
             ->setPermission(Action::EDIT, new Expression(sprintf('"%s" in role_names or "%s" in role_names', RoleEnum::Admin->value, RoleEnum::Manager->value)))
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_DETAIL, $resetPasswordAction)
-            ->add(Crud::PAGE_EDIT, $resetPasswordAction);
+            ->add(Crud::PAGE_EDIT, $resetPasswordAction)
+            ->add(Crud::PAGE_DETAIL, $resendInvitationAction)
+            ->add(Crud::PAGE_EDIT, $resendInvitationAction);
     }
 
     public function configureFields(string $pageName): iterable

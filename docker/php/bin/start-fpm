@@ -1,6 +1,14 @@
 #!/bin/sh
 set -e
 
+cd /var/www
+
 chown -R www-data var
+
+echo "Compiling the asset map..."
+php bin/console asset-map:compile
+
+mkdir -p public/assets public/uploads
+chown -R www-data public/assets public/uploads
 
 exec docker-php-entrypoint "php-fpm"

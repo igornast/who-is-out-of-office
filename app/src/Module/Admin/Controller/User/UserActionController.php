@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Controller\User;
 
+use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\UserDTO;
+use App\Shared\Exception\ConcurrentInvitationException;
 use App\Shared\Facade\EmailFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
 use Psr\Log\LoggerInterface;
@@ -76,6 +78,72 @@ class UserActionController extends AbstractController
         return $this->json([
             'success' => true,
             'message' => $this->translator->trans('user.action.success.reset_password', domain: 'admin'),
+        ]);
+    }
+
+    #[Route('/app/user/{id}/resend-invitation', name: 'app_user_resend_invitation', methods: ['POST'])]
+    public function resendInvitation(Request $request, string $id): JsonResponse
+    {
+        $userDTO = $this->userFacade->getUser($id);
+
+        if (!$userDTO instanceof UserDTO) {
+            throw new NotFoundHttpException(sprintf('User "%s" not found.', $id));
+        }
+
+        $token = $request->request->getString('_token');
+        if (!$this->isCsrfTokenValid(sprintf('resendInvitation%s', $id), $token)) {
+            return $this->json([
+                'success' => false,
+                'message' => $this->translator->trans('user.action.error.invalid_csrf', domain: 'admin'),
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        if ($userDTO->isActive) {
+            return $this->json([
+                'success' => false,
+                'message' => $this->translator->trans('user.action.error.user_already_active', domain: 'admin'),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        if (!$this->userFacade->hasPendingInvitation($id)) {
+            return $this->json([
+                'success' => false,
+                'message' => $this->translator->trans('user.action.error.user_not_invited', domain: 'admin'),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            $invitationDTO = $this->userFacade->issueUserInvitation($id);
+        } catch (ConcurrentInvitationException $e) {
+            $this->logger->error(sprintf('[USER][RESEND-INVITATION]: Concurrent resend detected for user %s: %s', $id, $e->getMessage()));
+
+            return $this->json([
+                'success' => false,
+                'message' => $this->translator->trans('user.action.error.resend_conflict', domain: 'admin'),
+            ], Response::HTTP_CONFLICT);
+        }
+
+        if (!$invitationDTO instanceof InvitationDTO) {
+            return $this->json([
+                'success' => false,
+                'message' => $this->translator->trans('user.action.error.resend_failed', domain: 'admin'),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            $this->emailFacade->sendInvitationEmail($invitationDTO);
+        } catch (MessengerExceptionInterface $e) {
+            $this->logger->error(sprintf('Failed to queue invitation email for user %s: %s', $id, $e->getMessage()));
+
+            return $this->json([
+                'success' => false,
+                'message' => $this->translator->trans('user.action.error.invitation_email_failed', domain: 'admin'),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $this->json([
+            'success' => true,
+            'message' => $this->translator->trans('user.action.success.resend_invitation', domain: 'admin'),
         ]);
     }
 }

@@ -28,6 +28,39 @@ services:
             - ./docker/php/conf/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
             - ./docker/php/conf/php.local.ini:/usr/local/etc/php/conf.d/docker-php-local.ini
 
+    worker-async:
+        container_name: app_ooo_worker_async
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+            target: local
+        command: start-worker async
+        restart: unless-stopped
+        environment:
+            MARIADB_TLS_DISABLE_PEER_VERIFICATION: 1
+            WORKER_TIME_LIMIT: 3600
+        volumes:
+            - ./app:/var/www
+        depends_on:
+            - php
+            - db
+
+    worker-scheduler:
+        container_name: app_ooo_worker_scheduler
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+            target: local
+        command: start-worker scheduler_default scheduler_weekly_digest
+        restart: unless-stopped
+        environment:
+            MARIADB_TLS_DISABLE_PEER_VERIFICATION: 1
+        volumes:
+            - ./app:/var/www
+        depends_on:
+            - php
+            - db
+
     db:
         image: mysql:8.4.4
         platform: linux/amd64

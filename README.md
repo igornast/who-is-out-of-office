@@ -43,8 +43,281 @@ The dev fixtures include a default admin account for initial access:
 - **Password:** `123`
 
 > ⚠️ **Important:** This account is only available in development (fixtures are never loaded in production).
-> Create your own admin account before going live.
+> Create your own admin account before going live — see
+> [Create the first admin account](#3-create-the-first-admin-account).
 
+
+## Production Deployment
+
+> ### ⚠️ Never run the development stack against production data
+>
+> The default `docker-compose.yml` is a **development** stack. Its entrypoint runs
+> `doctrine:database:drop --force` and reloads demo fixtures **on every container
+> start** — a single `docker compose up` with that file wipes a production database
+> irrecoverably.
+>
+> Two things keep the two stacks apart, and you need both:
+>
+> 1. **`COMPOSE_FILE=docker-compose.prod.yml` in the root `.env`** (it ships in
+>    `.env.dist`). This pins every *bare* `docker compose …` command in the checkout
+>    to the production stack, so `docker compose up -d` is safe.
+> 2. **Never pass `-f docker-compose.yml`** in a production checkout, and never run
+>    `docker compose` from a directory where the root `.env` is missing. The
+>    `COMPOSE_FILE` guard does not apply in either case.
+>
+> The two stacks also use separate Docker volumes and separate container names, so
+> they cannot silently share a database. See
+> [Moving an existing dev install to production](#moving-an-existing-dev-install-to-production).
+
+For a real deployment use `docker-compose.prod.yml`, which builds the `prod` image
+target, mounts no source volumes, runs with `APP_ENV=prod`, and includes the
+background workers.
+
+### 1. Configure
+
+Two separate files are involved:
+
+- **`.env`** at the repository root — read by docker compose itself, for the database
+  container's credentials and the `COMPOSE_FILE` pin. `cp .env.dist .env` and edit it.
+- **`app/.env.local`** — read by Symfony. Create it with at least:
+
+```dotenv
+APP_ENV=prod
+APP_SECRET=<run: openssl rand -hex 16>
+APP_BASE_URL=https://leave.example.com
+TRUSTED_PROXIES=<your reverse proxy's IP or CIDR>
+TRUSTED_HOSTS='^leave\.example\.com$'
+DATABASE_URL="mysql://ooo:<MYSQL_PASSWORD>@db:3306/ooo_db?serverVersion=8.4.4&charset=utf8mb4"
+MAILER_DSN=smtp://user:pass@smtp.example.com:587
+EMAIL_FROM_ADDRESS=noreply@example.com
+EMAIL_FROM_NAME="Who's OOO"
+TOTP_ENCRYPTION_KEY=<run: openssl rand -base64 32>
+ICAL_SECRET=<run: openssl rand -hex 16>
+MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0
+```
+
+Deactivated users cannot log in, and their existing sessions end on their next request.
+Older installs may have people whose `is_active` flag is still `0`, because the column was
+added without a backfill. Before upgrading, list the accounts that will be locked out
+(read-only):
+
+```sql
+SELECT u.email, u.created_at
+FROM user u
+LEFT JOIN invitation i ON i.user_id = u.id
+WHERE u.is_active = 0 AND i.id IS NULL;
+```
+
+Reactivate the people on that list who should keep access (**Team Members → Edit**).
+After the upgrade they cannot log in until an admin reactivates them.
+
+Use at least 32 characters for `ICAL_SECRET` (`openssl rand -hex 16`); workers log an error
+in production when it is shorter. On an existing install, changing it invalidates every
+calendar subscription URL your users have already added.
+
+Do not `cp app/.env app/.env.local` — that file ships `APP_ENV=dev` and a MailPit
+`MAILER_DSN`. The credentials in `DATABASE_URL` must match the `MYSQL_*` values in
+the root `.env`.
+
+### TLS and reverse proxies
+
+**This app does not terminate TLS.** `docker-compose.prod.yml` publishes plain HTTP on
+port `80`; you are expected to put a TLS-terminating reverse proxy (nginx, Caddy,
+Traefik, a cloud load balancer…) in front of it and let that proxy speak HTTPS to the
+outside world.
+
+When you do, you **must** set `TRUSTED_PROXIES` in `app/.env.local` to the address the
+proxy connects from. Without it Symfony ignores the `X-Forwarded-*` headers, believes every
+request arrived over plain `http`, and consequently:
+
+- session cookies are issued **without the `Secure` flag**;
+- absolute URLs generated inside a request come out as `http://`.
+
+```dotenv
+# One or more comma-separated IPs / CIDRs — only the proxy's own address.
+# 172.18.0.1 below is an example; replace it with your reverse proxy's address
+# or your compose network gateway.
+TRUSTED_PROXIES=172.18.0.1
+```
+
+Do **not** use `REMOTE_ADDR` or `PRIVATE_SUBNETS` unless port 80 is reachable by the proxy
+and nothing else. Trusting a client that is not your proxy lets it forge its IP, scheme and
+host. `docker-compose.prod.yml` publishes port 80 on all interfaces (IPv4 and IPv6) by
+default; when the proxy runs on the same host, set `HTTP_BIND_ADDRESS=127.0.0.1` in the
+root `.env`.
+
+Also set `TRUSTED_HOSTS` to a regular expression matching your public host name(s).
+Symfony then rejects requests carrying any other `Host` header with a `400`. It is empty
+by default, which accepts any host:
+
+```dotenv
+TRUSTED_HOSTS='^leave\.example\.com$'
+```
+
+`APP_BASE_URL` is separate and still required: it is what CLI-generated links (emails
+sent from workers and cron) use, since those run outside any HTTP request. It must have no
+trailing slash.
+
+### 2. Start
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml exec php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+### 3. Create the first admin account
+
+Fixtures are never loaded in prod and the app is invitation-only, so a fresh install
+has no way to log in until you insert an admin row by hand. Every later account can be
+created through the UI (**Team Members → Add**, which sends an invitation email).
+
+> This is a known rough edge. A `bin/console app:user:create-admin` bootstrap command
+> would be a sensible follow-up; until then, the recipe below is the supported path.
+
+First generate an Argon2id hash for the password you want:
+
+```bash
+docker compose -f docker-compose.prod.yml exec php \
+    bin/console security:hash-password 'your-password' 'App\Infrastructure\Doctrine\Entity\User'
+```
+
+Copy the `Password hash` value. Then open a MySQL shell **inside the container** and
+paste the statement below — do not try to inline the hash into a host shell command,
+because it is full of `$` characters that the host shell will expand and silently
+corrupt:
+
+```bash
+docker compose -f docker-compose.prod.yml exec db mysql -u root -p ooo_db
+```
+
+```sql
+INSERT INTO user (
+    id, first_name, last_name, email, password, roles,
+    annual_leave_allowance, current_leave_balance,
+    is_active, is_email_notifications_enabled, celebrate_work_anniversary,
+    working_days, backup_codes, is_two_factor_enabled,
+    absence_balance_reset_day, theme_preference, palette_preference,
+    created_at, updated_at
+) VALUES (
+    UUID(), 'Ada', 'Lovelace', 'admin@example.com',
+    '$argon2id$v=19$m=65536,t=4,p=1$REPLACE$WITH_THE_HASH_FROM_ABOVE',
+    '["ROLE_ADMIN"]',
+    30, 30,
+    1, 1, 1,
+    '[1, 2, 3, 4, 5]', '[]', 0,
+    MAKEDATE(YEAR(CURRENT_DATE()), 1), 'auto', 'teal',
+    NOW(), NOW()
+);
+```
+
+Notes on the values:
+
+- Every column listed is `NOT NULL`. Most have no usable default, so they must be
+  supplied; `theme_preference`, `palette_preference` and `is_two_factor_enabled` do
+  have defaults and are spelled out only so the row is explicit. Everything omitted
+  (`profile_image_url`, `birth_date`, `contract_started_at`, `manager_id`,
+  `holiday_calendar_id`, `totp_secret`, `subdivision_code`, …) is nullable and can be
+  filled in later from the profile page.
+- `roles` and `working_days` are JSON columns — the quoting above is exact.
+  `ROLE_USER` is added automatically at runtime, so `["ROLE_ADMIN"]` is enough.
+- `is_active` **must** be `1`; inactive users are hidden from team lists and calendars.
+- `working_days` is a list of ISO weekday numbers (`1` = Monday).
+- `absence_balance_reset_day` is the yearly leave-balance reset date; 1 January of the
+  current year is the usual choice.
+
+Log in at `https://your-domain/login`, then change the password and set up 2FA from
+**Profile → Security**.
+
+### The background workers are required
+
+Emails, Slack notifications and every scheduled job are dispatched through Symfony
+Messenger. **If nothing consumes the queue, no email is ever sent** — the messages
+simply accumulate in the `messenger_messages` table. Two services handle this:
+
+| Service | Transport | What breaks without it |
+|---|---|---|
+| `worker-async` | `async` | Invitation emails, leave-request notification emails, auto-approval messages |
+| `worker-scheduler` | `scheduler_default` | Leave-request auto-approve (5 min), Slack status sync (20 min), `app:feed:sync` (6 h), password-reset-token cleanup and absence-balance reset (daily), holiday-calendar sync (yearly) |
+| `worker-scheduler` | `scheduler_weekly_digest` | The Slack weekly digest |
+
+They are split because the scheduler must not be restarted on a timer: schedules are
+stateless, so a restart recomputes the next run from "now" and can skip a job that
+was due during the gap.
+
+Check they are alive with:
+
+```bash
+docker compose -f docker-compose.prod.yml logs worker-async worker-scheduler
+```
+
+A growing `messenger_messages` table is the symptom of a stopped worker. Messages that
+fail repeatedly land in the `failed` queue instead of being discarded:
+
+```bash
+docker compose -f docker-compose.prod.yml exec php bin/console messenger:failed:show
+docker compose -f docker-compose.prod.yml exec php bin/console messenger:failed:retry
+```
+
+### Testing your mail configuration
+
+Symfony's built-in `mailer:test` command hardcodes `from@example.org` as the sender,
+which many SMTP providers reject. Pass your own sender explicitly:
+
+```bash
+docker compose -f docker-compose.prod.yml exec php bin/console mailer:test you@example.com --from noreply@example.com
+```
+
+### Backups
+
+All application data lives in the `whoisooo-prod_mysql_prod` named volume, and uploaded
+profile images in `whoisooo-prod_uploads`. Neither is backed up for you:
+
+```bash
+docker compose -f docker-compose.prod.yml exec -T db \
+    sh -c 'exec mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" ooo_db' \
+    | gzip > backup-$(date +%F).sql.gz
+```
+
+The `sh -c '…'` wrapper with **single** quotes is deliberate: `$MYSQL_ROOT_PASSWORD` must
+expand inside the container, where the variable is set. Written as
+`-p"$MYSQL_ROOT_PASSWORD"` directly, your host shell expands it first — and since the
+root `.env` is not exported into your shell, it expands to an empty password and the
+dump fails.
+
+Profile images:
+
+```bash
+docker run --rm -v whoisooo-prod_uploads:/data -v "$PWD":/backup alpine \
+    tar czf /backup/uploads-$(date +%F).tar.gz -C /data .
+```
+
+### Moving an existing dev install to production
+
+The development and production stacks deliberately use **different Docker volumes**
+(`who-is-out-of-office_mysql` vs `whoisooo-prod_mysql_prod`) and different container
+names. Switching a running dev install to `docker-compose.prod.yml` therefore starts
+against an **empty database** — your data does not migrate itself, and MySQL will not
+re-apply the `MYSQL_*` credentials to an already-initialised datadir either.
+
+Dump from the old volume and restore into the new one:
+
+```bash
+# 1. Dump from the dev stack (dev db has no root password)
+docker compose -f docker-compose.yml exec -T db \
+    sh -c 'exec mysqldump -u root ooo_db' > dev-dump.sql
+
+# 2. Bring up the prod stack and run migrations
+docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml exec php bin/console doctrine:migrations:migrate --no-interaction
+
+# 3. Restore
+docker compose -f docker-compose.prod.yml exec -T db \
+    sh -c 'exec mysql -u root -p"$MYSQL_ROOT_PASSWORD" ooo_db' < dev-dump.sql
+```
+
+Copy `whoisooo-prod_uploads` across the same way if the dev install has profile images
+worth keeping. **Stop the dev stack before you start the prod one** — both publish port
+`80`.
 
 ## Application Settings
 
