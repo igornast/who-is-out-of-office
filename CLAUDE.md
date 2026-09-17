@@ -353,7 +353,7 @@ SLACK_AR_HR_DIGEST_CHANNEL_ID=
 - Leave requests can be exported as iCalendar feeds
 - Secured with hash-based verification
 - Accessible via `/api/calendar/{userId}/{hash}.ics`
-- `SecretConfigurationSubscriber` logs an error on every console command in prod when `ICAL_SECRET` is shorter than 32 characters. It never throws: rotating the secret invalidates every existing calendar subscription URL, so that is left to the operator.
+- `SecretConfigurationSubscriber` logs a warning on every console command in prod when `ICAL_SECRET` is shorter than 32 characters. It never throws: rotating the secret invalidates every existing calendar subscription URL, so that is left to the operator. Note that prod monolog is `fingers_crossed` with `action_level: error` and no `passthru_level`, so this warning is buffered and surfaces only if an error occurs in the same process — deliberate, to avoid nagging existing installs.
 
 #### Date Nager Integration
 - External API for fetching public holidays by country

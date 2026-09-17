@@ -111,7 +111,7 @@ WHERE u.is_active = 0 AND i.id IS NULL;
 Reactivate the people on that list who should keep access (**Team Members → Edit**).
 After the upgrade they cannot log in until an admin reactivates them.
 
-Use at least 32 characters for `ICAL_SECRET` (`openssl rand -hex 16`); workers log an error
+Use at least 32 characters for `ICAL_SECRET` (`openssl rand -hex 16`); workers log a warning
 in production when it is shorter. On an existing install, changing it invalidates every
 calendar subscription URL your users have already added.
 

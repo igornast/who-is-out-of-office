@@ -7,9 +7,9 @@ use App\Shared\Enum\AppEnvironmentEnum;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 
-it('logs an error when prod uses a short iCal secret', function (): void {
+it('logs a warning when prod uses a short iCal secret', function (): void {
     $logger = mock(LoggerInterface::class);
-    $logger->expects('error')->withArgs(
+    $logger->expects('warning')->withArgs(
         fn (string $message): bool => str_contains($message, '[CONFIG][ICAL-SECRET]')
             && str_contains($message, '32')
             && !str_contains($message, 'not-so-secret')
@@ -18,9 +18,9 @@ it('logs an error when prod uses a short iCal secret', function (): void {
     new SecretConfigurationSubscriber('not-so-secret', AppEnvironmentEnum::PROD->value, $logger)->warnAboutWeakSecrets();
 });
 
-it('logs an error when prod has an empty iCal secret', function (): void {
+it('logs a warning when prod has an empty iCal secret', function (): void {
     $logger = mock(LoggerInterface::class);
-    $logger->expects('error')->withArgs(
+    $logger->expects('warning')->withArgs(
         fn (string $message): bool => str_contains($message, '[CONFIG][ICAL-SECRET]')
     );
 
@@ -29,14 +29,14 @@ it('logs an error when prod has an empty iCal secret', function (): void {
 
 it('stays quiet when prod has a long enough iCal secret', function (): void {
     $logger = mock(LoggerInterface::class);
-    $logger->expects('error')->never();
+    $logger->expects('warning')->never();
 
     new SecretConfigurationSubscriber(str_repeat('a', 32), AppEnvironmentEnum::PROD->value, $logger)->warnAboutWeakSecrets();
 });
 
 it('stays quiet outside prod', function (): void {
     $logger = mock(LoggerInterface::class);
-    $logger->expects('error')->never();
+    $logger->expects('warning')->never();
 
     new SecretConfigurationSubscriber('not-so-secret', 'dev', $logger)->warnAboutWeakSecrets();
 });

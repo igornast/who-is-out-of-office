@@ -41,7 +41,7 @@ class SecretConfigurationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->logger->error(sprintf(
+        $this->logger->warning(sprintf(
             '[CONFIG][ICAL-SECRET]: ICAL_SECRET is shorter than %d characters in prod, so calendar feed URLs may be guessable. Generate a new one with "openssl rand -hex 16". Changing it invalidates every existing calendar subscription URL.',
             self::MIN_ICAL_SECRET_LENGTH,
         ));
