@@ -5,6 +5,8 @@ cd /var/www
 
 chown -R www-data var
 
+seed-app-settings
+
 echo "Compiling the asset map..."
 php bin/console asset-map:compile
 

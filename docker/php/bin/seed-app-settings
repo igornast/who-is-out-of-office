@@ -1,0 +1,29 @@
+#!/bin/sh
+set -e
+
+# The settings file lives on a volume shared by php and the workers, so a change saved
+# in the UI reaches every container and survives rebuilds. On an empty volume, seed it
+# from the defaults baked into the image. `ln` fails if the file already exists, so
+# concurrent starts never overwrite saved settings.
+
+case "${APP_SETTINGS_FILE:-}" in
+    /*) ;;
+    *) exit 0 ;;
+esac
+
+defaults=/var/www/src/Module/Settings/Config/app_setting.yaml
+settings_dir=$(dirname "$APP_SETTINGS_FILE")
+
+mkdir -p "$settings_dir"
+
+if [ ! -f "$APP_SETTINGS_FILE" ]; then
+    tmp=$(mktemp "$settings_dir/.app_setting.XXXXXX")
+    cp "$defaults" "$tmp"
+    if ln "$tmp" "$APP_SETTINGS_FILE" 2>/dev/null; then
+        echo "Seeded $APP_SETTINGS_FILE with the default settings."
+    fi
+    rm -f "$tmp"
+fi
+
+chown www-data:www-data "$settings_dir" "$APP_SETTINGS_FILE"
+chmod 0644 "$APP_SETTINGS_FILE"

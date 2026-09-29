@@ -162,6 +162,8 @@ APP_SETTINGS_FILE='%kernel.project_dir%/src/Module/Settings/Config/app_setting.y
 
 This allows you to use different settings files for different environments (dev, staging, production)
 
+The Docker production stack (`docker-compose.prod.yml`) sets `APP_SETTINGS_FILE=/var/www/settings/app_setting.yaml` on a volume shared by `php` and both workers, so settings saved in the UI reach scheduled jobs and survive rebuilds. `docker/php/bin/seed-app-settings` copies the defaults from `Config/app_setting.yaml` onto the volume on first start and never overwrites it afterwards. See [`docs/production-deployment.md`](../../../../docs/production-deployment.md#application-settings).
+
 
 ## Adding New Settings
 

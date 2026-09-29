@@ -26,11 +26,13 @@ services:
             target: prod
         environment:
             APP_ENV: prod
+            APP_SETTINGS_FILE: /var/www/settings/app_setting.yaml
         env_file:
             - ./app/.env.local
         volumes:
             - public_assets:/var/www/public/assets
             - uploads:/var/www/public/uploads
+            - settings:/var/www/settings
         restart: unless-stopped
         depends_on:
             db:
@@ -45,11 +47,13 @@ services:
         command: start-worker async
         environment:
             APP_ENV: prod
+            APP_SETTINGS_FILE: /var/www/settings/app_setting.yaml
             WORKER_TIME_LIMIT: 3600
         env_file:
             - ./app/.env.local
         volumes:
             - uploads:/var/www/public/uploads
+            - settings:/var/www/settings
         restart: unless-stopped
         depends_on:
             db:
@@ -64,10 +68,12 @@ services:
         command: start-worker scheduler_default scheduler_weekly_digest
         environment:
             APP_ENV: prod
+            APP_SETTINGS_FILE: /var/www/settings/app_setting.yaml
         env_file:
             - ./app/.env.local
         volumes:
             - uploads:/var/www/public/uploads
+            - settings:/var/www/settings
         restart: unless-stopped
         depends_on:
             db:
@@ -95,3 +101,4 @@ volumes:
     mysql_prod:
     public_assets:
     uploads:
+    settings:

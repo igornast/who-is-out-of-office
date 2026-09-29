@@ -37,7 +37,7 @@ Access the PHP container to run commands:
 docker exec -it app_ooo_php bash
 ```
 
-Production deployments use `docker-compose.prod.yml` (see README) — it builds the `prod`
+Production deployments use `docker-compose.prod.yml` (see [`docs/production-deployment.md`](docs/production-deployment.md)) — it builds the `prod`
 image target and runs the same two workers. The default `docker-compose.yml` is
 development-only: its entrypoint drops and recreates the database on every start.
 
@@ -279,6 +279,7 @@ The application uses Symfony events for cross-cutting concerns:
 - YAML-based application settings (leave request rules, notification preferences)
 - Type-safe access via `SettingsFacade` with enum keys and validated DTOs
 - See [`Module/Settings/README.md`](app/src/Module/Settings/README.md) for available settings, adding new ones, and architecture details
+- In `docker-compose.prod.yml` the file lives on the shared `settings` volume (`APP_SETTINGS_FILE=/var/www/settings/app_setting.yaml`, set in compose so it overrides `app/.env.local`), mounted by `php` and both workers so UI changes reach scheduled jobs and survive rebuilds. `docker/php/bin/seed-app-settings` (run by `start-fpm` and `start-worker`) copies the image defaults onto an empty volume and chowns the file to `www-data`; it never overwrites an existing file
 
 #### Holiday Module
 - Public holiday calendar management
@@ -361,7 +362,7 @@ SLACK_AR_HR_DIGEST_CHANNEL_ID=
 
 #### Inactive User Blocking
 - `UserChecker` (`Infrastructure/Security/UserChecker.php`) always rejects login for `isActive=false` users, and `InactiveUserSessionListener` logs out a session whose user became inactive
-- `user.is_active` was added without a backfill, so pre-existing users may be `0` — run the README audit query before upgrading an existing install
+- `user.is_active` was added without a backfill, so pre-existing users may be `0` — run the audit query in `docs/production-deployment.md` ("Upgrading an existing install") before upgrading an existing install
 - Never "fix" this with a data migration that sets `is_active = 1`: it would reactivate accounts deactivated on purpose
 
 #### Two-Factor Authentication (2FA)
