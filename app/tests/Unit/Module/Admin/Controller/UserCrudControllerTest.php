@@ -38,3 +38,21 @@ it('uses defaultAnnualAllowance from settings when creating a new user', functio
         ->and($user->annualLeaveAllowance)->toBe(30)
         ->and($user->currentLeaveBalance)->toBe(30);
 });
+
+it('schedules the first balance reset for 1 January next year when creating a new user', function (): void {
+    $this->appSettingsFacade->allows('defaultAnnualAllowance')->andReturn(30);
+
+    $controller = new UserCrudController(
+        roleTranslator: $this->roleTranslator,
+        passwordHasher: $this->passwordHasher,
+        urlGenerator: $this->urlGenerator,
+        csrfTokenManager: $this->csrfTokenManager,
+        appSettingsFacade: $this->appSettingsFacade,
+        userFacade: $this->userFacade,
+    );
+
+    $user = $controller->createEntity(User::class);
+
+    expect($user->absenceBalanceResetDay->format('Y-m-d'))->toBe(sprintf('%d-01-01', (int) date('Y') + 1))
+        ->and($user->absenceBalanceResetDay > new DateTimeImmutable('today'))->toBeTrue();
+});

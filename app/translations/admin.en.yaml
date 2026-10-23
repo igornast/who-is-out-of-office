@@ -277,6 +277,9 @@ crud:
         user: My Organization
 
     user:
+        label:
+            singular: team member
+            plural: team members
         action:
             reset_password: Reset Password
             resend_invitation: Resend Invitation

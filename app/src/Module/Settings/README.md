@@ -39,7 +39,7 @@ Settings/
 | Setting | Type | Description | Default |
 |---------|------|-------------|---------|
 | `auto_approve` | boolean | Enable/disable automatic approval of leave requests | `false` |
-| `auto_approve_delay` | integer | Delay in seconds before automatically approving leave requests | `115` |
+| `auto_approve_delay` | integer | Delay in minutes before automatically approving leave requests | `115` |
 | `default_annual_allowance` | integer | Default number of annual leave days for new users | `25` |
 | `min_notice_days` | integer | Minimum number of days notice required for leave requests (0 = no minimum) | `1` |
 | `max_consecutive_days` | integer | Maximum consecutive days allowed per leave request (0 = unlimited) | `0` |
@@ -140,7 +140,7 @@ public function someMethod(): void
     // Update all settings
     $newSettings = new AppSettingsDTO(
         autoApprove: false,
-        autoApproveDelay: 3600,
+        autoApproveDelay: 60,
         defaultAnnualAllowance: 25,
         minNoticeDays: 1,
         maxConsecutiveDays: 0,
