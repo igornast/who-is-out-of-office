@@ -34,7 +34,7 @@ class UserDTO
         public ?\DateTimeImmutable $birthDate = null,
         public ?\DateTimeImmutable $contractStartedAt = null,
         public ?\DateTimeImmutable $feedLastSeenAt = null,
-        public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
+        public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January next year midnight'),
         public ?string $managerId = null,
         public string $themePreference = 'auto',
         public string $palettePreference = 'teal',

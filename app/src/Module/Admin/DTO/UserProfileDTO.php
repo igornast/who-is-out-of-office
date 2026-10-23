@@ -28,7 +28,7 @@ class UserProfileDTO
         public ?string $removeProfileImage = null,
         public ?\DateTimeImmutable $birthDate = null,
         public ?\DateTimeImmutable $contractStartedAt = null,
-        public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
+        public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January next year midnight'),
         public ?HolidayCalendar $holidayCalendar = null,
         public ?string $subdivisionCode = null,
         #[Assert\Image(maxSize: '2M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'])]

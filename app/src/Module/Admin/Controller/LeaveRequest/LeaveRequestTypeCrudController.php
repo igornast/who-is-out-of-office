@@ -43,6 +43,11 @@ class LeaveRequestTypeCrudController extends AppAbstractCrudController
     {
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->update(
+                Crud::PAGE_INDEX,
+                Action::NEW,
+                static fn (Action $action): Action => $action->setLabel('crud.absence_request_type.action.new'),
+            )
             ->disable(Action::DELETE);
     }
 

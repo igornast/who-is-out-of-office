@@ -52,7 +52,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         public array $roles = [RoleEnum::User->value],
         public array $workingDays = [1, 2, 3, 4, 5],
         public array $backupCodes = [],
-        public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January'),
+        public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January next year midnight'),
         public ?\DateTimeImmutable $birthDate = null,
         public ?\DateTimeImmutable $contractStartedAt = null,
         public ?\DateTimeImmutable $feedLastSeenAt = null,

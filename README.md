@@ -75,7 +75,7 @@ stored in a YAML file. On the Docker production stack that file lives on a share
 | Setting | What it does |
 |---|---|
 | `leave_request.auto_approve` | Approve leave requests automatically |
-| `leave_request.auto_approve_delay` | Seconds to wait before auto-approving |
+| `leave_request.auto_approve_delay` | Minutes to wait before auto-approving |
 | `leave_request.default_annual_allowance` | Annual leave days for new users |
 | `leave_request.min_notice_days` | Minimum notice for a leave request, in days (0 means no minimum) |
 | `leave_request.max_consecutive_days` | Maximum consecutive days per request (0 means unlimited) |
@@ -256,8 +256,9 @@ Leave it blank and you get `:calendar:`.
 
 #### User opt-out
 
-Users can turn status sync off for their own account in Profile Settings. The toggle shows up
-once an admin has authorized status sync and the user has added their Slack member ID.
+Users can turn status sync off for their own account in Profile Settings. The toggle is in the
+Slack member ID dialog and shows up as soon as an admin turns on Slack status sync in App
+Settings, even before anyone has authorized it. Statuses only change once it is authorized.
 
 #### Revoking access
 

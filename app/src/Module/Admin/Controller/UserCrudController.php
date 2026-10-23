@@ -57,7 +57,10 @@ class UserCrudController extends AppAbstractCrudController
     {
         $crud->setSearchFields(['firstName', 'lastName', 'email']);
 
-        return $crud->setPageTitle(Action::INDEX, 'crud.title.user');
+        return $crud
+            ->setEntityLabelInSingular('crud.user.label.singular')
+            ->setEntityLabelInPlural('crud.user.label.plural')
+            ->setPageTitle(Action::INDEX, 'crud.title.user');
     }
 
     public function configureFilters(Filters $filters): Filters

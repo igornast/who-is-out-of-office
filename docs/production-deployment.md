@@ -269,6 +269,37 @@ on purpose.
 If the list includes `admin@whoisooo.app`, don't reactivate it; delete it as described in
 [Create the first admin account](#4-create-the-first-admin-account).
 
+### Leave balances added by mistake before this fix
+
+Older versions could add one year's allowance too many to a user's balance:
+
+- A user created in the admin panel got a balance reset day of 1 January of the year they were
+  created. That date had already passed, even for someone created on 1 January, because the
+  reset runs at midnight. The first nightly reset after the user was active added a second
+  allowance on top of the one they were created with.
+- The upgrade that introduced the reset day (migration `Version20260207000000`) set it to
+  1 January of the year it ran for every existing user. The first nightly reset after that
+  upgrade added an allowance to every active user, and to inactive users once they were
+  activated. If you had already set balances for that year, that allowance was one too many.
+
+Each affected user got exactly one extra allowance. Resets add to the balance, so that extra
+allowance is still in it today. Users created after their reset day who haven't been activated yet
+(for example, invited users created this year who haven't accepted) are handled by the fix and
+won't receive it.
+
+This read-only query lists everyone with their balance, oldest account first:
+
+```sql
+SELECT email, is_active, created_at, annual_leave_allowance, current_leave_balance,
+       absence_balance_reset_day
+FROM user
+ORDER BY created_at;
+```
+
+Check each balance and correct any that are too high in My Organization → Edit. Don't fix this
+with a blanket `UPDATE`: some admins changed the reset day when creating a user, or adjusted the
+balance afterwards, and those balances are already correct.
+
 ## Backups
 
 Nothing is backed up for you. Application data lives in the `whoisooo-prod_mysql_prod` volume,
