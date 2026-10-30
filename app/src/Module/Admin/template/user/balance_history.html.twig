@@ -1,0 +1,71 @@
+{% extends '@AppAdmin/layout.html.twig' %}
+
+{% block content_title %}{{ target_user.getFullName() }} &middot; {{ 'balance_history.title'|trans(domain: 'admin') }}{% endblock %}
+
+{% block main %}
+    <div class="content-header">
+        <h1 class="title">{{ target_user.getFullName() }} &middot; {{ 'balance_history.title'|trans(domain: 'admin') }}</h1>
+        <p class="text-secondary">{{ 'balance_history.admin_subtitle'|trans(domain: 'admin') }}</p>
+    </div>
+
+    {% if periods is empty %}
+        <div class="alert alert-secondary">{{ 'balance_history.empty'|trans(domain: 'admin') }}</div>
+    {% else %}
+        {% include '@AppAdmin/balance_history/_period_selector.html.twig' with {route: 'app_user_balance_history', route_params: {'id': target_user.id}} %}
+
+        {% include '@AppAdmin/balance_history/_statement.html.twig' %}
+
+        <p class="text-secondary small">{{ 'balance_history.attribution_note'|trans(domain: 'admin') }}</p>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{{ 'balance_history.table.date'|trans(domain: 'admin') }}</th>
+                        <th>{{ 'balance_history.table.description'|trans(domain: 'admin') }}</th>
+                        <th>{{ 'balance_history.table.source'|trans(domain: 'admin') }}</th>
+                        <th>{{ 'balance_history.table.actor'|trans(domain: 'admin') }}</th>
+                        <th class="text-end">{{ 'balance_history.table.transition'|trans(domain: 'admin') }}</th>
+                        <th class="text-end">{{ 'balance_history.table.change'|trans(domain: 'admin') }}</th>
+                        <th class="text-end">{{ 'balance_history.table.balance_after'|trans(domain: 'admin') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                        <tr>
+                            <td>{{ entry.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>
+                                {{ ('balance_history.type.' ~ entry.type.value)|trans(domain: 'admin') }}
+                                {% if entry.leaveTypeName %}
+                                    &middot; {{ entry.leaveTypeName }}
+                                    ({{ entry.leaveRequestStartDate|date('Y-m-d') }} &ndash; {{ entry.leaveRequestEndDate|date('Y-m-d') }})
+                                {% endif %}
+                                {% if entry.reason %}
+                                    <span class="text-secondary d-block small">{{ entry.reason }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ('balance_history.source.' ~ entry.source.value)|trans(domain: 'admin') }}</td>
+                            <td>{{ entry.actorName ?? ('balance_history.actor.system'|trans(domain: 'admin')) }}</td>
+                            <td class="text-end">{{ entry.balanceBefore }} &rarr; {{ entry.balanceAfter }}</td>
+                            <td class="text-end">{{ entry.delta > 0 ? '+' }}{{ entry.delta }}</td>
+                            <td class="text-end">{{ entry.balanceAfter }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="7" class="text-center text-secondary">{{ 'balance_history.empty'|trans(domain: 'admin') }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if has_previous_page or has_next_page %}
+            <nav class="d-flex justify-content-between" aria-label="{{ 'balance_history.pagination.label'|trans(domain: 'admin') }}">
+                {% if has_previous_page %}
+                    <a data-balance-page="previous" class="btn btn-secondary" href="{{ path('app_user_balance_history', {'id': target_user.id, 'period': selected_period.id, 'page': page - 1}) }}">{{ 'balance_history.pagination.previous'|trans(domain: 'admin') }}</a>
+                {% else %}<span></span>{% endif %}
+                {% if has_next_page %}
+                    <a data-balance-page="next" class="btn btn-secondary" href="{{ path('app_user_balance_history', {'id': target_user.id, 'period': selected_period.id, 'page': page + 1}) }}">{{ 'balance_history.pagination.next'|trans(domain: 'admin') }}</a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    {% endif %}
+{% endblock %}

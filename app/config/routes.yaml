@@ -2,6 +2,7 @@ easyadmin:
     resource: ../src/Module/**/*Controller.php
     type: easyadmin.routes
 
+# Attribute routes for modular application controllers.
 module.controllers:
     resource: ../src/Module/**/*Controller.php
     type: attribute

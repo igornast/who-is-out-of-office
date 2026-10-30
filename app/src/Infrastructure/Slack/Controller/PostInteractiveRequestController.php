@@ -37,6 +37,10 @@ class PostInteractiveRequestController extends AbstractController
 
         $leaveRequestDTO = $this->slackFacade->handleInteractiveNotification($notificationDTO);
 
+        if (null === $leaveRequestDTO) {
+            return new JsonResponse(null);
+        }
+
         if ($leaveRequestDTO->isAutoApproved) {
             return new JsonResponse(null);
         }

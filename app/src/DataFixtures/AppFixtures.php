@@ -19,6 +19,11 @@ class AppFixtures extends Fixture
             $manager->persist($object);
         }
 
+        $builder = new BalanceLedgerFixtureBuilder();
+        foreach ($builder->build($objectSet) as $entity) {
+            $manager->persist($entity);
+        }
+
         $manager->flush();
     }
 }

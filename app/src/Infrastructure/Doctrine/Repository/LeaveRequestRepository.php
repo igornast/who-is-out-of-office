@@ -11,6 +11,7 @@ use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -29,6 +30,19 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         $leaveRequest = $this->findOneBy(['id' => $id]);
 
         return null !== $leaveRequest ? LeaveRequestDTO::fromEntity($leaveRequest) : null;
+    }
+
+    public function findByIdForUpdate(string $id): ?LeaveRequestDTO
+    {
+        $leaveRequest = $this->find($id);
+
+        if (!$leaveRequest instanceof LeaveRequest) {
+            return null;
+        }
+
+        $this->getEntityManager()->refresh($leaveRequest, LockMode::PESSIMISTIC_WRITE);
+
+        return LeaveRequestDTO::fromEntity($leaveRequest);
     }
 
     public function saveLeaveRequest(LeaveRequestDTO $leaveRequestDTO): void
@@ -56,6 +70,19 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
         );
 
         $this->getEntityManager()->persist($leaveRequest);
+    }
+
+    public function discardPending(LeaveRequestDTO $leaveRequestDTO): void
+    {
+        $leaveRequest = $this->find($leaveRequestDTO->id);
+
+        if ($leaveRequest instanceof LeaveRequest) {
+            $this->getEntityManager()->detach($leaveRequest);
+        }
+    }
+
+    public function flush(): void
+    {
         $this->getEntityManager()->flush();
     }
 
@@ -474,6 +501,11 @@ class LeaveRequestRepository extends ServiceEntityRepository implements LeaveReq
     public function rollback(): void
     {
         $this->getEntityManager()->rollback();
+    }
+
+    public function isTransactionActive(): bool
+    {
+        return $this->getEntityManager()->getConnection()->isTransactionActive();
     }
 
     /**

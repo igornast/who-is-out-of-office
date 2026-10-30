@@ -11,7 +11,7 @@ class HasWorkdaysAndBalance extends Constraint
 {
     public string $noWorkdaysMessage = 'The selected range does not include any workdays.';
 
-    public string $notEnoughBalanceMessage = 'Your leave balance is insufficient for this request.';
+    public string $notEnoughBalanceMessage = 'leave_request.validation.insufficient_balance';
 
     public string $minNoticeDaysMessage = 'Leave requests must be submitted at least {{ days }} days in advance.';
 

@@ -82,6 +82,12 @@
                 <i data-lucide="calendar-days"></i>
                 <span class="ooo-sidebar-label">{{ 'menu.items.calendar'|trans(domain: 'admin') }}</span>
             </a>
+            <a class="ooo-sidebar-item {{ _current_route == 'app_balance_history' ? 'active' }}"
+               href="{{ path('app_balance_history') }}"
+               title="{{ 'menu.items.balance_history'|trans(domain: 'admin') }}">
+                <i data-lucide="receipt-text"></i>
+                <span class="ooo-sidebar-label">{{ 'menu.items.balance_history'|trans(domain: 'admin') }}</span>
+            </a>
 
             {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_MANAGER') %}
                 <div class="ooo-sidebar-section-label">{{ 'sidebar.section.my_team'|trans(domain: 'admin') }}</div>

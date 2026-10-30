@@ -133,5 +133,6 @@ it('dashboard displays vacation balance for logged-in user', function (): void {
 
     expect($content)
         ->toContain('My Vacation Balance')
+        ->toContain('Used days are attributed to the leave period containing the absence start date.')
         ->toContain('24');
 });

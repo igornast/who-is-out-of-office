@@ -1,0 +1,15 @@
+<div class="balance-statement mb-3">
+    {% for item in [
+        {key: 'opened', value: statement.openingBalance},
+        {key: 'granted', value: statement.granted},
+        {key: 'used', value: statement.used|abs},
+        {key: 'restored', value: statement.restored},
+        {key: 'adjusted', value: (statement.adjusted > 0 ? '+' : '') ~ statement.adjusted},
+        {key: 'current', value: statement.currentBalance},
+    ] %}
+        <div class="balance-statement-item{{ item.key == 'current' ? ' balance-statement-item-current' }}">
+            <span class="balance-statement-label">{{ ('balance_history.statement.' ~ item.key)|trans(domain: 'admin') }}</span>
+            <span class="balance-statement-value">{{ item.value }}</span>
+        </div>
+    {% endfor %}
+</div>

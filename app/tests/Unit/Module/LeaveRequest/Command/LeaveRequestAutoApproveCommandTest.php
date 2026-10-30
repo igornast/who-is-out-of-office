@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Module\LeaveRequest\Command\LeaveRequestAutoApproveCommand;
 use App\Module\LeaveRequest\Message\LeaveRequestAutoApprovedMessage;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestDTOFixture;
@@ -128,10 +129,13 @@ it('approves pending leave requests and dispatches messages', function () {
         ->andReturn($pendingRequests);
 
     $this->leaveRequestFacade
-        ->expects('update')
+        ->expects('updateAndRestoreBalanceIfNeeded')
         ->twice()
-        ->withArgs(fn ($leaveRequestDTO) => LeaveRequestStatusEnum::Approved === $leaveRequestDTO->status
-                && true === $leaveRequestDTO->isAutoApproved);
+        ->withArgs(fn ($leaveRequestDTO, $source, $actorUserId) => LeaveRequestStatusEnum::Approved === $leaveRequestDTO->status
+                && true === $leaveRequestDTO->isAutoApproved
+                && BalanceLedgerSourceEnum::Scheduler === $source
+                && null === $actorUserId)
+        ->andReturn(true);
 
     $this->messageBus
         ->expects('dispatch')
@@ -177,9 +181,10 @@ it('approves single pending leave request with correct message id', function () 
         ->andReturn([$leaveRequest]);
 
     $this->leaveRequestFacade
-        ->expects('update')
+        ->expects('updateAndRestoreBalanceIfNeeded')
         ->once()
-        ->with($leaveRequest);
+        ->with($leaveRequest, BalanceLedgerSourceEnum::Scheduler, null)
+        ->andReturn(true);
 
     $this->messageBus
         ->expects('dispatch')
@@ -191,4 +196,17 @@ it('approves single pending leave request with correct message id', function () 
     expect($result)->toBe(Command::SUCCESS)
         ->and($leaveRequest->status)->toBe(LeaveRequestStatusEnum::Approved)
         ->and($leaveRequest->isAutoApproved)->toBeTrue();
+});
+
+it('does not dispatch when another transition won the race', function () {
+    $leaveRequest = LeaveRequestDTOFixture::create(['status' => LeaveRequestStatusEnum::Pending]);
+
+    $this->appSettingsFacade->expects('isAutoApprove')->once()->andReturn(true);
+    $this->appSettingsFacade->expects('autoApproveDelay')->once()->andReturn(5);
+    $this->logger->expects('info')->twice();
+    $this->leaveRequestFacade->expects('getPendingLeaveRequests')->once()->andReturn([$leaveRequest]);
+    $this->leaveRequestFacade->expects('updateAndRestoreBalanceIfNeeded')->once()->andReturn(false);
+    $this->messageBus->expects('dispatch')->never();
+
+    expect(($this->command)())->toBe(Command::SUCCESS);
 });

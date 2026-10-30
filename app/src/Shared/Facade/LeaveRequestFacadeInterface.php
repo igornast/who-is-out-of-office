@@ -10,6 +10,7 @@ use App\Shared\DTO\Dashboard\LeaveBalanceDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 
@@ -21,9 +22,11 @@ interface LeaveRequestFacadeInterface
 
     public function getLeaveTypeById(string $id): ?LeaveRequestTypeDTO;
 
-    public function update(LeaveRequestDTO $leaveRequestDTO): void;
-
-    public function updateAndRestoreBalanceIfNeeded(LeaveRequestDTO $leaveRequestDTO): void;
+    public function updateAndRestoreBalanceIfNeeded(
+        LeaveRequestDTO $leaveRequestDTO,
+        BalanceLedgerSourceEnum $source = BalanceLedgerSourceEnum::App,
+        ?string $actorUserId = null,
+    ): bool;
 
     public function save(SaveLeaveRequestCommand $command): void;
 

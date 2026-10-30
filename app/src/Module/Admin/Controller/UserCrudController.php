@@ -100,6 +100,18 @@ class UserCrudController extends AppAbstractCrudController
             ->addCssClass('btn btn-outline')
             ->displayIf(fn (User $entity) => $this->isAdmin() && !$entity->isActive && $this->userFacade->hasPendingInvitation($entity->id->toString()));
 
+        $adjustBalanceAction = Action::new('adjustBalance', 'crud.user.action.adjust_balance')
+            ->linkToUrl(fn (User $entity) => $this->urlGenerator->generate('app_user_adjust_balance', ['id' => $entity->id]))
+            ->setIcon('icon-sliders')
+            ->addCssClass('btn btn-outline')
+            ->displayIf(fn (User $entity) => $this->isAdmin());
+
+        $balanceHistoryAction = Action::new('balanceHistory', 'crud.user.action.balance_history')
+            ->linkToUrl(fn (User $entity) => $this->urlGenerator->generate('app_user_balance_history', ['id' => $entity->id]))
+            ->setIcon('icon-receipt')
+            ->addCssClass('btn btn-outline')
+            ->displayIf(fn (User $entity) => $this->isAdmin());
+
         return $actions
             ->setPermission(Action::NEW, RoleEnum::Admin->value)
             ->setPermission(Action::DELETE, RoleEnum::Admin->value)
@@ -108,7 +120,10 @@ class UserCrudController extends AppAbstractCrudController
             ->add(Crud::PAGE_DETAIL, $resetPasswordAction)
             ->add(Crud::PAGE_EDIT, $resetPasswordAction)
             ->add(Crud::PAGE_DETAIL, $resendInvitationAction)
-            ->add(Crud::PAGE_EDIT, $resendInvitationAction);
+            ->add(Crud::PAGE_EDIT, $resendInvitationAction)
+            ->add(Crud::PAGE_DETAIL, $adjustBalanceAction)
+            ->add(Crud::PAGE_DETAIL, $balanceHistoryAction)
+            ->add(Crud::PAGE_EDIT, $balanceHistoryAction);
     }
 
     public function configureFields(string $pageName): iterable
@@ -141,10 +156,12 @@ class UserCrudController extends AppAbstractCrudController
             yield FormField::addFieldset('Absence Balance');
             yield NumberField::new('annualLeaveAllowance')->hideOnIndex();
             yield NumberField::new('currentLeaveBalance')
-                ->setHelp('The number of available holiday days for the employee.')
-                ->hideOnIndex();
+                ->setHelp('crud.user.help.current_leave_balance')
+                ->hideOnIndex()
+                ->hideOnForm();
             yield DateField::new('absenceBalanceResetDay')
-                ->setHelp('The next date when the absence balance will be reset annually.')
+                ->setHelp('crud.user.help.absence_balance_reset_day')
+                ->setDisabled(Crud::PAGE_EDIT === $pageName)
                 ->hideOnIndex();
 
             yield AssociationField::new('manager')
@@ -191,6 +208,34 @@ class UserCrudController extends AppAbstractCrudController
             annualLeaveAllowance: $allowance,
             currentLeaveBalance: $allowance,
         );
+    }
+
+    /**
+     * @param User $entityInstance
+     */
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $ownsTransaction = !$entityManager->getConnection()->isTransactionActive();
+
+        if ($ownsTransaction) {
+            $entityManager->beginTransaction();
+        }
+
+        try {
+            parent::persistEntity($entityManager, $entityInstance);
+
+            $this->userFacade->openInitialLeavePeriod($entityInstance->id->toString(), true);
+
+            if ($ownsTransaction) {
+                $entityManager->commit();
+            }
+        } catch (\Throwable $throwable) {
+            if ($ownsTransaction) {
+                $entityManager->rollback();
+            }
+
+            throw $throwable;
+        }
     }
 
     /**

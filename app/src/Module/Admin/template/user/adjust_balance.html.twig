@@ -1,0 +1,23 @@
+{% extends '@AppAdmin/layout.html.twig' %}
+
+{% block page_title %}{{ 'user.adjust_balance.title'|trans(domain: 'admin') }}{% endblock %}
+
+{% block content_header %}
+    <div class="content-header-title">
+        <h1 class="title">{{ 'user.adjust_balance.title'|trans(domain: 'admin') }}</h1>
+        <p class="text-secondary">{{ target_user.getFullName() }} &mdash; {{ 'user.adjust_balance.current'|trans(domain: 'admin') }}: <strong>{{ target_user.currentLeaveBalance }}</strong></p>
+    </div>
+{% endblock %}
+
+{% block main %}
+    {{ form_start(form) }}
+        {{ form_errors(form) }}
+        <div class="field-integer form-group">
+            <div class="form-widget">{{ form_row(form.delta, {'attr': {'class': 'form-control'}}) }}</div>
+        </div>
+        <div class="field-text form-group">
+            <div class="form-widget">{{ form_row(form.reason, {'attr': {'class': 'form-control'}}) }}</div>
+        </div>
+        <button type="submit" class="btn btn-primary">{{ 'user.adjust_balance.submit'|trans(domain: 'admin') }}</button>
+    {{ form_end(form) }}
+{% endblock %}

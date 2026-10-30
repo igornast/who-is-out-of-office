@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\LeaveRequest\LeaveRequestActionController;
 use App\Shared\Enum\LeaveRequestPermission;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\EmailFacadeInterface;
@@ -107,8 +108,11 @@ describe('withdraw', function (): void {
         $this->leaveRequestFacade->expects('getById')->andReturn($leaveRequest);
         $this->authChecker->expects('isGranted')->withArgs(fn (string $attr, mixed $subject) => LeaveRequestPermission::Withdraw->value === $attr && $subject === $leaveRequest)->andReturn(true);
         $this->leaveRequestFacade->expects('updateAndRestoreBalanceIfNeeded')
-            ->withArgs(fn (LeaveRequestDTO $dto) => LeaveRequestStatusEnum::Withdrawn === $dto->status)
-            ->once();
+            ->withArgs(fn (LeaveRequestDTO $dto, BalanceLedgerSourceEnum $source, ?string $actorUserId) => LeaveRequestStatusEnum::Withdrawn === $dto->status
+                && BalanceLedgerSourceEnum::App === $source
+                && $this->currentUserId->toString() === $actorUserId)
+            ->once()
+            ->andReturn(true);
         $this->emailFacade->expects('sendLeaveRequestWithdrawnEmail')->once();
 
         $response = $this->controller->withdraw(jsonRequest(), $leaveRequest->id->toString());
@@ -125,7 +129,10 @@ describe('withdraw', function (): void {
 
         $this->leaveRequestFacade->expects('getById')->andReturn($leaveRequest);
         $this->authChecker->expects('isGranted')->withArgs(fn (string $attr, mixed $subject) => LeaveRequestPermission::Withdraw->value === $attr && $subject === $leaveRequest)->andReturn(true);
-        $this->leaveRequestFacade->expects('updateAndRestoreBalanceIfNeeded')->once();
+        $this->leaveRequestFacade->expects('updateAndRestoreBalanceIfNeeded')
+            ->with($leaveRequest, BalanceLedgerSourceEnum::App, $this->currentUserId->toString())
+            ->once()
+            ->andReturn(true);
         $this->emailFacade->expects('sendLeaveRequestWithdrawnEmail')->once();
 
         $response = $this->controller->withdraw(jsonRequest(), $leaveRequest->id->toString());
@@ -207,9 +214,13 @@ describe('approve', function (): void {
 
         $this->leaveRequestFacade->expects('getById')->andReturn($leaveRequest);
         $this->authChecker->expects('isGranted')->withArgs(fn (string $attr, mixed $subject) => LeaveRequestPermission::Manage->value === $attr && $subject === $leaveRequest)->andReturn(true);
-        $this->leaveRequestFacade->expects('update')
-            ->withArgs(fn (LeaveRequestDTO $dto) => LeaveRequestStatusEnum::Approved === $dto->status && null !== $dto->approvedBy)
-            ->once();
+        $this->leaveRequestFacade->expects('updateAndRestoreBalanceIfNeeded')
+            ->withArgs(fn (LeaveRequestDTO $dto, BalanceLedgerSourceEnum $source, ?string $actorUserId) => LeaveRequestStatusEnum::Approved === $dto->status
+                && null !== $dto->approvedBy
+                && BalanceLedgerSourceEnum::App === $source
+                && $this->currentUserId->toString() === $actorUserId)
+            ->once()
+            ->andReturn(true);
         $this->emailFacade->expects('sendLeaveRequestApprovedEmail')->once();
 
         $response = $this->controller->approve(jsonRequest(), $leaveRequest->id->toString());
@@ -226,7 +237,7 @@ describe('approve', function (): void {
 
         $this->leaveRequestFacade->expects('getById')->andReturn($leaveRequest);
         $this->authChecker->expects('isGranted')->withArgs(fn (string $attr, mixed $subject) => LeaveRequestPermission::Manage->value === $attr && $subject === $leaveRequest)->andReturn(true);
-        $this->leaveRequestFacade->expects('update')->once();
+        $this->leaveRequestFacade->expects('updateAndRestoreBalanceIfNeeded')->once()->andReturn(true);
         $this->emailFacade->expects('sendLeaveRequestApprovedEmail')->once();
 
         $response = $this->controller->approve(jsonRequest(), $leaveRequest->id->toString());
@@ -276,8 +287,12 @@ describe('reject', function (): void {
         $this->leaveRequestFacade->expects('getById')->andReturn($leaveRequest);
         $this->authChecker->expects('isGranted')->withArgs(fn (string $attr, mixed $subject) => LeaveRequestPermission::Manage->value === $attr && $subject === $leaveRequest)->andReturn(true);
         $this->leaveRequestFacade->expects('updateAndRestoreBalanceIfNeeded')
-            ->withArgs(fn (LeaveRequestDTO $dto) => LeaveRequestStatusEnum::Rejected === $dto->status && null !== $dto->approvedBy)
-            ->once();
+            ->withArgs(fn (LeaveRequestDTO $dto, BalanceLedgerSourceEnum $source, ?string $actorUserId) => LeaveRequestStatusEnum::Rejected === $dto->status
+                && null !== $dto->approvedBy
+                && BalanceLedgerSourceEnum::App === $source
+                && $this->currentUserId->toString() === $actorUserId)
+            ->once()
+            ->andReturn(true);
         $this->emailFacade->expects('sendLeaveRequestRejectedEmail')->once();
 
         $response = $this->controller->reject(jsonRequest(), $leaveRequest->id->toString());
@@ -298,5 +313,24 @@ describe('reject', function (): void {
         $response = $this->controller->reject(jsonRequest(), $leaveRequest->id->toString());
 
         expect($response->getStatusCode())->toBe(Response::HTTP_FORBIDDEN);
+    });
+
+    it('does not email when another transition won the race', function (): void {
+        $leaveRequest = LeaveRequestDTOFixture::create([
+            'status' => LeaveRequestStatusEnum::Pending,
+            'user' => UserDTOFixture::create([
+                'id' => Uuid::uuid4()->toString(),
+                'managerId' => $this->currentUserId->toString(),
+            ]),
+        ]);
+
+        $this->leaveRequestFacade->expects('getById')->andReturn($leaveRequest);
+        $this->authChecker->expects('isGranted')->andReturn(true);
+        $this->leaveRequestFacade->expects('updateAndRestoreBalanceIfNeeded')->once()->andReturn(false);
+        $this->emailFacade->expects('sendLeaveRequestRejectedEmail')->never();
+
+        $response = $this->controller->reject(jsonRequest(), $leaveRequest->id->toString());
+
+        expect($response->getStatusCode())->toBe(Response::HTTP_UNPROCESSABLE_ENTITY);
     });
 });

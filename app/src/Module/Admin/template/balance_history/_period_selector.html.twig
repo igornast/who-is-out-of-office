@@ -1,0 +1,11 @@
+<form method="get" action="{{ path(route, route_params) }}" class="mb-4" data-controller="auto-submit">
+    <label class="form-label" for="period">{{ 'balance_history.period'|trans(domain: 'admin') }}</label>
+    <select id="period" name="period" class="form-select" data-action="auto-submit#submit">
+        {% for period in periods %}
+            <option value="{{ period.id }}" {{ period.id == selected_period.id ? 'selected' }}>
+                {{ period.startDate|date('Y-m-d') }} &ndash; {{ period.endDate|date('Y-m-d') }}
+                {{ period.isOpen ? ('balance_history.period.open'|trans(domain: 'admin')) : '' }}
+            </option>
+        {% endfor %}
+    </select>
+</form>

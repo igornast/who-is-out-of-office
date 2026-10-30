@@ -40,9 +40,13 @@ final class SlackFacade implements SlackFacadeInterface
         $this->notifyNewLeaveRequestHandler->handle($leaveRequestDTO);
     }
 
-    public function handleInteractiveNotification(InteractiveNotificationDTO $interactiveNotificationDTO): LeaveRequestDTO
+    public function handleInteractiveNotification(InteractiveNotificationDTO $interactiveNotificationDTO): ?LeaveRequestDTO
     {
         $leaveRequestDTO = $this->updateLeaveRequestWithNotificationHandler->handle($interactiveNotificationDTO);
+
+        if (null === $leaveRequestDTO) {
+            return null;
+        }
 
         $this->sendConfirmationToChannelHandler->handle($leaveRequestDTO, $interactiveNotificationDTO);
 

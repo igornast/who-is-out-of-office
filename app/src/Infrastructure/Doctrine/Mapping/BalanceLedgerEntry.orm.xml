@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Infrastructure\Doctrine\Entity\BalanceLedgerEntry" table="balance_ledger_entry">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="type" column="type" type="string" length="30" enum-type="App\Shared\Enum\BalanceLedgerEntryTypeEnum"/>
+        <field name="source" column="source" type="string" length="30" enum-type="App\Shared\Enum\BalanceLedgerSourceEnum"/>
+        <field name="sequence" column="sequence" type="integer"/>
+        <field name="delta" column="delta" type="integer"/>
+        <field name="balanceBefore" column="balance_before" type="integer"/>
+        <field name="balanceAfter" column="balance_after" type="integer"/>
+        <field name="reason" column="reason" length="255" nullable="true"/>
+
+        <field name="createdAt" column="created_at" type="datetime_immutable"/>
+        <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
+
+        <many-to-one field="user" target-entity="App\Infrastructure\Doctrine\Entity\User">
+            <join-column name="user_id" referenced-column-name="id" nullable="false" on-delete="CASCADE"/>
+        </many-to-one>
+
+        <many-to-one field="leavePeriod" target-entity="App\Infrastructure\Doctrine\Entity\LeavePeriod">
+            <join-column name="leave_period_id" referenced-column-name="id" nullable="false" on-delete="CASCADE"/>
+        </many-to-one>
+
+        <many-to-one field="actor" target-entity="App\Infrastructure\Doctrine\Entity\User">
+            <join-column name="actor_user_id" referenced-column-name="id" nullable="true" on-delete="SET NULL"/>
+        </many-to-one>
+
+        <many-to-one field="leaveRequest" target-entity="App\Infrastructure\Doctrine\Entity\LeaveRequest">
+            <join-column name="leave_request_id" referenced-column-name="id" nullable="true" on-delete="SET NULL"/>
+        </many-to-one>
+
+        <unique-constraints>
+            <unique-constraint name="uniq_ledger_user_sequence" columns="user_id,sequence"/>
+        </unique-constraints>
+
+        <indexes>
+            <index name="idx_ledger_user_created" columns="user_id,created_at"/>
+            <index name="idx_ledger_period" columns="leave_period_id"/>
+        </indexes>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="preUpdate" method="updateTimestamp"/>
+        </lifecycle-callbacks>
+    </entity>
+</doctrine-mapping>

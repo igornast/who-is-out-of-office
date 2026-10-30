@@ -6,6 +6,7 @@ namespace App\Module\LeaveRequest\Command;
 
 use App\Module\LeaveRequest\Message\LeaveRequestAutoApprovedMessage;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use Psr\Log\LoggerInterface;
@@ -40,20 +41,30 @@ class LeaveRequestAutoApproveCommand
         $createdBefore = new \DateTimeImmutable()->modify(sprintf('-%d seconds', $this->appSettingsFacade->autoApproveDelay() * 60));
 
         $leaveRequestDTOs = $this->leaveRequestFacade->getPendingLeaveRequests($createdBefore);
+        $processed = 0;
 
         foreach ($leaveRequestDTOs as $leaveRequestDTO) {
             $leaveRequestDTO->status = LeaveRequestStatusEnum::Approved;
             $leaveRequestDTO->isAutoApproved = true;
 
-            $this->leaveRequestFacade->update($leaveRequestDTO);
+            $transitionApplied = $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded(
+                $leaveRequestDTO,
+                BalanceLedgerSourceEnum::Scheduler,
+                null,
+            );
+
+            if (!$transitionApplied) {
+                continue;
+            }
 
             $this->messageBus->dispatch(
                 message: new LeaveRequestAutoApprovedMessage($leaveRequestDTO->id->toString()),
                 stamps: [new DelayStamp(delay: 15000)],
             );
+            ++$processed;
         }
 
-        $this->logger->info(sprintf('[LEAVE-REQUEST][AUTO]: Auto approve done. Approved %s requests.', count($leaveRequestDTOs)));
+        $this->logger->info(sprintf('[LEAVE-REQUEST][AUTO]: Auto approve done. Approved %s requests.', $processed));
 
         return Command::SUCCESS;
     }
