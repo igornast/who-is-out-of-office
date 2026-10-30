@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-# The settings file lives on a volume shared by php and the workers, so a change saved
+# The settings file lives on a volume shared by php and the worker, so a change saved
 # in the UI reaches every container and survives rebuilds. On an empty volume, seed it
 # from the defaults baked into the image. `ln` fails if the file already exists, so
 # concurrent starts never overwrite saved settings.

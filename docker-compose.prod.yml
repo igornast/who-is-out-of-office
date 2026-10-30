@@ -38,34 +38,16 @@ services:
             db:
                 condition: service_healthy
 
-    worker-async:
-        container_name: whoisooo_prod_worker_async
+    # One process for every transport, polled in the order given, so the schedulers are checked between async messages.
+    # No time limit: schedules keep no state, so a restart can skip a job that fell due while the worker was down.
+    # Never run a second copy: each copy would dispatch every scheduled job.
+    worker:
+        container_name: whoisooo_prod_worker
         build:
             context: .
             dockerfile: ./docker/php/Dockerfile
             target: prod
-        command: start-worker async
-        environment:
-            APP_ENV: prod
-            APP_SETTINGS_FILE: /var/www/settings/app_setting.yaml
-            WORKER_TIME_LIMIT: 3600
-        env_file:
-            - ./app/.env.local
-        volumes:
-            - uploads:/var/www/public/uploads
-            - settings:/var/www/settings
-        restart: unless-stopped
-        depends_on:
-            db:
-                condition: service_healthy
-
-    worker-scheduler:
-        container_name: whoisooo_prod_worker_scheduler
-        build:
-            context: .
-            dockerfile: ./docker/php/Dockerfile
-            target: prod
-        command: start-worker scheduler_default scheduler_weekly_digest
+        command: start-worker scheduler_default scheduler_weekly_digest async
         environment:
             APP_ENV: prod
             APP_SETTINGS_FILE: /var/www/settings/app_setting.yaml
