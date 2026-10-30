@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.4.0] — 2026-10-30
+
+### Added
+
+- Leave balance ledger ([e501f46](https://github.com/igornast/who-is-out-of-office/commit/e501f46b929408b464243b9cb37baaf85beee1ef))
+- Add weekly digest time configuration settings ([37f58f5](https://github.com/igornast/who-is-out-of-office/commit/37f58f5e75ae632822644629d9ba831eb4193252))
+- Add auto approve time forecast (#60) ([7762f77](https://github.com/igornast/who-is-out-of-office/commit/7762f77b9bf9ee6a75cbafd56832987544f86ade))
+
+### Fixed
+
+- Stop double leave allowance for new users and correct labels and docs ([1d964fd](https://github.com/igornast/who-is-out-of-office/commit/1d964fd9e2c155703472d8026cb71941f5e49149))
+- Production docker configuration and mailer service fixes ([b9ce345](https://github.com/igornast/who-is-out-of-office/commit/b9ce34574f3f11929f1ab0b0af31b5a54a619090))
+
+
+[0.4.0]: https://github.com/igornast/who-is-out-of-office/releases/tag/v0.4.0
+
+
 ## [0.3.0] — 2026-06-03
 
 ### Added
