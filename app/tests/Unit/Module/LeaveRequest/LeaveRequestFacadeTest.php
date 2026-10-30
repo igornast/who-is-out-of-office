@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Module\LeaveRequest\LeaveRequestFacade;
 use App\Module\LeaveRequest\UseCase\Command\RemoveLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\SaveLeaveRequestCommandHandler;
-use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestCommandHandler;
+use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestWithBalanceCommandHandler;
 use App\Module\LeaveRequest\UseCase\Query\CalculateWorkDaysQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAbsencesThisWeekQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAllPendingRequestsQueryHandler;
@@ -29,8 +29,8 @@ use App\Module\LeaveRequest\UseCase\Query\GetRecentLeaveRequestsQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetLeaveRequestsForUsersBetweenQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetUpcomingLeaveRequestsQueryHandler;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Tests\_fixtures\Shared\DTO\Dashboard\DashboardStatsDTOFixture;
-use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestDTOFixture;
@@ -43,7 +43,6 @@ beforeEach(function (): void {
     $this->getLeaveRequestHandler = mock(GetLeaveRequestQueryHandler::class);
     $this->getLeaveTypeHandler = mock(GetLeaveTypeQueryHandler::class);
     $this->getUpcomingLeaveRequestsHandler = mock(GetUpcomingLeaveRequestsQueryHandler::class);
-    $this->updateLeaveRequestCommandHandler = mock(UpdateLeaveRequestCommandHandler::class);
     $this->saveLeaveRequestCommandHandler = mock(SaveLeaveRequestCommandHandler::class);
     $this->getLeaveRequestForDatesHandler = mock(GetLeaveRequestsForDatesQueryHandler::class);
     $this->getLeaveRequestForDatesGroupedByUserIdHandler = mock(GetLeaveRequestsForDatesGroupedByUserIdQueryHandler::class);
@@ -58,7 +57,7 @@ beforeEach(function (): void {
     $this->getLeaveBalancesPerTypeHandler = mock(GetLeaveBalancesPerTypeQueryHandler::class);
     $this->getRecentLeaveRequestsHandler = mock(GetRecentLeaveRequestsQueryHandler::class);
     $this->countAllRequestsHandler = mock(CountAllRequestsQueryHandler::class);
-    $this->userFacade = mock(UserFacadeInterface::class);
+    $this->updateLeaveRequestWithBalanceHandler = mock(UpdateLeaveRequestWithBalanceCommandHandler::class);
     $this->getAllLeaveTypesHandler = mock(GetAllLeaveTypesQueryHandler::class);
     $this->findApprovedActiveNotSyncedHandler = mock(FindApprovedActiveNotSyncedQueryHandler::class);
     $this->findSyncedNeedingClearHandler = mock(FindSyncedNeedingClearQueryHandler::class);
@@ -71,7 +70,6 @@ beforeEach(function (): void {
         getLeaveRequestHandler: $this->getLeaveRequestHandler,
         getLeaveTypeHandler: $this->getLeaveTypeHandler,
         getUpcomingLeaveRequestsHandler: $this->getUpcomingLeaveRequestsHandler,
-        updateLeaveRequestCommandHandler: $this->updateLeaveRequestCommandHandler,
         saveLeaveRequestCommandHandler: $this->saveLeaveRequestCommandHandler,
         getLeaveRequestForDatesHandler: $this->getLeaveRequestForDatesHandler,
         getLeaveRequestForDatesGroupedByUserIdHandler: $this->getLeaveRequestForDatesGroupedByUserIdHandler,
@@ -86,7 +84,7 @@ beforeEach(function (): void {
         getLeaveBalancesPerTypeHandler: $this->getLeaveBalancesPerTypeHandler,
         getRecentLeaveRequestsHandler: $this->getRecentLeaveRequestsHandler,
         countAllRequestsHandler: $this->countAllRequestsHandler,
-        userFacade: $this->userFacade,
+        updateLeaveRequestWithBalanceHandler: $this->updateLeaveRequestWithBalanceHandler,
         getAllLeaveTypesHandler: $this->getAllLeaveTypesHandler,
         findApprovedActiveNotSyncedHandler: $this->findApprovedActiveNotSyncedHandler,
         findSyncedNeedingClearHandler: $this->findSyncedNeedingClearHandler,
@@ -172,50 +170,37 @@ it('delegates getLeaveTypeById to handler', function () {
     expect($this->facade->getLeaveTypeById('lt-1'))->toBe($expected);
 });
 
-it('delegates update to handler', function () {
-    $dto = LeaveRequestDTOFixture::create();
-
-    $this->updateLeaveRequestCommandHandler
-        ->expects('handle')
-        ->once()
-        ->with($dto);
-
-    $this->facade->update($dto);
-});
-
 it('updates and restores balance when leave type affects balance', function () {
-    $dto = LeaveRequestDTOFixture::create([
-        'leaveType' => LeaveRequestTypeDTOFixture::create(['isAffectingBalance' => true]),
-        'workDays' => 5,
-    ]);
+    $dto = LeaveRequestDTOFixture::create(['status' => LeaveRequestStatusEnum::Rejected]);
+    $this->updateLeaveRequestWithBalanceHandler->expects('handle')->once()->with($dto, BalanceLedgerSourceEnum::App, null)->andReturnTrue();
 
-    $this->updateLeaveRequestCommandHandler
-        ->expects('handle')
-        ->once()
-        ->with($dto);
-
-    $this->userFacade
-        ->expects('updateUserCurrentLeaveBalance')
-        ->once()
-        ->with($dto->user->id, 5);
-
-    $this->facade->updateAndRestoreBalanceIfNeeded($dto);
+    expect($this->facade->updateAndRestoreBalanceIfNeeded($dto))->toBeTrue();
 });
 
 it('updates without restoring balance when leave type does not affect balance', function () {
-    $dto = LeaveRequestDTOFixture::create([
-        'leaveType' => LeaveRequestTypeDTOFixture::create(['isAffectingBalance' => false]),
-    ]);
+    $dto = LeaveRequestDTOFixture::create(['status' => LeaveRequestStatusEnum::Rejected]);
+    $this->updateLeaveRequestWithBalanceHandler->expects('handle')->once()->with($dto, BalanceLedgerSourceEnum::App, null)->andReturnTrue();
 
-    $this->updateLeaveRequestCommandHandler
-        ->expects('handle')
-        ->once()
-        ->with($dto);
+    expect($this->facade->updateAndRestoreBalanceIfNeeded($dto))->toBeTrue();
+});
 
-    $this->userFacade
-        ->shouldNotReceive('updateUserCurrentLeaveBalance');
+it('rolls back the leave request update when restoring balance fails', function () {
+    $dto = LeaveRequestDTOFixture::create(['status' => LeaveRequestStatusEnum::Rejected]);
+    $exception = new RuntimeException('Ledger unavailable');
+    $this->updateLeaveRequestWithBalanceHandler->expects('handle')->once()->with($dto, BalanceLedgerSourceEnum::Slack, 'actor-1')->andThrow($exception);
 
-    $this->facade->updateAndRestoreBalanceIfNeeded($dto);
+    expect(fn () => $this->facade->updateAndRestoreBalanceIfNeeded(
+        $dto,
+        BalanceLedgerSourceEnum::Slack,
+        'actor-1',
+    ))->toThrow($exception);
+});
+
+it('does not apply or restore an already completed transition', function () {
+    $dto = LeaveRequestDTOFixture::create(['status' => LeaveRequestStatusEnum::Rejected]);
+    $this->updateLeaveRequestWithBalanceHandler->expects('handle')->once()->with($dto, BalanceLedgerSourceEnum::App, null)->andReturnFalse();
+
+    expect($this->facade->updateAndRestoreBalanceIfNeeded($dto))->toBeFalse();
 });
 
 it('calculates work days and saves leave request', function () {

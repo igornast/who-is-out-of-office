@@ -9,8 +9,10 @@ use App\Module\Admin\DTO\NewLeaveRequestDTO;
 use App\Module\Admin\Form\NewLeaveRequestFormType;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\UserDTO;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Enum\LeaveRequestPermission;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Exception\InsufficientLeaveBalanceException;
 use App\Shared\Facade\EmailFacadeInterface;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
@@ -48,7 +50,16 @@ class LeaveRequestActionController extends AbstractController
             }
 
             $dto->status = LeaveRequestStatusEnum::Withdrawn;
-            $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded($dto);
+            $transitionApplied = $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded(
+                $dto,
+                BalanceLedgerSourceEnum::App,
+                $this->getCurrentUser()->id->toString(),
+            );
+
+            if (!$transitionApplied) {
+                throw new \DomainException($this->translator->trans('leave_request.action.error.status_changed', domain: 'admin'));
+            }
+
             $this->emailFacade->sendLeaveRequestWithdrawnEmail($dto);
         });
     }
@@ -60,12 +71,21 @@ class LeaveRequestActionController extends AbstractController
             $this->denyAccessUnlessGranted(LeaveRequestPermission::Manage->value, $dto);
 
             if (LeaveRequestStatusEnum::Pending !== $dto->status) {
-                throw new \DomainException('Only pending requests can be approved.');
+                throw new \DomainException($this->translator->trans('leave_request.action.error.only_pending_approve', domain: 'admin'));
             }
 
             $dto->status = LeaveRequestStatusEnum::Approved;
             $dto->approvedBy = UserDTO::fromEntity($this->getCurrentUser());
-            $this->leaveRequestFacade->update($dto);
+            $transitionApplied = $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded(
+                $dto,
+                BalanceLedgerSourceEnum::App,
+                $this->getCurrentUser()->id->toString(),
+            );
+
+            if (!$transitionApplied) {
+                throw new \DomainException($this->translator->trans('leave_request.action.error.status_changed', domain: 'admin'));
+            }
+
             $this->emailFacade->sendLeaveRequestApprovedEmail($dto);
         });
     }
@@ -77,12 +97,21 @@ class LeaveRequestActionController extends AbstractController
             $this->denyAccessUnlessGranted(LeaveRequestPermission::Manage->value, $dto);
 
             if (LeaveRequestStatusEnum::Pending !== $dto->status) {
-                throw new \DomainException('Only pending requests can be rejected.');
+                throw new \DomainException($this->translator->trans('leave_request.action.error.only_pending_reject', domain: 'admin'));
             }
 
             $dto->status = LeaveRequestStatusEnum::Rejected;
             $dto->approvedBy = UserDTO::fromEntity($this->getCurrentUser());
-            $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded($dto);
+            $transitionApplied = $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded(
+                $dto,
+                BalanceLedgerSourceEnum::App,
+                $this->getCurrentUser()->id->toString(),
+            );
+
+            if (!$transitionApplied) {
+                throw new \DomainException($this->translator->trans('leave_request.action.error.status_changed', domain: 'admin'));
+            }
+
             $this->emailFacade->sendLeaveRequestRejectedEmail($dto);
         });
     }
@@ -150,12 +179,21 @@ class LeaveRequestActionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->leaveRequestFacade->save(new SaveLeaveRequestCommand(
-                $dto->leaveType,
-                $dto->startDate,
-                $dto->endDate,
-                UserDTO::fromEntity($this->getCurrentUser()),
-            ));
+            try {
+                $this->leaveRequestFacade->save(new SaveLeaveRequestCommand(
+                    $dto->leaveType,
+                    $dto->startDate,
+                    $dto->endDate,
+                    UserDTO::fromEntity($this->getCurrentUser()),
+                ));
+            } catch (InsufficientLeaveBalanceException) {
+                $this->addFlash('danger', $this->translator->trans(
+                    'leave_request.validation.insufficient_balance',
+                    domain: 'validators',
+                ));
+
+                return $this->redirect($this->urlGenerator->generate('app_dashboard_requests_new'));
+            }
 
             $this->addFlash('success', 'The leave request has been created.');
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Infrastructure\Doctrine\Entity\LeavePeriod" table="leave_period">
+        <id name="id" type="uuid" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="startDate" column="start_date" type="date_immutable"/>
+        <field name="endDate" column="end_date" type="date_immutable"/>
+        <field name="allowanceGranted" column="allowance_granted" type="integer"/>
+        <field name="openingBalance" column="opening_balance" type="integer"/>
+        <field name="closingBalance" column="closing_balance" type="integer" nullable="true"/>
+        <field name="closedAt" column="closed_at" type="datetime_immutable" nullable="true"/>
+
+        <field name="createdAt" column="created_at" type="datetime_immutable"/>
+        <field name="updatedAt" column="updated_at" type="datetime_immutable"/>
+
+        <many-to-one field="user" target-entity="App\Infrastructure\Doctrine\Entity\User">
+            <join-column name="user_id" referenced-column-name="id" nullable="false" on-delete="CASCADE"/>
+        </many-to-one>
+
+        <unique-constraints>
+            <unique-constraint name="uniq_leave_period_user_start" columns="user_id,start_date"/>
+        </unique-constraints>
+
+        <indexes>
+            <index name="idx_leave_period_user_closed" columns="user_id,closed_at"/>
+        </indexes>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="preUpdate" method="updateTimestamp"/>
+        </lifecycle-callbacks>
+    </entity>
+</doctrine-mapping>

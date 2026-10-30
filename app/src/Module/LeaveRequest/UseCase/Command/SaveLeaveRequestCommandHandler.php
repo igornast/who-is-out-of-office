@@ -7,9 +7,12 @@ namespace App\Module\LeaveRequest\UseCase\Command;
 use App\Module\LeaveRequest\Event\LeaveRequestSavedEvent;
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
+use App\Shared\Enum\BalanceLedgerEntryTypeEnum;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
+use App\Shared\Handler\User\Command\RecordBalanceChangeCommand;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Ramsey\Uuid\Uuid;
 
@@ -36,21 +39,35 @@ class SaveLeaveRequestCommandHandler
             user: $userDTO,
         );
 
+        $saved = false;
 
         try {
             $this->leaveRequestRepository->beginTransaction();
 
             $this->leaveRequestRepository->saveLeaveRequest($leaveRequestDTO);
+            $saved = true;
 
             if ($command->leaveRequestTypeDTO->isAffectingBalance) {
-                $this->userFacade->updateUserCurrentLeaveBalance($userDTO->id, -$workDaysNumber);
+                $this->userFacade->recordBalanceChange(new RecordBalanceChangeCommand(
+                    userId: $userDTO->id,
+                    delta: -$workDaysNumber,
+                    type: BalanceLedgerEntryTypeEnum::Usage,
+                    source: BalanceLedgerSourceEnum::App,
+                    actorUserId: $userDTO->id,
+                    leaveRequestId: $leaveRequestDTO->id->toString(),
+                ));
             }
 
-            $this->leaveRequestRepository->commit();
-        } catch (\Exception $e) {
-            $this->leaveRequestRepository->rollback();
+            $this->leaveRequestRepository->flush();
 
-            throw $e;
+            $this->leaveRequestRepository->commit();
+        } catch (\Throwable $throwable) {
+            $this->leaveRequestRepository->rollback();
+            if ($saved) {
+                $this->leaveRequestRepository->discardPending($leaveRequestDTO);
+            }
+
+            throw $throwable;
         }
 
         $this->dispatcher->dispatch(new LeaveRequestSavedEvent($leaveRequestDTO));

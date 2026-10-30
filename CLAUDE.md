@@ -274,6 +274,15 @@ The application uses Symfony events for cross-cutting concerns:
 - Team member relationships
 - User invitation system
 - Profile customization (working days, birthday, Slack integration)
+- **Balance ledger**: every change to `user.currentLeaveBalance` goes through
+  `UserFacadeInterface::recordBalanceChange(RecordBalanceChangeCommand)`, which takes a
+  pessimistic write lock, resolves the user's open `leave_period`, writes an append-only
+  `balance_ledger_entry` and the new balance in one transaction. A source-scanning test
+  (`tests/Architecture/BalanceFunnelTest.php`) fails the build if any other file assigns
+  the field. Employee view: `/app/balance-history`. Admin: adjust and history actions on
+  the user detail page. Entries are attributed to the period containing the **transaction
+  date**, which deliberately differs from the dashboard used-days panel (attributed by
+  absence start date) — both are labelled in the UI.
 
 #### Settings Module
 - YAML-based application settings (leave request rules, notification preferences)

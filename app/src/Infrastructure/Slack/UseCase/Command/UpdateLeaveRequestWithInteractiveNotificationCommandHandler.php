@@ -6,6 +6,7 @@ namespace App\Infrastructure\Slack\UseCase\Command;
 
 use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
@@ -18,7 +19,7 @@ class UpdateLeaveRequestWithInteractiveNotificationCommandHandler
     ) {
     }
 
-    public function handle(InteractiveNotificationDTO $notificationDTO): LeaveRequestDTO
+    public function handle(InteractiveNotificationDTO $notificationDTO): ?LeaveRequestDTO
     {
         $leaveRequestDTO = $this->leaveRequestFacade->getById($notificationDTO->identifier);
 
@@ -26,8 +27,12 @@ class UpdateLeaveRequestWithInteractiveNotificationCommandHandler
             throw new \RuntimeException(sprintf('Leave request with id "%s" not found', $notificationDTO->identifier));
         }
 
-        if ($this->isAlreadyWithdrawn($leaveRequestDTO) || true === $leaveRequestDTO->isAutoApproved) {
+        if (true === $leaveRequestDTO->isAutoApproved) {
             return $leaveRequestDTO;
+        }
+
+        if ($this->isAlreadyWithdrawn($leaveRequestDTO)) {
+            return null;
         }
 
         $approvedByUserDTO = !is_null($notificationDTO->memberId)
@@ -37,27 +42,17 @@ class UpdateLeaveRequestWithInteractiveNotificationCommandHandler
         $leaveRequestDTO->status = $notificationDTO->status;
         $leaveRequestDTO->approvedBy = $approvedByUserDTO;
 
-        if (in_array($leaveRequestDTO->status, [LeaveRequestStatusEnum::Rejected, LeaveRequestStatusEnum::Cancelled], true)) {
-            $this->handleRemoveAndReturnBlockedDays($leaveRequestDTO);
+        $transitionApplied = $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded(
+            $leaveRequestDTO,
+            BalanceLedgerSourceEnum::Slack,
+            $approvedByUserDTO?->id,
+        );
 
-            return $leaveRequestDTO;
+        if (!$transitionApplied) {
+            return null;
         }
-
-        $this->leaveRequestFacade->update($leaveRequestDTO);
 
         return $leaveRequestDTO;
-    }
-
-    private function handleRemoveAndReturnBlockedDays(LeaveRequestDTO $leaveRequestDTO): void
-    {
-        if ($leaveRequestDTO->leaveType->isAffectingBalance) {
-            $this->userFacade->updateUserCurrentLeaveBalance(
-                $leaveRequestDTO->user->id,
-                $leaveRequestDTO->workDays,
-            );
-        }
-
-        $this->leaveRequestFacade->remove($leaveRequestDTO);
     }
 
     public function isAlreadyWithdrawn(LeaveRequestDTO $leaveRequestDTO): bool

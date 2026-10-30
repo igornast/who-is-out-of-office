@@ -25,7 +25,13 @@ interface LeaveRequestRepositoryInterface
 
     public function findById(string $id): ?LeaveRequestDTO;
 
+    public function findByIdForUpdate(string $id): ?LeaveRequestDTO;
+
     public function saveLeaveRequest(LeaveRequestDTO $leaveRequestDTO): void;
+
+    public function discardPending(LeaveRequestDTO $leaveRequestDTO): void;
+
+    public function flush(): void;
 
     public function update(LeaveRequestDTO $leaveRequestDTO): void;
 
@@ -113,4 +119,6 @@ interface LeaveRequestRepositoryInterface
     public function commit(): void;
 
     public function rollback(): void;
+
+    public function isTransactionActive(): bool;
 }

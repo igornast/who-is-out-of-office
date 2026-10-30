@@ -9,6 +9,7 @@ use App\Infrastructure\Doctrine\Entity\UserSlackIntegration;
 use App\Module\User\Repository\UserRepositoryInterface;
 use App\Shared\DTO\UserDTO;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\LockMode;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -52,6 +53,39 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return UserDTO::fromEntity($user);
     }
 
+    public function findOneByIdForUpdate(string $id): ?UserDTO
+    {
+        $user = $this->find($id);
+
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        $this->getEntityManager()->refresh($user, LockMode::PESSIMISTIC_WRITE);
+
+        return UserDTO::fromEntity($user);
+    }
+
+    public function beginTransaction(): void
+    {
+        $this->getEntityManager()->beginTransaction();
+    }
+
+    public function commit(): void
+    {
+        $this->getEntityManager()->commit();
+    }
+
+    public function rollback(): void
+    {
+        $this->getEntityManager()->rollback();
+    }
+
+    public function isTransactionActive(): bool
+    {
+        return $this->getEntityManager()->getConnection()->isTransactionActive();
+    }
+
     public function findOneByEmail(string $email): ?UserDTO
     {
         $user = $this->findOneBy(['email' => $email]);
@@ -73,12 +107,9 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $user->email = $userDTO->email;
         $user->roles = $userDTO->roles;
         $user->annualLeaveAllowance = $userDTO->annualLeaveAllowance;
-        $user->currentLeaveBalance = $userDTO->currentLeaveBalance;
         $user->isActive = $userDTO->isActive;
         $user->isEmailNotificationsEnabled = $userDTO->isEmailNotificationsEnabled;
         $user->birthDate = $userDTO->birthDate;
-        $user->absenceBalanceResetDay = $userDTO->absenceBalanceResetDay;
-
         $user->calendarSubscriptionTeamMemberIds = $userDTO->calendarSubscriptionTeamMemberIds;
         $user->calendarSubscriptionHolidayCalendarIds = $userDTO->calendarSubscriptionHolidayCalendarIds;
 

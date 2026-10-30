@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Infrastructure\Slack\DTO\Slack\InteractiveNotificationDTO;
 use App\Infrastructure\Slack\UseCase\Command\UpdateLeaveRequestWithInteractiveNotificationCommandHandler;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
@@ -77,9 +78,10 @@ it('updates leave request with approved status and approver', function () {
         ->andReturn($approver);
 
     $this->leaveRequestFacade
-        ->expects('update')
+        ->expects('updateAndRestoreBalanceIfNeeded')
         ->once()
-        ->with($leaveRequestDTO);
+        ->with($leaveRequestDTO, BalanceLedgerSourceEnum::Slack, $approver->id)
+        ->andReturn(true);
 
     $result = $this->handler->handle($notificationDTO);
 
@@ -88,7 +90,7 @@ it('updates leave request with approved status and approver', function () {
         ->and($result->approvedBy)->toBe($approver);
 });
 
-it('removes leave request and returns blocked days when rejected', function () {
+it('retains a rejected leave request and restores its blocked days', function () {
     $leaveRequestDTO = LeaveRequestDTOFixture::create([
         'id' => Uuid::fromString('987e6543-e21b-12d3-a456-426614174999'),
         'status' => LeaveRequestStatusEnum::Pending,
@@ -122,19 +124,14 @@ it('removes leave request and returns blocked days when rejected', function () {
         ->with('U123456')
         ->andReturn($approver);
 
-    $this->userFacade
-        ->expects('updateUserCurrentLeaveBalance')
-        ->once()
-        ->with($leaveRequestDTO->user->id, 10);
-
     $this->leaveRequestFacade
-        ->expects('remove')
+        ->expects('updateAndRestoreBalanceIfNeeded')
         ->once()
-        ->with($leaveRequestDTO);
+        ->with($leaveRequestDTO, BalanceLedgerSourceEnum::Slack, $approver->id)
+        ->andReturn(true);
 
-    $this->leaveRequestFacade
-        ->expects('update')
-        ->never();
+    $this->leaveRequestFacade->shouldNotReceive('remove');
+    $this->userFacade->shouldNotReceive('recordBalanceChange');
 
     $result = $this->handler->handle($notificationDTO);
 
@@ -142,7 +139,7 @@ it('removes leave request and returns blocked days when rejected', function () {
         ->toBe(LeaveRequestStatusEnum::Rejected);
 });
 
-it('removes leave request and returns blocked days when cancelled', function () {
+it('retains a cancelled leave request and restores its blocked days', function () {
     $leaveRequestDTO = LeaveRequestDTOFixture::create([
         'id' => Uuid::fromString('111e2222-e33b-44d5-a666-777777777777'),
         'status' => LeaveRequestStatusEnum::Pending,
@@ -170,19 +167,14 @@ it('removes leave request and returns blocked days when cancelled', function () 
         ->expects('getUserBySlackMemberId')
         ->never();
 
-    $this->userFacade
-        ->expects('updateUserCurrentLeaveBalance')
-        ->once()
-        ->with($leaveRequestDTO->user->id, 7);
-
     $this->leaveRequestFacade
-        ->expects('remove')
+        ->expects('updateAndRestoreBalanceIfNeeded')
         ->once()
-        ->with($leaveRequestDTO);
+        ->with($leaveRequestDTO, BalanceLedgerSourceEnum::Slack, null)
+        ->andReturn(true);
 
-    $this->leaveRequestFacade
-        ->expects('update')
-        ->never();
+    $this->leaveRequestFacade->shouldNotReceive('remove');
+    $this->userFacade->shouldNotReceive('recordBalanceChange');
 
     $result = $this->handler->handle($notificationDTO);
 
@@ -191,7 +183,7 @@ it('removes leave request and returns blocked days when cancelled', function () 
         ->and($result->approvedBy)->toBeNull();
 });
 
-it('returns leave request unchanged when already withdrawn', function () {
+it('returns no transition when already withdrawn', function () {
     $leaveRequestDTO = LeaveRequestDTOFixture::create([
         'id' => Uuid::fromString('222e3333-e44b-55d6-a777-888888888888'),
         'status' => LeaveRequestStatusEnum::Withdrawn,
@@ -227,11 +219,10 @@ it('returns leave request unchanged when already withdrawn', function () {
 
     $result = $this->handler->handle($notificationDTO);
 
-    expect($result->status)
-        ->toBe(LeaveRequestStatusEnum::Withdrawn);
+    expect($result)->toBeNull();
 });
 
-it('returns leave request unchanged when already rejected', function () {
+it('returns no transition when already rejected', function () {
     $leaveRequestDTO = LeaveRequestDTOFixture::create([
         'id' => Uuid::fromString('333e4444-e55b-66d7-a888-999999999999'),
         'status' => LeaveRequestStatusEnum::Rejected,
@@ -267,8 +258,7 @@ it('returns leave request unchanged when already rejected', function () {
 
     $result = $this->handler->handle($notificationDTO);
 
-    expect($result->status)
-        ->toBe(LeaveRequestStatusEnum::Rejected);
+    expect($result)->toBeNull();
 });
 
 it('updates leave request without approver when member id is null', function () {
@@ -298,9 +288,10 @@ it('updates leave request without approver when member id is null', function () 
         ->never();
 
     $this->leaveRequestFacade
-        ->expects('update')
+        ->expects('updateAndRestoreBalanceIfNeeded')
         ->once()
-        ->with($leaveRequestDTO);
+        ->with($leaveRequestDTO, BalanceLedgerSourceEnum::Slack, null)
+        ->andReturn(true);
 
     $result = $this->handler->handle($notificationDTO);
 
@@ -309,7 +300,7 @@ it('updates leave request without approver when member id is null', function () 
         ->and($result->approvedBy)->toBeNull();
 });
 
-it('returns leave request unchanged when auto approved', function () {
+it('returns an auto approved request for the existing confirmation flow', function () {
     $leaveRequestDTO = LeaveRequestDTOFixture::create([
         'id' => Uuid::fromString('555e6666-e77b-88d9-a000-111111111111'),
         'status' => LeaveRequestStatusEnum::Pending,
@@ -346,7 +337,29 @@ it('returns leave request unchanged when auto approved', function () {
 
     $result = $this->handler->handle($notificationDTO);
 
-    expect($result->status)
-        ->toBe(LeaveRequestStatusEnum::Pending)
-        ->and($result->isAutoApproved)->toBeTrue();
+    expect($result)->toBe($leaveRequestDTO);
+});
+
+it('returns no transition when the locked status was already changed', function () {
+    $leaveRequestDTO = LeaveRequestDTOFixture::create([
+        'status' => LeaveRequestStatusEnum::Pending,
+        'approvedBy' => null,
+    ]);
+    $notificationDTO = new InteractiveNotificationDTO(
+        status: LeaveRequestStatusEnum::Rejected,
+        type: 'leave-request',
+        identifier: $leaveRequestDTO->id->toString(),
+        channel: 'C1234567890',
+        responseUrl: null,
+        memberId: null,
+    );
+
+    $this->leaveRequestFacade->expects('getById')->once()->andReturn($leaveRequestDTO);
+    $this->userFacade->expects('getUserBySlackMemberId')->never();
+    $this->leaveRequestFacade
+        ->expects('updateAndRestoreBalanceIfNeeded')
+        ->once()
+        ->andReturn(false);
+
+    expect($this->handler->handle($notificationDTO))->toBeNull();
 });

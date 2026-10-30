@@ -6,7 +6,10 @@ use App\Module\LeaveRequest\Event\LeaveRequestSavedEvent;
 use App\Module\LeaveRequest\Repository\LeaveRequestRepositoryInterface;
 use App\Module\LeaveRequest\UseCase\Command\SaveLeaveRequestCommandHandler;
 use App\Shared\Facade\UserFacadeInterface;
+use App\Shared\Enum\BalanceLedgerEntryTypeEnum;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
+use App\Shared\Handler\User\Command\RecordBalanceChangeCommand;
 use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestTypeDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -36,18 +39,41 @@ it('saves leave request and updates user balance when leave type affects balance
 
     $workDaysNumber = 4;
 
+    $writeOrder = [];
+
     $this->repository
         ->expects('beginTransaction')
         ->once();
 
     $this->repository
         ->expects('saveLeaveRequest')
-        ->once();
+        ->once()
+        ->andReturnUsing(function () use (&$writeOrder): void {
+            $writeOrder[] = 'persist request';
+        });
 
     $this->userFacade
-        ->expects('updateUserCurrentLeaveBalance')
+        ->expects('recordBalanceChange')
         ->once()
-        ->with('user-123', -4);
+        ->withArgs(
+            fn (RecordBalanceChangeCommand $balanceCommand): bool => 'user-123' === $balanceCommand->userId
+            && -4 === $balanceCommand->delta
+            && BalanceLedgerEntryTypeEnum::Usage === $balanceCommand->type
+            && BalanceLedgerSourceEnum::App === $balanceCommand->source
+            && 'user-123' === $balanceCommand->actorUserId
+            && null !== $balanceCommand->leaveRequestId
+        )
+        ->andReturnUsing(function () use (&$writeOrder): void {
+            expect($writeOrder)->toBe(['persist request']);
+            $writeOrder[] = 'lock and record balance';
+        });
+
+    $this->repository
+        ->expects('flush')
+        ->once()
+        ->andReturnUsing(function () use (&$writeOrder): void {
+            expect($writeOrder)->toBe(['persist request', 'lock and record balance']);
+        });
 
     $this->repository
         ->expects('commit')
@@ -83,8 +109,12 @@ it('saves leave request without updating balance when leave type does not affect
         ->once();
 
     $this->userFacade
-        ->expects('updateUserCurrentLeaveBalance')
+        ->expects('recordBalanceChange')
         ->never();
+
+    $this->repository
+        ->expects('flush')
+        ->once();
 
     $this->repository
         ->expects('commit')
@@ -120,6 +150,10 @@ it('rolls back transaction and throws exception when save fails', function () {
         ->expects('saveLeaveRequest')
         ->once()
         ->andThrow($expectedException);
+
+    $this->repository
+        ->expects('flush')
+        ->never();
 
     $this->repository
         ->expects('rollback')
@@ -160,13 +194,28 @@ it('rolls back transaction when balance update fails', function () {
         ->once();
 
     $this->userFacade
-        ->expects('updateUserCurrentLeaveBalance')
+        ->expects('recordBalanceChange')
         ->once()
-        ->with('user-999', -3)
+        ->withArgs(
+            fn (RecordBalanceChangeCommand $balanceCommand): bool => 'user-999' === $balanceCommand->userId
+            && -3 === $balanceCommand->delta
+            && BalanceLedgerEntryTypeEnum::Usage === $balanceCommand->type
+            && BalanceLedgerSourceEnum::App === $balanceCommand->source
+            && 'user-999' === $balanceCommand->actorUserId
+            && null !== $balanceCommand->leaveRequestId
+        )
         ->andThrow($expectedException);
 
     $this->repository
+        ->expects('flush')
+        ->never();
+
+    $this->repository
         ->expects('rollback')
+        ->once();
+
+    $this->repository
+        ->expects('discardPending')
         ->once();
 
     $this->repository

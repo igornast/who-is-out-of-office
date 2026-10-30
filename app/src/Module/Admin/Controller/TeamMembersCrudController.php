@@ -26,6 +26,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -38,6 +39,7 @@ class TeamMembersCrudController extends AppAbstractCrudController
 {
     public function __construct(
         private readonly RoleTranslator $roleTranslator,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
@@ -49,6 +51,9 @@ class TeamMembersCrudController extends AppAbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
+            ->setEntityPermission(new Expression(
+                'object == null or "ROLE_ADMIN" in role_names or ("ROLE_MANAGER" in role_names and object.manager != null and object.manager.id.toString() == user.id.toString())'
+            ))
             ->setPageTitle(Crud::PAGE_INDEX, 'crud.title.team_members')
             ->setPageTitle(Crud::PAGE_DETAIL, 'crud.team_members.detail.title')
             ->setSearchFields(['firstName', 'lastName', 'email']);
@@ -56,8 +61,14 @@ class TeamMembersCrudController extends AppAbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        $balanceHistoryAction = Action::new('balanceHistory', 'crud.user.action.balance_history')
+            ->linkToUrl(fn (User $entity) => $this->urlGenerator->generate('app_user_balance_history', ['id' => $entity->id]))
+            ->setIcon('icon-receipt')
+            ->addCssClass('btn btn-outline');
+
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_DETAIL, $balanceHistoryAction)
             ->disable(Action::NEW, Action::EDIT, Action::DELETE);
     }
 
@@ -98,6 +109,7 @@ class TeamMembersCrudController extends AppAbstractCrudController
             ->setDisabled();
         yield NumberField::new('currentLeaveBalance', 'crud.team_members.field.current_balance')
             ->hideOnIndex()
+            ->hideOnForm()
             ->setDisabled();
         yield DateField::new('absenceBalanceResetDay', 'crud.team_members.field.balance_reset_day')
             ->hideOnIndex()

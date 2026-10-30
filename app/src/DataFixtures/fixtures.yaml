@@ -31,7 +31,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((new DateTime("+3 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+5 days"))->modify("-5 years")->format("Y-m-d H:i:s")))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
     user_2:
         __construct:
             id: '<(Ramsey\Uuid\Uuid::uuid4())>'
@@ -49,7 +49,7 @@ App\Infrastructure\Doctrine\Entity\User:
             subdivisionCode: 'DE-BY'
             birthDate: '<(new \DateTimeImmutable("1988-06-15"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2021-09-01"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_1'
     user_3:
         __construct:
@@ -67,7 +67,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1992-03-22"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2022-06-15"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_12'
     user_4:
         __construct:
@@ -85,7 +85,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((new DateTime("+8 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable((new DateTime("+8 days"))->modify("-3 years")->format("Y-m-d H:i:s")))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_12'
     user_5:
         __construct:
@@ -103,7 +103,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable("1990-11-03"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2020-03-16"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_12'
     user_6:
         __construct:
@@ -121,7 +121,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable((new DateTime("+15 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable("2019-01-07"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_13'
     user_7:
         __construct:
@@ -140,7 +140,7 @@ App\Infrastructure\Doctrine\Entity\User:
             subdivisionCode: 'DE-BY'
             birthDate: '<(new \DateTimeImmutable("1995-08-28"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2023-02-01"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_15'
     user_8:
         __construct:
@@ -158,7 +158,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable("1993-12-14"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2018-04-23"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_15'
     user_9:
         __construct:
@@ -176,7 +176,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1987-05-10"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2024-11-04"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_13'
     user_10:
         __construct:
@@ -194,7 +194,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable("1991-09-18"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2017-08-01"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_17'
     user_11:
         __construct:
@@ -213,7 +213,7 @@ App\Infrastructure\Doctrine\Entity\User:
             subdivisionCode: 'DE-BY'
             birthDate: '<(new \DateTimeImmutable("1981-02-09"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2019-05-02"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_1'
     user_12:
         __construct:
@@ -231,7 +231,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_de'
             birthDate: '<(new \DateTimeImmutable("1986-07-30"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2020-10-12"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_2'
     user_13:
         __construct:
@@ -249,7 +249,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_nl'
             birthDate: '<(new \DateTimeImmutable("1989-04-17"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2021-03-08"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_2'
     user_14:
         __construct:
@@ -267,7 +267,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_nl'
             birthDate: '<(new \DateTimeImmutable((new DateTime("+12 days"))->format("Y-m-d")))>'
             contractStartedAt: '<(new \DateTimeImmutable("2023-07-19"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_13'
     user_15:
         __construct:
@@ -285,7 +285,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1984-10-25"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2019-11-18"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_11'
     user_16:
         __construct:
@@ -303,7 +303,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1994-01-12"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2024-02-26"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_15'
     user_17:
         __construct:
@@ -321,7 +321,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_nl'
             birthDate: '<(new \DateTimeImmutable("1983-09-06"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2020-01-20"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_11'
     user_18:
         __construct:
@@ -340,7 +340,7 @@ App\Infrastructure\Doctrine\Entity\User:
             subdivisionCode: 'DE-BY'
             birthDate: '<(new \DateTimeImmutable("1996-06-21"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2024-09-09"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_17'
     user_19:
         __construct:
@@ -358,7 +358,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_fr'
             birthDate: '<(new \DateTimeImmutable("1993-11-08"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2023-04-03"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_1'
     user_20:
         __construct:
@@ -376,7 +376,7 @@ App\Infrastructure\Doctrine\Entity\User:
             holidayCalendar: '@holiday_calendar_nl'
             birthDate: '<(new \DateTimeImmutable("1990-07-19"))>'
             contractStartedAt: '<(new \DateTimeImmutable("2022-10-17"))>'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_1'
 
     invited_user:
@@ -392,7 +392,7 @@ App\Infrastructure\Doctrine\Entity\User:
             isActive: false
             hasCelebrateWorkAnniversary: false
             holidayCalendar: '@holiday_calendar_fr'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_1'
 
     invited_user_2:
@@ -408,7 +408,7 @@ App\Infrastructure\Doctrine\Entity\User:
             isActive: false
             hasCelebrateWorkAnniversary: false
             holidayCalendar: '@holiday_calendar_fr'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_1'
 
     invited_user_3:
@@ -424,7 +424,7 @@ App\Infrastructure\Doctrine\Entity\User:
             isActive: false
             hasCelebrateWorkAnniversary: false
             holidayCalendar: '@holiday_calendar_fr'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
             manager: '@user_1'
 
     deactivated_user:
@@ -440,7 +440,7 @@ App\Infrastructure\Doctrine\Entity\User:
             isActive: false
             hasCelebrateWorkAnniversary: false
             holidayCalendar: '@holiday_calendar_fr'
-            absenceBalanceResetDay: '<(new \DateTimeImmutable(date("Y") . "-01-01"))>'
+            absenceBalanceResetDay: '<(new \DateTimeImmutable((date("Y") + 1) . "-01-01"))>'
 
 App\Infrastructure\Doctrine\Entity\Invitation:
     invitation_1:

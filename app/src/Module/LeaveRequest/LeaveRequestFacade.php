@@ -7,7 +7,7 @@ namespace App\Module\LeaveRequest;
 use App\Module\LeaveRequest\UseCase\Command\MarkExternalStatusSyncedCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\RemoveLeaveRequestCommandHandler;
 use App\Module\LeaveRequest\UseCase\Command\SaveLeaveRequestCommandHandler;
-use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestCommandHandler;
+use App\Module\LeaveRequest\UseCase\Command\UpdateLeaveRequestWithBalanceCommandHandler;
 use App\Module\LeaveRequest\UseCase\Query\CalculateWorkDaysQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\CountAbsencesThisWeekQueryHandler;
 use App\Module\LeaveRequest\UseCase\Query\GetAllLeaveTypesQueryHandler;
@@ -33,9 +33,9 @@ use App\Shared\DTO\Dashboard\DashboardStatsDTO;
 use App\Shared\DTO\Dashboard\LeaveBalanceDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestDTO;
 use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
-use App\Shared\Facade\UserFacadeInterface;
 use App\Shared\Handler\LeaveRequest\Command\SaveLeaveRequestCommand;
 use App\Shared\Handler\LeaveRequest\Query\CalculateWorkdaysQuery;
 
@@ -47,7 +47,6 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetLeaveRequestQueryHandler $getLeaveRequestHandler,
         private readonly GetLeaveTypeQueryHandler $getLeaveTypeHandler,
         private readonly GetUpcomingLeaveRequestsQueryHandler $getUpcomingLeaveRequestsHandler,
-        private readonly UpdateLeaveRequestCommandHandler $updateLeaveRequestCommandHandler,
         private readonly SaveLeaveRequestCommandHandler $saveLeaveRequestCommandHandler,
         private readonly GetLeaveRequestsForDatesQueryHandler $getLeaveRequestForDatesHandler,
         private readonly GetLeaveRequestsForDatesGroupedByUserIdQueryHandler $getLeaveRequestForDatesGroupedByUserIdHandler,
@@ -62,7 +61,7 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         private readonly GetLeaveBalancesPerTypeQueryHandler $getLeaveBalancesPerTypeHandler,
         private readonly GetRecentLeaveRequestsQueryHandler $getRecentLeaveRequestsHandler,
         private readonly CountAllRequestsQueryHandler $countAllRequestsHandler,
-        private readonly UserFacadeInterface $userFacade,
+        private readonly UpdateLeaveRequestWithBalanceCommandHandler $updateLeaveRequestWithBalanceHandler,
         private readonly GetAllLeaveTypesQueryHandler $getAllLeaveTypesHandler,
         private readonly FindApprovedActiveNotSyncedQueryHandler $findApprovedActiveNotSyncedHandler,
         private readonly FindSyncedNeedingClearQueryHandler $findSyncedNeedingClearHandler,
@@ -104,21 +103,12 @@ final class LeaveRequestFacade implements LeaveRequestFacadeInterface
         return $this->getLeaveTypeHandler->handle($id);
     }
 
-    public function update(LeaveRequestDTO $leaveRequestDTO): void
-    {
-        $this->updateLeaveRequestCommandHandler->handle($leaveRequestDTO);
-    }
-
-    public function updateAndRestoreBalanceIfNeeded(LeaveRequestDTO $leaveRequestDTO): void
-    {
-        $this->update($leaveRequestDTO);
-
-        if ($leaveRequestDTO->leaveType->isAffectingBalance) {
-            $this->userFacade->updateUserCurrentLeaveBalance(
-                $leaveRequestDTO->user->id,
-                $leaveRequestDTO->workDays,
-            );
-        }
+    public function updateAndRestoreBalanceIfNeeded(
+        LeaveRequestDTO $leaveRequestDTO,
+        BalanceLedgerSourceEnum $source = BalanceLedgerSourceEnum::App,
+        ?string $actorUserId = null,
+    ): bool {
+        return $this->updateLeaveRequestWithBalanceHandler->handle($leaveRequestDTO, $source, $actorUserId);
     }
 
     public function save(SaveLeaveRequestCommand $command): void

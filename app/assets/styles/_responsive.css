@@ -39,6 +39,12 @@ body.ea .lr-form-card-body {
    =========================================== */
 @media (max-width: 767px) {
 
+    /* -- Balance history statement: current balance wraps, so no divider -- */
+    body.ea .balance-statement-item-current {
+        padding-left: 0;
+        border-left: none;
+    }
+
     /* -- Stats grid: 2x2 instead of 1-column -- */
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);

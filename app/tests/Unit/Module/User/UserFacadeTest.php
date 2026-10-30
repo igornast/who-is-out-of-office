@@ -14,22 +14,31 @@ use App\Module\User\UseCase\Command\CreatePasswordResetTokenCommandHandler;
 use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
 use App\Module\User\UseCase\Command\RegenerateCalendarSubscriptionCommandHandler;
 use App\Module\User\UseCase\Command\RemoveProfileImageCommandHandler;
+use App\Module\User\UseCase\Command\RecordBalanceChangeCommandHandler;
+use App\Module\User\UseCase\Command\OpenInitialLeavePeriodCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\ResetPasswordCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCalendarSubscriptionConfigCommandHandler;
-use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackMemberIdCommandHandler;
 use App\Module\User\UseCase\Command\UpdateSlackStatusSyncPreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateUserFeedLastSeenAtCommandHandler;
 use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
+use App\Module\User\UseCase\Query\GetBalanceLedgerForUserQueryHandler;
+use App\Module\User\UseCase\Query\GetBalanceStatementQueryHandler;
 use App\Module\User\UseCase\Query\GetCalendarSubscriptionConfigQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
+use App\Module\User\UseCase\Query\GetLeavePeriodsForUserQueryHandler;
+use App\Module\User\UseCase\Query\ShouldRestoreBalanceForLeaveRequestQueryHandler;
 use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use App\Shared\DTO\Balance\BalanceStatementDTO;
 use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
+use App\Shared\Enum\BalanceLedgerEntryTypeEnum;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
+use App\Shared\Handler\User\Command\RecordBalanceChangeCommand;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetOrganizationTreeQueryHandler;
 use App\Module\User\UseCase\Query\GetUserByIdQueryHandler;
@@ -41,11 +50,13 @@ use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHand
 use App\Module\User\UseCase\Query\HasPendingInvitationQueryHandler;
 use App\Module\User\UserFacade;
 use App\Tests\_fixtures\Shared\DTO\InvitationDTOFixture;
+use App\Tests\_fixtures\Shared\DTO\BalanceLedgerEntryDTOFixture;
+use App\Tests\_fixtures\Shared\DTO\LeavePeriodDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Ramsey\Uuid\Uuid;
 
 beforeEach(function (): void {
-    $this->updateCurrentLeaveBalanceHandler = mock(UpdateCurrentLeaveBalanceCommandHandler::class);
+    $this->recordBalanceChangeHandler = mock(RecordBalanceChangeCommandHandler::class);
     $this->getMyTeamUsersHandler = mock(GetMyTeamUsersQueryHandler::class);
     $this->getUsersWithIncomingBirthdaysHandler = mock(GetUsersWithIncomingBirthdaysQueryHandler::class);
     $this->getUserBySlackMemberIdQueryHandler = mock(GetUserBySlackMemberIdQueryHandler::class);
@@ -77,9 +88,14 @@ beforeEach(function (): void {
     $this->getOrganizationTreeHandler = mock(GetOrganizationTreeQueryHandler::class);
     $this->issueUserInvitationHandler = mock(IssueUserInvitationCommandHandler::class);
     $this->hasPendingInvitationHandler = mock(HasPendingInvitationQueryHandler::class);
+    $this->openInitialLeavePeriodHandler = mock(OpenInitialLeavePeriodCommandHandler::class);
+    $this->getLeavePeriodsForUserHandler = mock(GetLeavePeriodsForUserQueryHandler::class);
+    $this->getBalanceLedgerForUserHandler = mock(GetBalanceLedgerForUserQueryHandler::class);
+    $this->getBalanceStatementHandler = mock(GetBalanceStatementQueryHandler::class);
+    $this->shouldRestoreBalanceForLeaveRequestHandler = mock(ShouldRestoreBalanceForLeaveRequestQueryHandler::class);
 
     $this->facade = new UserFacade(
-        updateCurrentLeaveBalanceHandler: $this->updateCurrentLeaveBalanceHandler,
+        recordBalanceChangeHandler: $this->recordBalanceChangeHandler,
         getMyTeamUsersHandler: $this->getMyTeamUsersHandler,
         getUsersWithIncomingBirthdaysHandler: $this->getUsersWithIncomingBirthdaysHandler,
         getUserBySlackMemberIdQueryHandler: $this->getUserBySlackMemberIdQueryHandler,
@@ -111,16 +127,78 @@ beforeEach(function (): void {
         getOrganizationTreeHandler: $this->getOrganizationTreeHandler,
         issueUserInvitationHandler: $this->issueUserInvitationHandler,
         hasPendingInvitationHandler: $this->hasPendingInvitationHandler,
+        openInitialLeavePeriodHandler: $this->openInitialLeavePeriodHandler,
+        getLeavePeriodsForUserHandler: $this->getLeavePeriodsForUserHandler,
+        getBalanceLedgerForUserHandler: $this->getBalanceLedgerForUserHandler,
+        getBalanceStatementHandler: $this->getBalanceStatementHandler,
+        shouldRestoreBalanceForLeaveRequestHandler: $this->shouldRestoreBalanceForLeaveRequestHandler,
     );
 });
 
-it('delegates updateUserCurrentLeaveBalance to handler', function () {
-    $this->updateCurrentLeaveBalanceHandler
+it('delegates recordBalanceChange to handler', function () {
+    $command = new RecordBalanceChangeCommand(
+        userId: 'user-1',
+        delta: -5,
+        type: BalanceLedgerEntryTypeEnum::Usage,
+        source: BalanceLedgerSourceEnum::App,
+        actorUserId: 'actor-1',
+        leaveRequestId: 'leave-request-1',
+    );
+
+    $this->recordBalanceChangeHandler
         ->expects('handle')
         ->once()
-        ->with('user-1', -5);
+        ->with($command);
 
-    $this->facade->updateUserCurrentLeaveBalance('user-1', -5);
+    $this->facade->recordBalanceChange($command);
+});
+
+it('delegates openInitialLeavePeriod to handler', function () {
+    $this->openInitialLeavePeriodHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', false);
+
+    $this->facade->openInitialLeavePeriod('user-1');
+});
+
+it('delegates getLeavePeriods to handler', function () {
+    $periods = [LeavePeriodDTOFixture::create()];
+    $this->getLeavePeriodsForUserHandler->expects('handle')->once()->with('user-1')->andReturn($periods);
+
+    expect($this->facade->getLeavePeriods('user-1'))->toBe($periods);
+});
+
+it('delegates getBalanceLedger to handler', function () {
+    $entries = [BalanceLedgerEntryDTOFixture::create()];
+    $this->getBalanceLedgerForUserHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', 'period-1', 20, 5)
+        ->andReturn($entries);
+
+    expect($this->facade->getBalanceLedger('user-1', 'period-1', 20, 5))->toBe($entries);
+});
+
+it('delegates getBalanceStatement to handler', function () {
+    $statement = new BalanceStatementDTO(3, 24, -10, 2, 0, 19);
+    $this->getBalanceStatementHandler
+        ->expects('handle')
+        ->once()
+        ->with('user-1', 'period-1')
+        ->andReturn($statement);
+
+    expect($this->facade->getBalanceStatement('user-1', 'period-1'))->toBe($statement);
+});
+
+it('delegates shouldRestoreBalanceForLeaveRequest to handler', function (): void {
+    $createdAt = new DateTimeImmutable('-1 day');
+    $this->shouldRestoreBalanceForLeaveRequestHandler->expects('handle')
+        ->once()
+        ->with('leave-request-1', 'user-1', $createdAt, true)
+        ->andReturnTrue();
+
+    expect($this->facade->shouldRestoreBalanceForLeaveRequest('leave-request-1', 'user-1', $createdAt, true))->toBeTrue();
 });
 
 it('delegates getTeamMembersForUserId to handler', function () {

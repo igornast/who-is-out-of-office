@@ -10,6 +10,7 @@ use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\AppAbstractCrudController;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\LeaveRequestStatusEnum;
+use App\Shared\Enum\BalanceLedgerSourceEnum;
 use App\Shared\Facade\LeaveRequestFacadeInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -141,7 +142,6 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
             $batchActionDto,
             'ea-batch-action-batchApprove',
             LeaveRequestStatusEnum::Approved,
-            restoreBalance: false,
         );
     }
 
@@ -155,7 +155,6 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
             $batchActionDto,
             'ea-batch-action-batchReject',
             LeaveRequestStatusEnum::Rejected,
-            restoreBalance: true,
         );
     }
 
@@ -208,7 +207,6 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
         BatchActionDto $batchActionDto,
         string $csrfTokenId,
         LeaveRequestStatusEnum $newStatus,
-        bool $restoreBalance,
     ): Response {
         if (!$this->isCsrfTokenValid($csrfTokenId, $batchActionDto->getCsrfToken())) {
             return $this->redirectToIndex();
@@ -235,9 +233,15 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
             $dto->status = $newStatus;
             $dto->approvedBy = $approver;
 
-            $restoreBalance
-                ? $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded($dto)
-                : $this->leaveRequestFacade->update($dto);
+            $transitionApplied = $this->leaveRequestFacade->updateAndRestoreBalanceIfNeeded(
+                $dto,
+                BalanceLedgerSourceEnum::App,
+                $approver->id,
+            );
+
+            if (!$transitionApplied) {
+                continue;
+            }
 
             ++$processed;
         }
@@ -247,7 +251,7 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
         return $this->redirectToIndex();
     }
 
-    private function redirectToIndex(): Response
+    protected function redirectToIndex(): Response
     {
         return $this->redirect(
             $this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl()

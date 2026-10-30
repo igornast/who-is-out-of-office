@@ -1,0 +1,9 @@
+user:
+    adjust_balance:
+        validation:
+            non_zero: 'An adjustment must change the balance.'
+            range: 'Adjustment must be between {{ min }} and {{ max }} days.'
+
+leave_request:
+    validation:
+        insufficient_balance: 'Your leave balance is insufficient for this request.'

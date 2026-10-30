@@ -112,6 +112,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('menu.items.absence_requests', 'fa fa-calendar-plus', LeaveRequest::class)
             ->setController(LeaveRequestCrudController::class);
         yield MenuItem::linkToRoute('menu.items.calendar', 'fa fa-calendar', 'app_calendar_view');
+        yield MenuItem::linkToRoute('menu.items.balance_history', 'fa fa-receipt', 'app_balance_history');
 
         if ($this->isGranted(RoleEnum::Manager->value)) {
             yield MenuItem::section('menu.section.my_team')->setPermission(RoleEnum::Manager->value);

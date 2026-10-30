@@ -20,6 +20,16 @@ interface UserRepositoryInterface
 
     public function findOneById(string $id): ?UserDTO;
 
+    public function findOneByIdForUpdate(string $id): ?UserDTO;
+
+    public function beginTransaction(): void;
+
+    public function commit(): void;
+
+    public function rollback(): void;
+
+    public function isTransactionActive(): bool;
+
     public function findOneByEmail(string $email): ?UserDTO;
 
     public function update(UserDTO $userDTO): void;

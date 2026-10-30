@@ -155,6 +155,6 @@ it('resets password and can log in with the new password', function (): void {
     loginUserWithLoginForm($client, 'admin@whoisooo.app', 'newSecurePass123');
     $client->waitForVisibility('.ooo-sidebar');
 
-    $content = $client->getCrawler()->text();
+    $content = $client->waitForElementToContain('body', 'Dashboard')->text();
     expect($content)->toContain('Dashboard');
 });

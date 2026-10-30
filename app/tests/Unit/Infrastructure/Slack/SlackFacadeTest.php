@@ -117,6 +117,27 @@ it('handles interactive notification and skips user notification when auto appro
     expect($result)->toBe($leaveRequestDTO);
 });
 
+it('suppresses downstream notifications when the transition was already applied', function () {
+    $interactiveDTO = new InteractiveNotificationDTO(
+        status: LeaveRequestStatusEnum::Rejected,
+        type: 'leave-request',
+        identifier: 'lr-1',
+        channel: 'C123',
+        responseUrl: null,
+        memberId: 'U123',
+    );
+
+    $this->updateLeaveRequestWithNotificationHandler
+        ->expects('handle')
+        ->once()
+        ->with($interactiveDTO)
+        ->andReturn(null);
+    $this->sendConfirmationToChannelHandler->expects('handle')->never();
+    $this->notifyUserLeaveRequestStatusChanged->expects('handle')->never();
+
+    expect($this->facade->handleInteractiveNotification($interactiveDTO))->toBeNull();
+});
+
 it('delegates notifyUserOnLeaveRequestChange to handler', function () {
     $dto = LeaveRequestDTOFixture::create();
 

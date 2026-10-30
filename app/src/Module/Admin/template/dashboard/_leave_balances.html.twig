@@ -31,6 +31,9 @@
                     </div>
                 {% endfor %}
             </div>
+            <p class="text-secondary small mt-3 mb-0">
+                {{ 'dashboard.leave_balances.attribution_note'|trans(domain: 'admin') }}
+            </p>
         {% else %}
             <div class="card-body-padded empty-state-text">
                 {{ 'dashboard.leave_balances.empty'|trans(domain: 'admin') }}

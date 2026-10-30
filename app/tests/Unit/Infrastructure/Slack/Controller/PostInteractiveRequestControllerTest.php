@@ -165,3 +165,27 @@ it('skips email when leave request is auto approved', function () {
 
     expect($response->getStatusCode())->toBe(Response::HTTP_OK);
 });
+
+it('skips email when the interactive transition was already applied', function () {
+    $payload = json_encode([
+        'actions' => [
+            ['value' => 'lr_rejected_abc-456'],
+        ],
+        'channel' => ['id' => 'C12345'],
+        'user' => ['id' => 'U12345'],
+    ]);
+    $request = Request::create(
+        '/api/slack/interactive-endpoint',
+        'POST',
+        ['payload' => $payload],
+    );
+
+    $this->requestVerifier->expects('isValid')->once()->with($request)->andReturn(true);
+    $this->slackFacade->expects('handleInteractiveNotification')->once()->andReturn(null);
+    $this->emailFacade->expects('sendLeaveRequestApprovedEmail')->never();
+    $this->emailFacade->expects('sendLeaveRequestRejectedEmail')->never();
+
+    $response = ($this->requestController)($request);
+
+    expect($response->getStatusCode())->toBe(Response::HTTP_OK);
+});

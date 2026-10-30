@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Shared\Facade;
 
 use App\Module\User\DTO\UserInvitationRequestDTO;
+use App\Shared\DTO\Balance\BalanceLedgerEntryDTO;
+use App\Shared\DTO\Balance\BalanceStatementDTO;
+use App\Shared\DTO\Balance\LeavePeriodDTO;
 use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
 use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\OrganizationNodeDTO;
@@ -12,11 +15,33 @@ use App\Shared\DTO\PasswordResetTokenDTO;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
+use App\Shared\Handler\User\Command\RecordBalanceChangeCommand;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 interface UserFacadeInterface
 {
-    public function updateUserCurrentLeaveBalance(string $userId, int $number): void;
+    public function recordBalanceChange(RecordBalanceChangeCommand $command): void;
+
+    public function openInitialLeavePeriod(string $userId, bool $isNewUser = false): void;
+
+    /**
+     * @return LeavePeriodDTO[]
+     */
+    public function getLeavePeriods(string $userId): array;
+
+    /**
+     * @return BalanceLedgerEntryDTO[]
+     */
+    public function getBalanceLedger(string $userId, ?string $leavePeriodId = null, int $limit = 50, int $offset = 0): array;
+
+    public function getBalanceStatement(string $userId, string $leavePeriodId): BalanceStatementDTO;
+
+    public function shouldRestoreBalanceForLeaveRequest(
+        string $leaveRequestId,
+        string $userId,
+        ?\DateTimeImmutable $createdAt,
+        bool $isAffectingBalance,
+    ): bool;
 
     /**
      * @return UserDTO[]

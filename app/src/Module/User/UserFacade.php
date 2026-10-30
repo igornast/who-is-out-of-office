@@ -8,7 +8,8 @@ use App\Module\User\DTO\UserInvitationRequestDTO;
 use App\Module\User\UseCase\Command\AcceptUserInvitationCommandHandler;
 use App\Module\User\UseCase\Command\ResetAbsenceBalanceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateCalendarSubscriptionConfigCommandHandler;
-use App\Module\User\UseCase\Command\UpdateCurrentLeaveBalanceCommandHandler;
+use App\Module\User\UseCase\Command\RecordBalanceChangeCommandHandler;
+use App\Module\User\UseCase\Command\OpenInitialLeavePeriodCommandHandler;
 use App\Module\User\UseCase\Command\ChangePasswordCommandHandler;
 use App\Module\User\UseCase\Command\DisableTwoFactorCommandHandler;
 use App\Module\User\UseCase\Command\DisconnectSlackCommandHandler;
@@ -25,8 +26,12 @@ use App\Module\User\UseCase\Command\UpdateSlackStatusSyncPreferenceCommandHandle
 use App\Module\User\UseCase\Command\UpdateThemePreferenceCommandHandler;
 use App\Module\User\UseCase\Command\UpdateUserFeedLastSeenAtCommandHandler;
 use App\Module\User\UseCase\Query\GetAllActiveUsersQueryHandler;
+use App\Module\User\UseCase\Query\GetBalanceLedgerForUserQueryHandler;
+use App\Module\User\UseCase\Query\GetBalanceStatementQueryHandler;
 use App\Module\User\UseCase\Query\GetCalendarSubscriptionConfigQueryHandler;
 use App\Module\User\UseCase\Query\GetDirectReportsQueryHandler;
+use App\Module\User\UseCase\Query\GetLeavePeriodsForUserQueryHandler;
+use App\Module\User\UseCase\Query\ShouldRestoreBalanceForLeaveRequestQueryHandler;
 use App\Module\User\UseCase\Query\GetPasswordResetTokenQueryHandler;
 use App\Module\User\UseCase\Query\GetMyTeamUsersQueryHandler;
 use App\Module\User\UseCase\Query\GetOrganizationTreeQueryHandler;
@@ -38,6 +43,9 @@ use App\Module\User\UseCase\Query\GetUsersWithIncomingWorkAnniversariesQueryHand
 use App\Module\User\UseCase\Query\GetUsersWithWorkAnniversariesForDatesQueryHandler;
 use App\Module\User\UseCase\Query\HasPendingInvitationQueryHandler;
 use App\Shared\DTO\CalendarSubscription\CalendarSubscriptionConfigDTO;
+use App\Shared\DTO\Balance\BalanceLedgerEntryDTO;
+use App\Shared\DTO\Balance\BalanceStatementDTO;
+use App\Shared\DTO\Balance\LeavePeriodDTO;
 use App\Shared\DTO\InvitationDTO;
 use App\Shared\DTO\OrganizationNodeDTO;
 use App\Shared\DTO\PasswordResetTokenDTO;
@@ -45,12 +53,13 @@ use App\Shared\DTO\UserDTO;
 use App\Shared\Enum\PaletteEnum;
 use App\Shared\Enum\ThemeEnum;
 use App\Shared\Facade\UserFacadeInterface;
+use App\Shared\Handler\User\Command\RecordBalanceChangeCommand;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 final class UserFacade implements UserFacadeInterface
 {
     public function __construct(
-        private readonly UpdateCurrentLeaveBalanceCommandHandler $updateCurrentLeaveBalanceHandler,
+        private readonly RecordBalanceChangeCommandHandler $recordBalanceChangeHandler,
         private readonly GetMyTeamUsersQueryHandler $getMyTeamUsersHandler,
         private readonly GetUsersWithIncomingBirthdaysQueryHandler $getUsersWithIncomingBirthdaysHandler,
         private readonly GetUserBySlackMemberIdQueryHandler $getUserBySlackMemberIdQueryHandler,
@@ -82,12 +91,57 @@ final class UserFacade implements UserFacadeInterface
         private readonly UpdateCalendarSubscriptionConfigCommandHandler $updateCalendarSubscriptionConfigHandler,
         private readonly IssueUserInvitationCommandHandler $issueUserInvitationHandler,
         private readonly HasPendingInvitationQueryHandler $hasPendingInvitationHandler,
+        private readonly OpenInitialLeavePeriodCommandHandler $openInitialLeavePeriodHandler,
+        private readonly GetLeavePeriodsForUserQueryHandler $getLeavePeriodsForUserHandler,
+        private readonly GetBalanceLedgerForUserQueryHandler $getBalanceLedgerForUserHandler,
+        private readonly GetBalanceStatementQueryHandler $getBalanceStatementHandler,
+        private readonly ShouldRestoreBalanceForLeaveRequestQueryHandler $shouldRestoreBalanceForLeaveRequestHandler,
     ) {
     }
 
-    public function updateUserCurrentLeaveBalance(string $userId, int $number): void
+    public function recordBalanceChange(RecordBalanceChangeCommand $command): void
     {
-        $this->updateCurrentLeaveBalanceHandler->handle($userId, $number);
+        $this->recordBalanceChangeHandler->handle($command);
+    }
+
+    public function openInitialLeavePeriod(string $userId, bool $isNewUser = false): void
+    {
+        $this->openInitialLeavePeriodHandler->handle($userId, $isNewUser);
+    }
+
+    /**
+     * @return LeavePeriodDTO[]
+     */
+    public function getLeavePeriods(string $userId): array
+    {
+        return $this->getLeavePeriodsForUserHandler->handle($userId);
+    }
+
+    /**
+     * @return BalanceLedgerEntryDTO[]
+     */
+    public function getBalanceLedger(string $userId, ?string $leavePeriodId = null, int $limit = 50, int $offset = 0): array
+    {
+        return $this->getBalanceLedgerForUserHandler->handle($userId, $leavePeriodId, $limit, $offset);
+    }
+
+    public function getBalanceStatement(string $userId, string $leavePeriodId): BalanceStatementDTO
+    {
+        return $this->getBalanceStatementHandler->handle($userId, $leavePeriodId);
+    }
+
+    public function shouldRestoreBalanceForLeaveRequest(
+        string $leaveRequestId,
+        string $userId,
+        ?\DateTimeImmutable $createdAt,
+        bool $isAffectingBalance,
+    ): bool {
+        return $this->shouldRestoreBalanceForLeaveRequestHandler->handle(
+            $leaveRequestId,
+            $userId,
+            $createdAt,
+            $isAffectingBalance,
+        );
     }
 
     /**

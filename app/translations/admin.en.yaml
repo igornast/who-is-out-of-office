@@ -22,6 +22,7 @@ menu:
         integrations: Integrations
         account_security: Security
         appearance: Appearance
+        balance_history: 'Balance History'
     section:
         my_team: My Team
         organization: Organization
@@ -68,6 +69,8 @@ bottom_nav:
 
 
 dashboard:
+    balance:
+        view_history: 'View history'
     title:
         my_team: My Team
         employee: Employee
@@ -133,6 +136,7 @@ dashboard:
     leave_balances:
         title: Leave Balances
         empty: No leave types configured
+        attribution_note: Used days are attributed to the leave period containing the absence start date.
     quick_links:
         title: Quick Links
         new_request: New Leave Request
@@ -161,6 +165,9 @@ leave_request:
         error:
             invalid_csrf: Invalid CSRF token.
             access_denied: Access denied.
+            status_changed: The leave request status was already changed.
+            only_pending_approve: Only pending requests can be approved.
+            only_pending_reject: Only pending requests can be rejected.
     new:
         page_title: New Absence Request
         heading: Create New Absence Request
@@ -248,6 +255,15 @@ calendar:
         scope_regional: Regional
 
 user:
+    adjust_balance:
+        title: 'Adjust leave balance'
+        current: 'Current balance'
+        delta: 'Change'
+        delta_help: 'Positive adds days, negative removes them.'
+        reason: 'Reason'
+        reason_help: 'Recorded in the audit trail. Required.'
+        submit: 'Record adjustment'
+        success: 'Balance adjusted.'
     action:
         reset_password_confirm_title: Reset Password
         reset_password_confirm_body: Are you sure you want to reset the password for this user? They will receive an email with a link to set a new password.
@@ -283,6 +299,11 @@ crud:
         action:
             reset_password: Reset Password
             resend_invitation: Resend Invitation
+            adjust_balance: 'Adjust balance'
+            balance_history: 'Balance history'
+        help:
+            current_leave_balance: 'The number of available holiday days for the employee. Change it with the Adjust balance action so the change is recorded.'
+            absence_balance_reset_day: 'The next annual reset date. It becomes read-only after the employee’s first leave period is created.'
 
     actions:
         leave_requests:
@@ -805,3 +826,44 @@ organization_chart:
         admin: 'Admin'
         manager: 'Manager'
         user: 'Employee'
+
+balance_history:
+    title: 'Balance History'
+    subtitle: 'Where your leave days went, newest change first.'
+    admin_subtitle: 'Where this employee’s leave days went, newest change first.'
+    empty: 'Nothing here yet. Entries show up once leave is booked or the balance changes.'
+    period: 'Leave year'
+    attribution_note: 'Each entry counts toward the leave year it was recorded in, which isn’t always the year the absence falls in.'
+    period.open: '(current)'
+    pagination:
+        label: 'Balance history pages'
+        previous: 'Newer entries'
+        next: 'Older entries'
+    statement:
+        opened: 'Opening balance'
+        granted: 'Granted'
+        used: 'Used'
+        restored: 'Returned'
+        adjusted: 'Adjusted'
+        current: 'Current balance'
+    table:
+        date: 'Date'
+        description: 'Description'
+        source: 'Source'
+        actor: 'Actor'
+        transition: 'Before → After'
+        change: 'Change'
+        balance_after: 'Balance after'
+    actor:
+        system: 'System'
+    source:
+        app: 'App'
+        slack: 'Slack'
+        scheduler: 'Scheduler'
+        migration: 'Migration'
+    type:
+        opening_balance: 'Opening balance'
+        accrual: 'Annual allowance granted'
+        usage: 'Leave booked'
+        restoration: 'Days returned'
+        manual_adjustment: 'Manual adjustment'

@@ -29,7 +29,7 @@ it('displays error message for invalid credentials', function (): void {
     $client = createPantherClient();
     loginUserWithLoginForm($client, 'unknown@whoisooo.app', '123');
 
-    $content = $client->getCrawler()->text();
+    $content = $client->waitForElementToContain('body', 'Invalid credentials')->text();
     expect($content)->toContain('Invalid credentials');
 });
 
