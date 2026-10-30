@@ -1,8 +1,8 @@
 # Production deployment
 
 This guide covers running Who's OOO in production with `docker-compose.prod.yml`. That file
-builds the `prod` image target, mounts no source code, sets `APP_ENV=prod`, and starts two
-Messenger workers next to PHP-FPM, nginx and MySQL. The PHP container compiles the asset map on
+builds the `prod` image target, mounts no source code, sets `APP_ENV=prod`, and starts one
+Messenger worker next to PHP-FPM, nginx and MySQL. The PHP container compiles the asset map on
 every start, so there's no separate asset build step.
 
 The stack serves plain HTTP on port 80. TLS is your reverse proxy's job (see
@@ -62,7 +62,7 @@ root `.env`.
 Don't start from a copy of `app/.env`. That file sets `APP_ENV=dev` and points `MAILER_DSN`
 at MailPit.
 
-`APP_BASE_URL` takes no trailing slash. Emails sent from the workers and from scheduled jobs
+`APP_BASE_URL` takes no trailing slash. Emails sent from the worker and from scheduled jobs
 run outside any HTTP request, so they build their links from this value.
 
 Use at least 32 characters for `ICAL_SECRET`. `openssl rand -hex 16` gives exactly 32, and the
@@ -111,7 +111,7 @@ docker compose -f docker-compose.prod.yml up -d --build
 docker compose -f docker-compose.prod.yml exec php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
-The workers wait for the `messenger_messages` table before they start consuming, so they sit
+The worker waits for the `messenger_messages` table before it starts consuming, so it sits
 idle until the migrations have run.
 
 ## 4. Create the first admin account
@@ -192,26 +192,28 @@ the Account section of the sidebar.
 
 Emails, auto-approvals and every scheduled job (including the Slack status sync and weekly
 digest) go through Symfony Messenger. If nothing consumes the queue, no email is sent: the
-messages pile up in the `messenger_messages` table. Two services consume it:
+messages pile up in the `messenger_messages` table. One service, `worker`, consumes it:
 
 | Service | Transport | What stops working without it |
 |---|---|---|
-| `worker-async` | `async` | Invitation emails, leave request notification emails, auto-approval messages |
-| `worker-scheduler` | `scheduler_default` | Leave request auto-approve (5 min), Slack status sync (20 min), `app:feed:sync` (6 h), password reset token cleanup and absence balance reset (daily), holiday calendar sync (yearly) |
-| `worker-scheduler` | `scheduler_weekly_digest` | The Slack weekly digest |
+| `worker` | `scheduler_default` | Leave request auto-approve (5 min), Slack status sync (20 min), `app:feed:sync` (6 h), password reset token cleanup and absence balance reset (daily), holiday calendar sync (yearly) |
+| `worker` | `scheduler_weekly_digest` | The Slack weekly digest |
+| `worker` | `async` | Invitation emails, leave request notification emails, auto-approval messages |
 
-I split them into two services because the scheduler must not restart on a timer. Schedules
-keep no state, so a restarted scheduler computes the next run from the current time and can
-skip a job that fell due while it was down. `worker-async` restarts itself every hour
-(`WORKER_TIME_LIMIT`); `worker-scheduler` doesn't.
+I run one process that polls the scheduler transports first, then `async`, so the schedulers are
+checked between async messages. The worker has no time limit because schedules keep no state, and
+a restart can skip a job that fell due while the worker was down. I never scale it past one copy,
+because each copy dispatches every scheduled job. Scheduled jobs run inside the same process, so
+a long job (for example the holiday sync or the weekly digest) delays queued emails until it
+finishes.
 
-Check that both are running:
+Check that it is running:
 
 ```bash
-docker compose -f docker-compose.prod.yml logs worker-async worker-scheduler
+docker compose -f docker-compose.prod.yml logs worker
 ```
 
-A `messenger_messages` table that keeps growing means a worker has stopped. Messages that fail
+A `messenger_messages` table that keeps growing means the worker has stopped. Messages that fail
 repeatedly are moved to the `failed` queue, not thrown away:
 
 ```bash
@@ -231,7 +233,7 @@ docker compose -f docker-compose.prod.yml exec php bin/console mailer:test you@e
 ## Application settings
 
 App Settings are stored in a YAML file on the `whoisooo-prod_settings` volume, at
-`/var/www/settings/app_setting.yaml`. The `php` container and both workers mount the same
+`/var/www/settings/app_setting.yaml`. The `php` and `worker` containers mount the same
 volume. In practice, this means a change saved in the UI reaches the scheduled jobs on their
 next run and survives `up --build`.
 
@@ -364,7 +366,7 @@ docker compose -f docker-compose.prod.yml exec php bin/console doctrine:migratio
 
 Restore before you migrate. The dump drops and recreates every table, including
 `doctrine_migration_versions`, so migrations run first would be undone by the restore. Restoring
-before the workers start also keeps them from consuming queued dev messages.
+before the worker starts also keeps it from consuming queued dev messages.
 
 The dump contains the dev fixture accounts, including `admin@whoisooo.app`, and every fixture
 user has the password `123`. Delete those accounts or change their passwords before the site

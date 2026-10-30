@@ -58,11 +58,11 @@ The dev fixtures include an admin account you can log in with:
 > [how to keep the two stacks apart](docs/production-deployment.md#keep-the-development-stack-away-from-production-data).
 
 For production there's `docker-compose.prod.yml`. It builds the `prod` image, runs with
-`APP_ENV=prod` and includes the background workers that send email and run scheduled jobs.
+`APP_ENV=prod` and includes the background worker that sends email and runs scheduled jobs.
 It serves plain HTTP, so you put your own TLS proxy in front of it.
 
 The [production deployment guide](docs/production-deployment.md) walks through the whole
-setup: configuration, the reverse proxy, creating the first admin, the workers and where App
+setup: configuration, the reverse proxy, creating the first admin, the worker and where App
 Settings live. It also covers the less fun parts, like what to check before upgrading, backups,
 and moving a dev install to production.
 
@@ -175,11 +175,11 @@ short message saying so.
 
 Admins set the day, time and timezone under App Settings. The job runs on its own Symfony
 Scheduler schedule, `weekly_digest`, and picks up changes on the next scheduler tick without a
-restart. The Docker production stack consumes both scheduler transports in `worker-scheduler`.
+restart. The Docker production stack consumes both scheduler transports in `worker`.
 Without Docker, run:
 
 ```bash
-php bin/console messenger:consume scheduler_default scheduler_weekly_digest
+php bin/console messenger:consume scheduler_default scheduler_weekly_digest async
 ```
 
 To post a digest by hand:

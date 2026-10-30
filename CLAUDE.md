@@ -19,11 +19,10 @@ This is "Who's Out of Office" - an online staff leave planner built with **Symfo
 
 ### Docker Setup
 
-The project runs in Docker with six services:
+The project runs in Docker with five services:
 - **nginx** (port 80): Web server
 - **php**: PHP-FPM with Xdebug support
-- **worker-async**: Consumes the `async` Messenger transport — required for any email to be sent
-- **worker-scheduler**: Consumes `scheduler_default` and `scheduler_weekly_digest` — required for any scheduled job to run
+- **worker**: Consumes `scheduler_default`, `scheduler_weekly_digest` and `async` in one process — required for emails and scheduled jobs; never run a second copy
 - **db**: MySQL 8.4 (port 3306)
 - **mailer**: MailPit (port 8025 web UI) — catches all outgoing emails in development
 
@@ -38,7 +37,7 @@ docker exec -it app_ooo_php bash
 ```
 
 Production deployments use `docker-compose.prod.yml` (see [`docs/production-deployment.md`](docs/production-deployment.md)) — it builds the `prod`
-image target and runs the same two workers. The default `docker-compose.yml` is
+image target and runs the same worker. The default `docker-compose.yml` is
 development-only: its entrypoint drops and recreates the database on every start.
 
 ### Database Credentials
@@ -154,7 +153,7 @@ and run by `App\\Infrastructure\\Slack\\Schedule\\WeeklyDigestScheduleProvider`
 every scheduler tick. Production must run:
 
 ```bash
-php bin/console messenger:consume scheduler_default scheduler_weekly_digest
+php bin/console messenger:consume scheduler_default scheduler_weekly_digest async
 ```
 
 ### Asset Management
@@ -288,7 +287,7 @@ The application uses Symfony events for cross-cutting concerns:
 - YAML-based application settings (leave request rules, notification preferences)
 - Type-safe access via `SettingsFacade` with enum keys and validated DTOs
 - See [`Module/Settings/README.md`](app/src/Module/Settings/README.md) for available settings, adding new ones, and architecture details
-- In `docker-compose.prod.yml` the file lives on the shared `settings` volume (`APP_SETTINGS_FILE=/var/www/settings/app_setting.yaml`, set in compose so it overrides `app/.env.local`), mounted by `php` and both workers so UI changes reach scheduled jobs and survive rebuilds. `docker/php/bin/seed-app-settings` (run by `start-fpm` and `start-worker`) copies the image defaults onto an empty volume and chowns the file to `www-data`; it never overwrites an existing file
+- In `docker-compose.prod.yml` the file lives on the shared `settings` volume (`APP_SETTINGS_FILE=/var/www/settings/app_setting.yaml`, set in compose so it overrides `app/.env.local`), mounted by `php` and `worker` so UI changes reach scheduled jobs and survive rebuilds. `docker/php/bin/seed-app-settings` (run by `start-fpm` and `start-worker`) copies the image defaults onto an empty volume and chowns the file to `www-data`; it never overwrites an existing file
 
 #### Holiday Module
 - Public holiday calendar management
