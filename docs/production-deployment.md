@@ -298,9 +298,11 @@ FROM user
 ORDER BY created_at;
 ```
 
-Check each balance and correct any that are too high in My Organization → Edit. Don't fix this
-with a blanket `UPDATE`: some admins changed the reset day when creating a user, or adjusted the
-balance afterwards, and those balances are already correct.
+Check each balance and correct any that are too high with Adjust balance: open the user in
+My Organization, click Adjust balance, enter a negative change and a reason. The correction is
+recorded in the user's balance history. Don't fix this with a blanket `UPDATE`: some admins changed
+the reset day when creating a user, or adjusted the balance afterwards, and those balances are
+already correct. An `UPDATE` would also bypass the balance history.
 
 ## Backups
 
