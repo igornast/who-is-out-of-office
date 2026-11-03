@@ -13,6 +13,7 @@ services:
             PHP_HOST: whoisooo_prod_php
         volumes:
             - public_assets:/var/www/public/assets:ro
+            - public_bundles:/var/www/public/bundles:ro
             - uploads:/var/www/public/uploads:ro
         restart: unless-stopped
         depends_on:
@@ -31,6 +32,7 @@ services:
             - ./app/.env.local
         volumes:
             - public_assets:/var/www/public/assets
+            - public_bundles:/var/www/public/bundles
             - uploads:/var/www/public/uploads
             - settings:/var/www/settings
         restart: unless-stopped
@@ -82,5 +84,6 @@ services:
 volumes:
     mysql_prod:
     public_assets:
+    public_bundles:
     uploads:
     settings:

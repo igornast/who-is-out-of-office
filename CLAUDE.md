@@ -38,7 +38,7 @@ docker exec -it app_ooo_php bash
 
 Production deployments use `docker-compose.prod.yml` (see [`docs/production-deployment.md`](docs/production-deployment.md)) — it builds the `prod`
 image target and runs the same worker. The default `docker-compose.yml` is
-development-only: its entrypoint drops and recreates the database on every start.
+development-only: its entrypoint drops and recreates the database on every start, and refuses to start unless `APP_ENV` resolves to `dev` or `test` (`docker/php/bin/assert-dev-env`).
 
 ### Database Credentials
 

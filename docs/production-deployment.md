@@ -2,8 +2,8 @@
 
 This guide covers running Who's OOO in production with `docker-compose.prod.yml`. That file
 builds the `prod` image target, mounts no source code, sets `APP_ENV=prod`, and starts one
-Messenger worker next to PHP-FPM, nginx and MySQL. The PHP container compiles the asset map on
-every start, so there's no separate asset build step.
+Messenger worker next to PHP-FPM, nginx and MySQL. The PHP container compiles the asset map and
+publishes bundle assets (EasyAdmin's CSS and JS) on every start, so there's no separate asset build step.
 
 The stack serves plain HTTP on port 80. TLS is your reverse proxy's job (see
 [step 2](#2-put-a-tls-proxy-in-front)).
@@ -18,6 +18,9 @@ them: the first section below and the admin account step.
 > `doctrine:database:drop --force` and reloads demo fixtures every time the container starts.
 > That's great for development. Against production, one `docker compose up` with that file
 > wipes the database, and there's no undo.
+> The development entrypoint refuses to start when `APP_ENV` resolves to anything other than
+> `dev` or `test`. That stops a stray `APP_ENV=prod` from reaching the drop, but a dev stack
+> running as `dev` still wipes its database on every start.
 
 You need both of these safeguards:
 

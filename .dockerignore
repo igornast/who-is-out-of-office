@@ -5,11 +5,14 @@ app/vendor
 app/var
 app/node_modules
 app/public/assets
+app/public/bundles
 app/assets/vendor
 app/tests/_output
 .env
 app/.env.local
 app/.env.*.local
+app/.env.local.php
+app/config/secrets/prod/prod.decrypt.private.php
 .claude
 .codex
 .idea

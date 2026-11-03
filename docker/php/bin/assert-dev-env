@@ -1,0 +1,22 @@
+#!/bin/sh
+set -e
+
+if ! resolved=$(php -d display_errors=stderr -r 'require "/var/www/vendor/autoload.php"; new Symfony\Component\Dotenv\Dotenv()->bootEnv($argv[1]."/.env"); echo $_SERVER["APP_ENV"] ?? "";' "${1:-/var/www}"); then
+    echo "Refusing to start: could not resolve APP_ENV (see the PHP error above)." >&2
+    exit 1
+fi
+
+case "$resolved" in
+    dev|test)
+        exit 0
+        ;;
+esac
+
+printf 'Refusing to start: APP_ENV is "%s".\n' "$resolved" >&2
+cat >&2 <<'EOF'
+This is the development stack. Its entrypoint drops the database and loads demo fixtures on every start.
+APP_ENV comes from the container environment, app/.env.local or app/.env.
+To run in production, use: docker compose -f docker-compose.prod.yml up -d --build
+See docs/production-deployment.md.
+EOF
+exit 1

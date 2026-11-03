@@ -108,11 +108,12 @@ php app/bin/console app:holiday:import DE Germany 2025
 
 The frontend uses Symfony AssetMapper and Symfony UX for JavaScript, CSS and components.
 
-The production PHP container compiles assets each time it starts. If you deploy without
+The production PHP container compiles assets and publishes bundle assets each time it starts. If you deploy without
 Docker, compile them yourself after each deploy:
 
 ```shell
 php app/bin/console asset-map:compile
+php app/bin/console assets:install
 ```
 
 Source assets live in `assets/` and `importmap.php`. Remote packages such as Stimulus and the UX

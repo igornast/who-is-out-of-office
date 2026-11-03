@@ -3,12 +3,22 @@ set -e
 
 cd /var/www
 
-chown -R www-data var
+if [ ! -f vendor/autoload.php ]; then
+    echo "Refusing to start: /var/www/vendor is missing." >&2
+    echo "The source directory is probably bind-mounted over the production image (for example ./app:/var/www)." >&2
+    echo "Use docker-compose.prod.yml, which mounts no source code. See docs/production-deployment.md." >&2
+    exit 1
+fi
 
 seed-app-settings
 
 echo "Compiling the asset map..."
 php bin/console asset-map:compile
+
+echo "Publishing bundle assets..."
+php bin/console assets:install public --no-interaction
+
+chown -R www-data var
 
 mkdir -p public/assets public/uploads
 chown -R www-data public/assets public/uploads
