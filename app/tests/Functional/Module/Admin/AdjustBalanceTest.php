@@ -171,7 +171,7 @@ it('rejects decimal adjustments', function (): void {
     $crawler = $client->submit($form);
 
     expect($client->getResponse()->getStatusCode())->toBe(200)
-        ->and($crawler->text())->toContain('Please enter an integer.');
+        ->and($crawler->text())->toContain('This value is not a valid integer.');
 });
 
 it('accepts a negative adjustment that takes the balance below zero', function (): void {
