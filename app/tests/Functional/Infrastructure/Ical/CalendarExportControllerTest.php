@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Infrastructure\Doctrine\Entity\Holiday;
+use App\Infrastructure\Doctrine\Entity\HolidayCalendar;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Shared\DTO\UserDTO;
 use App\Shared\Service\Ical\IcalSubscriptionUrlGenerator;
+use Ramsey\Uuid\Uuid;
 
 /*
  * Functional test for GET /api/calendar/{userId}/{secret}.ics
@@ -14,7 +17,6 @@ use App\Shared\Service\Ical\IcalSubscriptionUrlGenerator;
  *     Own approved leave: leave_request_1 (+2..+6 days), leave_request_2 (+8..+9 days)
  *     Teammates (share manager user_2): user_3 (John Doe), user_4 (Sofia Bergström),
  *       user_5 (Marco Rossi), user_6 (Aisha Patel) — all have approved leave in-window
- *   - holiday_calendar_de has holiday_4 (Tag der Deutschen Einheit, 2026-10-03) — in +1 year window
  */
 beforeEach(function (): void {
     $this->client = static::createClient();
@@ -94,25 +96,33 @@ it('explicit empty opt-out ([]/[]) keeps own leave but excludes teammates and ho
 });
 
 it('auto config (null/null) includes holiday events for user holiday calendar country', function (): void {
-    // holiday_calendar_de has holiday_4: Tag der Deutschen Einheit on YEAR-10-03
-    // Today is 2026-05-24; window is -1 month .. +1 year => 2026-04-24 .. 2027-05-24
-    // 2026-10-03 is within the window — so this holiday WILL appear
+    $holidayCalendar = $this->em->getRepository(HolidayCalendar::class)->findOneBy(['countryCode' => 'DE']);
+    $holiday = new Holiday(
+        id: Uuid::uuid4(),
+        description: 'In-window German holiday',
+        date: new DateTimeImmutable('+20 days')->setTime(0, 0),
+        holidayCalendar: $holidayCalendar,
+    );
+    $this->em->persist($holiday);
+
     $this->manager->calendarSubscriptionTeamMemberIds = null;
     $this->manager->calendarSubscriptionHolidayCalendarIds = null;
     $this->em->flush();
 
-    $userDTO = UserDTO::fromEntity($this->manager);
-    $url = $this->urlGenerator->generateForUser($userDTO);
-    $path = parse_url($url, PHP_URL_PATH);
+    try {
+        $userDTO = UserDTO::fromEntity($this->manager);
+        $url = $this->urlGenerator->generateForUser($userDTO);
+        $path = parse_url($url, PHP_URL_PATH);
 
-    $this->client->request('GET', $path);
-    $response = $this->client->getResponse();
+        $this->client->request('GET', $path);
+        $response = $this->client->getResponse();
 
-    expect($response->getStatusCode())->toBe(200);
-    $body = $response->getContent();
-
-    // Holiday events are prefixed with the country flag emoji (🇩🇪 for DE) in SUMMARY
-    expect($body)->toContain('Tag der Deutschen Einheit');
+        expect($response->getStatusCode())->toBe(200)
+            ->and($response->getContent())->toContain('In-window German holiday');
+    } finally {
+        $this->em->remove($holiday);
+        $this->em->flush();
+    }
 });
 
 it('auto config (null/null) includes teammate-country holiday calendars', function (): void {
