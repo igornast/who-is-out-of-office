@@ -54,7 +54,7 @@ Settings/
 
 | Setting | Type | Description | Default |
 |---------|------|-------------|---------|
-| `status_sync_enabled` | boolean | Enable/disable the Slack status auto-sync feature | `false` |
+| `status_sync_enabled` | boolean | Enable/disable the Slack status auto-sync feature (leave and public holidays) | `false` |
 | `weekly_digest_day` | enum (`WeeklyDigestDayEnum`) | Day of week the digest is sent (`MON`–`SUN`) | `MON` |
 | `weekly_digest_time` | string (`HH:MM`, 24h) | Time of day the digest is sent, interpreted in `weekly_digest_timezone` | `08:15` |
 | `weekly_digest_timezone` | string (IANA tz) | Timezone `weekly_digest_time` is interpreted in | `UTC` |

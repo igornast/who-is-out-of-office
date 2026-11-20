@@ -8,7 +8,6 @@ use App\Module\Holiday\UseCase\Command\DeleteCalendarCommandHandler;
 use App\Module\Holiday\UseCase\Command\SyncAllActiveCalendarsCommandHandler;
 use App\Module\Holiday\UseCase\Command\SyncCalendarCommandHandler;
 use App\Module\Holiday\UseCase\Command\ToggleCalendarActiveCommandHandler;
-use App\Module\Holiday\UseCase\Command\UpsertHolidayCalendarCommandHandler;
 use App\Module\Holiday\UseCase\Query\GetActiveCalendarsForCountryCodesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetAllCalendarsQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidaysForCalendarsBetweenQueryHandler;
@@ -24,7 +23,6 @@ use App\Shared\Facade\HolidayFacadeInterface;
 final class HolidayFacade implements HolidayFacadeInterface
 {
     public function __construct(
-        private readonly UpsertHolidayCalendarCommandHandler $upsertHandler,
         private readonly GetHolidayCalendarForCountryQueryHandler $holidayCalendarHandler,
         private readonly GetHolidayDaysForCountryBetweenDatesQueryHandler $holidayDaysHandler,
         private readonly GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler $holidayDaysGroupedByUserIdHandler,
@@ -42,11 +40,6 @@ final class HolidayFacade implements HolidayFacadeInterface
     public function getHolidayCalendarForCountry(string $countryCode): PublicHolidayCalendarDTO
     {
         return $this->holidayCalendarHandler->handle($countryCode);
-    }
-
-    public function upsertHolidayCalendar(PublicHolidayCalendarDTO $publicHolidayCalendarDTO): void
-    {
-        $this->upsertHandler->handle($publicHolidayCalendarDTO);
     }
 
     /**

@@ -7,7 +7,6 @@ use App\Infrastructure\Slack\Http\SlackProfileApiClient;
 use App\Infrastructure\Slack\UseCase\Command\RevokeSlackAdminTokenCommandHandler;
 use App\Infrastructure\Slack\UseCase\Command\SetSlackStatusCommandHandler;
 use App\Infrastructure\Slack\UseCase\Query\GetSlackAdminTokenQueryHandler;
-use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestTypeDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\Slack\SlackAdminTokenDTOFixture;
 use App\Tests\_fixtures\Shared\DTO\UserDTOFixture;
 use Psr\Log\LoggerInterface;
@@ -25,7 +24,6 @@ beforeEach(function (): void {
         $this->logger,
     );
 
-    $this->leaveType = LeaveRequestTypeDTOFixture::create(['name' => 'Vacation', 'slackStatusEmoji' => ':palm_tree:']);
     $this->until = new DateTimeImmutable('2026-03-24');
 });
 
@@ -34,7 +32,7 @@ it('skips silently when no admin token is configured', function (): void {
     $this->tokenQuery->expects('handle')->andReturn(null);
     $this->client->shouldNotReceive('setProfileStatus');
 
-    expect($this->handler->handle($user, $this->leaveType, $this->until))->toBeFalse();
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':palm_tree:', $this->until))->toBeFalse();
 });
 
 it('skips silently when user has no slack member id', function (): void {
@@ -42,7 +40,7 @@ it('skips silently when user has no slack member id', function (): void {
     $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create());
     $this->client->shouldNotReceive('setProfileStatus');
 
-    expect($this->handler->handle($user, $this->leaveType, $this->until))->toBeFalse();
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':palm_tree:', $this->until))->toBeFalse();
 });
 
 it('skips silently when user opted out', function (): void {
@@ -50,7 +48,7 @@ it('skips silently when user opted out', function (): void {
     $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create());
     $this->client->shouldNotReceive('setProfileStatus');
 
-    expect($this->handler->handle($user, $this->leaveType, $this->until))->toBeFalse();
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':palm_tree:', $this->until))->toBeFalse();
 });
 
 it('calls the client with the expected text, emoji, and end-of-day expiration', function (): void {
@@ -64,20 +62,140 @@ it('calls the client with the expected text, emoji, and end-of-day expiration', 
         ->once()
         ->with('xoxp-admin', 'U123', 'Vacation until Mar 24', ':palm_tree:', $expectedExpires);
 
-    expect($this->handler->handle($user, $this->leaveType, $this->until))->toBeTrue();
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':palm_tree:', $this->until))->toBeTrue();
 });
 
-it('uses :calendar: fallback when leave type has no slackStatusEmoji', function (): void {
+it('retries once with the fallback emoji when slack rejects the emoji', function (string $error): void {
     $user = UserDTOFixture::create(['slackMemberId' => 'U123']);
-    $leaveType = LeaveRequestTypeDTOFixture::create(['name' => 'Training', 'slackStatusEmoji' => null]);
     $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create(['plainToken' => 'xoxp-admin']));
 
     $this->client
         ->expects('setProfileStatus')
         ->once()
-        ->with('xoxp-admin', 'U123', Mockery::any(), ':calendar:', Mockery::any());
+        ->ordered()
+        ->with('xoxp-admin', 'U123', 'Vacation until Mar 24', ':flag-xx:', $this->until->setTime(23, 59, 59)->getTimestamp())
+        ->andThrow(new SlackStatusApiException($error));
+    $this->client
+        ->expects('setProfileStatus')
+        ->once()
+        ->ordered()
+        ->with('xoxp-admin', 'U123', 'Vacation until Mar 24', ':crossed_flags:', $this->until->setTime(23, 59, 59)->getTimestamp());
 
-    expect($this->handler->handle($user, $leaveType, $this->until))->toBeTrue();
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':flag-xx:', $this->until, ':crossed_flags:'))->toBeTrue();
+})->with([
+    'invalid_emoji_not_allowed',
+    'profile_status_set_failed_not_valid_emoji',
+    'profile_status_set_failed_not_emoji_syntax',
+]);
+
+it('does not retry with the fallback emoji on other non-fatal errors', function (string $error): void {
+    $user = UserDTOFixture::create(['slackMemberId' => 'U123']);
+    $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create());
+    $this->client->expects('setProfileStatus')->once()->andThrow(new SlackStatusApiException($error));
+    $this->logger->expects('warning')->once();
+
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':flag-xx:', $this->until, ':crossed_flags:'))->toBeFalse();
+})->with(['ratelimited', 'http_error']);
+
+it('handles a fatal auth error from the fallback attempt like the initial attempt', function (): void {
+    $user = UserDTOFixture::create(['slackMemberId' => 'U123']);
+    $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create(['plainToken' => 'xoxp-admin']));
+    $this->client
+        ->expects('setProfileStatus')
+        ->once()
+        ->ordered()
+        ->with('xoxp-admin', 'U123', 'Vacation until Mar 24', ':flag-xx:', $this->until->setTime(23, 59, 59)->getTimestamp())
+        ->andThrow(new SlackStatusApiException('invalid_emoji_not_allowed'));
+    $this->client
+        ->expects('setProfileStatus')
+        ->once()
+        ->ordered()
+        ->with('xoxp-admin', 'U123', 'Vacation until Mar 24', ':crossed_flags:', $this->until->setTime(23, 59, 59)->getTimestamp())
+        ->andThrow(new SlackStatusApiException('token_revoked'));
+    $this->logger->expects('error')->once();
+    $this->revoke->expects('handle')->once();
+
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':flag-xx:', $this->until, ':crossed_flags:'))->toBeFalse();
+});
+
+it('does not retry when no fallback emoji is given', function (): void {
+    $user = UserDTOFixture::create(['slackMemberId' => 'U123']);
+    $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create());
+    $this->client->expects('setProfileStatus')->once()->andThrow(new SlackStatusApiException('invalid_emoji_not_allowed'));
+    $this->logger->expects('warning')->once();
+
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':flag-xx:', $this->until))->toBeFalse();
+});
+
+it('does not retry when the fallback emoji is the same as the rejected emoji', function (): void {
+    $user = UserDTOFixture::create(['slackMemberId' => 'U123']);
+    $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create());
+    $this->client->expects('setProfileStatus')->once()->andThrow(new SlackStatusApiException('invalid_emoji_not_allowed'));
+    $this->logger->expects('warning')->once();
+
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':flag-xx:', $this->until, ':flag-xx:'))->toBeFalse();
+});
+
+it('returns false when the fallback retry also fails with a non-fatal error', function (): void {
+    $user = UserDTOFixture::create(['slackMemberId' => 'U123']);
+    $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create(['plainToken' => 'xoxp-admin']));
+    $this->client
+        ->expects('setProfileStatus')
+        ->once()
+        ->ordered()
+        ->with('xoxp-admin', 'U123', 'Vacation until Mar 24', ':flag-xx:', $this->until->setTime(23, 59, 59)->getTimestamp())
+        ->andThrow(new SlackStatusApiException('invalid_emoji_not_allowed'));
+    $this->client
+        ->expects('setProfileStatus')
+        ->once()
+        ->ordered()
+        ->with('xoxp-admin', 'U123', 'Vacation until Mar 24', ':crossed_flags:', $this->until->setTime(23, 59, 59)->getTimestamp())
+        ->andThrow(new SlackStatusApiException('ratelimited'));
+    $this->logger->expects('warning')->once();
+    $this->revoke->shouldNotReceive('handle');
+
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':flag-xx:', $this->until, ':crossed_flags:'))->toBeFalse();
+});
+
+it('does not retry on a fatal auth error from the first attempt and revokes the token', function (string $error): void {
+    $user = UserDTOFixture::create(['slackMemberId' => 'U123']);
+    $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create());
+    $this->client->expects('setProfileStatus')->once()->andThrow(new SlackStatusApiException($error));
+    $this->logger->expects('error')->once();
+    $this->revoke->expects('handle')->once();
+
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':flag-xx:', $this->until, ':crossed_flags:'))->toBeFalse();
+})->with(['invalid_auth', 'token_revoked', 'account_inactive']);
+
+it('does not retry again when the fallback emoji is also rejected', function (): void {
+    $user = UserDTOFixture::create(['slackMemberId' => 'U123']);
+    $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create(['plainToken' => 'xoxp-admin']));
+    $this->client
+        ->expects('setProfileStatus')
+        ->once()
+        ->ordered()
+        ->with('xoxp-admin', 'U123', 'Vacation until Mar 24', ':flag-xx:', $this->until->setTime(23, 59, 59)->getTimestamp())
+        ->andThrow(new SlackStatusApiException('invalid_emoji_not_allowed'));
+    $this->client
+        ->expects('setProfileStatus')
+        ->once()
+        ->ordered()
+        ->with('xoxp-admin', 'U123', 'Vacation until Mar 24', ':crossed_flags:', $this->until->setTime(23, 59, 59)->getTimestamp())
+        ->andThrow(new SlackStatusApiException('profile_status_set_failed_not_valid_emoji'));
+    $this->logger->expects('warning')->once();
+    $this->revoke->shouldNotReceive('handle');
+
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':flag-xx:', $this->until, ':crossed_flags:'))->toBeFalse();
+});
+
+it('propagates unexpected client exceptions without retrying', function (): void {
+    $user = UserDTOFixture::create(['slackMemberId' => 'U123']);
+    $this->tokenQuery->expects('handle')->andReturn(SlackAdminTokenDTOFixture::create());
+    $this->client->expects('setProfileStatus')->once()->andThrow(new RuntimeException('boom'));
+    $this->revoke->shouldNotReceive('handle');
+
+    expect(fn () => $this->handler->handle($user, 'Vacation until Mar 24', ':flag-xx:', $this->until, ':crossed_flags:'))
+        ->toThrow(RuntimeException::class, 'boom');
 });
 
 it('revokes the admin token when the API returns a fatal auth error', function (): void {
@@ -87,7 +205,7 @@ it('revokes the admin token when the API returns a fatal auth error', function (
     $this->logger->expects('error')->once();
     $this->revoke->expects('handle')->once();
 
-    expect($this->handler->handle($user, $this->leaveType, $this->until))->toBeFalse();
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':palm_tree:', $this->until))->toBeFalse();
 });
 
 it('logs but does not revoke on non-fatal api errors', function (): void {
@@ -97,5 +215,17 @@ it('logs but does not revoke on non-fatal api errors', function (): void {
     $this->logger->expects('warning')->once();
     $this->revoke->shouldNotReceive('handle');
 
-    expect($this->handler->handle($user, $this->leaveType, $this->until))->toBeFalse();
+    expect($this->handler->handle($user, 'Vacation until Mar 24', ':palm_tree:', $this->until))->toBeFalse();
 });
+
+it('identifies documented and runtime invalid emoji errors', function (string $error, bool $expected): void {
+    expect((new SlackStatusApiException($error))->isInvalidEmojiError())->toBe($expected);
+})->with([
+    ['invalid_emoji_not_allowed', true],
+    ['profile_status_set_failed_not_valid_emoji', true],
+    ['profile_status_set_failed_not_emoji_syntax', true],
+    ['ratelimited', false],
+    ['http_error', false],
+    ['invalid_auth', false],
+    ['too_long', false],
+]);

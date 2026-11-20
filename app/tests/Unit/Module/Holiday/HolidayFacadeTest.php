@@ -7,7 +7,6 @@ use App\Module\Holiday\UseCase\Command\DeleteCalendarCommandHandler;
 use App\Module\Holiday\UseCase\Command\SyncAllActiveCalendarsCommandHandler;
 use App\Module\Holiday\UseCase\Command\SyncCalendarCommandHandler;
 use App\Module\Holiday\UseCase\Command\ToggleCalendarActiveCommandHandler;
-use App\Module\Holiday\UseCase\Command\UpsertHolidayCalendarCommandHandler;
 use App\Module\Holiday\UseCase\Query\GetActiveCalendarsForCountryCodesQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetAllCalendarsQueryHandler;
 use App\Module\Holiday\UseCase\Query\GetHolidaysForCalendarsBetweenQueryHandler;
@@ -20,7 +19,6 @@ use App\Tests\_fixtures\Shared\DTO\Holiday\PublicHolidayDTOFixture;
 use Ramsey\Uuid\Uuid;
 
 beforeEach(function (): void {
-    $this->upsertHandler = mock(UpsertHolidayCalendarCommandHandler::class);
     $this->holidayCalendarHandler = mock(GetHolidayCalendarForCountryQueryHandler::class);
     $this->holidayDaysHandler = mock(GetHolidayDaysForCountryBetweenDatesQueryHandler::class);
     $this->holidayDaysGroupedByUserIdHandler = mock(GetHolidayDaysGroupedByUserIdBetweenDatesQueryHandler::class);
@@ -34,7 +32,6 @@ beforeEach(function (): void {
     $this->holidaysForCalendarsHandler = mock(GetHolidaysForCalendarsBetweenQueryHandler::class);
 
     $this->facade = new HolidayFacade(
-        upsertHandler: $this->upsertHandler,
         holidayCalendarHandler: $this->holidayCalendarHandler,
         holidayDaysHandler: $this->holidayDaysHandler,
         holidayDaysGroupedByUserIdHandler: $this->holidayDaysGroupedByUserIdHandler,
@@ -60,21 +57,6 @@ it('calls handler to get holiday calendar for country', function () {
         ->andReturn($expectedCalendar);
 
     $this->facade->getHolidayCalendarForCountry($countryCode);
-});
-
-it('calls handler to upsert holiday calendar', function () {
-    $calendarDTO = PublicHolidayCalendarDTOFixture::create([
-        'id' => Uuid::uuid4(),
-        'countryCode' => 'NG',
-        'countryName' => 'Nigeria',
-    ]);
-
-    $this->upsertHandler
-        ->expects('handle')
-        ->once()
-        ->with($calendarDTO);
-
-    $this->facade->upsertHolidayCalendar($calendarDTO);
 });
 
 it('calls handler to get holiday days for country between dates', function () {
