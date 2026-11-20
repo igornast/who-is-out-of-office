@@ -46,13 +46,12 @@ class PublicHolidayCalendarRepository extends ServiceEntityRepository implements
             return [];
         }
 
-        return array_values(array_map(
-            fn (Holiday $holiday): PublicHolidayDTO => PublicHolidayDTO::fromEntity($holiday),
-            array_filter(
-                $calendarEntity->holidays->toArray(),
-                fn (Holiday $holiday): bool => $holiday->date->format('Y') === (string) $year,
-            ),
-        ));
+        return array_filter(
+            $calendarEntity->holidays->toArray(),
+            fn (Holiday $holiday): bool => $holiday->date->format('Y') === (string) $year,
+        )
+            |> (fn (array $holidays): array => array_map(PublicHolidayDTO::fromEntity(...), $holidays))
+            |> array_values(...);
     }
 
     public function applyHolidayReconciliation(PublicHolidayCalendarDTO $calendarDTO, int $year, HolidayReconciliationDTO $reconciliation): void
