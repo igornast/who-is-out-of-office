@@ -27,4 +27,9 @@ class Version20261118120000 extends AbstractMigration
         $this->addSql('ALTER TABLE slack_holiday_status DROP FOREIGN KEY FK_DA04057D830A3EC0');
         $this->addSql('DROP TABLE slack_holiday_status');
     }
+
+    public function isTransactional(): bool
+    {
+        return false;
+    }
 }
