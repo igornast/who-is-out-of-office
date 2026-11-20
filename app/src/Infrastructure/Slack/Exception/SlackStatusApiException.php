@@ -17,4 +17,13 @@ class SlackStatusApiException extends \RuntimeException
     {
         return in_array($this->slackError, ['invalid_auth', 'token_revoked', 'account_inactive'], true);
     }
+
+    public function isInvalidEmojiError(): bool
+    {
+        return in_array($this->slackError, [
+            'invalid_emoji_not_allowed',
+            'profile_status_set_failed_not_valid_emoji',
+            'profile_status_set_failed_not_emoji_syntax',
+        ], true);
+    }
 }

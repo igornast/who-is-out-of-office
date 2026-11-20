@@ -7,7 +7,9 @@ namespace App\Infrastructure\Doctrine\Repository;
 use App\Infrastructure\Doctrine\Entity\Holiday;
 use App\Infrastructure\Doctrine\Entity\HolidayCalendar;
 use App\Module\Holiday\Repository\PublicHolidayCalendarRepositoryInterface;
+use App\Shared\DTO\Holiday\HolidayReconciliationDTO;
 use App\Shared\DTO\Holiday\PublicHolidayCalendarDTO;
+use App\Shared\DTO\Holiday\PublicHolidayDTO;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Ramsey\Uuid\Uuid;
@@ -33,28 +35,55 @@ class PublicHolidayCalendarRepository extends ServiceEntityRepository implements
         return PublicHolidayCalendarDTO::fromEntity($item);
     }
 
-    public function upsertByCountryCode(PublicHolidayCalendarDTO $calendarDTO, ?int $year = null): void
+    /**
+     * @return list<PublicHolidayDTO>
+     */
+    public function findHolidaysForYear(string $countryCode, int $year): array
+    {
+        /** @var ?HolidayCalendar $calendarEntity */
+        $calendarEntity = $this->findOneBy(['countryCode' => $countryCode]);
+        if (null === $calendarEntity) {
+            return [];
+        }
+
+        return array_values(array_map(
+            fn (Holiday $holiday): PublicHolidayDTO => PublicHolidayDTO::fromEntity($holiday),
+            array_filter(
+                $calendarEntity->holidays->toArray(),
+                fn (Holiday $holiday): bool => $holiday->date->format('Y') === (string) $year,
+            ),
+        ));
+    }
+
+    public function applyHolidayReconciliation(PublicHolidayCalendarDTO $calendarDTO, int $year, HolidayReconciliationDTO $reconciliation): void
     {
         /** @var ?HolidayCalendar $calendarEntity */
         $calendarEntity = $this->findOneBy(['countryCode' => $calendarDTO->countryCode]);
-
-        $entityManager = $this->getEntityManager();
         if (null === $calendarEntity) {
             $calendarEntity = new HolidayCalendar(
                 id: Uuid::uuid4(),
                 countryCode: $calendarDTO->countryCode,
-                countryName: $calendarDTO->countryName
+                countryName: $calendarDTO->countryName,
             );
-        }
-
-        if (null !== $year) {
-            $this->deleteHolidaysForYear($calendarEntity->id->toString(), $year);
-            $calendarEntity->lastSyncedYear = $year;
         }
 
         $calendarEntity->countryName = $calendarDTO->countryName;
         $calendarEntity->countryCode = $calendarDTO->countryCode;
-        foreach ($calendarDTO->holidays as $holidayDTO) {
+        $calendarEntity->lastSyncedYear = $year;
+        $entityManager = $this->getEntityManager();
+
+        foreach ($reconciliation->toUpdate as $holidayId => $holidayDTO) {
+            $holiday = $entityManager->find(Holiday::class, Uuid::fromString($holidayId));
+            if (null === $holiday) {
+                continue;
+            }
+
+            $holiday->description = $holidayDTO->description;
+            $holiday->isGlobal = $holidayDTO->isGlobal;
+            $holiday->counties = $holidayDTO->counties;
+        }
+
+        foreach ($reconciliation->toInsert as $holidayDTO) {
             $calendarEntity->holidays->add(new Holiday(
                 id: Uuid::fromString($holidayDTO->id),
                 description: $holidayDTO->description,
@@ -63,6 +92,13 @@ class PublicHolidayCalendarRepository extends ServiceEntityRepository implements
                 isGlobal: $holidayDTO->isGlobal,
                 counties: $holidayDTO->counties,
             ));
+        }
+
+        foreach ($reconciliation->toDelete as $holidayId) {
+            $holiday = $entityManager->find(Holiday::class, Uuid::fromString($holidayId));
+            if (null !== $holiday) {
+                $calendarEntity->holidays->removeElement($holiday);
+            }
         }
 
         $entityManager->persist($calendarEntity);
@@ -117,19 +153,6 @@ class PublicHolidayCalendarRepository extends ServiceEntityRepository implements
             ->getSingleScalarResult();
 
         return $count > 0;
-    }
-
-    public function deleteHolidaysForYear(string $calendarId, int $year): void
-    {
-        $startDate = new \DateTimeImmutable(sprintf('%d-01-01', $year));
-        $endDate = new \DateTimeImmutable(sprintf('%d-12-31', $year));
-
-        $this->getEntityManager()
-            ->createQuery('DELETE FROM App\Infrastructure\Doctrine\Entity\Holiday h WHERE h.holidayCalendar = :calendarId AND h.date >= :startDate AND h.date <= :endDate')
-            ->setParameter('calendarId', Uuid::fromString($calendarId))
-            ->setParameter('startDate', $startDate)
-            ->setParameter('endDate', $endDate)
-            ->execute();
     }
 
     /**

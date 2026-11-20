@@ -205,6 +205,14 @@ withdrawn.
 Each leave request carries an internal sync flag, so a status is never set twice and the
 command catches up on its own after downtime.
 
+On public holidays, it sets a status with the holiday name and the calendar country's flag (or
+🎌 if Slack rejects the flag). National holidays apply to everyone on the calendar; regional
+holidays apply to users in that region and to users without a region. Holiday statuses are set
+only on working days and never replace an active leave status. Several holidays on the same day
+are combined into one status. The status expires at the end of the day in the server's timezone
+(UTC by default), so users far from UTC may see it change a few hours early or late, as leave
+statuses already do.
+
 #### Requirements
 
 Besides the paid workspace, the Slack app needs an OAuth redirect URL that points to your

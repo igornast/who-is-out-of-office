@@ -84,3 +84,23 @@ it('returns correct flag emoji for various valid country codes', function (strin
     ['BR', '🇧🇷'],
     ['IN', '🇮🇳'],
 ]);
+
+it('returns a Slack flag shortcode for a valid uppercase country code', function () {
+    expect(EmojisProvider::getFlagShortcode('DE'))->toBe(':flag-de:');
+});
+
+it('returns a Slack flag shortcode for a valid lowercase country code', function () {
+    expect(EmojisProvider::getFlagShortcode('gr'))->toBe(':flag-gr:');
+});
+
+it('returns the generic holiday shortcode for an invalid country code', function (string $countryCode) {
+    expect(EmojisProvider::getFlagShortcode($countryCode))->toBe(':crossed_flags:');
+})->with(['', 'D', 'DEU', '12', 'D-']);
+
+it('returns a Slack flag shortcode for a mixed case country code', function () {
+    expect(EmojisProvider::getFlagShortcode('De'))->toBe(':flag-de:');
+});
+
+it('returns the generic holiday shortcode for non-ASCII letters', function (string $countryCode) {
+    expect(EmojisProvider::getFlagShortcode($countryCode))->toBe(':crossed_flags:');
+})->with(['Ä', 'ÄB', 'ÖÜ']);

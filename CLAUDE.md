@@ -296,6 +296,7 @@ The application uses Symfony events for cross-cutting concerns:
 - Holidays store `isGlobal` flag and `counties` (JSON array of subdivision codes like `DE-BY`)
 - Users can set a `subdivisionCode` to filter holidays to their region
 - Workday calculation respects subdivision: global holidays always apply, regional only when matching
+- Calendar re-import (`SyncCalendarCommandHandler` + `HolidayImportReconciler`) updates holidays in place and keeps their ids, because `slack_holiday_status` references them
 
 #### Feed Module
 
@@ -346,6 +347,7 @@ TRUSTED_HOSTS=         # optional regex of allowed Host headers, e.g. '^leave\.e
 #### Slack Integration
 - **Approval workflow**: Managers can approve/reject leave requests via Slack buttons
 - **Weekly digest**: Scheduled summary of absences and birthdays
+- **Status sync**: `slack:sync-statuses` (every 20 min) sets statuses for approved leave and public holidays; holiday statuses are tracked in `slack_holiday_status`; leave takes priority.
 - **Private DMs**: User-specific notifications when requests are processed
 - **Webhook endpoint**: `/api/slack/interactive-endpoint` handles button clicks
 - **Verification**: Uses `SLACK_SIGNING_SECRET` to verify incoming requests; `RequestVerifier` rejects every request while it is empty
