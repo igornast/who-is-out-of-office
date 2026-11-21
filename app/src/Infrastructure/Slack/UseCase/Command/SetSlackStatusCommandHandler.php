@@ -7,7 +7,6 @@ namespace App\Infrastructure\Slack\UseCase\Command;
 use App\Infrastructure\Slack\Exception\SlackStatusApiException;
 use App\Infrastructure\Slack\Http\SlackProfileApiClient;
 use App\Infrastructure\Slack\UseCase\Query\GetSlackAdminTokenQueryHandler;
-use App\Shared\DTO\LeaveRequest\LeaveRequestTypeDTO;
 use App\Shared\DTO\UserDTO;
 use Psr\Log\LoggerInterface;
 
@@ -21,7 +20,7 @@ class SetSlackStatusCommandHandler
     ) {
     }
 
-    public function handle(UserDTO $user, LeaveRequestTypeDTO $leaveType, \DateTimeImmutable $until): bool
+    public function handle(UserDTO $user, string $text, string $emoji, \DateTimeImmutable $until, ?string $fallbackEmoji = null): bool
     {
         $token = $this->tokenQuery->handle();
         if (null === $token) {
@@ -36,8 +35,6 @@ class SetSlackStatusCommandHandler
             return false;
         }
 
-        $text = sprintf('%s until %s', $leaveType->name, $until->format('M j'));
-        $emoji = $leaveType->slackStatusEmoji ?? LeaveRequestTypeDTO::DEFAULT_SLACK_STATUS_EMOJI;
         $expiresAt = $until->setTime(23, 59, 59)->getTimestamp();
 
         try {
@@ -45,16 +42,31 @@ class SetSlackStatusCommandHandler
 
             return true;
         } catch (SlackStatusApiException $e) {
-            if ($e->isFatalAuthError()) {
-                $this->logger->error('Slack status set failed with fatal auth error; revoking admin token', ['error' => $e->slackError]);
-                $this->revokeHandler->handle();
+            if ($e->isInvalidEmojiError() && null !== $fallbackEmoji && $fallbackEmoji !== $emoji) {
+                try {
+                    $this->client->setProfileStatus($token->plainToken, $user->slackMemberId, $text, $fallbackEmoji, $expiresAt);
 
-                return false;
+                    return true;
+                } catch (SlackStatusApiException $retryException) {
+                    return $this->handleApiError($retryException, $user);
+                }
             }
 
-            $this->logger->warning('Slack status set failed', ['error' => $e->slackError, 'user' => $user->id]);
+            return $this->handleApiError($e, $user);
+        }
+    }
+
+    private function handleApiError(SlackStatusApiException $exception, UserDTO $user): bool
+    {
+        if ($exception->isFatalAuthError()) {
+            $this->logger->error('Slack status set failed with fatal auth error; revoking admin token', ['error' => $exception->slackError]);
+            $this->revokeHandler->handle();
 
             return false;
         }
+
+        $this->logger->warning('Slack status set failed', ['error' => $exception->slackError, 'user' => $user->id]);
+
+        return false;
     }
 }

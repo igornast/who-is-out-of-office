@@ -6,13 +6,15 @@ namespace App\Shared\Service\Messaging;
 
 class EmojisProvider
 {
+    public const GENERIC_HOLIDAY_SHORTCODE = ':crossed_flags:';
+
     public static function getFlagEmojiCode(string $countryCode): string
     {
-        $countryCode = strtoupper($countryCode);
-
-        if (2 !== strlen($countryCode) || !ctype_alpha($countryCode)) {
+        if (!self::isValidCountryCode($countryCode)) {
             return '🏳';
         }
+
+        $countryCode = strtoupper($countryCode);
 
         $emoji = '';
         foreach (str_split($countryCode) as $char) {
@@ -24,5 +26,19 @@ class EmojisProvider
         }
 
         return $emoji;
+    }
+
+    public static function getFlagShortcode(string $countryCode): string
+    {
+        if (!self::isValidCountryCode($countryCode)) {
+            return self::GENERIC_HOLIDAY_SHORTCODE;
+        }
+
+        return sprintf(':flag-%s:', strtolower($countryCode));
+    }
+
+    private static function isValidCountryCode(string $countryCode): bool
+    {
+        return 2 === strlen($countryCode) && ctype_alpha($countryCode);
     }
 }

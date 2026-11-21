@@ -12,8 +12,6 @@ interface HolidayFacadeInterface
 {
     public function getHolidayCalendarForCountry(string $countryCode): PublicHolidayCalendarDTO;
 
-    public function upsertHolidayCalendar(PublicHolidayCalendarDTO $publicHolidayCalendarDTO): void;
-
     /**
      * @return PublicHolidayDTO[]
      */
