@@ -16,7 +16,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -185,13 +184,25 @@ class UserCrudController extends AppAbstractCrudController
                 ->allowMultipleChoices()
                 ->renderExpanded();
 
-            yield FormField::addTab('Security')->hideOnDetail();
-            yield ArrayField::new('roles')
-                ->hideOnDetail()
-                ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
+            yield ChoiceField::new('roles', 'crud.user.field.roles')
+                ->onlyOnIndex()
+                ->setChoices(RoleEnum::assignableChoices())
+                ->formatValue(fn (mixed $value, User $user): string => $this->roleTranslator->translate($user->getRoles()));
 
-            yield TextField::new('plainPassword')
-                ->onlyWhenUpdating()->setRequired(false);
+            if ($this->isAdmin()) {
+                yield FormField::addTab('Security')->hideOnDetail();
+                yield ChoiceField::new('roles', 'crud.user.field.roles')
+                    ->setChoices(RoleEnum::assignableChoices())
+                    ->allowMultipleChoices()
+                    ->renderExpanded()
+                    ->setRequired(false)
+                    ->setHelp('crud.user.help.roles')
+                    ->hideOnDetail()
+                    ->hideOnIndex();
+
+                yield TextField::new('plainPassword')
+                    ->onlyWhenUpdating()->setRequired(false);
+            }
         }
     }
 
@@ -215,6 +226,8 @@ class UserCrudController extends AppAbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
+        $this->ensureBaseRole($entityInstance);
+
         $ownsTransaction = !$entityManager->getConnection()->isTransactionActive();
 
         if ($ownsTransaction) {
@@ -243,6 +256,8 @@ class UserCrudController extends AppAbstractCrudController
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
+        $this->ensureBaseRole($entityInstance);
+
         if (isset($entityInstance->plainPassword)) {
             $entityInstance->password = $this->passwordHasher->hashPassword($entityInstance, $entityInstance->plainPassword);
         }
@@ -253,5 +268,10 @@ class UserCrudController extends AppAbstractCrudController
         }
 
         parent::updateEntity($entityManager, $entityInstance);
+    }
+
+    private function ensureBaseRole(User $user): void
+    {
+        $user->roles = array_values(array_unique([...$user->roles, RoleEnum::User->value]));
     }
 }
