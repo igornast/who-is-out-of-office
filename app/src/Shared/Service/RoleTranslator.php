@@ -9,15 +9,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RoleTranslator
 {
-    /**
-     * @var array<string, string>
-     */
-    private array $roleMapping = [
-        RoleEnum::Admin->value => 'role.admin',
-        RoleEnum::Manager->value => 'role.manager',
-        RoleEnum::User->value => 'role.user',
-    ];
-
     public function __construct(private readonly TranslatorInterface $translator)
     {
     }
@@ -27,7 +18,7 @@ class RoleTranslator
      */
     public function translate(array $roles): string
     {
-        $translated = array_map(fn (string $role): string => $this->translator->trans(id: $this->roleMapping[$role] ?? $role, domain: 'admin'), $roles);
+        $translated = array_map(fn (string $role): string => $this->translator->trans(id: RoleEnum::tryFrom($role)?->translationKey() ?? $role, domain: 'admin'), $roles);
 
         return implode(', ', $translated);
     }

@@ -304,6 +304,9 @@ crud:
         help:
             current_leave_balance: 'The number of available holiday days for the employee. Change it with the Adjust balance action so the change is recorded.'
             absence_balance_reset_day: 'The next annual reset date. It becomes read-only after the employee’s first leave period is created.'
+            roles: 'Everyone gets the User role automatically. Administrator doesn’t include Manager, so tick both if someone needs both.'
+        field:
+            roles: 'Roles'
 
     actions:
         leave_requests:
