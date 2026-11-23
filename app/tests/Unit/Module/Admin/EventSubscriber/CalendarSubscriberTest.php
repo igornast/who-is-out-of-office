@@ -98,7 +98,10 @@ it('adds leave request events with enriched extended props', function (): void {
     $leaveEvent = array_values($leaveEvents)[0];
 
     $options = $leaveEvent->getOptions();
-    expect($options['allDay'])->toBeTrue()
+    $serialized = $leaveEvent->toArray();
+    expect($serialized['allDay'])->toBeTrue()
+        ->and($serialized['start'])->toBe('2026-03-10')
+        ->and($serialized['end'])->toBe('2026-03-15')
         ->and($options['extendedProps']['type'])->toBe('leave')
         ->and($options['extendedProps']['status'])->toBe('approved')
         ->and($options['extendedProps']['leaveTypeName'])->toBe('Vacation')
@@ -109,7 +112,8 @@ it('adds leave request events with enriched extended props', function (): void {
         ->and($options['extendedProps']['startDate'])->toBe('Mar 10, 2026')
         ->and($options['extendedProps']['endDate'])->toBe('Mar 14, 2026')
         ->and($options['extendedProps']['detailUrl'])->toBeString()
-        ->and($options)->not->toHaveKey('url');
+        ->and($options)->not->toHaveKey('url')
+        ->and($options)->not->toHaveKey('allDay');
 });
 
 it('applies pending style for pending leave requests', function (): void {
@@ -150,11 +154,15 @@ it('adds birthday events with extended props', function (): void {
     $birthdayEvent = array_values($birthdayEvents)[0];
 
     $options = $birthdayEvent->getOptions();
-    expect($options['extendedProps']['type'])->toBe('birthday')
+    $serialized = $birthdayEvent->toArray();
+    expect($serialized['allDay'])->toBeTrue()
+        ->and($serialized['start'])->toBe('2026-03-15')
+        ->and($serialized['end'])->toBe('2026-03-15')
+        ->and($options['extendedProps']['type'])->toBe('birthday')
         ->and($options['extendedProps']['employeeName'])->toBe('Alice Wonder')
         ->and($options['extendedProps']['date'])->toBe('Mar 15')
         ->and($options['className'])->toBe(['birthday-event'])
-        ->and($options['allDay'])->toBeTrue();
+        ->and($options)->not->toHaveKey('allDay');
 });
 
 it('skips birthday events when birthDate is null', function (): void {
@@ -203,11 +211,15 @@ it('adds public holiday events with extended props', function (): void {
     $holidayEvent = array_values($holidayEvents)[0];
 
     $options = $holidayEvent->getOptions();
-    expect($options['extendedProps']['type'])->toBe('holiday')
+    $serialized = $holidayEvent->toArray();
+    expect($serialized['allDay'])->toBeTrue()
+        ->and($serialized['start'])->toBe('2026-04-03')
+        ->and($serialized)->not->toHaveKey('end')
+        ->and($options['extendedProps']['type'])->toBe('holiday')
         ->and($options['extendedProps']['description'])->toBe('Good Friday')
         ->and($options['extendedProps']['date'])->toBe('Apr 3, 2026')
-        ->and($options['allDay'])->toBeTrue()
-        ->and($options['backgroundColor'])->toBe('#fde2e2');
+        ->and($options['backgroundColor'])->toBe('#fde2e2')
+        ->and($options)->not->toHaveKey('allDay');
 });
 
 it('skips public holidays when user has no calendarCountryCode', function (): void {
@@ -552,5 +564,8 @@ it('marks non-working days as background events', function (): void {
 
     $offDay = array_values($offDayEvents)[0];
     expect($offDay->getOptions()['display'])->toBe('background')
-        ->and($offDay->getOptions()['allDay'])->toBeTrue();
+        ->and($offDay->getOptions())->not->toHaveKey('allDay')
+        ->and($offDay->toArray()['allDay'])->toBeTrue()
+        ->and($offDay->toArray()['start'])->toBe('2026-03-06')
+        ->and($offDay->toArray())->not->toHaveKey('end');
 });

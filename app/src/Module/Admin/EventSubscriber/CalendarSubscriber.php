@@ -113,6 +113,7 @@ class CalendarSubscriber implements EventSubscriberInterface
                 $title,
                 \DateTime::createFromImmutable($dto->startDate),
                 \DateTime::createFromImmutable($dto->endDate->modify('+1 day')),
+                allDay: true,
             );
             $style = $this->getLeaveEventStyle($dto->status, $leaveTypeDTO);
 
@@ -120,7 +121,6 @@ class CalendarSubscriber implements EventSubscriberInterface
                 'backgroundColor' => $style['backgroundColor'],
                 'borderColor' => $style['borderColor'],
                 'textColor' => $style['textColor'],
-                'allDay' => true,
                 'extendedProps' => [
                     'type' => 'leave',
                     'status' => $dto->status->value,
@@ -179,7 +179,8 @@ class CalendarSubscriber implements EventSubscriberInterface
             $calendarEvent = new Event(
                 sprintf('🥳 %s %s', $userDTO->firstName, $userDTO->lastName),
                 $birthdayThisYear,
-                $birthdayThisYear
+                $birthdayThisYear,
+                allDay: true,
             );
 
             $calendarEvent->setOptions([
@@ -187,7 +188,6 @@ class CalendarSubscriber implements EventSubscriberInterface
                 'borderColor' => '#00acc1',
                 'textColor' => '#000000',
                 'className' => ['birthday-event'],
-                'allDay' => true,
                 'extendedProps' => [
                     'type' => 'birthday',
                     'userId' => $userDTO->id,
@@ -215,13 +215,12 @@ class CalendarSubscriber implements EventSubscriberInterface
             $weekday = (int) $date->format('N');
 
             if (in_array($weekday, $nonWorkingDays)) {
-                $calendarEvent = new Event('⛔ Off Day', $date);
+                $calendarEvent = new Event('⛔ Off Day', $date, allDay: true);
                 $calendarEvent->setOptions([
                     'backgroundColor' => '#f0f0f0',
                     'borderColor' => '#d3d3d3',
                     'textColor' => '#888',
                     'display' => 'background',
-                    'allDay' => true,
                 ]);
                 $event->addEvent($calendarEvent);
             }
@@ -240,12 +239,12 @@ class CalendarSubscriber implements EventSubscriberInterface
             $calendarEvent = new Event(
                 sprintf('🎌 %s', $holidayDTO->description),
                 \DateTime::createFromImmutable($holidayDTO->date),
+                allDay: true,
             );
             $calendarEvent->setOptions([
                 'backgroundColor' => '#fde2e2',
                 'borderColor' => '#f5bcbc',
                 'textColor' => '#b30000',
-                'allDay' => true,
                 'extendedProps' => [
                     'type' => 'holiday',
                     'description' => $holidayDTO->description,

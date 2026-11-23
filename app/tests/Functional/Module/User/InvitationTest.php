@@ -25,7 +25,8 @@ it('displays the invitation form for a valid token', function (): void {
         ->toContain('Date of Birth')
         ->toContain('Password')
         ->toContain('Repeat Password')
-        ->toContain('Create Account');
+        ->toContain('Create Account')
+        ->and($client->getCrawler()->filter('script[type="importmap"]')->count())->toBe(1);
 });
 
 it('returns 404 for an invalid token', function (): void {

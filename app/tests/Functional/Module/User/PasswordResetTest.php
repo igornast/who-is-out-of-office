@@ -21,7 +21,8 @@ it('displays the password reset request form', function (): void {
     expect($content)
         ->toContain('Forgot Password')
         ->toContain('Email Address')
-        ->toContain('Send Reset Link');
+        ->toContain('Send Reset Link')
+        ->and($client->getCrawler()->filter('script[type="importmap"]')->count())->toBe(1);
 });
 
 it('submits email and shows success flash message', function (): void {

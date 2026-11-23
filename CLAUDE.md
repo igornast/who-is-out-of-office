@@ -378,7 +378,7 @@ SLACK_AR_HR_DIGEST_CHANNEL_ID=
 #### Two-Factor Authentication (2FA)
 - Built on `scheb/2fa-bundle` with TOTP + backup codes (user opt-in)
 - TOTP secret stored **encrypted at rest** via `TotpSecretEncryptor` (libsodium AEAD — `sodium_crypto_secretbox`)
-- `EncryptedTotpAuthenticator` decorates `scheb_two_factor.security.totp_authenticator` and decrypts the secret just-in-time; `User::eraseCredentials()` clears the plaintext after auth
+- `EncryptedTotpAuthenticator` decorates `scheb_two_factor.security.totp_authenticator` and decrypts the secret just-in-time; `User::__serialize()` leaves `plainPassword` and the decrypted TOTP secret out of the session payload, and `TwoFactorAuthenticationListener` clears the decrypted secret on 2FA success
 - Backup codes: 8-char codes (31-char alphabet), hashed with Argon2id via `BackupCodeHasher` (`NativePasswordHasher`), verified with `password_verify`
 - Firewall rule: `^/2fa` requires `IS_AUTHENTICATED_2FA_IN_PROGRESS`; `default_target_path: /app/dashboard` + `always_use_default_target_path: true` (no open redirect)
 - All privileged actions (setup, disable, regenerate codes) require password re-auth; disable additionally requires a valid TOTP code

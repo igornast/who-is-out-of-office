@@ -11,10 +11,11 @@ use App\Module\Admin\Form\TwoFactorDisableType;
 use App\Shared\Facade\UserFacadeInterface;
 use OTPHP\TOTP;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -26,7 +27,8 @@ class TwoFactorDisableController extends AbstractController
         private readonly UserFacadeInterface $userFacade,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly TotpSecretEncryptor $encryptor,
-        private readonly RateLimiterFactory $twoFactorLoginLimiter,
+        #[Target('two_factor_login')]
+        private readonly RateLimiterFactoryInterface $twoFactorLoginLimiter,
     ) {
     }
 

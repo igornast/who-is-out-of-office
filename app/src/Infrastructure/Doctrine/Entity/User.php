@@ -123,8 +123,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return array_unique(array_merge($this->roles, [RoleEnum::User->value]));
     }
 
-    public function eraseCredentials(): void
+    /**
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
     {
+        $data = get_object_vars($this);
+        unset($data['plainPassword'], $data['decryptedTotpSecret']);
+
+        return $data;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $property => $value) {
+            $this->{$property} = $value;
+        }
+
         $this->plainPassword = null;
         $this->decryptedTotpSecret = null;
     }
