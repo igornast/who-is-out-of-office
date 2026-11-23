@@ -1,4 +1,11 @@
 when@prod:
+    services:
+        Sentry\Monolog\Handler:
+            arguments:
+                $hub: '@Sentry\State\HubInterface'
+                $level: !php/const Monolog\Logger::ERROR
+                $fillExtraContext: true
+
     sentry:
         dsn: '%env(SENTRY_DSN)%'
         options:
@@ -12,8 +19,5 @@ when@prod:
     monolog:
         handlers:
             sentry:
-                type: sentry
-                level: !php/const Monolog\Logger::ERROR
-                hub_id: Sentry\State\HubInterface
-                fill_extra_context: true # Enables sending monolog context to Sentry
-                process_psr_3_messages: false # Disables the resolution of PSR-3 placeholders
+                type: service
+                id: Sentry\Monolog\Handler

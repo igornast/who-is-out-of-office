@@ -6,14 +6,16 @@ namespace App\Module\Admin\EventSubscriber;
 
 use Scheb\TwoFactorBundle\Security\TwoFactor\Event\TwoFactorAuthenticationEvent;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Event\TwoFactorAuthenticationEvents;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
 
 class TwoFactorRateLimitSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly RateLimiterFactory $twoFactorLoginLimiter,
+        #[Target('two_factor_login')]
+        private readonly RateLimiterFactoryInterface $twoFactorLoginLimiter,
     ) {
     }
 

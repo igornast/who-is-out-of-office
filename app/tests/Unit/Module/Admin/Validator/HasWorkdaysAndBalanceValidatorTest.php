@@ -13,8 +13,8 @@ use App\Tests\_fixtures\Shared\DTO\LeaveRequest\LeaveRequestTypeDTOFixture;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 beforeEach(function (): void {
     $this->security = mock(Security::class);
@@ -50,7 +50,6 @@ beforeEach(function (): void {
         leaveRequestFacade: $this->leaveRequestFacade,
         appSettingsFacade: $this->appSettingsFacade,
     );
-    $this->validator->initialize($this->context);
 });
 
 function setupFormContext(object $testCase, LeaveRequestTypeDTO $leaveType): void
@@ -71,7 +70,7 @@ it('throws UnexpectedTypeException when leaveType is not a LeaveRequestTypeDTO',
     $form->allows('getParent')->andReturn($parentForm);
     $this->context->allows('getObject')->andReturn($form);
 
-    $this->validator->validate(['start' => new DateTimeImmutable(), 'end' => new DateTimeImmutable()], $this->constraint);
+    $this->validator->validateInContext(['start' => new DateTimeImmutable(), 'end' => new DateTimeImmutable()], $this->constraint, $this->context);
 })->throws(Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
 
 it('adds violation when start date is less than minNoticeDays from today', function (): void {
@@ -91,7 +90,7 @@ it('adds violation when start date is less than minNoticeDays from today', funct
         ->once()
         ->andReturn($violationBuilder);
 
-    $this->validator->validate(['start' => $startDate, 'end' => $endDate], $this->constraint);
+    $this->validator->validateInContext(['start' => $startDate, 'end' => $endDate], $this->constraint, $this->context);
 });
 
 it('does not add minNoticeDays violation when start date meets minimum notice', function (): void {
@@ -109,7 +108,7 @@ it('does not add minNoticeDays violation when start date meets minimum notice', 
         ->with($this->constraint->minNoticeDaysMessage)
         ->never();
 
-    $this->validator->validate(['start' => $startDate, 'end' => $endDate], $this->constraint);
+    $this->validator->validateInContext(['start' => $startDate, 'end' => $endDate], $this->constraint, $this->context);
 });
 
 it('skips minNoticeDays check when setting is 0', function (): void {
@@ -127,7 +126,7 @@ it('skips minNoticeDays check when setting is 0', function (): void {
         ->with($this->constraint->minNoticeDaysMessage)
         ->never();
 
-    $this->validator->validate(['start' => $startDate, 'end' => $endDate], $this->constraint);
+    $this->validator->validateInContext(['start' => $startDate, 'end' => $endDate], $this->constraint, $this->context);
 });
 
 it('skips minNoticeDays check for non-balance leave types', function (): void {
@@ -138,7 +137,7 @@ it('skips minNoticeDays check for non-balance leave types', function (): void {
 
     $this->context->expects('buildViolation')->never();
 
-    $this->validator->validate(['start' => $startDate, 'end' => $endDate], $this->constraint);
+    $this->validator->validateInContext(['start' => $startDate, 'end' => $endDate], $this->constraint, $this->context);
 });
 
 it('adds violation when workdays exceed maxConsecutiveDays', function (): void {
@@ -160,7 +159,7 @@ it('adds violation when workdays exceed maxConsecutiveDays', function (): void {
         ->once()
         ->andReturn($violationBuilder);
 
-    $this->validator->validate(['start' => $startDate, 'end' => $endDate], $this->constraint);
+    $this->validator->validateInContext(['start' => $startDate, 'end' => $endDate], $this->constraint, $this->context);
 });
 
 it('does not add maxConsecutiveDays violation when within limit', function (): void {
@@ -178,7 +177,7 @@ it('does not add maxConsecutiveDays violation when within limit', function (): v
         ->with($this->constraint->maxConsecutiveDaysMessage)
         ->never();
 
-    $this->validator->validate(['start' => $startDate, 'end' => $endDate], $this->constraint);
+    $this->validator->validateInContext(['start' => $startDate, 'end' => $endDate], $this->constraint, $this->context);
 });
 
 it('skips maxConsecutiveDays check when setting is 0', function (): void {
@@ -196,31 +195,32 @@ it('skips maxConsecutiveDays check when setting is 0', function (): void {
         ->with($this->constraint->maxConsecutiveDaysMessage)
         ->never();
 
-    $this->validator->validate(['start' => $startDate, 'end' => $endDate], $this->constraint);
+    $this->validator->validateInContext(['start' => $startDate, 'end' => $endDate], $this->constraint, $this->context);
 });
 
 it('throws UnexpectedTypeException when the constraint is not HasWorkdaysAndBalance', function (): void {
-    $this->validator->validate(
+    $this->validator->validateInContext(
         ['start' => new DateTimeImmutable(), 'end' => new DateTimeImmutable()],
         new Symfony\Component\Validator\Constraints\NotBlank(),
+        $this->context,
     );
 })->throws(Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
 
 it('ignores an empty value', function (mixed $value): void {
     $this->context->expects('buildViolation')->never();
 
-    $this->validator->validate($value, $this->constraint);
+    $this->validator->validateInContext($value, $this->constraint, $this->context);
 })->with([
     'null' => [null],
     'empty string' => [''],
 ]);
 
 it('throws UnexpectedValueException when the value is not a date range', function (): void {
-    $this->validator->validate('2026-01-01', $this->constraint);
+    $this->validator->validateInContext('2026-01-01', $this->constraint, $this->context);
 })->throws(Symfony\Component\Validator\Exception\UnexpectedValueException::class);
 
 it('throws UnexpectedValueException when the range has no end date', function (): void {
-    $this->validator->validate(['start' => new DateTimeImmutable()], $this->constraint);
+    $this->validator->validateInContext(['start' => new DateTimeImmutable()], $this->constraint, $this->context);
 })->throws(Symfony\Component\Validator\Exception\UnexpectedValueException::class);
 
 it('throws AccessDeniedHttpException when nobody is authenticated', function (): void {
@@ -232,9 +232,7 @@ it('throws AccessDeniedHttpException when nobody is authenticated', function ():
         leaveRequestFacade: $this->leaveRequestFacade,
         appSettingsFacade: $this->appSettingsFacade,
     );
-    $validator->initialize($this->context);
-
-    $validator->validate(['start' => new DateTimeImmutable(), 'end' => new DateTimeImmutable()], $this->constraint);
+    $validator->validateInContext(['start' => new DateTimeImmutable(), 'end' => new DateTimeImmutable()], $this->constraint, $this->context);
 })->throws(Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException::class);
 
 it('adds violation when the range contains no workdays', function (): void {
@@ -252,9 +250,10 @@ it('adds violation when the range contains no workdays', function (): void {
         ->once()
         ->andReturn($violationBuilder);
 
-    $this->validator->validate(
+    $this->validator->validateInContext(
         ['start' => new DateTimeImmutable('+1 day'), 'end' => new DateTimeImmutable('+2 days')],
         $this->constraint,
+        $this->context,
     );
 });
 
@@ -273,9 +272,10 @@ it('adds violation when the leave balance is lower than the requested workdays',
         ->once()
         ->andReturn($violationBuilder);
 
-    $this->validator->validate(
+    $this->validator->validateInContext(
         ['start' => new DateTimeImmutable('+1 day'), 'end' => new DateTimeImmutable('+40 days')],
         $this->constraint,
+        $this->context,
     );
 });
 
@@ -289,8 +289,9 @@ it('adds no violation when workdays fit within the leave balance', function (): 
 
     $this->context->expects('buildViolation')->never();
 
-    $this->validator->validate(
+    $this->validator->validateInContext(
         ['start' => new DateTimeImmutable('+1 day'), 'end' => new DateTimeImmutable('+30 days')],
         $this->constraint,
+        $this->context,
     );
 });
