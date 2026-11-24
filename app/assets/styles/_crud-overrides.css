@@ -5,7 +5,7 @@
 /* Page header title */
 body.ea .content-header-title .title {
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--text-primary);
 }
@@ -27,19 +27,39 @@ body.ea .datagrid {
 
 
 /* Sort headers */
-body.ea .datagrid .table > thead > tr > th a {
+body.ea .datagrid > thead > tr > th a {
     color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     text-decoration: none;
+    white-space: nowrap;
 }
 
-body.ea .datagrid .table > thead > tr > th a:hover {
+body.ea .datagrid > thead > tr > th a:hover {
     color: var(--primary);
 }
 
-body.ea .datagrid .table > thead > tr > th a:focus-visible {
+body.ea .datagrid > thead > tr > th a:focus-visible {
     outline: none;
     box-shadow: var(--shadow-focus);
     border-radius: var(--radius-sm);
+}
+
+body.ea .datagrid > thead > tr > th,
+body.ea .datagrid > tbody > tr > td {
+    min-width: 0;
+}
+
+body.ea .datagrid > tbody > tr > td {
+    overflow-wrap: normal;
+}
+
+body.ea .datagrid > tbody > tr > td.field-text,
+body.ea .datagrid > tbody > tr > td.field-association,
+body.ea .datagrid > tbody > tr > td.field-choice,
+body.ea .datagrid > tbody > tr > td.field-boolean {
+    white-space: nowrap;
 }
 
 /* Pagination */
@@ -108,7 +128,7 @@ body.ea .action-delete .btn {
 body.ea .form-action-search .form-control {
     border-radius: var(--radius-full);
     background-color: var(--app-surface-sunken);
-    border-color: var(--border);
+    border-color: transparent;
     font-family: var(--font-body);
     font-size: 13px;
     transition: all 0.15s ease;
@@ -116,6 +136,129 @@ body.ea .form-action-search .form-control {
 
 body.ea .form-action-search .form-control:focus {
     border-color: var(--border-focus);
+    box-shadow: var(--shadow-focus);
+}
+
+/* The holiday importer was an outline action before the EasyAdmin 5 refresh. */
+body.ea .content-header .action-importCalendar {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text-secondary);
+}
+
+body.ea .content-header .action-importCalendar:hover {
+    background: var(--primary-subtle);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Keep the app's compact filled boolean badges instead of EA5's outlined defaults. */
+body.ea .badge.badge-boolean-true {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--text-on-primary);
+}
+
+body.ea .badge.badge-boolean-false {
+    background-color: var(--app-surface-sunken);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+
+/* EA5's tab component inherits the primary color for every tab in this app. */
+body.ea .form-tabs-tablist .nav-tabs .nav-link {
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+}
+
+body.ea .form-tabs-tablist .nav-tabs .nav-link.active {
+    color: var(--primary);
+}
+
+body.ea .form-tabs-tablist .nav-tabs .nav-link::after {
+    background-color: var(--primary);
+}
+
+body.ea .field-date input[type='date'] {
+    width: auto;
+}
+
+/* EA5 keeps the batch inputs in the datagrid, but its dark-theme border token is too faint
+   for the app's table surface. Keep the controls visible and use the app's compact checkbox
+   treatment in both color schemes. */
+body.ea .datagrid .form-batch-checkbox,
+body.ea .datagrid .form-batch-checkbox-all {
+    --bs-border-color: var(--border-strong);
+    --form-type-check-input-border-color: var(--border-strong);
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    margin: 2px 0 0;
+    background-color: var(--app-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+body.ea .datagrid input.form-check-input.form-batch-checkbox,
+body.ea .datagrid input.form-check-input.form-batch-checkbox-all {
+    border-color: var(--border-strong);
+}
+
+html.dark body.ea .datagrid input.form-check-input.form-batch-checkbox,
+html.dark body.ea .datagrid input.form-check-input.form-batch-checkbox-all {
+    border-color: var(--border-strong);
+}
+
+body.ea .datagrid .form-batch-checkbox:checked,
+body.ea .datagrid .form-batch-checkbox-all:checked,
+body.ea .datagrid .form-batch-checkbox-all:indeterminate {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    background-image: var(--ea-primary-foreground-check-icon);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+body.ea .datagrid .form-batch-checkbox:focus-visible,
+body.ea .datagrid .form-batch-checkbox-all:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+/* EA5 renders the action-menu icon as an SVG with block-size: 100%, but the inline icon
+   wrapper has no definite height in the app's compact table cells. Give the trigger and icon
+   an explicit box so the dots remain visible and clickable. */
+body.ea .datagrid .dropdown-actions > .dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 4px;
+    color: var(--text-muted);
+}
+
+body.ea .datagrid .dropdown-actions > .dropdown-toggle > .icon {
+    width: 1.25em;
+    height: 1.25em;
+}
+
+body.ea .datagrid .dropdown-actions > .dropdown-toggle > .icon > svg {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+}
+
+body.ea .datagrid .dropdown-actions > .dropdown-toggle:hover,
+body.ea .datagrid .dropdown-actions > .dropdown-toggle:focus-visible {
+    color: var(--primary);
+}
+
+body.ea .datagrid .dropdown-actions > .dropdown-toggle:focus-visible {
+    outline: none;
     box-shadow: var(--shadow-focus);
 }
 
@@ -248,25 +391,25 @@ body.ea .toast-header {
     color: var(--text-primary);
 }
 
-html.dark body.ea .datagrid .table > tbody > tr > td,
-html.dark body.ea .datagrid .table > thead > tr > th {
+html.dark body.ea .datagrid > tbody > tr > td,
+html.dark body.ea .datagrid > thead > tr > th {
     border-color: var(--border-light);
 }
 
-html.dark body.ea .datagrid .table > tbody > tr > td {
+html.dark body.ea .datagrid > tbody > tr > td {
     color: var(--text-secondary);
 }
 
-html.dark body.ea .datagrid .table > thead > tr > th {
+html.dark body.ea .datagrid > thead > tr > th {
     background-color: var(--app-bg-alt);
     color: var(--text-muted);
 }
 
-html.dark body.ea .datagrid .table > thead > tr > th a {
+html.dark body.ea .datagrid > thead > tr > th a {
     color: var(--text-muted);
 }
 
-html.dark body.ea .datagrid .table > tbody > tr:hover > td {
+html.dark body.ea .datagrid > tbody > tr:hover > td {
     background-color: var(--app-bg-alt);
 }
 
@@ -284,7 +427,7 @@ html.dark body.ea .content-header {
     background-color: var(--app-bg);
 }
 
-html.dark body.ea .datagrid .table > tbody > tr > td .icon svg {
+html.dark body.ea .datagrid > tbody > tr > td .icon svg {
     color: var(--text-muted);
 }
 
@@ -310,29 +453,21 @@ html.dark body.ea .datagrid .table > tbody > tr > td .icon svg {
         gap: 8px;
     }
 
-    /* Hide checkbox column on mobile (batch actions impractical on touch) */
-    body.ea .datagrid .table th.checkbox-column,
-    body.ea .datagrid .table td.checkbox-column,
-    body.ea .form-check.form-switch.field-boolean {
-        display: none;
-    }
-
     /* Compact table cell padding */
-    body.ea .datagrid .table > thead > tr > th,
-    body.ea .datagrid .table > tbody > tr > td {
+    body.ea .datagrid > thead > tr > th,
+    body.ea .datagrid > tbody > tr > td {
         padding: 8px 10px;
         font-size: 12px;
     }
 
-    /* Responsive header (EA's built-in mobile header) */
-    body.ea .responsive-header {
-        background-color: var(--app-surface);
-        border-bottom: 1px solid var(--border-light);
+    body.ea .datagrid > tbody > tr > td:not(.batch-actions-selector, .actions, .field-boolean) {
+        padding-block: 8px;
+        padding-inline-end: 10px;
+        padding-inline-start: 35%;
     }
 
-    body.ea .responsive-header .title {
-        font-family: var(--font-display);
-        color: var(--text-primary);
+    body.ea .datagrid > tbody > tr > td.field-boolean {
+        padding-inline-start: 35%;
     }
 
     /* Reduce global-actions spacing */

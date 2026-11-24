@@ -87,9 +87,7 @@ it('attributes a batch rejection to the current app user', function () {
         'batchReject',
         [$leaveRequest->id->toString()],
         LeaveRequest::class,
-        '/admin',
         'token',
-        false,
     );
     $context = (new ReflectionClass(AdminContext::class))->newInstanceWithoutConstructor();
     assert($context instanceof AdminContext);

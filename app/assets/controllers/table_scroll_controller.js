@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
     connect() {
-        this.contentBody = this.element.querySelector('.content-body');
+        this.contentBody = this.element.querySelector('.datagrid-scroll');
         if (!this.contentBody || !this.contentBody.querySelector('.datagrid')) {
             return;
         }

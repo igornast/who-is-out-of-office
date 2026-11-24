@@ -56,4 +56,18 @@ abstract class AppAbstractCrudController extends AbstractCrudController
 
         return false;
     }
+
+    protected function formatAdminUserName(?User $user): string
+    {
+        if (null === $user) {
+            return '—';
+        }
+
+        return $this->escapeAdminText(sprintf('%s %s', $user->firstName, $user->lastName));
+    }
+
+    protected function escapeAdminText(string $value): string
+    {
+        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
 }
