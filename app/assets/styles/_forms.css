@@ -116,6 +116,15 @@ body.ea .form-check-input:focus {
     border-color: var(--border-focus);
 }
 
+/* EasyAdmin 5 replaced Bootstrap's .form-switch markup with .ea-switch. */
+body.ea .ea-switch-input:checked ~ .ea-switch-track {
+    background-color: var(--primary);
+}
+
+body.ea .ea-switch-input:focus-visible ~ .ea-switch-track {
+    box-shadow: var(--shadow-focus);
+}
+
 body.ea .has-error .form-control,
 body.ea .is-invalid {
     border-color: var(--danger);
@@ -156,53 +165,6 @@ body.ea .is-invalid:focus {
     font-size: 12px;
     color: var(--text-muted);
     margin-top: 2px;
-}
-
-.toggle-switch {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    flex-shrink: 0;
-}
-
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-    position: absolute;
-}
-
-.toggle-track {
-    position: absolute;
-    inset: 0;
-    background-color: var(--border);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.toggle-track::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 18px;
-    height: 18px;
-    background-color: var(--app-surface);
-    border-radius: 50%;
-    transition: transform 0.2s ease;
-}
-
-.toggle-switch input:checked + .toggle-track {
-    background-color: var(--primary);
-}
-
-.toggle-switch input:checked + .toggle-track::after {
-    transform: translateX(20px);
-}
-
-.toggle-switch input:focus-visible + .toggle-track {
-    box-shadow: var(--shadow-focus);
 }
 
 .info-panel {
@@ -385,9 +347,7 @@ body.ea .is-invalid:focus {
 @media (prefers-reduced-motion: reduce) {
     body.ea .form-control,
     body.ea .form-select,
-    .form-input,
-    .toggle-track,
-    .toggle-track::after {
+    .form-input {
         transition: none;
     }
 }

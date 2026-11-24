@@ -211,7 +211,7 @@ body.ea .responsive-header {
     display: none !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
     body.ea .main-content .content-top .content-search,
     body.ea .main-content .content-top .ooo-breadcrumb {
         display: none;

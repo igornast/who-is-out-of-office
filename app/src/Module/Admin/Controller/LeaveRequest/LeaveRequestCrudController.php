@@ -154,11 +154,11 @@ class LeaveRequestCrudController extends AppAbstractCrudController
         yield FormField::addColumn(8);
         yield FormField::addFieldset('Request absence');
         yield AssociationField::new('user', 'Person')
-            ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName))
+            ->formatValue(fn (User $user, LeaveRequest $request): string => $this->formatAdminUserName($user))
             ->setPermission(RoleEnum::Admin->value);
 
         yield AssociationField::new('leaveType', 'Type of the absence')
-            ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $requestType->name);
+            ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $this->escapeAdminText($requestType->name));
 
         yield DateField::new('startDate', 'From')
             ->setColumns(6);
@@ -170,7 +170,7 @@ class LeaveRequestCrudController extends AppAbstractCrudController
         yield ChoiceField::new('status')->setChoices(LeaveRequestStatusEnum::cases())->setDisabled()->hideWhenCreating();
         yield NumberField::new('workDays')->setDisabled()->hideWhenCreating();
         yield AssociationField::new('approvedBy')
-            ->formatValue(fn (?User $user): string => null === $user ? '—' : sprintf('%s %s', $user->firstName, $user->lastName))
+            ->formatValue(fn (?User $user): string => $this->formatAdminUserName($user))
             ->setDisabled()->hideWhenCreating();
 
         if ($this->appSettingsFacade->isAutoApprove()) {

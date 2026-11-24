@@ -110,6 +110,35 @@ it('returns 405 for GET requests to action routes', function (): void {
     expect($this->client->getResponse()->getStatusCode())->toBe(405);
 });
 
+it('escapes a users HTML name on the team index and detail pages', function (): void {
+    $htmlName = '<img src=x onerror=alert(1)>';
+    $this->regularUser->firstName = $htmlName;
+    $this->em->flush();
+
+    $this->client->loginUser($this->admin);
+    $indexCrawler = $this->client->request('GET', '/app/dashboard/team/leave-requests');
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200)
+        ->and($indexCrawler->filter('img[src="x"]')->count())->toBe(0)
+        ->and($this->client->getResponse()->getContent())->toContain('&lt;img');
+
+    $detailUrl = null;
+    foreach ($indexCrawler->filter('a')->extract(['href']) as $href) {
+        if (is_string($href) && str_contains($href, $this->pendingRequest->id->toString())) {
+            $detailUrl = $href;
+            break;
+        }
+    }
+
+    expect($detailUrl)->not->toBeNull();
+
+    $detailCrawler = $this->client->request('GET', $detailUrl);
+
+    expect($this->client->getResponse()->getStatusCode())->toBe(200)
+        ->and($detailCrawler->filter('img[src="x"]')->count())->toBe(0)
+        ->and($this->client->getResponse()->getContent())->toContain('&lt;img');
+});
+
 it('returns JSON 403 for missing CSRF token', function (): void {
     $this->client->loginUser($this->admin);
     $id = $this->pendingRequest->id;

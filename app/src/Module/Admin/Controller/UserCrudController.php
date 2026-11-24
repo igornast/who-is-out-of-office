@@ -187,7 +187,7 @@ class UserCrudController extends AppAbstractCrudController
             yield ChoiceField::new('roles', 'crud.user.field.roles')
                 ->onlyOnIndex()
                 ->setChoices(RoleEnum::assignableChoices())
-                ->formatValue(fn (mixed $value, User $user): string => $this->roleTranslator->translate($user->getRoles()));
+                ->formatValue(fn (mixed $value, User $user): string => $this->escapeAdminText($this->roleTranslator->translate($user->getRoles())));
 
             if ($this->isAdmin()) {
                 yield FormField::addTab('Security')->hideOnDetail();

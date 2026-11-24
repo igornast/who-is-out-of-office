@@ -37,7 +37,7 @@
             var palette = localStorage.getItem('whosooo-palette') || serverPalette || 'teal';
             if (['teal','sage','sunset','lavender'].indexOf(palette) === -1) palette = 'teal';
             document.documentElement.dataset.palette = palette;
-            if (window.innerWidth > 768 && localStorage.getItem('whosooo-sidebar') === 'collapsed') {
+            if (window.innerWidth > 991 && localStorage.getItem('whosooo-sidebar') === 'collapsed') {
                 document.documentElement.classList.add('sidebar-collapsed');
             }
         })();
@@ -49,7 +49,7 @@
     {% set _current_route = app.request.attributes.get('_route') %}
     {% set _current_crud = app.request.attributes.get('crudControllerFqcn') ?? app.request.query.get('crudControllerFqcn') %}
 
-    <div class="ooo-sidebar"
+    <div id="ooo-sidebar" class="ooo-sidebar"
          data-controller="sidebar">
         <div class="ooo-sidebar-logo">
             <h1><a href="{{ path('app_dashboard') }}">Who's <span>OOO</span></a></h1>
@@ -216,7 +216,9 @@
     <div class="topbar-actions">
         <button class="ooo-mobile-toggle"
                 onclick="window.dispatchEvent(new CustomEvent('sidebar:toggle'))"
-                aria-label="{{ 'sidebar.menu'|trans(domain: 'admin') }}">
+                aria-label="{{ 'sidebar.menu'|trans(domain: 'admin') }}"
+                aria-expanded="false"
+                aria-controls="ooo-sidebar">
             <i data-lucide="menu"></i>
         </button>
         <a class="btn-quick-add" href="{{ url('app_dashboard_requests_new') }}">

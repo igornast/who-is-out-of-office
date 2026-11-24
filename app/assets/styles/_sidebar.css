@@ -1,31 +1,41 @@
-body.ea .sidebar-wrapper {
-    width: var(--sidebar-width);
-    min-width: var(--sidebar-width);
-    flex-shrink: 0;
-    transition: width 0.25s ease, min-width 0.25s ease;
+body.ea {
+    --sidebar-max-width: var(--sidebar-width);
 }
 
-body.ea .sidebar-wrapper .sidebar {
-    width: var(--sidebar-width);
-    background: var(--sidebar-bg);
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    z-index: 100;
-    transition: width 0.25s ease, background-color 0.25s ease;
-    padding: 0;
-    border-right: none;
-    overflow: visible;
-}
+@media (min-width: 992px) {
+    body.ea .sidebar-wrapper {
+        width: var(--sidebar-width);
+        min-width: var(--sidebar-width);
+        flex-shrink: 0;
+        transition: width 0.25s ease, min-width 0.25s ease;
+    }
 
-body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
-    display: none;
+    body.ea .ea-sidebar {
+        width: var(--sidebar-width);
+        max-width: none;
+        height: 100vh;
+        background: var(--sidebar-bg);
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        transition: width 0.25s ease, background-color 0.25s ease;
+        padding: 0;
+        border-right: none;
+        overflow: hidden;
+    }
+
+    body.ea .ea-layout-toggle-sidebar,
+    body.ea .ea-layout-toggle-content {
+        display: none;
+    }
 }
 
 .ooo-sidebar {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    min-height: 100%;
     height: 100%;
     overflow: hidden;
 }
@@ -41,7 +51,7 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
 
 .ooo-sidebar-logo h1 {
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--sidebar-text-active);
     letter-spacing: -0.3px;
@@ -140,6 +150,11 @@ body.ea .sidebar-wrapper .sidebar #sidebar-resizer-handler {
     color: var(--sidebar-icon);
     opacity: 0.7;
     flex-shrink: 0;
+}
+
+.ooo-sidebar-item i svg {
+    width: 100%;
+    height: 100%;
 }
 
 .ooo-sidebar-item:hover {
@@ -299,22 +314,6 @@ html.dark .ooo-theme-toggle .icon-moon {
     text-align: center;
 }
 
-.ooo-sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 99;
-    backdrop-filter: blur(2px);
-    transition: opacity 0.25s ease;
-    opacity: 0;
-}
-
-.ooo-sidebar-overlay.active {
-    display: block;
-    opacity: 1;
-}
-
 .ooo-mobile-toggle {
     display: none;
     width: 34px;
@@ -409,7 +408,7 @@ html.sidebar-collapsed body.ea .sidebar-wrapper {
     min-width: var(--sidebar-collapsed);
 }
 
-html.sidebar-collapsed body.ea .sidebar-wrapper .sidebar {
+html.sidebar-collapsed body.ea .ea-sidebar {
     width: var(--sidebar-collapsed);
 }
 
@@ -421,27 +420,32 @@ html.sidebar-collapsed .ooo-sidebar-item[title] {
     position: relative;
 }
 
-@media (min-width: 769px) and (max-width: 991px) {
+@media (max-width: 991px) {
     body.ea .wrapper {
-        display: grid;
-        grid-template-columns: var(--sidebar-width) auto;
+        display: block;
+        min-block-size: 100vh;
     }
-}
 
-@media (max-width: 768px) {
     body.ea .sidebar-wrapper {
         width: 0;
         min-width: 0;
     }
 
-    body.ea .sidebar-wrapper .sidebar {
-        width: var(--sidebar-width);
-        transform: translateX(-100%);
-        transition: transform 0.25s ease;
+    html.sidebar-collapsed body.ea .sidebar-wrapper {
+        width: 0;
+        min-width: 0;
     }
 
-    body.ea .sidebar-wrapper.sidebar-mobile-open .sidebar {
-        transform: translateX(0);
+    body.ea .ea-sidebar {
+        width: var(--sidebar-width);
+        max-width: none;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+    }
+
+    html.sidebar-collapsed body.ea .ea-sidebar {
+        width: var(--sidebar-width);
     }
 
     .ooo-sidebar-collapse-btn {
@@ -455,10 +459,9 @@ html.sidebar-collapsed .ooo-sidebar-item[title] {
 
 @media (prefers-reduced-motion: reduce) {
     body.ea .sidebar-wrapper,
-    body.ea .sidebar-wrapper .sidebar,
+    body.ea .ea-sidebar,
     .ooo-sidebar-collapse-btn i,
-    .ooo-sidebar-section-label,
-    .ooo-sidebar-overlay {
+    .ooo-sidebar-section-label {
         transition: none;
     }
 }

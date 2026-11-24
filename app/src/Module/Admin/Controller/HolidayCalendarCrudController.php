@@ -18,7 +18,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -33,7 +32,6 @@ class HolidayCalendarCrudController extends AppAbstractCrudController
 {
     public function __construct(
         private readonly HolidayFacadeInterface $holidayFacade,
-        private readonly EntityManagerInterface $entityManager,
         private readonly TranslatorInterface $translator,
     ) {
     }
@@ -55,10 +53,12 @@ class HolidayCalendarCrudController extends AppAbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         $toggleAction = Action::new('toggleActive', 'crud.holiday_calendar.action.toggle_active')
-            ->linkToCrudAction('toggleActive');
+            ->linkToCrudAction('toggleActive')
+            ->renderAsForm();
 
         $syncAction = Action::new('syncCalendar', 'crud.holiday_calendar.action.sync')
-            ->linkToCrudAction('syncCalendar');
+            ->linkToCrudAction('syncCalendar')
+            ->renderAsForm();
 
         $importAction = Action::new('importCalendar', 'crud.holiday_calendar.action.import')
             ->linkToUrl(fn () => $this->generateUrl('app_settings_holidays_import'))
@@ -96,6 +96,7 @@ class HolidayCalendarCrudController extends AppAbstractCrudController
     /**
      * @param AdminContext<HolidayCalendar> $context
      */
+    #[AdminRoute('/{entityId}/toggle-active', name: 'toggle_active', options: ['methods' => ['POST']])]
     public function toggleActive(AdminContext $context): Response
     {
         $calendar = $this->getCalendarFromContext($context);
@@ -112,6 +113,7 @@ class HolidayCalendarCrudController extends AppAbstractCrudController
     /**
      * @param AdminContext<HolidayCalendar> $context
      */
+    #[AdminRoute('/{entityId}/sync', name: 'sync', options: ['methods' => ['POST']])]
     public function syncCalendar(AdminContext $context): Response
     {
         $calendar = $this->getCalendarFromContext($context);
@@ -138,24 +140,12 @@ class HolidayCalendarCrudController extends AppAbstractCrudController
      */
     private function getCalendarFromContext(AdminContext $context): HolidayCalendar
     {
-        if (null !== $context->getCrud()) {
-            $instance = $context->getEntity()->getInstance();
-            if ($instance instanceof HolidayCalendar) {
-                return $instance;
-            }
-        }
-
-        $entityId = $context->getRequest()->query->get('entityId');
-        if (null === $entityId || '' === $entityId) {
+        $instance = $context->getEntity()->getInstance();
+        if (!$instance instanceof HolidayCalendar) {
             throw new NotFoundHttpException('Holiday calendar not found.');
         }
 
-        $calendar = $this->entityManager->find(HolidayCalendar::class, Uuid::fromString($entityId));
-        if (!$calendar instanceof HolidayCalendar) {
-            throw new NotFoundHttpException('Holiday calendar not found.');
-        }
-
-        return $calendar;
+        return $instance;
     }
 
     private function redirectToIndex(): Response

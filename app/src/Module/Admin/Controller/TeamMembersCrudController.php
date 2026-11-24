@@ -96,11 +96,11 @@ class TeamMembersCrudController extends AppAbstractCrudController
         yield TextField::new('lastName', 'crud.team_members.field.last_name');
         yield TextField::new('email', 'crud.team_members.field.email');
         yield ArrayField::new('roles', 'crud.team_members.field.role')
-            ->formatValue(fn (array $roles, User $user): string => $this->roleTranslator->translate($roles));
+            ->formatValue(fn (array $roles, User $user): string => $this->escapeAdminText($this->roleTranslator->translate($roles)));
         yield DateField::new('contractStartedAt', 'crud.team_members.field.start_date')
             ->hideOnForm();
         yield AssociationField::new('manager', 'crud.team_members.field.manager')
-            ->formatValue(fn (?User $manager): string => null === $manager ? '—' : sprintf('%s %s', $manager->firstName, $manager->lastName))
+            ->formatValue(fn (?User $manager): string => $this->formatAdminUserName($manager))
             ->onlyOnDetail();
 
         yield FormField::addTab('crud.team_members.tab.leave_balance')->hideOnIndex();

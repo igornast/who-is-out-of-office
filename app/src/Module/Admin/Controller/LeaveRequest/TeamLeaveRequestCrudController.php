@@ -136,11 +136,11 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
      * @param AdminContext<LeaveRequest>   $context
      * @param BatchActionDto<LeaveRequest> $batchActionDto
      */
+    #[AdminRoute('/batch-approve', name: 'batch_approve', options: ['methods' => ['POST']])]
     public function batchApprove(AdminContext $context, BatchActionDto $batchActionDto): Response
     {
         return $this->processBatchAction(
             $batchActionDto,
-            'ea-batch-action-batchApprove',
             LeaveRequestStatusEnum::Approved,
         );
     }
@@ -149,11 +149,11 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
      * @param AdminContext<LeaveRequest>   $context
      * @param BatchActionDto<LeaveRequest> $batchActionDto
      */
+    #[AdminRoute('/batch-reject', name: 'batch_reject', options: ['methods' => ['POST']])]
     public function batchReject(AdminContext $context, BatchActionDto $batchActionDto): Response
     {
         return $this->processBatchAction(
             $batchActionDto,
-            'ea-batch-action-batchReject',
             LeaveRequestStatusEnum::Rejected,
         );
     }
@@ -164,10 +164,10 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
             FormField::addColumn(8),
             FormField::addFieldset('crud.team_leave_requests.fieldset.request'),
             AssociationField::new('user', 'crud.team_leave_requests.field.employee')
-                ->formatValue(fn (User $user, LeaveRequest $request): string => sprintf('%s %s', $user->firstName, $user->lastName)),
+                ->formatValue(fn (User $user, LeaveRequest $request): string => $this->formatAdminUserName($user)),
 
             AssociationField::new('leaveType', 'crud.team_leave_requests.field.type')
-                ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $requestType->name),
+                ->formatValue(fn (LeaveRequestType $requestType, LeaveRequest $request): string => $this->escapeAdminText($requestType->name)),
 
             DateField::new('startDate', 'crud.team_leave_requests.field.from')
                 ->setColumns(6),
@@ -187,7 +187,7 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
                 ->setDisabled()
                 ->hideWhenCreating(),
             AssociationField::new('approvedBy', 'crud.team_leave_requests.field.approved_by')
-                ->formatValue(fn (?User $user): string => null === $user ? '—' : sprintf('%s %s', $user->firstName, $user->lastName))
+                ->formatValue(fn (?User $user): string => $this->formatAdminUserName($user))
                 ->setDisabled()
                 ->hideWhenCreating(),
             BooleanField::new('isAutoApproved', 'crud.team_leave_requests.field.auto_approved')
@@ -205,10 +205,17 @@ class TeamLeaveRequestCrudController extends AppAbstractCrudController
      */
     private function processBatchAction(
         BatchActionDto $batchActionDto,
-        string $csrfTokenId,
         LeaveRequestStatusEnum $newStatus,
     ): Response {
-        if (!$this->isCsrfTokenValid($csrfTokenId, $batchActionDto->getCsrfToken())) {
+        $csrfTokenId = sprintf(
+            'ea-batch-action-%s-%s',
+            $batchActionDto->getName(),
+            $batchActionDto->getEntityFqcn(),
+        );
+
+        if (LeaveRequest::class !== $batchActionDto->getEntityFqcn()
+            || !$this->isCsrfTokenValid($csrfTokenId, $batchActionDto->getCsrfToken())
+        ) {
             return $this->redirectToIndex();
         }
 

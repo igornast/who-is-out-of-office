@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Module\Admin\Controller;
 
-use App\Infrastructure\Doctrine\Entity\LeaveRequest;
-use App\Infrastructure\Doctrine\Entity\LeaveRequestType;
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\LeaveRequest\LeaveRequestCrudController;
+use App\Module\Admin\Controller\LeaveRequest\LeaveRequestTypeCrudController;
 use App\Module\Admin\Controller\LeaveRequest\TeamLeaveRequestCrudController;
 use App\Shared\Enum\LeaveRequestStatusEnum;
 use App\Shared\Enum\RoleEnum;
@@ -109,18 +108,15 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToLogout('menu.items.logout', 'fa fa-right-from-bracket');
         yield MenuItem::linkToDashboard('menu.items.dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('menu.items.absence_requests', 'fa fa-calendar-plus', LeaveRequest::class)
-            ->setController(LeaveRequestCrudController::class);
+        yield MenuItem::linkTo(LeaveRequestCrudController::class, 'menu.items.absence_requests', 'fa fa-calendar-plus');
         yield MenuItem::linkToRoute('menu.items.calendar', 'fa fa-calendar', 'app_calendar_view');
         yield MenuItem::linkToRoute('menu.items.balance_history', 'fa fa-receipt', 'app_balance_history');
 
         if ($this->isGranted(RoleEnum::Manager->value)) {
             yield MenuItem::section('menu.section.my_team')->setPermission(RoleEnum::Manager->value);
-            yield MenuItem::linkToCrud('menu.items.team_leave_requests', 'fa fa-calendar-check', LeaveRequest::class)
-                ->setController(TeamLeaveRequestCrudController::class)
+            yield MenuItem::linkTo(TeamLeaveRequestCrudController::class, 'menu.items.team_leave_requests', 'fa fa-calendar-check')
                 ->setPermission(RoleEnum::Manager->value);
-            yield MenuItem::linkToCrud('menu.items.team_members', 'fa fa-users', User::class)
-                ->setController(TeamMembersCrudController::class)
+            yield MenuItem::linkTo(TeamMembersCrudController::class, 'menu.items.team_members', 'fa fa-users')
                 ->setPermission(RoleEnum::Manager->value);
         }
 
@@ -128,12 +124,12 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToRoute('menu.organization_chart', 'bi bi-diagram-3', 'app_organization_chart');
 
         if ($this->isAdmin()) {
-            yield MenuItem::linkToCrud('menu.items.my_team', 'fa fa-user', User::class);
+            yield MenuItem::linkTo(UserCrudController::class, 'menu.items.my_team', 'fa fa-user');
 
             yield MenuItem::section('menu.section.settings')->setPermission(RoleEnum::Admin->value);
             yield MenuItem::linkToRoute('menu.items.app_settings', 'fa fa-gear', 'app_settings');
-            yield MenuItem::linkToCrud('menu.items.leave_request_types', 'fa fa-calendar-day', LeaveRequestType::class);
-            yield MenuItem::linkToRoute('menu.items.public_holidays', 'fa fa-calendar', 'app_dashboard_app_settings_holidays_index');
+            yield MenuItem::linkTo(LeaveRequestTypeCrudController::class, 'menu.items.leave_request_types', 'fa fa-calendar-day');
+            yield MenuItem::linkTo(HolidayCalendarCrudController::class, 'menu.items.public_holidays', 'fa fa-calendar');
 
         }
 
