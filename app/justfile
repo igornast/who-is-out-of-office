@@ -26,7 +26,7 @@ stan:
     {{ in_container }}composer test:stan
 
 # Testing commands
-test: db-reset-test
+test:
     {{ in_container }}composer test
 
 test-unit: db-reset-test
@@ -42,5 +42,8 @@ pest-file file:
     {{ in_container }}./vendor/bin/pest {{ file }}
 
 # Database
+schema-check:
+    {{ in_container }}composer test:schema
+
 db-reset-test:
     {{ in_container }}composer reset-test-db

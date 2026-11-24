@@ -61,8 +61,11 @@ docker exec app_ooo_php bash -c "php vendor/bin/pest tests/Functional/Path/To/Te
 ```
 
 ```bash
-# Run full test suite (CS, PHPStan, Architecture, Unit, Functional)
+# Run full test suite (CS, PHPStan, Architecture, Unit, schema check, Functional)
 docker exec app_ooo_php just test
+
+# Build test DB from migrations and validate against the mapping
+docker exec app_ooo_php just schema-check
 
 # Run only unit tests
 docker exec app_ooo_php just test-unit
@@ -85,6 +88,9 @@ docker exec app_ooo_php just stan
 # Reset test database
 docker exec app_ooo_php just db-reset-test
 ```
+
+If `just schema-check` or `just test` fails, it leaves `ooo_db_test` migrated without
+fixtures. Run `just db-reset-test` before using `pest-file`.
 
 ### Commands inside the container
 
@@ -860,6 +866,8 @@ The app runs live with existing data, so migrations must be backfill-safe. Key r
 - **Always add an explicit `DEFAULT`** on new `NOT NULL` columns (e.g. `TINYINT(1) NOT NULL DEFAULT 0`) rather than relying on MySQL's implicit defaults.
 - **Nullable new columns** (`DEFAULT NULL`) are always safe.
 - **New required env vars** introduced by a feature: document them in CLAUDE.md next to the feature, and ensure services fail loudly on missing config rather than silently using weak defaults.
+- `composer test:schema` (`just schema-check`, part of `test` and `test-ci`) builds the test DB from migrations and runs `doctrine:schema:validate`. A mapping change without a matching migration, or a migration that differs from the mapping, fails CI.
+- Hand-written migrations must not add `COMMENT '(DC2Type:…)'` (DBAL 4 writes none). Index names in a migration must match the mapping: name the index in the XML, or use the name Doctrine generates.
 
 ## Important Notes
 

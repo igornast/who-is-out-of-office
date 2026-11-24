@@ -43,6 +43,8 @@
         <indexes>
             <index name="idx_ledger_user_created" columns="user_id,created_at"/>
             <index name="idx_ledger_period" columns="leave_period_id"/>
+            <index name="fk_ledger_actor" columns="actor_user_id"/>
+            <index name="fk_ledger_leave_request" columns="leave_request_id"/>
         </indexes>
 
         <lifecycle-callbacks>
