@@ -274,6 +274,26 @@ on purpose.
 If the list includes `admin@whoisooo.app`, don't reactivate it; delete it as described in
 [Create the first admin account](#4-create-the-first-admin-account).
 
+### Schema check
+
+After `doctrine:migrations:migrate`, this should report `[OK]` twice:
+
+```bash
+docker compose -f docker-compose.prod.yml exec php bin/console doctrine:schema:validate
+```
+
+Older installs reported the database as out of sync because of leftover column comments,
+defaults and index names. Migration `Version20261124120000` fixes that. It changes table
+metadata only and leaves rows untouched. If the check still fails, open an issue with the
+output of `docker compose -f docker-compose.prod.yml exec php bin/console doctrine:schema:update --dump-sql`. Don't run
+`doctrine:schema:update --force` in production.
+
+If the migration fails with a lock wait timeout, a long-running query holds a lock on the table.
+Check `SHOW PROCESSLIST` in the database, then re-run the migration; re-running is safe.
+
+`doctrine:migrations:migrate --dry-run` and `--write-sql` output depends on the database it
+runs against, because the index renames are conditional.
+
 ### Leave balances added by mistake before this fix
 
 Older versions could add one year's allowance too many to a user's balance:
