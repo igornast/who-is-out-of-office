@@ -6,7 +6,7 @@
 ![PHP](https://img.shields.io/badge/PHP-8.5-blue)
 ![License](https://img.shields.io/github/license/igornast/who-is-out-of-office)
 
-Who's OOO is a self-hosted staff leave planner I built with Symfony 7.4 and PHP 8.5. It
+Who's OOO is a self-hosted staff leave planner I built with Symfony 8.1 and PHP 8.5. It
 handles leave requests, team calendars, public holidays and Slack notifications, and it runs on
 your own server.
 

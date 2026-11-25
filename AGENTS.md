@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This Symfony 7.4/PHP 8.5 application keeps all app code under `app/`. Domain code lives in `app/src/Module/` (`Admin`, `Feed`, `Holiday`, `LeaveRequest`, `Settings`, `User`). External integrations and persistence live in `app/src/Infrastructure/`, including Doctrine entities and XML mappings. Cross-cutting DTOs, enums, facades, and shared handlers live in `app/src/Shared/`. Tests are split into `app/tests/Unit`, `app/tests/Functional`, and `app/tests/Architecture`; fixtures and sample payloads are under `app/tests/_fixtures` and `app/tests/_sample-data`. Frontend assets live in `app/assets`; do not edit generated files in `app/public/assets`.
+This Symfony 8.1/PHP 8.5 application keeps all app code under `app/`. Domain code lives in `app/src/Module/` (`Admin`, `Feed`, `Holiday`, `LeaveRequest`, `Settings`, `User`). External integrations and persistence live in `app/src/Infrastructure/`, including Doctrine entities and XML mappings. Cross-cutting DTOs, enums, facades, and shared handlers live in `app/src/Shared/`. Tests are split into `app/tests/Unit`, `app/tests/Functional`, and `app/tests/Architecture`; fixtures and sample payloads are under `app/tests/_fixtures` and `app/tests/_sample-data`. Frontend assets live in `app/assets`; do not edit generated files in `app/public/assets`.
 
 ## Build, Test, and Development Commands
 
