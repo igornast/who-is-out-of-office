@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Shared\Facade;
 
 use App\Shared\DTO\Settings\AppSettingsDTO;
+use App\Shared\Exception\AppSettingsWriteException;
 
 interface AppSettingsFacadeInterface
 {
@@ -30,5 +31,8 @@ interface AppSettingsFacadeInterface
 
     public function getAllSettings(): AppSettingsDTO;
 
+    /**
+     * @throws AppSettingsWriteException
+     */
     public function updateAllSettings(AppSettingsDTO $settingsDTO): void;
 }

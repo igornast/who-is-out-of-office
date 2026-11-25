@@ -155,8 +155,15 @@ php bin/console slack:weekly_digest
 **Weekly digest scheduling:** day, time, and timezone are configurable in
 `App Settings → Weekly Digest Schedule` (`slack.weekly_digest_day` / `_time` / `_timezone`)
 and run by `App\\Infrastructure\\Slack\\Schedule\\WeeklyDigestScheduleProvider`
-(`#[AsSchedule('weekly_digest')]`) using `DynamicWeeklyDigestTrigger`, which reads settings
-every scheduler tick. Production must run:
+(`#[AsSchedule('weekly_digest')]`) using `DynamicWeeklyDigestTrigger`. Symfony's scheduler
+caches the next run date, so `WeeklyDigestScheduleReloadListener` re-reads the digest settings
+after every worker loop (`WorkerRunningEvent`) and, when they changed, rebuilds the schedule in
+the running worker. The trigger never returns a date before the last time the worker read the old
+settings (or now, after a read failure), so a change never sends a catch-up digest for slots before
+that. A new slot that already passed this week waits until next week. Settings are
+written atomically (temp file and rename) because the worker reads the same file. The settings
+directory must be writable by the PHP user; a single-file bind mount of `APP_SETTINGS_FILE` is
+not supported. Production must run:
 
 ```bash
 php bin/console messenger:consume scheduler_default scheduler_weekly_digest async

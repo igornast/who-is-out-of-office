@@ -67,7 +67,7 @@ Settings/
 
 ### Weekly Digest Schedule
 
-The three `slack.weekly_digest_*` settings drive **when** the Slack weekly digest is sent. They are read live (no cache) on every scheduler tick, so changing them in the admin UI takes effect on the next evaluation — no cache clear or worker restart required.
+The three `slack.weekly_digest_*` settings drive **when** the Slack weekly digest is sent. A running worker re-reads them after every loop, so a saved change applies to the next digest within a few seconds, without a cache clear or worker restart. A new slot that already passed this week waits until next week. If you move it later in a week where it already went out, it's sent again at the new time.
 
 - `weekly_digest_day` is the backed enum `App\Shared\Enum\WeeklyDigestDayEnum` (`MON`…`SUN`), rendered as a dropdown.
 - `weekly_digest_time` is stored as a 24-hour `HH:MM` string **without seconds** — the canonical format shared by the DTO's `Assert\Regex` (`AppSettingsDTO::WEEKLY_DIGEST_TIME_PATTERN`), the form field, and `SettingsFacade::weeklyDigestCronExpression()` (which does `explode(':', $time)`).
@@ -86,7 +86,7 @@ Weekly digest scheduling** in the root `CLAUDE.md` for how the Messenger schedul
 them. To verify the live value the server computes:
 
 ```bash
-php bin/console debug:scheduler weekly_digest   # shows the next run date derived from current settings
+php bin/console debug:scheduler weekly_digest   # next run date from the current settings, computed in a fresh process
 ```
 
 ## Backward Compatibility & Migration Defaults
@@ -95,7 +95,7 @@ The app runs live, and a deployed `APP_SETTINGS_FILE` may predate newer settings
 
 - **`AppSettingsDTO::fromArray()` defaults every key.** Missing keys resolve to a documented default via `getNestedValue($data, $key, $default)` rather than yielding `null` (which would fail the DTO's non-nullable constructor). Canonical defaults live as constants on the DTO: `DEFAULT_ANNUAL_ALLOWANCE`, `DEFAULT_WEEKLY_DIGEST_DAY`, `DEFAULT_WEEKLY_DIGEST_TIME`, `DEFAULT_WEEKLY_DIGEST_TIMEZONE`.
 - **The facade falls back on missing values too.** `weeklyDigestCronExpression()` and `weeklyDigestTimezone()` read path-by-path via `GetAppSettingsValueQueryHandler` (*not* through `fromArray()`), so they apply the same defaults when a key is absent (`null`) instead of throwing `InvalidAppSettingTypeException`. This mirrors the existing `skipWeekendHolidays()` / `isSlackStatusSyncEnabled()` null-guard pattern.
-- **The facade guards invalid stored values.** `weekly_digest_day` is coerced with `WeeklyDigestDayEnum::tryFrom()`, `weekly_digest_time` is re-checked against `WEEKLY_DIGEST_TIME_PATTERN`, and the timezone is validated against `timezone_identifiers_list()` — each falling back to its default. This keeps manual config drift (hand-edited YAML) from producing a malformed cron or a bad timezone reaching `CronExpression`. A genuine type mismatch (e.g. a non-string where a string is expected) still throws.
+- **The facade guards invalid stored values.** `weekly_digest_day` is coerced with `WeeklyDigestDayEnum::tryFrom()`, `weekly_digest_time` is re-checked against `WEEKLY_DIGEST_TIME_PATTERN`, and the timezone is validated against `timezone_identifiers_list()` — each falling back to its default. This keeps manual config drift (hand-edited YAML) from producing a malformed cron or a bad timezone reaching the digest trigger. A genuine type mismatch (e.g. a non-string where a string is expected) still throws.
 
 > **When adding a new setting, always pass a default to `getNestedValue()`** so an older `APP_SETTINGS_FILE` deserializes cleanly after deploy.
 
@@ -162,7 +162,7 @@ APP_SETTINGS_FILE='%kernel.project_dir%/src/Module/Settings/Config/app_setting.y
 
 This allows you to use different settings files for different environments (dev, staging, production)
 
-The Docker production stack (`docker-compose.prod.yml`) sets `APP_SETTINGS_FILE=/var/www/settings/app_setting.yaml` on a volume shared by `php` and the worker, so settings saved in the UI reach scheduled jobs and survive rebuilds. `docker/php/bin/seed-app-settings` copies the defaults from `Config/app_setting.yaml` onto the volume on first start and never overwrites it afterwards. See [`docs/production-deployment.md`](../../../../docs/production-deployment.md#application-settings).
+The Docker production stack (`docker-compose.prod.yml`) sets `APP_SETTINGS_FILE=/var/www/settings/app_setting.yaml` on a volume shared by `php` and the worker, so settings saved in the UI reach scheduled jobs and survive rebuilds. `docker/php/bin/seed-app-settings` copies the defaults from `Config/app_setting.yaml` onto the volume on first start and never overwrites it afterwards. The settings directory must be writable by the PHP user because saves use a temporary file and rename; a single-file bind mount of `APP_SETTINGS_FILE` is not supported. See [`docs/production-deployment.md`](../../../../docs/production-deployment.md#application-settings).
 
 
 ## Adding New Settings

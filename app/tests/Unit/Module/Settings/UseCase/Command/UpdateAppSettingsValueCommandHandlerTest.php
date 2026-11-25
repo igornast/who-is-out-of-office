@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 use App\Module\Settings\UseCase\Command\UpdateAppSettingsValueCommandHandler;
 use App\Shared\DTO\Settings\AppSettingsDTO;
+use App\Shared\Exception\AppSettingsWriteException;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Yaml\Yaml;
 
 beforeEach(function (): void {
     $this->tempFile = tempnam(sys_get_temp_dir(), 'app_settings_test_');
 
-    $this->handler = new UpdateAppSettingsValueCommandHandler(appSettingsFilename: $this->tempFile);
+    $this->handler = new UpdateAppSettingsValueCommandHandler(appSettingsFilename: $this->tempFile, filesystem: new Filesystem());
 });
 
 afterEach(function (): void {
@@ -76,4 +79,62 @@ it('overwrites existing settings file', function () {
         ->and($content['notification']['skip_weekend_holidays'])->toBeTrue()
         ->and($content['slack']['status_sync_enabled'])->toBeTrue()
         ->and($content['organization']['name'])->toBe('Acme Inc.');
+});
+
+it('wraps a settings write failure', function (): void {
+    $directory = sprintf('%s/app_settings_write_failure_%s', sys_get_temp_dir(), bin2hex(random_bytes(4)));
+    mkdir($directory);
+    $handler = new UpdateAppSettingsValueCommandHandler(appSettingsFilename: $directory, filesystem: new Filesystem());
+    $exception = null;
+
+    try {
+        $handler->handle(new AppSettingsDTO(
+            autoApprove: false,
+            autoApproveDelay: 0,
+            defaultAnnualAllowance: 20,
+            minNoticeDays: 0,
+            maxConsecutiveDays: 0,
+            skipWeekendHolidays: false,
+            slackStatusSyncEnabled: false,
+            organizationName: 'New',
+        ));
+    } catch (AppSettingsWriteException $caughtException) {
+        $exception = $caughtException;
+    } finally {
+        new Filesystem()->remove($directory);
+    }
+
+    expect($exception)->toBeInstanceOf(AppSettingsWriteException::class)
+        ->and($exception?->getPrevious())->toBeInstanceOf(IOException::class);
+});
+
+it('replaces the settings file through a rename and keeps its permissions', function (): void {
+    $dir = sprintf('%s/app_settings_atomic_%s', sys_get_temp_dir(), bin2hex(random_bytes(4)));
+    mkdir($dir);
+    $file = sprintf('%s/app_setting.yaml', $dir);
+    file_put_contents($file, "organization:\n    name: Old\n");
+    chmod($file, 0644);
+    $inodeBefore = fileinode($file);
+
+    try {
+        new UpdateAppSettingsValueCommandHandler(appSettingsFilename: $file, filesystem: new Filesystem())
+            ->handle(new AppSettingsDTO(
+                autoApprove: false,
+                autoApproveDelay: 0,
+                defaultAnnualAllowance: 20,
+                minNoticeDays: 0,
+                maxConsecutiveDays: 0,
+                skipWeekendHolidays: false,
+                slackStatusSyncEnabled: false,
+                organizationName: 'New',
+            ));
+        clearstatcache();
+
+        expect(fileinode($file))->not->toBe($inodeBefore)
+            ->and(fileperms($file) & 0777)->toBe(0644)
+            ->and(Yaml::parseFile($file)['organization']['name'])->toBe('New')
+            ->and(glob(sprintf('%s/*', $dir)))->toBe([$file]);
+    } finally {
+        new Filesystem()->remove($dir);
+    }
 });
