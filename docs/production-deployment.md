@@ -240,6 +240,11 @@ App Settings are stored in a YAML file on the `whoisooo-prod_settings` volume, a
 volume. In practice, this means a change saved in the UI reaches the scheduled jobs on their
 next run and survives `up --build`.
 
+A save writes a temporary file next to the settings file and renames it over the old one, so
+the PHP user needs write access to the settings directory, not just the file. That's also why a
+single-file bind mount for `APP_SETTINGS_FILE` won't work. A change to the weekly digest
+schedule takes effect in the running worker, no restart needed.
+
 On first start, the containers copy the defaults from the image onto the empty volume. After
 that, the file on the volume wins and later images never overwrite it.
 

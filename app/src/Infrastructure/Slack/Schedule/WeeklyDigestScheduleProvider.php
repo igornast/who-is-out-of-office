@@ -13,17 +13,26 @@ use Symfony\Component\Scheduler\ScheduleProviderInterface;
 #[AsSchedule('weekly_digest')]
 class WeeklyDigestScheduleProvider implements ScheduleProviderInterface
 {
+    private ?Schedule $schedule = null;
+
     public function __construct(private readonly DynamicWeeklyDigestTrigger $trigger)
     {
     }
 
     public function getSchedule(): Schedule
     {
-        return new Schedule()->add(
+        return $this->schedule ??= new Schedule()->add(
             RecurringMessage::trigger(
                 trigger: $this->trigger,
                 message: new RunCommandMessage('slack:weekly_digest'),
             ),
         );
+    }
+
+    public function reload(?\DateTimeImmutable $notBefore = null): void
+    {
+        $this->trigger->setNotBefore($notBefore);
+
+        $this->schedule?->setRestart(true);
     }
 }

@@ -175,8 +175,9 @@ public holidays), birthdays and work anniversaries. If there isn'thing to report
 short message saying so.
 
 Admins set the day, time and timezone under App Settings. The job runs on its own Symfony
-Scheduler schedule, `weekly_digest`, and picks up changes on the next scheduler tick without a
-restart. The Docker production stack consumes both scheduler transports in `worker`.
+Scheduler schedule, `weekly_digest`, and the running worker applies a saved change to the next
+digest within a few seconds, without a restart. The Docker production stack consumes both
+scheduler transports in `worker`.
 Without Docker, run:
 
 ```bash

@@ -12,6 +12,7 @@ use App\Shared\DTO\Settings\AppSettingsDTO;
 use App\Shared\Enum\AppSettingsEnum;
 use App\Shared\Enum\WeeklyDigestDayEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
+use App\Shared\Exception\AppSettingsWriteException;
 
 final class SettingsFacade implements AppSettingsFacadeInterface
 {
@@ -193,6 +194,9 @@ final class SettingsFacade implements AppSettingsFacadeInterface
         return $this->getAllAppSettingsQueryHandler->handle();
     }
 
+    /**
+     * @throws AppSettingsWriteException
+     */
     public function updateAllSettings(AppSettingsDTO $settingsDTO): void
     {
         $this->updateAppSettingsValueCommandHandler->handle($settingsDTO);

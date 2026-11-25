@@ -513,7 +513,7 @@ crud:
             slack: Slack Integration
             slack_desc: Configure Slack notifications and status auto-sync for users on leave.
             weekly_digest: Weekly Digest Schedule
-            weekly_digest_desc: Choose when the Slack weekly digest is sent. Changes apply on the next scheduler tick.
+            weekly_digest_desc: Choose when the Slack weekly digest is sent. A saved change applies to the next digest. A time that already passed this week takes effect next week.
             organization: Organization
             organization_desc: The organization name displayed in email communications and the footer of outbound emails.
         field:
@@ -549,6 +549,8 @@ crud:
             SUN: Sunday
         action:
             save: Save Changes
+        flash:
+            save_error: Could not save settings. Check that the settings directory is writable.
 
 settings:
     status:
