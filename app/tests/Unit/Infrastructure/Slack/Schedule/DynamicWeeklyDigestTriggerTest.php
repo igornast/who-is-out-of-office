@@ -11,6 +11,38 @@ it('identifies itself as the weekly_digest schedule', function (): void {
     expect((string) $trigger)->toBe('weekly_digest');
 });
 
+it('rejects a cron expression with an unsupported shape', function (): void {
+    $facade = mock(AppSettingsFacadeInterface::class);
+    $facade->allows('weeklyDigestCronExpression')->andReturn('0 9 * * *');
+    $facade->allows('weeklyDigestTimezone')->andReturn('UTC');
+    $trigger = new DynamicWeeklyDigestTrigger($facade);
+
+    expect(fn () => $trigger->getNextRunDate(new DateTimeImmutable('2026-06-17 09:00:00', new DateTimeZone('UTC'))))
+        ->toThrow(InvalidArgumentException::class, 'Unsupported weekly digest cron expression: 0 9 * * *');
+});
+
+it('rejects a cron expression with an out-of-range minute or hour', function (): void {
+    foreach (['60 9 * * MON', '0 24 * * MON'] as $expression) {
+        $facade = mock(AppSettingsFacadeInterface::class);
+        $facade->allows('weeklyDigestCronExpression')->andReturn($expression);
+        $facade->allows('weeklyDigestTimezone')->andReturn('UTC');
+        $trigger = new DynamicWeeklyDigestTrigger($facade);
+
+        expect(fn () => $trigger->getNextRunDate(new DateTimeImmutable('2026-06-17 09:00:00', new DateTimeZone('UTC'))))
+            ->toThrow(InvalidArgumentException::class, 'Unsupported weekly digest cron expression: '.$expression);
+    }
+});
+
+it('rejects a cron expression with an unknown day', function (): void {
+    $facade = mock(AppSettingsFacadeInterface::class);
+    $facade->allows('weeklyDigestCronExpression')->andReturn('0 9 * * FOO');
+    $facade->allows('weeklyDigestTimezone')->andReturn('UTC');
+    $trigger = new DynamicWeeklyDigestTrigger($facade);
+
+    expect(fn () => $trigger->getNextRunDate(new DateTimeImmutable('2026-06-17 09:00:00', new DateTimeZone('UTC'))))
+        ->toThrow(InvalidArgumentException::class, 'Unsupported weekly digest cron expression: 0 9 * * FOO');
+});
+
 it('never returns a run date before the reload floor', function (): void {
     $facade = mock(AppSettingsFacadeInterface::class);
     $facade->allows('weeklyDigestCronExpression')->andReturn('0 9 * * TUE');

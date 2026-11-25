@@ -37,20 +37,20 @@ class DynamicWeeklyDigestTrigger implements TriggerInterface
         $localDate = $from->setTimezone($configuredTimezone)->format('Y-m-d');
         $date = new \DateTimeImmutable($localDate.' 00:00:00', $utcTimezone);
 
-        for ($dayOffset = 0; $dayOffset <= 7; ++$dayOffset) {
-            $candidateDate = $date->modify(sprintf('+%d days', $dayOffset));
-            if ((int) $candidateDate->format('N') !== $dayOfWeek) {
-                continue;
-            }
+        $dayOffset = ($dayOfWeek - (int) $date->format('N') + 7) % 7;
+        $candidateDate = $date->modify(sprintf('+%d days', $dayOffset));
+        $candidate = $this->resolveLocalSlot($candidateDate->format('Y-m-d'), $hour, $minute, $configuredTimezone);
 
-            $candidate = $this->resolveLocalSlot($candidateDate->format('Y-m-d'), $hour, $minute, $configuredTimezone);
-
-            if ($candidate > $from) {
-                return $candidate;
-            }
+        if ($candidate > $from) {
+            return $candidate;
         }
 
-        return null;
+        return $this->resolveLocalSlot(
+            $candidateDate->modify('+7 days')->format('Y-m-d'),
+            $hour,
+            $minute,
+            $configuredTimezone,
+        );
     }
 
     private function resolveLocalSlot(string $localDate, int $hour, int $minute, \DateTimeZone $timezone): \DateTimeImmutable
@@ -82,22 +82,10 @@ class DynamicWeeklyDigestTrigger implements TriggerInterface
             return new \DateTimeImmutable('@'.$candidateTimestamp);
         }
 
-        for ($index = 1, $count = count($transitions); $index < $count; ++$index) {
-            $beforeOffset = $transitions[$index - 1]['offset'];
-            $afterOffset = $transitions[$index]['offset'];
-            if ($afterOffset <= $beforeOffset) {
-                continue;
-            }
+        $largestOffset = max(array_keys($offsets) ?: [PHP_INT_MIN]);
+        $beforeTransition = new \DateTimeImmutable('@'.($naiveTimestamp - (int) $largestOffset));
 
-            $transitionTimestamp = $transitions[$index]['ts'];
-            $gapStart = $transitionTimestamp + $beforeOffset;
-            $gapEnd = $transitionTimestamp + $afterOffset;
-            if ($naiveTimestamp >= $gapStart && $naiveTimestamp < $gapEnd) {
-                return new \DateTimeImmutable('@'.($naiveTimestamp - $beforeOffset));
-            }
-        }
-
-        throw new \RuntimeException(sprintf('Unable to resolve local slot %s in %s', $target, $timezone->getName()));
+        return new \DateTimeImmutable('@'.($naiveTimestamp - $timezone->getOffset($beforeTransition)));
     }
 
     /** @return array{0: int, 1: int, 2: int} */
