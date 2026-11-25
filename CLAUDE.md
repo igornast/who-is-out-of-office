@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is "Who's Out of Office" - an online staff leave planner built with **Symfony 7.4** and **PHP 8.5**. The application manages employee leave requests, public holidays, team calendars, and integrates with Slack for notifications. It follows a modular architecture with clean separation of concerns using Facades, DTOs, and Command/Query patterns.
+This is "Who's Out of Office" - an online staff leave planner built with **Symfony 8.1** and **PHP 8.5**. The application manages employee leave requests, public holidays, team calendars, and integrates with Slack for notifications. It follows a modular architecture with clean separation of concerns using Facades, DTOs, and Command/Query patterns.
 
 ### Application Structure
 
 - **Application code location**: All source code lives in the `/app` directory
 - **Application URL prefix**: The application is accessible via `/app` URLs (e.g., `http://localhost/app`)
-- **EasyAdmin Bundle**: The application uses **EasyAdmin Bundle** as its primary UI framework
+- **EasyAdmin Bundle 5**: The application uses **EasyAdmin Bundle 5** as its primary UI framework
   - EasyAdmin is used throughout the entire application (not just for admin areas)
   - It provides easier rendering, CRUD operations, and reusable components
   - Main dashboard route: `/app/dashboard`
@@ -860,7 +860,7 @@ When adding new fields to the User entity/DTO, you **must** also add explicit ma
 
 Raw SQL queries use `UserDTO::fromArray()`. When adding fields, handle cases where the column may not exist in older data or test fixtures that build arrays manually (use `isset()` check or provide defaults).
 
-### Doctrine Migrations on Live Data (MySQL 8)
+### Doctrine Migrations on Live Data (MySQL 8.4)
 
 The app runs live with existing data, so migrations must be backfill-safe. Key rules when adding columns to non-empty tables:
 

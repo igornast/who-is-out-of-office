@@ -3,7 +3,7 @@
 This guide covers running Who's OOO in production with `docker-compose.prod.yml`. That file
 builds the `prod` image target, mounts no source code, sets `APP_ENV=prod`, and starts one
 Messenger worker next to PHP-FPM, nginx and MySQL. The PHP container compiles the asset map and
-publishes bundle assets (EasyAdmin's CSS and JS) on every start, so there's no separate asset build step.
+publishes bundle assets (EasyAdmin 5's CSS and JS) on every start, so there's no separate asset build step.
 
 The stack serves plain HTTP on port 80. TLS is your reverse proxy's job (see
 [step 2](#2-put-a-tls-proxy-in-front)).
