@@ -22,7 +22,8 @@ it('configures data_class as UserProfileDTO with admin translation domain', func
     $resolved = $resolver->resolve();
 
     expect($resolved['data_class'])->toBe(UserProfileDTO::class)
-        ->and($resolved['translation_domain'])->toBe('admin');
+        ->and($resolved['translation_domain'])->toBe('admin')
+        ->and($resolved['post_max_size_message'])->toBe(UserProfileDTO::PROFILE_REQUEST_TOO_LARGE_MESSAGE);
 });
 
 it('adds all expected fields with correct types', function (): void {
@@ -98,6 +99,27 @@ it('contractStartedAt and absenceBalanceResetDay are disabled', function (): voi
 
     expect($fields['contractStartedAt']['disabled'])->toBeTrue()
         ->and($fields['absenceBalanceResetDay']['disabled'])->toBeTrue();
+});
+
+it('firstName and lastName turn a blank value into an empty string', function (): void {
+    $fields = [];
+
+    $builder = mock(FormBuilderInterface::class);
+    $builder->allows('add')->andReturnUsing(
+        function (string $child, string $type, array $options = []) use (&$fields, $builder) {
+            $fields[$child] = $options;
+
+            return $builder;
+        }
+    );
+
+    $formType = new UserProfileType();
+    $resolver = new OptionsResolver();
+    $formType->configureOptions($resolver);
+    $formType->buildForm($builder, $resolver->resolve());
+
+    expect($fields['firstName']['empty_data'])->toBe('')
+        ->and($fields['lastName']['empty_data'])->toBe('');
 });
 
 it('profileImageFile and removeProfileImage are not required', function (): void {

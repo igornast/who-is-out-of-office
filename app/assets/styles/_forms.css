@@ -319,6 +319,10 @@ body.ea .is-invalid:focus {
     color: var(--text-muted);
 }
 
+.profile-avatar-errors:not(:has(.invalid-feedback)) {
+    display: none;
+}
+
 .profile-avatar-file-input {
     position: absolute;
     width: 1px;

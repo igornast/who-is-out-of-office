@@ -80,6 +80,9 @@ lists them.
 The app doesn't terminate TLS. Put nginx, Caddy, Traefik or a cloud load balancer in front of
 it and let that proxy handle HTTPS. You probably run one already.
 
+The outer proxy must accept request bodies of at least 25 MB (nginx's default is 1 MB), or
+photo uploads fail with the proxy's 413 page.
+
 Once the proxy is in place, set `TRUSTED_PROXIES` in `app/.env.local` to the address the proxy
 connects from. Without it, Symfony ignores the `X-Forwarded-*` headers and treats every request
 as plain `http`. Session cookies then lose the `Secure` flag, and absolute URLs built during a
@@ -258,6 +261,11 @@ docker compose -f docker-compose.prod.yml exec php chown www-data:www-data /var/
 ```
 
 ## Upgrading an existing install
+
+Profile photos can now be up to 15 MB. The PHP limits ship in the image, so rebuild the images
+with `docker compose -f docker-compose.prod.yml up -d --build`. A plain restart keeps the old
+2M default. The profile page refuses photos over 15 MB in the browser. Uploads over 25 MB that
+skip that check (the admin user form, or browsers without JavaScript) still get nginx's 413 page.
 
 Deactivated users can't log in, and an active session ends on the user's next request after
 deactivation. The `is_active` column was added without a backfill, so on older installs some

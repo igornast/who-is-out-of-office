@@ -12,6 +12,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserProfileDTO
 {
     public const string REMOVE_IMAGE_FLAG = '1';
+    public const int PROFILE_IMAGE_MAX_SIZE_MB = 15;
+    public const int PROFILE_IMAGE_MAX_BYTES = self::PROFILE_IMAGE_MAX_SIZE_MB * 1_000_000;
+    public const array PROFILE_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    public const string PROFILE_IMAGE_TOO_LARGE_MESSAGE = 'user.profile_image.too_large';
+    public const string PROFILE_REQUEST_TOO_LARGE_MESSAGE = 'user.profile_image.request_too_large';
 
     /**
      * @param int[] $workingDays
@@ -31,7 +36,7 @@ class UserProfileDTO
         public \DateTimeImmutable $absenceBalanceResetDay = new \DateTimeImmutable('first day of January next year midnight'),
         public ?HolidayCalendar $holidayCalendar = null,
         public ?string $subdivisionCode = null,
-        #[Assert\Image(maxSize: '2M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'])]
+        #[Assert\Image(maxSize: self::PROFILE_IMAGE_MAX_SIZE_MB.'M', mimeTypes: self::PROFILE_IMAGE_MIME_TYPES, maxSizeMessage: self::PROFILE_IMAGE_TOO_LARGE_MESSAGE, uploadIniSizeErrorMessage: self::PROFILE_IMAGE_TOO_LARGE_MESSAGE)]
         public ?UploadedFile $profileImageFile = null,
     ) {
     }
