@@ -398,7 +398,7 @@ crud:
             is_email_notifications_enabled: Receive email notifications
             is_email_notifications_enabled_help: When enabled, you will receive email notifications for leave request updates.
             profile_image: Profile Image
-            profile_image_help: 'JPEG, PNG or WebP. Max 2 MB.'
+            profile_image_help: 'JPEG, PNG or WebP. Max %max_size% MB.'
             profile_image_change: 'Change photo'
             profile_image_remove: Remove
         action:

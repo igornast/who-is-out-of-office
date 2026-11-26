@@ -25,9 +25,11 @@ class UserProfileType extends AbstractType
     {
         $builder
             ->add('firstName', TextType::class, [
+                'empty_data' => '',
                 'label' => 'crud.user_profile.field.first_name',
             ])
             ->add('lastName', TextType::class, [
+                'empty_data' => '',
                 'label' => 'crud.user_profile.field.last_name',
             ])
             ->add('workingDays', ChoiceType::class, [
@@ -94,6 +96,7 @@ class UserProfileType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => UserProfileDTO::class,
+            'post_max_size_message' => UserProfileDTO::PROFILE_REQUEST_TOO_LARGE_MESSAGE,
             'translation_domain' => 'admin',
         ]);
     }

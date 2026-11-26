@@ -26,6 +26,8 @@ The project runs in Docker with five services:
 - **db**: MySQL 8.4 (port 3306)
 - **mailer**: MailPit (port 8025 web UI) — catches all outgoing emails in development
 
+The `docker/` directory is mounted read-only at `/var/docker` in the development `php` container for `UploadLimitsTest`. After pulling the compose change that adds this mount, recreate `php` with `docker compose up -d php` (this drops the development database) or `just test` fails.
+
 Start services:
 ```bash
 docker-compose up -d
@@ -286,6 +288,7 @@ The application uses Symfony events for cross-cutting concerns:
 - Team member relationships
 - User invitation system
 - Profile customization (working days, birthday, Slack integration)
+- The profile photo limit lives in `UserProfileDTO::PROFILE_IMAGE_MAX_SIZE_MB` and must change together with `php.prod.ini`, `php.local.ini`, `user.profile_image.too_large`, `user.profile_image.request_too_large`, `docker/nginx/tmpl.nginx.conf` and `docs/production-deployment.md`.
 - **Balance ledger**: every change to `user.currentLeaveBalance` goes through
   `UserFacadeInterface::recordBalanceChange(RecordBalanceChangeCommand)`, which takes a
   pessimistic write lock, resolves the user's open `leave_period`, writes an append-only

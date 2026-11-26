@@ -80,7 +80,7 @@ class UserProfileSettingsController extends AbstractController
         }
 
         return $this->render('@AppAdmin/user/profile_edit.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form,
             'profile_images_base_path' => $this->profileImagesBasePath,
             'calendar_subscription_url' => $this->icalSubscriptionUrlGenerator->generateForUser(UserDTO::fromEntity($user)),
             'slack_connected' => null !== $user->slackIntegration,

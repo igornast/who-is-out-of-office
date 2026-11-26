@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 beforeEach(function (): void {
     $this->em = mock(EntityManagerInterface::class);
@@ -86,6 +87,14 @@ beforeEach(function (): void {
     $container->allows('get')->with('form.factory')->andReturn($formFactory);
     $container->allows('get')->with('router')->andReturn($urlGenerator);
     $container->allows('get')->with('request_stack')->andReturn($requestStack);
+    $this->renderedContext = [];
+    $this->twig = mock(Environment::class);
+    $this->twig->allows('render')->andReturnUsing(function (string $name, array $context): string {
+        $this->renderedContext = $context;
+
+        return '';
+    });
+    $container->allows('get')->with('twig')->andReturn($this->twig);
 
     $this->controller = new UserProfileSettingsController(
         profileImagesBasePath: 'uploads/profile_images',
@@ -134,4 +143,16 @@ it('maps subdivisionCode from DTO to entity on form submit', function (): void {
     ($this->controller)(Request::create('/app/user/profile', 'POST'));
 
     expect($this->user->subdivisionCode)->toBe('DE-BY');
+});
+
+it('answers 422 when the submitted form is invalid', function (): void {
+    $this->form->allows('handleRequest')->andReturnSelf();
+    $this->form->allows('isSubmitted')->andReturn(true);
+    $this->form->allows('isValid')->andReturn(false);
+    $this->em->expects('flush')->never();
+
+    $response = ($this->controller)(Request::create('/app/user/profile', 'POST'));
+
+    expect($response->getStatusCode())->toBe(422)
+        ->and($this->renderedContext['form'])->toBeInstanceOf(FormView::class);
 });

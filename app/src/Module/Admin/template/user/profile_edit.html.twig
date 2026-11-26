@@ -57,9 +57,10 @@
                             </button>
                         </div>
                         <div class="profile-avatar-hint">
-                            {{ 'crud.user_profile.field.profile_image_help'|trans(domain='admin') }}
+                            {{ 'crud.user_profile.field.profile_image_help'|trans({'%max_size%': constant('App\\Module\\Admin\\DTO\\UserProfileDTO::PROFILE_IMAGE_MAX_SIZE_MB')}, 'admin') }}
                         </div>
-                        {{ form_widget(form.profileImageFile, {'attr': {'class': 'profile-avatar-file-input', 'accept': 'image/jpeg,image/png,image/webp'}}) }}
+                        <div class="profile-avatar-errors" id="profile-image-errors" aria-live="polite">{{ form_errors(form.profileImageFile) }}</div>
+                        {{ form_widget(form.profileImageFile, {'attr': {'class': 'profile-avatar-file-input', 'accept': constant('App\\Module\\Admin\\DTO\\UserProfileDTO::PROFILE_IMAGE_MIME_TYPES')|join(','), 'data-max-bytes': constant('App\\Module\\Admin\\DTO\\UserProfileDTO::PROFILE_IMAGE_MAX_BYTES'), 'data-too-large-message': constant('App\\Module\\Admin\\DTO\\UserProfileDTO::PROFILE_IMAGE_TOO_LARGE_MESSAGE')|trans({}, 'validators')}}) }}
                         {{ form_widget(form.removeProfileImage) }}
                     </div>
 
@@ -382,6 +383,21 @@
             var removeFlag = document.getElementById('{{ form.removeProfileImage.vars.id }}');
             var changeBtn = document.getElementById('profile-image-change-btn');
             var avatarZone = document.getElementById('profile-avatar-zone');
+            var originalPreviewSrc = imagePreview ? imagePreview.src : '';
+            var originalPreviewDisplay = imagePreview ? imagePreview.style.display : '';
+            var originalPlaceholderDisplay = imagePlaceholder ? imagePlaceholder.style.display : '';
+            var originalRemoveButtonDisplay = removeBtn ? removeBtn.style.display : '';
+            var originalRemoveFlagValue = removeFlag ? removeFlag.value : '';
+
+            function restoreOriginalPreview() {
+                if (imagePreview) {
+                    imagePreview.src = originalPreviewSrc;
+                    imagePreview.style.display = originalPreviewDisplay;
+                }
+                if (imagePlaceholder) imagePlaceholder.style.display = originalPlaceholderDisplay;
+                if (removeBtn) removeBtn.style.display = originalRemoveButtonDisplay;
+                if (removeFlag) removeFlag.value = originalRemoveFlagValue;
+            }
 
             if (changeBtn && imageInput) {
                 changeBtn.addEventListener('click', function() { imageInput.click(); });
@@ -392,8 +408,21 @@
 
             if (imageInput) {
                 imageInput.addEventListener('change', function() {
+                    var profileImageErrors = document.getElementById('profile-image-errors');
+                    if (profileImageErrors) profileImageErrors.innerHTML = '';
+
                     var file = this.files[0];
                     if (!file) return;
+
+                    if (file.size > Number(this.dataset.maxBytes)) {
+                        var error = document.createElement('div');
+                        error.className = 'invalid-feedback d-block';
+                        error.textContent = this.dataset.tooLargeMessage;
+                        if (profileImageErrors) profileImageErrors.appendChild(error);
+                        this.value = '';
+                        restoreOriginalPreview();
+                        return;
+                    }
 
                     var reader = new FileReader();
                     reader.onload = function(e) {
@@ -409,6 +438,8 @@
 
             if (removeBtn && removeFlag) {
                 removeBtn.addEventListener('click', function() {
+                    var profileImageErrors = document.getElementById('profile-image-errors');
+                    if (profileImageErrors) profileImageErrors.innerHTML = '';
                     removeFlag.value = '{{ constant('App\\Module\\Admin\\DTO\\UserProfileDTO::REMOVE_IMAGE_FLAG') }}';
                     imagePreview.style.display = 'none';
                     removeBtn.style.display = 'none';

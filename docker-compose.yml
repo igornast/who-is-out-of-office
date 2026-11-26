@@ -27,6 +27,7 @@ services:
             - ./app:/var/www
             - ./docker/php/conf/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
             - ./docker/php/conf/php.local.ini:/usr/local/etc/php/conf.d/docker-php-local.ini
+            - ./docker:/var/docker:ro
 
     # One process for every transport, polled in the order given, so the schedulers are checked between async messages.
     # No time limit: schedules keep no state, so a restart can skip a job that fell due while the worker was down.

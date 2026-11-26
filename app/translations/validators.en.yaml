@@ -1,4 +1,7 @@
 user:
+    profile_image:
+        too_large: 'This photo is too large. The maximum size is 15 MB.'
+        request_too_large: 'Nothing was saved because the photo is larger than 15 MB. Choose a smaller photo and make your changes again.'
     adjust_balance:
         validation:
             non_zero: 'An adjustment must change the balance.'

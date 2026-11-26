@@ -6,6 +6,7 @@ namespace App\Module\Admin\Controller;
 
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Constants\UserSettings;
+use App\Module\Admin\DTO\UserProfileDTO;
 use App\Shared\Enum\RoleEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
@@ -30,6 +31,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @extends AppAbstractCrudController<User>
@@ -137,6 +139,12 @@ class UserCrudController extends AppAbstractCrudController
             ->setBasePath('uploads/profile_images')
             ->setUploadDir('public/uploads/profile_images')
             ->setUploadedFileNamePattern('[slug]-[uuid].[extension]')
+            ->setFileConstraints(new Assert\Image(
+                maxSize: UserProfileDTO::PROFILE_IMAGE_MAX_SIZE_MB.'M',
+                mimeTypes: UserProfileDTO::PROFILE_IMAGE_MIME_TYPES,
+                maxSizeMessage: UserProfileDTO::PROFILE_IMAGE_TOO_LARGE_MESSAGE,
+                uploadIniSizeErrorMessage: UserProfileDTO::PROFILE_IMAGE_TOO_LARGE_MESSAGE,
+            ))
             ->onlyWhenUpdating();
 
         yield FormField::addColumn(9);

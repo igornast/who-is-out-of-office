@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Infrastructure\Doctrine\Entity\User;
 use App\Module\Admin\Controller\UserCrudController;
+use App\Module\Admin\DTO\UserProfileDTO;
 use App\Shared\Enum\RoleEnum;
 use App\Shared\Facade\AppSettingsFacadeInterface;
 use App\Shared\Facade\UserFacadeInterface;
@@ -11,9 +12,12 @@ use App\Shared\Service\RoleTranslator;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 beforeEach(function (): void {
     $this->roleTranslator = mock(RoleTranslator::class);
@@ -22,6 +26,36 @@ beforeEach(function (): void {
     $this->csrfTokenManager = mock(CsrfTokenManagerInterface::class);
     $this->appSettingsFacade = mock(AppSettingsFacadeInterface::class);
     $this->userFacade = mock(UserFacadeInterface::class);
+});
+
+it('limits admin profile photo uploads like the profile page', function (): void {
+    $controller = new UserCrudController(
+        roleTranslator: $this->roleTranslator,
+        passwordHasher: $this->passwordHasher,
+        urlGenerator: $this->urlGenerator,
+        csrfTokenManager: $this->csrfTokenManager,
+        appSettingsFacade: $this->appSettingsFacade,
+        userFacade: $this->userFacade,
+    );
+
+    $uploadField = null;
+    foreach ($controller->configureFields(Crud::PAGE_EDIT) as $field) {
+        if ($field instanceof ImageField && null !== $field->getAsDto()->getCustomOption(ImageField::OPTION_UPLOAD_DIR)) {
+            $uploadField = $field;
+            break;
+        }
+    }
+
+    expect($uploadField)->toBeInstanceOf(ImageField::class);
+
+    $constraints = $uploadField->getAsDto()->getCustomOption(ImageField::OPTION_FILE_CONSTRAINTS);
+    $imageConstraint = array_find($constraints, fn (mixed $constraint): bool => $constraint instanceof Assert\Image);
+
+    expect($imageConstraint)->toBeInstanceOf(Assert\Image::class)
+        ->and($imageConstraint->maxSize)->toBe(UserProfileDTO::PROFILE_IMAGE_MAX_BYTES)
+        ->and($imageConstraint->mimeTypes)->toBe(UserProfileDTO::PROFILE_IMAGE_MIME_TYPES)
+        ->and($imageConstraint->maxSizeMessage)->toBe(UserProfileDTO::PROFILE_IMAGE_TOO_LARGE_MESSAGE)
+        ->and($imageConstraint->uploadIniSizeErrorMessage)->toBe(UserProfileDTO::PROFILE_IMAGE_TOO_LARGE_MESSAGE);
 });
 
 it('uses defaultAnnualAllowance from settings when creating a new user', function (): void {

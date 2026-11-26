@@ -66,6 +66,8 @@ RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-progress 
 
 RUN chmod -R a+rX /var/www
 
+COPY docker/php/conf/php.prod.ini /usr/local/etc/php/conf.d/zz-app.ini
+
 CMD ["start-fpm"]
 
 FROM app AS local
